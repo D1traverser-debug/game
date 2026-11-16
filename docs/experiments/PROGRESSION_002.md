@@ -47,3 +47,13 @@ Main remains at c7980a12e582cf3c265b8bbdaf1e7f16eecfcd6b as the previous playabl
 
 ## Next goal-causal action
 Build the versioned spell quest/event contract and all three new spells' exact augmentations; run negative mutations against unlock and slot gates. In parallel, continue the 3D WebGL renderer quality/performance work. Do not substitute tests/docs for the complete playable game.
+
+
+## Final refinement — Debug API removed from player build
+- Updated development/index.html at implementation commit 29492caf5b7db433704f9cfa7543b0e3126b2e6e.
+- Exact artifact size: 119417 bytes.
+- SHA-256: e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190.
+- Removed the query-string-gated window.__QA tool that previously allowed synthetic time jumps, forced lethal boss damage, and state mutation.
+- Retained test-only instrumentation in tests/progression_regression.py, inserted into test HTML bytes at runtime. Nothing test-specific needs to ship in the user HTML.
+- Re-ran node --check PASS, 17/17 targeted Chromium Playwright checks PASS, and desktop/mobile menu, start, pause, joystick smoke PASS, with no captured JS errors.
+- This does not turn mocked persistence or synthetic progression tests into real-player or file:// acceptance.
