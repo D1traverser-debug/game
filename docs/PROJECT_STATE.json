@@ -2,9 +2,9 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "TRIAL_004_TEXTURE_ADAPTIVE_3D_COMPONENT_REGRESSION",
+  "checkpoint": "2_5D_CANDIDATE_VALIDATED_LOCALLY_NOT_SYNCED",
   "status": "NOT_READY",
-  "updated_at": "2026-11-16",
+  "updated_at": "2026-11-17",
   "scope": {
     "hero": "Reginald",
     "map": "Verdant Meadow",
@@ -50,7 +50,10 @@
     "Reginald-only spell trial UI and permanent source-quest grant pipeline integrated with the game",
     "11/11 targeted solo trial/quest browser component checks passed, including actual Falling Stars cast event and duplicate-grant rejection",
     "All previous 17/17 browser progression component checks remain green on local integrated source",
-    "All 3 bosses and 9 objective constructors/update loops passed synthetic local browser component checks on latest source"
+    "All 3 bosses and 9 objective constructors/update loops passed synthetic local browser component checks on latest source",
+    "2026-11-17 local 2.5D art-forward candidate with embedded sprite atlas validated in Playwright desktop 1440x900 and mobile 390x844; both launch, HUD, pause/resume pass with zero page/console errors and zero external requests",
+    "2.5D candidate uses embedded sprite atlas and procedural terrain; no external runtime asset dependency",
+    "2.5D candidate does not display NaN in normal 3-second start smoke or 15-second movement/kill smoke"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -79,9 +82,13 @@
     "Complete human-played 19-minute run and naturally defeated boss NOT_TESTED",
     "Unverified original boss mechanics/element pairs and unavailable spell quest trackers remain open",
     "One-hero trial is a usability adaptation, not an original mechanic; remaining spell-specific quests still need real event tracking",
-    "Current textured software rendering often falls below 30 FPS; adaptive rendering lowered resolution, hardware GPU acceptance remains NOT_TESTED"
+    "Current textured software rendering often falls below 30 FPS; adaptive rendering lowered resolution, hardware GPU acceptance remains NOT_TESTED",
+    "2.5D candidate HTML SHA de29ddd... is a conversation-local artifact and has NOT been committed to GitHub; repository index.html remains older 3D candidate",
+    "3D renderer capability check returns unavailable in current Chromium test sandbox; 2.5D is the validated primary renderer, 3D mode is disabled when WebGL2 is unavailable",
+    "15-second normal gameplay smoke recorded 18 kills but 0 XP collected; orbs appeared on the map. XP acquisition and magnet/pickup pacing need focused gameplay investigation",
+    "2.5D candidate still needs real 19-minute full-run and natural boss win, save/reload, real-device performance, full spell/infusion/boss/objective fidelity and owner playtest"
   ],
-  "next_action": "Complete remaining source-faithful spell unlock events, verified boss patterns and objective interactions; upgrade 3D character/environment/art/audio quality; independently test a normal full-run boss kill, real local-file persistence and hardware performance before release.",
+  "next_action": "Promote the 2.5D art direction as the primary target; investigate XP orb collection/pickup pacing from normal play; add source-faithful enemy/spell/infusion and objective/boss behavior; sync the exact candidate source into GitHub; complete real full-run, persistence, hardware performance and player acceptance.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -97,5 +104,15 @@
     "browser_component": "PASS",
     "covered_product_artifact_sha256": "0c8d9de43c8fe30f3cad8bd47d657056e1d84bf4a54869229b585b944c281a6a",
     "meaning": "Exact artifact integrity, repo governance controls, 17 progression tests, 3-boss/9-objective synthetic component suite and 11 solo trial/quest component checks. NOT a full-run/player acceptance."
+  },
+  "latest_local_candidate": {
+    "artifact": "咒语旅团-单人网页版-2.5D验收候选.html",
+    "bytes": 718627,
+    "sha256": "de29ddd55575f1fe78c9b525d41709c2d619d41694cac4eb679cd0dd5f41d48f",
+    "source_base": "conversation-local 3D single-player artifact with embedded 4x4 sprite atlas",
+    "repository_sync": "NOT_SYNCED_TO_GITHUB",
+    "scope": "Reginald only / Verdant Meadows only / single-player / offline single HTML",
+    "tested": "Playwright in-memory desktop and mobile smoke; start, 2.5D render, HUD, no NaN text, pause/resume, no JS/console errors, no external requests",
+    "not_tested": "real file:// persistence, full 19-minute completion, natural boss kill, real device performance, owner acceptance"
   }
 }
