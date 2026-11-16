@@ -28,6 +28,14 @@
 - Do not copy original game source, extracted game assets, music, sound recordings, or animations.
 - Fan project is unofficial and must not imply endorsement.
 
-## D-006 — Architecture not yet frozen (OPEN)
-- Canvas 2D, WebGL/Three.js, and hybrid options require a comparative experiment against fidelity, performance, single-file packaging, asset cost, and mobile support.
-- Do not prematurely rewrite the whole game before the comparison.
+## D-006 — Primary renderer is art-forward 2.5D (ACCEPTED)
+- The final product may use a different rendering technique from the original if the complete player experience is equivalent.
+- Use Canvas 2D 2.5D with original sprite art, a coherent tile-cached environment, readable spell VFX and depth-sorted actors as the primary path.
+- Keep WebGL2 3D as an optional experiment only where actually supported; failure to initialize must fall back to 2.5D without breaking play.
+- Rationale: 2.5D now uses an embedded atlas and 24 cached static scene tiles; it is more portable and visually coherent than the current low-poly software-rendered 3D path. This decision does NOT waive the 60 FPS, art, animation or owner-acceptance gates.
+
+## D-007 — Reginald-only spell eligibility (ACCEPTED)
+- The Reginald product catalogue is 18 spells: Astral Orbs; Loaded Dice, Tiny Tremors and Wicked Buzzsaw (official 1.2 starters); plus the 14 general spell-quest unlocks.
+- Other wizard Ascension signature spells are excluded from Reginald's research, temporary trials, persistent unlocks and level-up offer pool.
+- The trial slot is a single-player adaptation for otherwise impossible unlock prerequisites, not an original-game feature; the underlying quest conditions remain source-derived and must be labeled as adaptation where needed.
+- Evidence: official 1.2 patch notes, Reginald and Spells wiki pages, and Ascension signature discussion. Sources are listed in MECHANIC_REFERENCE_MATRIX.md.
