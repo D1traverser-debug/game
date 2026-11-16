@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "SOURCE_MATRIX_EXPANDED_AND_WEBGL_SLICE_RECORDED",
+  "checkpoint": "PROGRESSION_002_REGRESSION_PASS_NOT_READY",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -27,7 +27,10 @@
     "Previous QA evidence reclassified",
     "Exact latest 116721-byte HTML source read back from Library and committed to main",
     "Source-grounded audit confirmed unlock overwrite, random spell acquisition, missing 1.2 spells, synthetic QA oracle and 2D visual mismatch",
-    "Raw WebGL2 3D vertical slice runs in Chromium 144 under Xvfb/SwiftShader with zero JS/console/WebGL errors and zero external requests"
+    "Raw WebGL2 3D vertical slice runs in Chromium 144 under Xvfb/SwiftShader with zero JS/console/WebGL errors and zero external requests",
+    "17/17 Playwright component progression checks passed using temporarily injected probes and mocked storage",
+    "Web UI smoke passed for desktop/mobile menu, start, pause, HUD and joystick",
+    "Committed actual progression code fixes and new spell scaffolds to development; main preserved"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -38,8 +41,6 @@
     "Spell/enemy/objective/boss fidelity incomplete",
     "Visual/audio quality and balance not independently accepted",
     "Human owner playtest not performed",
-    "All spell unlocks are overwritten at runtime; quest-based unlock model is not implemented",
-    "Spell slots are offered randomly instead of source-derived level milestones",
     "Three 1.2.0 spells and their augmentations are missing",
     "Current QA oracle is nondeterministic and includes forced state mutation",
     "WebGL 3D slice is a rough prototype, not accepted visual quality",
@@ -47,10 +48,15 @@
     "Renderer engine choice (raw WebGL2 vs bundled Three.js) remains open",
     "Current boss implementation is Sol'phish-only; Krog'wa and Mul'gath are missing",
     "Objective variants introduced in 1.1 and full solo objective catalogue are not yet verified",
-    "Reginald-only persistent meta/quest subset is not yet implemented"
+    "Reginald-only persistent meta/quest subset is not yet implemented",
+    "Individual spell-specific quest event trackers remain unimplemented",
+    "Second spell-slot level is a provisional research assumption, not a verified source fact",
+    "Loaded Dice, Tiny Tremors and Wicked Buzzsaw initial attacks exist but original augmentations/visuals not accepted"
   ],
-  "next_action": "Continue the 3D renderer experiment with culling/batching and compare raw WebGL2 versus bundled Three.js; in parallel define the source-versioned spell, quest, infusion, objective and boss content contracts.",
+  "next_action": "Implement and test source-derived spell quest events, current-version three-spell augmentations, and continue 3D renderer integration without sacrificing single-file delivery.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
-  "last_main_baseline_commit": "c7980a12e582cf3c265b8bbdaf1e7f16eecfcd6b"
+  "last_main_baseline_commit": "c7980a12e582cf3c265b8bbdaf1e7f16eecfcd6b",
+  "last_development_product_commit": "656881540ec26c5d60a580baa2ac42ac21128595",
+  "development_candidate_sha256": "a4fe8215c491d2139f8345a8f331482cf9d399a9a5d59742b348a08d32f85095"
 }
