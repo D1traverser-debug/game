@@ -30,3 +30,8 @@
 | GAME-022 | P0 | Corrected unlock/slot progression still lacks the real individual quest-event trackers | PROGRESSION-002: old blanket unlock removed; 14 source quests only documented | OPEN | Add event-sourced achievements with positive/negative event sequence tests |
 | GAME-023 | P1 | Spell-slot two threshold is a provisional level-2 assumption | No authoritative source version pin for slot two | OPEN | Verify original, then update contract and rerun boundary tests |
 | GAME-024 | P0 | Three new 1.2 spells lack individual augmentations and full audiovisual fidelity | PROGRESSION-002 adds only distinct initial attack behavior | OPEN | Research and implement all 12 source augmentations and spell identities |
+
+| GAME-022 | P0 | No full player-driven 19-minute normal-combat win test | Synthetic boss/objective tests are the only acceptance | OPEN | Build independent real-play acceptance loop |
+| GAME-023 | P1 | Spell-specific quests for imp/sprout/blades/talon and others are not event-complete | TRIAL-004 implements only a source-derived subset | OPEN | Complete all solo-applicable quest event trackers |
+| GAME-024 | P0 | Textured 3D + adaptive scale still misses the FPS target in software tests | TRIAL-004 SwiftShader ~15-25 FPS observed | OPEN | Profile rendering, reduce expensive draw calls, test real GPU |
+| GAME-025 | P0 | Complete 3D art/audio quality is not comparable to original title yet | Current low-poly screenshot and absence of production audio/character animation | OPEN | Produce original assets, VFX, SFX and review under peak combat |
