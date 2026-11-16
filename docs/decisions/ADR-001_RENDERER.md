@@ -51,3 +51,15 @@ If any P0 criterion fails, profile the cause and compare a targeted WebGL implem
 
 ## 5. Rollback
 Keep the current 2D baseline on main. All renderer experiments remain on development in a separate prototype path until the vertical slice passes. No destructive replacement of the baseline.
+
+
+## 6. Experiment result — WEBGL-SLICE-001 (2026-11-16)
+A raw WebGL2 + DOM HUD proof of concept now exists at experiments/webgl-slice.html. It demonstrates a self-contained 3D scene, instanced geometry, low-poly Reginald/enemy forms, a following camera, a homing projectile, and a Gnasher burrow/leap code path. Chromium 144 under Xvfb/SwiftShader reported WebGL2 available, zero page/console errors, zero external requests, and zero WebGL errors. A 200-enemy synthetic scene reported approximately 20 FPS.
+
+Interpretation:
+- Confirms technical feasibility of a self-contained WebGL2 world and DOM UI.
+- Does not establish final visual fidelity or acceptable performance.
+- The 20 FPS result is from software rendering, not a hardware GPU; hardware performance remains NOT_TESTED.
+- The current prototype is visually rudimentary and is not a player-ready game.
+
+Architecture decision is narrowed to WebGL 3D world + DOM UI. The engine choice remains OPEN: compare raw WebGL2 with a bundled Three.js build on the same scene and test environment before committing to one.
