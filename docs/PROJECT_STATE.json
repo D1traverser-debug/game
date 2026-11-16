@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "2_5D_ATLAS_SCOPE_AND_STATIC_CACHE_008",
+  "checkpoint": "OBJECTIVE_COLLECTION_AND_NATURAL_RUN_009",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -65,7 +65,13 @@
     "Two embedded JavaScript blocks pass node --check; production artifact contains one v2enemy definition, no legacy v2buildSprite and no injected QA probe",
     "15-second normal movement smoke produced 12 kills, collected XP, reached level 2 and opened a real upgrade selection with 100/100 HP and no runtime errors",
     "Synthetic 197-active-enemy stress sample after static caching measured approximately 48.7 FPS desktop at 1440x900 and 60 FPS mobile viewport at 390x844; desktop remains below 60 FPS target and real hardware is not tested",
-    "Added 90-second non-cheating normal-play browser smoke: real update loop, movement steering, actual XP pickup and production upgrade selection; 83 kills, level 8, 100/100 HP, 8 real upgrade choices, no runtime/console errors and no external requests"
+    "Added 90-second non-cheating normal-play browser smoke: real update loop, movement steering, actual XP pickup and production upgrade selection; 83 kills, level 8, 100/100 HP, 8 real upgrade choices, no runtime/console errors and no external requests",
+    "Source audit of full mission pilot found missing production collection handlers for normal/scared fungi, Soul Sludge patches and standard spell cores; heavy-core pickup/delivery path was already distinct",
+    "Production updateObjective now collects normal/scared fungi on contact, preserves explosive-fungi proximity detonation, collects Soul Sludge patches and standard cores on contact, and preserves heavy-core carry/delivery",
+    "New Playwright objective_collection_regression.py passes 9/9 checks for normal/scared/explosive fungi, normal/dark sludge, normal/heavy cores, no runtime errors and offline operation",
+    "Objective collection test is synthetic component coverage only; it does not count as full player-run acceptance",
+    "Natural-run trace exposed survival failure at 154.3 in-game seconds during a Seal the Rift objective: HP 10.7/100, damage taken 89.3, level 9, 135 kills; no JS errors or external requests",
+    "Full mission pilot now considers real health and magnet orb pickups as player actions; the next CI run will determine whether the rift survival failure is resolved"
   ],
   "failed_or_open": [
     "Real unassisted full-run completion not tested",
@@ -90,7 +96,6 @@
     "Unverified original boss mechanics/element pairs and unavailable spell quest trackers remain open",
     "One-hero trial is a usability adaptation, not an original mechanic; remaining spell-specific quests still need real event tracking",
     "Current textured software rendering often falls below 30 FPS; adaptive rendering lowered resolution, hardware GPU acceptance remains NOT_TESTED",
-    "2.5D candidate HTML SHA de29ddd... is a conversation-local artifact and has NOT been committed to GitHub; repository index.html remains older 3D candidate",
     "3D renderer capability check returns unavailable in current Chromium test sandbox; 2.5D is the validated primary renderer, 3D mode is disabled when WebGL2 is unavailable",
     "2.5D candidate still needs real 19-minute full-run and natural boss win, save/reload, real-device performance, full spell/infusion/boss/objective fidelity and owner playtest",
     "2.5D synthetic stress at 197 active enemies measured ~48.7 FPS desktop / ~60 FPS mobile viewport; desktop target is 60 FPS, p95 frame time was 33.4 ms in the recorded desktop run; repeat on real hardware and tune further",
@@ -108,15 +113,17 @@
     "WebGL2 3D path remains experimental and is unavailable in the current software Chromium environment; 2.5D is the primary renderer",
     "Progression CI assertion lagged behind save schema v3; updated to assert v3, preserving migration behavior and other regression checks",
     "Reginald spell-scope regression probe used the same literal backslash-n injection defect; corrected test harness to insert a real newline",
-    "New spell augmentations for Loaded Dice, Tiny Tremors and Wicked Buzzsaw have independent mechanics, but their exact names/effects are not listed in official 1.2 patch notes; they are original adaptations and must remain explicitly distinguished from source-confirmed content"
+    "New spell augmentations for Loaded Dice, Tiny Tremors and Wicked Buzzsaw have independent mechanics, but their exact names/effects are not listed in official 1.2 patch notes; they are original adaptations and must remain explicitly distinguished from source-confirmed content",
+    "Full natural-run pilot still died at 154.3 seconds before the 19-minute boss window during a Rift objective; health pickup routing was added to the test pilot, but real-player balance and survival remain unverified",
+    "Character upgrade pool still does not yet reproduce the source game's broad global stat choices at each level-up; verify source-backed upgrade offer distribution and implementation"
   ],
-  "next_action": "Continue from the source-pinned Reginald spell/quest/augmentation audit. Implement and verify missing 1.2 and legacy augmentation behaviors, then test objective variants and all three bosses in natural play. Run a complete 19-minute mission with a natural boss kill, real save/reload on an actual file origin, and repeatable 60 FPS hardware benchmarks before any READY or release claim.",
+  "next_action": "Continue from the natural-run survival failure. Validate the new health/magnet pickup pilot, audit and correct the global character-upgrade offer pool against source evidence, then iterate objective survival and complete the 19-minute normal-combat boss encounter without forced state mutation. Keep real-device performance, real file-origin save/reload, source-fidelity content and owner playtest as release gates.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "last_development_product_commit": "632868c3e16077281758d1db18358317e2af33be",
-  "development_candidate_sha256": "587113d2dcc3641314ff914234c64c9fa61b922a83592d3d6b8a94636ab0f128",
-  "development_candidate_bytes": 717383,
+  "last_development_product_commit": "ae820ed62f3ad4e27c160cfd6ecc3c91abd9e061",
+  "development_candidate_sha256": "46f3c1c5ad7806fe45bc226e2df55b14de19c975182b619dd0db11524841923d",
+  "development_candidate_bytes": 718366,
   "last_successful_candidate_ci": {
     "run_id": 43848382432,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/43848382432",
@@ -131,14 +138,14 @@
   "latest_local_candidate": {
     "artifact": "development/index.html",
     "delivery_filename": "咒语旅团-当前开发版-单人网页版.html",
-    "bytes": 717368,
-    "sha256": "21fbfcdf3149c5d2eee188a213bf66c3fba5a6b777e7c868a5ddb823a79c0239",
+    "bytes": 718366,
+    "sha256": "46f3c1c5ad7806fe45bc226e2df55b14de19c975182b619dd0db11524841923d",
     "source_base": "single-file 2.5D art-forward candidate with embedded 4x4 sprite atlas",
     "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
-    "product_commit": "17070bc703b7bd7800b4bb67d6a5c40288a9bfee",
-    "scope": "Reginald only / Verdant Meadows only / single-player / offline single HTML",
-    "tested": "Atlas enemy sprites, 24 static decor cache tiles, 18 Reginald-eligible spells, save migration filtering, 15-second combat and level-up flow, desktop/mobile synthetic stress, no JS/console errors and no external requests",
-    "not_tested": "full 19-minute run, natural boss win, real file:// persistence, real hardware performance, source-complete spell effects and owner acceptance"
+    "product_commit": "ae820ed62f3ad4e27c160cfd6ecc3c91abd9e061",
+    "scope": "Reginald only / Verdant Meadow only / single-player / offline single HTML",
+    "tested": "Atlas renderer, 24 static decor cache tiles, 18 Reginald-eligible spells, save migration filtering, 90-second normal combat, contact collection for fungi/sludge/standard and heavy cores; component browser tests",
+    "not_tested": "full 19-minute run, natural boss win, actual file-origin persistence, real hardware performance, complete source-fidelity content, owner acceptance"
   },
-  "latest_candidate_ci_status": "PENDING_REVALIDATION_AFTER_AUGMENTATION_UI_POLISH"
+  "latest_candidate_ci_status": "PENDING_OBJECTIVE_COLLECTION_AND_HEALTH_PICKUP_PILOT_REVALIDATION"
 }
