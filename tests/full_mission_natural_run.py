@@ -55,11 +55,11 @@ window.__fullRun = async (maxSeconds) => {
     const augPriority=['healingSprout','quakeBurst','diceTwin','diceEcho','sawTwin','sawReturn','orbSplit','orbBurst','quakeAfter','quakePull','sawMagnet','seeking','surge','tempo','reach'];
     const aug=opts.filter(x=>x.kind==='spellAugment').sort((a,b)=>augPriority.indexOf(a.aug)-augPriority.indexOf(b.aug))[0];
     if(aug)return aug;
-    const statPriority=['regen','armor','speed','damage','crit','critDmg','magnet','luck'];
-    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
-    if(stat)return stat;
     const newSpell=opts.find(x=>x.kind==='newSpell');
     if(newSpell)return newSpell;
+    const statPriority=['regen','maxHp','armor','dodge','speed','damage','cast','crit','critDmg','manaPull','manaGain','luck','spellSize'];
+    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
+    if(stat)return stat;
     const bonus=opts.find(x=>x.kind==='spellLevelBonus'&&x.mode==='damage')||opts.find(x=>x.kind==='spellLevelBonus');
     if(bonus)return bonus;
     const infusion=opts.find(x=>x.kind==='infuse');
@@ -124,6 +124,25 @@ window.__fullRun = async (maxSeconds) => {
       if(shot.kind!=='enemy')continue;
       const dx=p.x-shot.x,dy=p.y-shot.y,d=Math.hypot(dx,dy)||1;
       if(d<190){const w=(190-d)/190*1.7;rx+=dx/d*w;ry+=dy/d*w;}
+      // Predict the closest approach of a live projectile and sidestep its path.
+      const vx=shot.vx||0,vy=shot.vy||0,v2=vx*vx+vy*vy;
+      if(v2>1){
+        const t=-(dx*vx+dy*vy)/v2;
+        if(t>0&&t<1.35){
+          const cx=dx-vx*t,cy=dy-vy*t,cd=Math.hypot(cx,cy);
+          if(cd<92){
+            const speed=Math.sqrt(v2),px=-vy/speed,py=vx/speed;
+            const danger=(x,y)=>game.enemies.reduce((sum,e)=>{
+              if(e.dead||e.type==='boss')return sum;
+              const q=Math.hypot(e.x-x,e.y-y);
+              return sum+(q<230?(230-q)/230:0);
+            },0);
+            const side=danger(p.x+px*90,p.y+py*90)<=danger(p.x-px*90,p.y-py*90)?1:-1;
+            const w=(92-cd)/92*2.5;
+            rx+=px*side*w;ry+=py*side*w;
+          }
+        }
+      }
     }
     for(const h of game.hazards){
       if(h.hit||!['warning','runestone','krogLeap','krogAcid'].includes(h.kind))continue;
