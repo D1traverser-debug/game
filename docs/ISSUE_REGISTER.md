@@ -15,7 +15,7 @@
 | GAME-010 | P0 | Spell-slot acquisition is random at any level | offerUpgrade uses 27% random new-spell chance | OPEN | Implement source-derived slot milestones and immediate spell upgrade |
 | GAME-011 | P0 | 1.2.0 spell content is incomplete | Missing Loaded Dice, Tiny Tremors, Wicked Buzzsaw | OPEN | Add distinct spell behavior and four augmentations each |
 | GAME-012 | P1 | Level-14 infusion test is nondeterministic | Random candidate generation can omit target infusion | OPEN | Add deterministic candidate-pool and RNG control |
-| GAME-013 | P1 | Debug API is embedded in production artifact | ?qa exposes direct mutation/time-jump/forced-boss helpers | OPEN | Separate test instrumentation from release build |
+| GAME-013 | P1 | Debug API was embedded in production artifact | 29492caf removes window.__QA from development/index.html; test hooks remain temporary | RESOLVED_IN_DEVELOPMENT | Recheck exact artifact before final release |
 | GAME-014 | P0 | Current 2D renderer does not match original 3D visual structure | Steam screenshot review + current Canvas 2D | OPEN | Validate WebGL 3D hybrid vertical slice |
 
 | GAME-015 | P0 | WebGL 3D slice is not yet visually or performance accepted | WEBGL-SLICE-001: 20 FPS on SwiftShader at ~200 entities; hardware untested | OPEN | Improve scene batching/culling and benchmark on real GPU |
