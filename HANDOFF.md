@@ -80,3 +80,11 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - The local portable Chromium Playwright test passed 17/17 targeted component checks; desktop/mobile interaction smoke passed. Browser navigation is blocked; localStorage was mocked, not a real reload acceptance.
 - Test entry: tests/progression_regression.py. Evidence: docs/experiments/PROGRESSION_002.md.
 - Do not merge into main or announce product-ready; actual full-run, 3D integrated product, all boss types, audio, visual QA and performance remain incomplete.
+
+
+## PROGRESSION-002 final post-regression refinement
+- The current development/index.html is now the **debug-stripped** 119417-byte candidate, SHA-256 e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190.
+- Product code commit: 29492caf5b7db433704f9cfa7543b0e3126b2e6e.
+- The ?qa-gated window.__QA with time jump / forced boss kill / direct finish no longer ships inside the HTML.
+- tests/progression_regression.py still injects its own isolated temporary test probe into in-memory browser document. All 17 targeted checks passed after the strip; desktop/mobile smoke also passed.
+- All previously documented NOT_TESTED/fidelity gaps remain open. Main stays the old baseline.
