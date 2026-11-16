@@ -29,7 +29,7 @@ const __originalV2Sprite=v2sprite;
 v2sprite=function(...args){window.__atlasSpriteDraws++;return __originalV2Sprite(...args)};
 window.__artProbe={snapshot:()=>({screen,atlasComplete:V2_ATLAS.complete,atlasWidth:V2_ATLAS.naturalWidth,atlasHeight:V2_ATLAS.naturalHeight,mode:save.renderMode,enemies:game?.enemies.filter(e=>!e.dead).length||0,enemySpriteRenders:window.__enemySpriteRenders||0,atlasSpriteDraws:window.__atlasSpriteDraws||0,cacheTiles:V2.decorTiles?.length||0})};
 """
-    return source.replace(marker, probe + "\\n" + marker)
+    return source.replace(marker, probe + "\n" + marker)
 
 
 async def main():
