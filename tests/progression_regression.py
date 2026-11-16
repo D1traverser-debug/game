@@ -3,7 +3,7 @@
 Runs Chromium with Playwright set_content. Browser navigation is blocked in some
 sandboxes, so localStorage is mocked; this is NOT a file:// persistence test.
 """
-import asyncio, json, pathlib, re
+import asyncio, json, pathlib, re, shutil
 from playwright.async_api import async_playwright
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -25,7 +25,10 @@ DOCUMENT=RAW.replace('<script>',MOCK+'<script>',1).replace('// Input\naddEventLi
 async def run():
  checks={};errors=[]
  async with async_playwright() as pw:
-  browser=await pw.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+  opts={'headless':True,'args':['--no-sandbox','--disable-dev-shm-usage']}
+  binary=shutil.which('chromium') or shutil.which('chromium-browser')
+  if binary:opts['executable_path']=binary
+  browser=await pw.chromium.launch(**opts)
   page=await browser.new_page(viewport={'width':1280,'height':720})
   page.on('pageerror',lambda e:errors.append(str(e)))
   await page.set_content(DOCUMENT,wait_until='domcontentloaded')
