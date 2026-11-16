@@ -49,8 +49,8 @@ window.__normalPlay = async (seconds) => {
   }
   keys={};
   return {
-    screen,ended:game.ended,time:game.time,kills:p.kills,level:p.level,
-    hp:p.hp,maxHp:p.maxHp,xp:p.xp,nextXp:p.nextXp,upgrades,
+    screen,ended:game.ended,time:game.time,kills:game.player.kills,level:game.player.level,
+    hp:game.player.hp,maxHp:game.player.maxHp,xp:game.player.xp,nextXp:game.player.nextXp,upgrades,
     objectiveCount:p.objectives,enemyCount:game.enemies.filter(e=>!e.dead).length
   };
 };
