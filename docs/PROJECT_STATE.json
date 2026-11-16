@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BYTE_FIDELITY_RESTORED_CI_RECHECK_PENDING",
+  "checkpoint": "BYTE_FIDELITY_AND_GITHUB_COMPONENT_CI_PASS_PRODUCT_NOT_READY",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -37,7 +37,8 @@
     "Playwright regression test made portable and reran 17/17 locally",
     "GitHub Actions workflow .github/workflows/qa.yml authored for checkpoint guard and browser tests",
     "Main baseline trailing LF restored exactly to 116721 bytes and c14e0f... hash",
-    "Development candidate trailing LF restored exactly to 119417 bytes and e97ed877... hash"
+    "Development candidate trailing LF restored exactly to 119417 bytes and e97ed877... hash",
+    "GitHub Actions run 43838646149 completed SUCCESS on exact product artifact commit 44938fb8557a856d794e7a0ceff45ccd71faedeb; checkpoint, negative controls and browser-component jobs all passed"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -59,9 +60,7 @@
     "Individual spell-specific quest event trackers remain unimplemented",
     "Second spell-slot level is a provisional research assumption, not a verified source fact",
     "Loaded Dice, Tiny Tremors and Wicked Buzzsaw initial attacks exist but original augmentations/visuals not accepted",
-    "Fresh-chat autonomous cold-start recovery has not been independently tested",
-    "New GitHub Actions workflow execution has not yet been verified; a YAML file is not evidence of CI success",
-    "Initial CI checkpoint failed due to a parsed-content transport losing one trailing LF; remediated, fresh CI outcome pending"
+    "Fresh-chat autonomous cold-start recovery has not been independently tested"
   ],
   "next_action": "Research/implement source-verified spell quest event tracking and the 1.2 three-spell augmentations; compare 3D renderer candidates under repeatable real GPU tests, then integrate the passing renderer into the complete single HTML.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
@@ -69,5 +68,14 @@
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
   "last_development_product_commit": "44938fb8557a856d794e7a0ceff45ccd71faedeb",
   "development_candidate_sha256": "e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190",
-  "development_candidate_bytes": 119417
+  "development_candidate_bytes": 119417,
+  "last_successful_candidate_ci": {
+    "run_id": 43838646149,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/43838646149",
+    "commit": "44938fb8557a856d794e7a0ceff45ccd71faedeb",
+    "checkpoint": "PASS",
+    "positive_negative_controls": "PASS",
+    "browser_component": "PASS",
+    "meaning": "MECHANICAL_AND_COMPONENT_ONLY_NOT_PRODUCT_ACCEPTANCE"
+  }
 }
