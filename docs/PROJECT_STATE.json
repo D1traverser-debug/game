@@ -89,14 +89,13 @@
   "development_candidate_sha256": "0c8d9de43c8fe30f3cad8bd47d657056e1d84bf4a54869229b585b944c281a6a",
   "development_candidate_bytes": 153894,
   "last_successful_candidate_ci": {
-    "run_id": 43838646149,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/43838646149",
-    "commit": "44938fb8557a856d794e7a0ceff45ccd71faedeb",
+    "run_id": 43848382432,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/43848382432",
+    "commit": "0b513f19a67393fcfdff64fd37c444571aa31f7b",
     "checkpoint": "PASS",
     "positive_negative_controls": "PASS",
     "browser_component": "PASS",
-    "meaning": "MECHANICAL_AND_COMPONENT_ONLY_NOT_PRODUCT_ACCEPTANCE",
-    "superseded_by": "TRIAL_004_NEW_CANDIDATE_PENDING_CI",
-    "historical_only": true
+    "covered_product_artifact_sha256": "0c8d9de43c8fe30f3cad8bd47d657056e1d84bf4a54869229b585b944c281a6a",
+    "meaning": "Exact artifact integrity, repo governance controls, 17 progression tests, 3-boss/9-objective synthetic component suite and 11 solo trial/quest component checks. NOT a full-run/player acceptance."
   }
 }
