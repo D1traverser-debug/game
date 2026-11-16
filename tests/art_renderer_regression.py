@@ -15,7 +15,7 @@ SOURCE = (ROOT / "index.html").read_text(encoding="utf-8")
 def instrument(source: str) -> str:
     marker = "// Production build: internal debug mutations are test-only and not shipped."
     assert source.count(marker) == 1
-    assert len(re.findall(r"function\\s+v2enemy\\s*\\(", source)) == 1
+    assert len(re.findall(r"function\s+v2enemy\s*\(", source)) == 1
     assert "function v2buildSprite" not in source
     assert "const V2_SPRITES" not in source
     old = "function v2enemy(e){let t=V2.age"
