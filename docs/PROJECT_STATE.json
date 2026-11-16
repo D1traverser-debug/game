@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BYTE_FIDELITY_AND_GITHUB_COMPONENT_CI_PASS_PRODUCT_NOT_READY",
+  "checkpoint": "INTEGRATION_003_3D_GAME_COMPONENT_PASS_PRODUCT_NOT_READY",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -38,7 +38,14 @@
     "GitHub Actions workflow .github/workflows/qa.yml authored for checkpoint guard and browser tests",
     "Main baseline trailing LF restored exactly to 116721 bytes and c14e0f... hash",
     "Development candidate trailing LF restored exactly to 119417 bytes and e97ed877... hash",
-    "GitHub Actions run 43838646149 completed SUCCESS on exact product artifact commit 44938fb8557a856d794e7a0ceff45ccd71faedeb; checkpoint, negative controls and browser-component jobs all passed"
+    "GitHub Actions run 43838646149 completed SUCCESS on exact product artifact commit 44938fb8557a856d794e7a0ceff45ccd71faedeb; checkpoint, negative controls and browser-component jobs all passed",
+    "3D WebGL2 instanced world integrated with single-player game mechanics and 2D fallback",
+    "Three boss IDs and unique attack logic exist; normal-player boss kill NOT_TESTED",
+    "Nine objective types generated and bounded inside the map in synthetic browser integration",
+    "Gnasher underground invulnerability regression passed",
+    "Three 1.2 starter spells each have four prototype-specific augment options",
+    "Existing 17/17 source-backed progression browser checks passed after 3D integration",
+    "XP common/rare/epic/legendary orb values corrected to 7/12/17/21"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -60,15 +67,20 @@
     "Individual spell-specific quest event trackers remain unimplemented",
     "Second spell-slot level is a provisional research assumption, not a verified source fact",
     "Loaded Dice, Tiny Tremors and Wicked Buzzsaw initial attacks exist but original augmentations/visuals not accepted",
-    "Fresh-chat autonomous cold-start recovery has not been independently tested"
+    "Fresh-chat autonomous cold-start recovery has not been independently tested",
+    "Integrated WebGL2 SwiftShader software run observed ~18-25 FPS; real desktop and mobile hardware FPS NOT_TESTED",
+    "Container blocks file:// and localhost navigation; real-origin save/close/reopen NOT_TESTED",
+    "Original 3D art/animation/audio fidelity materially below commercial title",
+    "Complete human-played 19-minute run and naturally defeated boss NOT_TESTED",
+    "Unverified original boss mechanics/element pairs and unavailable spell quest trackers remain open"
   ],
-  "next_action": "Research/implement source-verified spell quest event tracking and the 1.2 three-spell augmentations; compare 3D renderer candidates under repeatable real GPU tests, then integrate the passing renderer into the complete single HTML.",
+  "next_action": "Raise visual quality of 3D models/animation/VFX, implement source-faithful spell quest unlocks and complete objective/boss patterns, then perform real full-run, save-reload, hardware performance and independent owner playtest acceptance. Do not promote to main until P0 gates pass.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "last_development_product_commit": "44938fb8557a856d794e7a0ceff45ccd71faedeb",
-  "development_candidate_sha256": "e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190",
-  "development_candidate_bytes": 119417,
+  "last_development_product_commit": "ac295edce42e1f0781694168d3d82aca1463c48e",
+  "development_candidate_sha256": "07bd70906f1020f2c5343d0ab4c16950a863cfc8b42e639fdaa74ef938fae648",
+  "development_candidate_bytes": 148704,
   "last_successful_candidate_ci": {
     "run_id": 43838646149,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/43838646149",
@@ -76,6 +88,8 @@
     "checkpoint": "PASS",
     "positive_negative_controls": "PASS",
     "browser_component": "PASS",
-    "meaning": "MECHANICAL_AND_COMPONENT_ONLY_NOT_PRODUCT_ACCEPTANCE"
+    "meaning": "MECHANICAL_AND_COMPONENT_ONLY_NOT_PRODUCT_ACCEPTANCE",
+    "superseded_by": "INTEGRATION_003_UNVERIFIED_NEW_COMMIT",
+    "historical_only": true
   }
 }
