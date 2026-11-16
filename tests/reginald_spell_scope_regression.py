@@ -16,7 +16,7 @@ EXCLUDED = {"hex", "necro", "spear", "sickle", "orbital", "seismic", "mesh"}
 def instrument(source: str) -> str:
     marker = "// Production build: internal debug mutations are test-only and not shipped."
     assert source.count(marker) == 1
-    assert len(re.findall(r"function\\s+v2enemy\\s*\\(", source)) == 1
+    assert len(re.findall(r"function\s+v2enemy\s*\(", source)) == 1
     probe = r"""
 window.__scopeProbe={
  snapshot:()=>({ids:[...REGINALD_SPELL_IDS],unlocks:[...save.unlocks],trial:save.trialSpellId,questFlags:[...save.questFlags],atlas:{loaded:V2_ATLAS.complete,w:V2_ATLAS.naturalWidth,h:V2_ATLAS.naturalHeight},screen}),
