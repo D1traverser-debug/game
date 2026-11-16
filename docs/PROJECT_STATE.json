@@ -67,7 +67,6 @@
     "Synthetic 197-active-enemy stress sample after static caching measured approximately 48.7 FPS desktop at 1440x900 and 60 FPS mobile viewport at 390x844; desktop remains below 60 FPS target and real hardware is not tested"
   ],
   "failed_or_open": [
-    "200-enemy performance baseline approximately 21.6 FPS",
     "Real unassisted full-run completion not tested",
     "Boss defeat was forced by test hook; genuine combat victory not tested",
     "Real file:// open and localStorage close/reopen not tested",
@@ -105,15 +104,16 @@
     "Human owner playtest and independent product acceptance are NOT_DONE",
     "One-hero temporary trial remains an explicitly labeled single-player adaptation, not an original-game mechanic",
     "Level-2 second spell slot remains a provisional research assumption pending authoritative source confirmation",
-    "WebGL2 3D path remains experimental and is unavailable in the current software Chromium environment; 2.5D is the primary renderer"
+    "WebGL2 3D path remains experimental and is unavailable in the current software Chromium environment; 2.5D is the primary renderer",
+    "Progression CI assertion lagged behind save schema v3; updated to assert v3, preserving migration behavior and other regression checks"
   ],
   "next_action": "Continue from the source-pinned Reginald spell/quest/augmentation audit. Implement and verify missing 1.2 and legacy augmentation behaviors, then test objective variants and all three bosses in natural play. Run a complete 19-minute mission with a natural boss kill, real save/reload on an actual file origin, and repeatable 60 FPS hardware benchmarks before any READY or release claim.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
   "last_development_product_commit": "17070bc703b7bd7800b4bb67d6a5c40288a9bfee",
-  "development_candidate_sha256": "7c64a2e3b650cfc1b07e314eec6fe07ca1448e791e1ac6198e762cfdfe332cd3",
-  "development_candidate_bytes": 717369,
+  "development_candidate_sha256": "21fbfcdf3149c5d2eee188a213bf66c3fba5a6b777e7c868a5ddb823a79c0239",
+  "development_candidate_bytes": 717368,
   "last_successful_candidate_ci": {
     "run_id": 43848382432,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/43848382432",
@@ -137,5 +137,5 @@
     "tested": "Atlas enemy sprites, 24 static decor cache tiles, 18 Reginald-eligible spells, save migration filtering, 15-second combat and level-up flow, desktop/mobile synthetic stress, no JS/console errors and no external requests",
     "not_tested": "full 19-minute run, natural boss win, real file:// persistence, real hardware performance, source-complete spell effects and owner acceptance"
   },
-  "latest_candidate_ci_status": "PENDING_FOR_17070BC"
+  "latest_candidate_ci_status": "PENDING_SCHEMA_V3_ASSERTION_AND_HASH_SYNC"
 }
