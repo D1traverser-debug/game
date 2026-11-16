@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "INTEGRATION_003_3D_GAME_COMPONENT_PASS_PRODUCT_NOT_READY",
+  "checkpoint": "TRIAL_004_TEXTURE_ADAPTIVE_3D_COMPONENT_REGRESSION",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -45,7 +45,12 @@
     "Gnasher underground invulnerability regression passed",
     "Three 1.2 starter spells each have four prototype-specific augment options",
     "Existing 17/17 source-backed progression browser checks passed after 3D integration",
-    "XP common/rare/epic/legendary orb values corrected to 7/12/17/21"
+    "XP common/rare/epic/legendary orb values corrected to 7/12/17/21",
+    "Procedural grass texture replaces flat 3D terrain and WebGL resolution scaling now adapts to slow software-rendered conditions",
+    "Reginald-only spell trial UI and permanent source-quest grant pipeline integrated with the game",
+    "11/11 targeted solo trial/quest browser component checks passed, including actual Falling Stars cast event and duplicate-grant rejection",
+    "All previous 17/17 browser progression component checks remain green on local integrated source",
+    "All 3 bosses and 9 objective constructors/update loops passed synthetic local browser component checks on latest source"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -72,15 +77,17 @@
     "Container blocks file:// and localhost navigation; real-origin save/close/reopen NOT_TESTED",
     "Original 3D art/animation/audio fidelity materially below commercial title",
     "Complete human-played 19-minute run and naturally defeated boss NOT_TESTED",
-    "Unverified original boss mechanics/element pairs and unavailable spell quest trackers remain open"
+    "Unverified original boss mechanics/element pairs and unavailable spell quest trackers remain open",
+    "One-hero trial is a usability adaptation, not an original mechanic; remaining spell-specific quests still need real event tracking",
+    "Current textured software rendering often falls below 30 FPS; adaptive rendering lowered resolution, hardware GPU acceptance remains NOT_TESTED"
   ],
-  "next_action": "Raise visual quality of 3D models/animation/VFX, implement source-faithful spell quest unlocks and complete objective/boss patterns, then perform real full-run, save-reload, hardware performance and independent owner playtest acceptance. Do not promote to main until P0 gates pass.",
+  "next_action": "Complete remaining source-faithful spell unlock events, verified boss patterns and objective interactions; upgrade 3D character/environment/art/audio quality; independently test a normal full-run boss kill, real local-file persistence and hardware performance before release.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "last_development_product_commit": "ac295edce42e1f0781694168d3d82aca1463c48e",
-  "development_candidate_sha256": "07bd70906f1020f2c5343d0ab4c16950a863cfc8b42e639fdaa74ef938fae648",
-  "development_candidate_bytes": 148704,
+  "last_development_product_commit": "b21cdba002dc78167cc62601d3a93723d969f191",
+  "development_candidate_sha256": "0c8d9de43c8fe30f3cad8bd47d657056e1d84bf4a54869229b585b944c281a6a",
+  "development_candidate_bytes": 153894,
   "last_successful_candidate_ci": {
     "run_id": 43838646149,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/43838646149",
@@ -89,7 +96,7 @@
     "positive_negative_controls": "PASS",
     "browser_component": "PASS",
     "meaning": "MECHANICAL_AND_COMPONENT_ONLY_NOT_PRODUCT_ACCEPTANCE",
-    "superseded_by": "INTEGRATION_003_UNVERIFIED_NEW_COMMIT",
+    "superseded_by": "TRIAL_004_NEW_CANDIDATE_PENDING_CI",
     "historical_only": true
   }
 }
