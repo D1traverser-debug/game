@@ -153,9 +153,9 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Full 19-minute playthrough, genuine boss kill, real localStorage reload, real-device performance, content fidelity and owner acceptance remain NOT_TESTED. Product status stays NOT_READY.
 
 ## 2.5D_ATLAS_SCOPE_AND_STATIC_CACHE_008 — Current canonical checkpoint (2026-11-17)
-- Canonical product source is now development/index.html; exact 717369-byte content was read back from GitHub and compared to the source candidate.
+- Canonical product source is now development/index.html; exact 717368-byte content was read back from GitHub and compared to the source candidate.
 - Product commit: 17070bc703b7bd7800b4bb67d6a5c40288a9bfee.
-- SHA-256: 7c64a2e3b650cfc1b07e314eec6fe07ca1448e791e1ac6198e762cfdfe332cd3.
+- SHA-256: 21fbfcdf3149c5d2eee188a213bf66c3fba5a6b777e7c868a5ddb823a79c0239.
 - Main remains the preserved earlier baseline. Do not merge or publish while status is NOT_READY.
 - Fixed a real renderer-shadowing bug: a later duplicate v2enemy declaration overrode the intended atlas renderer. It is removed; the 1024x1024 embedded sprite atlas is now used by enemy draw calls.
 - 480 static meadow props and seven ruin landmarks are baked at run start into 24 visible 512x512 tiles. Per-frame dynamic entities remain depth-sorted.
