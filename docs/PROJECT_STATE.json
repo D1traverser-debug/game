@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "AUDIT_001_SOURCE_AND_QA_AUDIT_COMPLETE",
+  "checkpoint": "WEBGL_SLICE_001_TECHNICAL_SMOKE_COMPLETE",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -26,7 +26,8 @@
     "Previous single-file prototype recovered",
     "Previous QA evidence reclassified",
     "Exact latest 116721-byte HTML source read back from Library and committed to main",
-    "Source-grounded audit confirmed unlock overwrite, random spell acquisition, missing 1.2 spells, synthetic QA oracle and 2D visual mismatch"
+    "Source-grounded audit confirmed unlock overwrite, random spell acquisition, missing 1.2 spells, synthetic QA oracle and 2D visual mismatch",
+    "Raw WebGL2 3D vertical slice runs in Chromium 144 under Xvfb/SwiftShader with zero JS/console/WebGL errors and zero external requests"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -41,9 +42,12 @@
     "Spell slots are offered randomly instead of source-derived level milestones",
     "Three 1.2.0 spells and their augmentations are missing",
     "Current QA oracle is nondeterministic and includes forced state mutation",
-    "Renderer architecture selected for a controlled WebGL 3D hybrid experiment; not yet implemented"
+    "Renderer architecture selected for a controlled WebGL 3D hybrid experiment; not yet implemented",
+    "WebGL 3D slice is a rough prototype, not accepted visual quality",
+    "200-enemy SwiftShader synthetic profile reports approximately 20 FPS; hardware GPU benchmark is not tested",
+    "Renderer engine choice (raw WebGL2 vs bundled Three.js) remains open"
   ],
-  "next_action": "Build and test the source-derived progression/content contract, then execute the WebGL 3D vertical-slice experiment on development.",
+  "next_action": "Profile and improve the 3D slice, compare raw WebGL2 and Three.js on the same scene, then implement the source-derived progression/content contract.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "c7980a12e582cf3c265b8bbdaf1e7f16eecfcd6b"
