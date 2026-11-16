@@ -89,6 +89,13 @@ window.__fullRun = async (maxSeconds) => {
         const chest=nearest(game.chests.filter(c=>!c.open),p);
         if(chest&&chest.d<780)target=chest.o;
       }
+      // Health pickups are real drops and must be considered by the pilot.
+      const health=nearest(game.orbs.filter(x=>x.type==='health'),p);
+      if(health&&p.hp<p.maxHp-5&&health.d<(p.hp<45?700:p.hp<75?420:0))target=health.o;
+      if(!target){
+        const magnet=nearest(game.orbs.filter(x=>x.type==='magnet'),p);
+        if(magnet&&magnet.d<260)target=magnet.o;
+      }
       if(!target){
         const orb=nearest(game.orbs.filter(x=>x.type==='xp'),p);
         if(orb&&orb.d<850)target=orb.o;
@@ -146,7 +153,7 @@ window.__fullRun = async (maxSeconds) => {
       trace.push({t:+game.time.toFixed(1),hp:+q.hp.toFixed(1),maxHp:q.maxHp,level:q.level,
         kills:q.kills,damageTaken:+q.damageTaken.toFixed(1),armor:+q.armor.toFixed(1),
         regen:+q.regen.toFixed(1),enemyCount:game.enemies.filter(e=>!e.dead).length,
-        nearestEnemy:near?+near.d.toFixed(1):null,objective:game.objective?.type||null,
+        nearestEnemy:near?+near.d.toFixed(1):null,healthOrbs:game.orbs.filter(x=>x.type==='health').length,magnetOrbs:game.orbs.filter(x=>x.type==='magnet').length,objective:game.objective?.type||null,
         objectiveProgress:game.objective?.progress||0,spells:q.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()}))});
       lastTrace=game.time;
     }
