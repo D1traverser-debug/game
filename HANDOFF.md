@@ -175,3 +175,10 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - GAME-031 and GAME-032 record these QA defects and repairs; GAME-033 remains OPEN for a full normal-combat mission and natural boss victory. Do not mutate boss HP/time/win state and call that acceptance.
 - Latest CI runs after these corrections: 43917069068 and 43917060710; inspect final job logs before claiming green.
 - Product remains NOT_READY. No CAOS assets or repositories touched.
+
+## Normal-play smoke and source audit — 2026-11-17
+- New non-cheating 90-second normal-play smoke is in `tests/normal_play_smoke.py`. It uses the real update loop, movement input, actual XP drops/pickups and the production upgrade handler; it does not write XP, damage enemies, set mission time or force outcomes.
+- GitHub Actions run 43918259686 passed all jobs. The 90-second normal-play run recorded: 90.47 simulated seconds, 83 kills, level 8, 8 actual upgrade choices, 100/100 HP, 18 XP toward the next level, no runtime/console errors and no external requests. This is an automated short-run smoke, not full mission acceptance.
+- Product copy for the three new 1.2 spell augmentation sets was polished: the rough “Prototype” label is removed, and Buzzsaw descriptions now match implemented behavior (Piercing Teeth pierces; Heavy Teeth grants +25% base damage; Magnetic Edge pulls enemies; Twin Saw fires two saws).
+- Important fidelity distinction: official 1.2 notes confirm four augmentations for each of the three new spells but do not disclose their names or detailed effects. Those twelve are our own named original adaptations, not source-confirmed exact augmentations. See `docs/MECHANIC_REFERENCE_MATRIX.md` and `docs/REFERENCE_RESEARCH.md`.
+- Current code hash/bytes after the UI polish: `587113d2dcc3641314ff914234c64c9fa61b922a83592d3d6b8a94636ab0f128`, 717383 bytes; product commit `632868c3e16077281758d1db18358317e2af33be`. Checkpoint sync is committed separately; wait for the resulting CI before claiming green.
