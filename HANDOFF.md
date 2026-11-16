@@ -141,3 +141,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Both checkpoint and browser-component jobs succeeded. Browser steps: 17 progression, 3-boss/9-objective/Gnasher immunity, 11 solo spell trial/quest event checks.
 - The earlier failure at run 43848226627 was a stale checkpoint SHA/size mismatch; browser tests passed. The checkpoint was then corrected to the exact artifact SHA/bytes and the new run passed.
 - This is mechanical + component regression evidence only. It does not prove real local-file storage, human 19-minute completion, genuine boss kill, high-fidelity art/audio or real-GPU performance.
+
+## 2.5D art-forward candidate — 2026-11-17 (local artifact, NOT yet synced)
+- Candidate file in this conversation: `咒语旅团-单人网页版-2.5D验收候选.html`
+- Exact bytes: 718627; SHA-256: `de29ddd55575f1fe78c9b525d41709c2d619d41694cac4eb679cd0dd5f41d48f`.
+- It includes a 4x4 embedded sprite atlas, sprite-based Reginald and monster rendering, a textured Verdant Meadows field, ruins/trees/flowers, combat effects, HUD and the existing single-player mechanics. The file has no external runtime asset requests.
+- It is the preferred art-direction candidate: high-quality 2.5D instead of insisting on a 3D renderer unavailable in all browser environments. A WebGL2 experimental mode remains optional only where actually supported.
+- Fixed a false UI promise: if WebGL2 initialization fails, the 3D selector is disabled and the game remains in 2.5D.
+- Local Playwright tests: desktop 1440x900 and mobile 390x844 each passed start, HUD, pause/resume, no NaN text, no JS/console errors, and zero external requests. 15-second normal play smoke recorded 18 kills; XP remained 0 while orbs were visible. This is a gameplay pacing issue to investigate, not a passing progression test.
+- The 2.5D file has NOT been committed to GitHub. Current repository `development/index.html` remains the older 3D candidate. Do not claim the local candidate is in GitHub until its exact bytes are synchronized and fetched back.
+- Full 19-minute playthrough, genuine boss kill, real localStorage reload, real-device performance, content fidelity and owner acceptance remain NOT_TESTED. Product status stays NOT_READY.
