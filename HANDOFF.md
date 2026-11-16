@@ -124,3 +124,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Latest test scripts: tests/game3d_integration.py, tests/progression_regression.py.
 - Historical GitHub Action green run 43838646149 applies to the old 2D commit only; check the newest 3D commit workflow before claiming CI status.
 - Mandatory next action: inspect the latest branch HEAD and current project state, then continue highest-impact source-faithful gameplay, art and performance work. CAOS stays read-only.
+
+## TRIAL-004 — Latest game file and playable systems (2026-11-16)
+- Product code commit: `b21cdba002dc78167cc62601d3a93723d969f191`.
+- development/index.html is **153894 bytes**, SHA-256 `0c8d9de43c8fe30f3cad8bd47d657056e1d84bf4a54869229b585b944c281a6a`. Treat as prototype, **NOT_READY**.
+- A procedural grass texture and adaptive WebGL resolution scaling were added. SwiftShader software-rendered FPS is still low, about 15–25 FPS in reported scenes; real GPU acceptance remains NOT_TESTED.
+- To respect the single-Reginald scope while unblocking spell-specific quests, the camp now allows a temporary next-run spell trial without permanent unlock. Source-grounded quest event trackers grant spells permanently after satisfying conditions. This is an explicitly labeled solo adaptation, NOT a claim of exact original behavior.
+- Local targeted browser trial regression: 11/11 PASS. Existing progression 17/17 PASS. Synthetic 3-boss / 9-objective / Gnasher component checks PASS. No uncaught page errors or external requests in these tests.
+- New test: `tests/trial_unlock_regression.py` and CI job. Evidence: `docs/experiments/TRIAL_004.md`.
+- Current main branch remains the archived 2D baseline; do NOT publish or merge development until full acceptance.
+- **Current remaining P0:** source-accurate artwork, boss mechanics, all objective variants, spell/element pair completeness, real unassisted 19-min run, hardware FPS and browser save/reload; user acceptance NOT_TESTED.
