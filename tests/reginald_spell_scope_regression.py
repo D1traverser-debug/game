@@ -24,7 +24,7 @@ window.__scopeProbe={
  grant:(id)=>({result:grantSpellQuest(id),unlocks:[...save.unlocks],flags:[...save.questFlags]})
 };
 """
-    return source.replace(marker, probe + "\\n" + marker)
+    return source.replace(marker, probe + "\n" + marker)
 
 
 async def main():
