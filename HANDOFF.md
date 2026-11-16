@@ -98,3 +98,11 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - .github/workflows/qa.yml added. Live GitHub Actions execution is not yet verified; do not promote CI to PASS until readback of actual run.
 - The latest product artifact is still development/index.html SHA-256 e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190, size 119417 bytes, product code commit 29492caf5b7db433704f9cfa7543b0e3126b2e6e.
 - Fresh-chat automatic cold-start selection/execution is NOT_TESTED; the handoff protocol is installed, not independently proven.
+
+
+## INCIDENT-001 — GitHub write byte identity and CI
+- The first GitHub checkpoint job FAILED because the file read/import process omitted the final LF byte; source was 119416 bytes in GitHub vs 119417 in the local recorded artifact. Browser component test passed, but that does not override the checksum failure.
+- Restored exact original trailing LF in both branches: main commit eace4cb66f282d35c663f3a13d6e39ff8a15e0b8, development product commit 44938fb8557a856d794e7a0ceff45ccd71faedeb.
+- Canonical hashes remain main c14e0f3210320453b0b81b6d49fbd55ae372cf36cfe99a91902d089b8672ef3a (116721 B) and dev e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190 (119417 B).
+- See docs/audits/INCIDENT_001_BYTE_FIDELITY.md for evidence, root-cause escalation and re-test requirement.
+- Do not assert byte exactness from parsed Files content; verify remote actual bytes and SHA. Fresh CI status must be read back.
