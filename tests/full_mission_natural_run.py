@@ -92,7 +92,7 @@ async def main():
         page.on("pageerror",lambda e:report["page_errors"].append(str(e)))
         page.on("console",lambda m:report["console_errors"].append(m.text) if m.type=="error" else None)
         page.on("request",lambda r:report["external_requests"].append(r.url) if r.url.startswith(("http://","https://")) else None)
-        await page.set_default_timeout(180000)
+        page.set_default_timeout(180000)
         await page.set_content(DOCUMENT,wait_until="load")
         await page.locator("#start").click()
         state=await page.evaluate("window.__fullRun(1500)",timeout=180000)
