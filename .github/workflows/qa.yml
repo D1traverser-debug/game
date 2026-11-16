@@ -37,6 +37,8 @@ jobs:
         run: python tests/normal_play_smoke.py
       - name: Browser objective collection regression
         run: python tests/objective_collection_regression.py
+      - name: Browser character upgrade regression
+        run: python tests/character_upgrade_regression.py
       - name: Browser full mission natural boss victory attempt
         run: python tests/full_mission_natural_run.py
       - name: Browser 3D combat, boss and objectives integration
