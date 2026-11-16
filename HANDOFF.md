@@ -112,3 +112,15 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Real GitHub Actions run 43838646149 completed SUCCESS. Both checkpoint (exact file SHA/scope + negative mutation tests) and browser-component (Playwright regression) jobs succeeded.
 - This proves source integrity and scripted component paths only, NOT 3D fidelity, full real gameplay, hardware FPS, file:// persistence or owner approval.
 - If the latest development HEAD differs by documentation-only commits, do not mistake the earlier green run for a run at the later SHA; fetch the latest run when needed.
+
+## INTEGRATION-003 — Latest integrated 3D candidate (2026-11-16)
+- DEVELOPMENT code: index.html SHA-256 `07bd70906f1020f2c5343d0ab4c16950a863cfc8b42e639fdaa74ef938fae648`; size 148704 bytes; code commit `ac295edce42e1f0781694168d3d82aca1463c48e`.
+- Backup before overwrite: archive/2d-progression-before-3d.html; main remains the previous 2D baseline. **Do not replace main with unaccepted 3D experiment.**
+- Three-boss/9-objective 3D integration and source-data corrections are present. Test-only diagnostic probes were injected into browser memory, NOT shipped in index.html.
+- Local Node.js both-script syntax: PASS; Playwright 17/17 progression: PASS; synthetic browser integration passed all 9 objective generators, 3 boss constructors/updates, Gnasher invulnerability, and new spell augment counts. No JS exceptions/network requests in the tested scenarios.
+- `file://` and localhost URL navigation returned net::ERR_BLOCKED_BY_ADMINISTRATOR, so actual persisted close/reopen remains NOT_TESTED.
+- Visual polish, hardware performance, source-faithful boss mechanics, spell unlock quest tracking, naturally played 19-minute run and owner acceptance remain OPEN. **Product status NOT_READY.**
+- Latest report: docs/experiments/INTEGRATION_003.md.
+- Latest test scripts: tests/game3d_integration.py, tests/progression_regression.py.
+- Historical GitHub Action green run 43838646149 applies to the old 2D commit only; check the newest 3D commit workflow before claiming CI status.
+- Mandatory next action: inspect the latest branch HEAD and current project state, then continue highest-impact source-faithful gameplay, art and performance work. CAOS stays read-only.
