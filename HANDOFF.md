@@ -134,3 +134,10 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - New test: `tests/trial_unlock_regression.py` and CI job. Evidence: `docs/experiments/TRIAL_004.md`.
 - Current main branch remains the archived 2D baseline; do NOT publish or merge development until full acceptance.
 - **Current remaining P0:** source-accurate artwork, boss mechanics, all objective variants, spell/element pair completeness, real unassisted 19-min run, hardware FPS and browser save/reload; user acceptance NOT_TESTED.
+
+## CI-005 — Exact 3D candidate verified by GitHub Actions (2026-11-16)
+- Run: https://github.com/D1traverser-debug/game/actions/runs/43848382432
+- Run completed SUCCESS on development docs checkpoint `0b513f19a67393fcfdff64fd37c444571aa31f7b`, with the exact game artifact pinned as SHA-256 `0c8d9de43c8fe30f3cad8bd47d657056e1d84bf4a54869229b585b944c281a6a`, 153894 bytes, product commit `b21cdba002dc78167cc62601d3a93723d969f191`.
+- Both checkpoint and browser-component jobs succeeded. Browser steps: 17 progression, 3-boss/9-objective/Gnasher immunity, 11 solo spell trial/quest event checks.
+- The earlier failure at run 43848226627 was a stale checkpoint SHA/size mismatch; browser tests passed. The checkpoint was then corrected to the exact artifact SHA/bytes and the new run passed.
+- This is mechanical + component regression evidence only. It does not prove real local-file storage, human 19-minute completion, genuine boss kill, high-fidelity art/audio or real-GPU performance.
