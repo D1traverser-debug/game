@@ -3,8 +3,8 @@
 Date: 2026-11-17
 Branch: development
 Product commit: 17070bc703b7bd7800b4bb67d6a5c40288a9bfee
-Artifact: 717369 bytes
-SHA-256: 7c64a2e3b650cfc1b07e314eec6fe07ca1448e791e1ac6198e762cfdfe332cd3
+Artifact: 717368 bytes
+SHA-256: 21fbfcdf3149c5d2eee188a213bf66c3fba5a6b777e7c868a5ddb823a79c0239
 Status: COMPONENT_PASS / NOT_PRODUCT_READY
 
 ## Root causes corrected
