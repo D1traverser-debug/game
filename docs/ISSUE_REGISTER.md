@@ -17,3 +17,5 @@
 | GAME-012 | P1 | Level-14 infusion test is nondeterministic | Random candidate generation can omit target infusion | OPEN | Add deterministic candidate-pool and RNG control |
 | GAME-013 | P1 | Debug API is embedded in production artifact | ?qa exposes direct mutation/time-jump/forced-boss helpers | OPEN | Separate test instrumentation from release build |
 | GAME-014 | P0 | Current 2D renderer does not match original 3D visual structure | Steam screenshot review + current Canvas 2D | OPEN | Validate WebGL 3D hybrid vertical slice |
+
+| GAME-015 | P0 | WebGL 3D slice is not yet visually or performance accepted | WEBGL-SLICE-001: 20 FPS on SwiftShader at ~200 entities; hardware untested | OPEN | Improve scene batching/culling and benchmark on real GPU |
