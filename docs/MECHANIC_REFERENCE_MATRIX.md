@@ -86,3 +86,10 @@ Sources:
 - Ascension signature mapping discussion (secondary corroboration): https://steamcommunity.com/app/2904000/discussions/0/838375062933398814/
 
 The wiki and community discussion are secondary sources. Reconfirm against the target game build where possible. The 1.2 starter status is grounded in the official patch announcement. Do not claim the complete source game contains only 18 spells; this allowlist is specific to the one-hero Reginald product.
+
+## Official 1.2 spell-content reconciliation (2026-11-17)
+- The developer's 1.2.0.20127 notes explicitly confirm three new start-unlocked spells and four augmentations for each: Loaded Dice, Tiny Tremors and Wicked Buzzsaw. The public notes describe the core spell behavior and augmentation count, but do **not** publish the names or detailed effects of those twelve new augmentations.
+- The same notes list thirteen augmentations for older spells: Aura Beam (Aether Beam), Baby Sprout (Vengeful Sprout), Chthonic Pull (Chthonic Charge), Counter Talon (Talon Slash), Massive Missile (Magic Missile), Piercing Blades (Phantom Blades), Pulling Whirl (Necro Whirl), Scepter Link (Scepter Mesh), Solar Zenith (Solar Pulse), Super Star (Falling Stars), Unrung Bells (Bell March), Waxing Moon (Moonerang), Wing Split (Aurora Wings).
+- Only the Reginald-eligible subset belongs in this one-hero product. Non-Reginald signature spells and their augmentations remain excluded.
+- The four augmentations for each 1.2 starter are our own named, original gameplay adaptations because official notes provide only the count, not their source names/effects. Do not label those twelve as source-faithful. Their actual mechanics must be tested individually.
+- Official source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026, patch 1.2.0.20127); the same feed's 22 Oct 2026 performance patch makes high-entity stability a first-class quality requirement.
