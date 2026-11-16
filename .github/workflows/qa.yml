@@ -35,6 +35,8 @@ jobs:
         run: python tests/progression_regression.py
       - name: Browser normal-play 90-second combat smoke
         run: python tests/normal_play_smoke.py
+      - name: Browser full mission natural boss victory attempt
+        run: python tests/full_mission_natural_run.py
       - name: Browser 3D combat, boss and objectives integration
         run: python tests/game3d_integration.py
       - name: Browser solo spell trials and quest persistence regression
