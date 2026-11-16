@@ -105,7 +105,8 @@
     "One-hero temporary trial remains an explicitly labeled single-player adaptation, not an original-game mechanic",
     "Level-2 second spell slot remains a provisional research assumption pending authoritative source confirmation",
     "WebGL2 3D path remains experimental and is unavailable in the current software Chromium environment; 2.5D is the primary renderer",
-    "Progression CI assertion lagged behind save schema v3; updated to assert v3, preserving migration behavior and other regression checks"
+    "Progression CI assertion lagged behind save schema v3; updated to assert v3, preserving migration behavior and other regression checks",
+    "Reginald spell-scope regression probe used the same literal backslash-n injection defect; corrected test harness to insert a real newline"
   ],
   "next_action": "Continue from the source-pinned Reginald spell/quest/augmentation audit. Implement and verify missing 1.2 and legacy augmentation behaviors, then test objective variants and all three bosses in natural play. Run a complete 19-minute mission with a natural boss kill, real save/reload on an actual file origin, and repeatable 60 FPS hardware benchmarks before any READY or release claim.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
@@ -137,5 +138,5 @@
     "tested": "Atlas enemy sprites, 24 static decor cache tiles, 18 Reginald-eligible spells, save migration filtering, 15-second combat and level-up flow, desktop/mobile synthetic stress, no JS/console errors and no external requests",
     "not_tested": "full 19-minute run, natural boss win, real file:// persistence, real hardware performance, source-complete spell effects and owner acceptance"
   },
-  "latest_candidate_ci_status": "PENDING_FOR_17070BC_WITH_CORRECT_GITHUB_BYTES"
+  "latest_candidate_ci_status": "PENDING_ALL_TEST_HARNESS_NEWLINE_REPAIRS"
 }
