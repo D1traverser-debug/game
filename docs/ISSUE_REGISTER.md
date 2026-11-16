@@ -35,3 +35,6 @@
 | GAME-023 | P1 | Spell-specific quests for imp/sprout/blades/talon and others are not event-complete | TRIAL-004 implements only a source-derived subset | OPEN | Complete all solo-applicable quest event trackers |
 | GAME-024 | P0 | Textured 3D + adaptive scale still misses the FPS target in software tests | TRIAL-004 SwiftShader ~15-25 FPS observed | OPEN | Profile rendering, reduce expensive draw calls, test real GPU |
 | GAME-025 | P0 | Complete 3D art/audio quality is not comparable to original title yet | Current low-poly screenshot and absence of production audio/character animation | OPEN | Produce original assets, VFX, SFX and review under peak combat |
+
+| GAME-026 | P1 | XP orb acquisition feels inconsistent in short smoke play | 15-second movement smoke recorded 18 kills but 0 XP collected while orbs remained visible; movement path did not reliably cross pickup radius | OPEN | Test controlled pickup/magnet cases and tune drop placement/magnet radius without inflating XP |
+| GAME-027 | P0 | Art-forward 2.5D candidate is not synchronized to repository source | Local candidate SHA-256 de29ddd55575f1fe78c9b525d41709c2d619d41694cac4eb679cd0dd5f41d48f, 718627 bytes; GitHub index.html is still older 3D source | OPEN | Transfer exact candidate bytes into GitHub, fetch back and verify SHA before treating it as repository current |
