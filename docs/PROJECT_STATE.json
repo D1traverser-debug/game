@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "PROGRESSION_002_REGRESSION_PASS_NOT_READY",
+  "checkpoint": "PROGRESSION_002_DEBUG_STRIPPED_COMPONENT_PASS",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -30,7 +30,8 @@
     "Raw WebGL2 3D vertical slice runs in Chromium 144 under Xvfb/SwiftShader with zero JS/console/WebGL errors and zero external requests",
     "17/17 Playwright component progression checks passed using temporarily injected probes and mocked storage",
     "Web UI smoke passed for desktop/mobile menu, start, pause, HUD and joystick",
-    "Committed actual progression code fixes and new spell scaffolds to development; main preserved"
+    "Committed actual progression code fixes and new spell scaffolds to development; main preserved",
+    "Query-gated window.__QA mutation API stripped from player HTML; regression 17/17 and desktop/mobile UI smoke pass"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -57,6 +58,7 @@
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "c7980a12e582cf3c265b8bbdaf1e7f16eecfcd6b",
-  "last_development_product_commit": "656881540ec26c5d60a580baa2ac42ac21128595",
-  "development_candidate_sha256": "a4fe8215c491d2139f8345a8f331482cf9d399a9a5d59742b348a08d32f85095"
+  "last_development_product_commit": "29492caf5b7db433704f9cfa7543b0e3126b2e6e",
+  "development_candidate_sha256": "e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190",
+  "development_candidate_bytes": 119417
 }
