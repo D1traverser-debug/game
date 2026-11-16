@@ -62,3 +62,12 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - 200-enemy synthetic scene reported ~20 FPS in software rendering. This is not a hardware performance verdict; GPU benchmark remains NOT_TESTED.
 - Current renderer is still rough; no visual acceptance. WebGL 3D + DOM UI is the direction; raw WebGL2 vs bundled Three.js engine choice remains OPEN.
 - Next: profile/cull/batch the 3D slice, compare engine choices on identical content, and then implement the versioned progression contract. Do not replace main index.html yet.
+
+## Expanded source research (2026-11-16)
+- Official Steam announcement feed was opened directly; latest public post found in this snapshot is the 2026-10-22 performance patch, after 1.2.0.20127 (2026-10-06).
+- 1.1 patch lines 317-322 confirm third spell at player level 13, fourth at 20, immediate upgrade on new spell, starting spell levels 3/4 for slots 3/4. Second-slot milestone remains unverified.
+- 1.2 patch lines 51-80 confirm Loaded Dice, Tiny Tremors, Wicked Buzzsaw (all unlocked from start), four augmentations each, and 13 named augmentations for older spells. Lines 104-109 confirm specific infusion crit fixes and removal of Healing Slam from solo.
+- Current objectives reference confirms 02:00, 06:00, 11:00, 14:00 and boss 19:00; 10 objective types and 1.1 variants need implementation.
+- There are three named end-run bosses: Sol'phish, Krog'wa and Mul'gath. The current prototype's Sol'phish-only boss is incomplete.
+- Current single-player scope must exclude co-op-only augmentations and teammate-only quests.
+- See docs/MECHANIC_REFERENCE_MATRIX.md and docs/ISSUE_REGISTER.md for expanded content and issues.
