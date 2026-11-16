@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "WEBGL_SLICE_001_TECHNICAL_SMOKE_COMPLETE",
+  "checkpoint": "SOURCE_MATRIX_EXPANDED_AND_WEBGL_SLICE_RECORDED",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -42,12 +42,14 @@
     "Spell slots are offered randomly instead of source-derived level milestones",
     "Three 1.2.0 spells and their augmentations are missing",
     "Current QA oracle is nondeterministic and includes forced state mutation",
-    "Renderer architecture selected for a controlled WebGL 3D hybrid experiment; not yet implemented",
     "WebGL 3D slice is a rough prototype, not accepted visual quality",
     "200-enemy SwiftShader synthetic profile reports approximately 20 FPS; hardware GPU benchmark is not tested",
-    "Renderer engine choice (raw WebGL2 vs bundled Three.js) remains open"
+    "Renderer engine choice (raw WebGL2 vs bundled Three.js) remains open",
+    "Current boss implementation is Sol'phish-only; Krog'wa and Mul'gath are missing",
+    "Objective variants introduced in 1.1 and full solo objective catalogue are not yet verified",
+    "Reginald-only persistent meta/quest subset is not yet implemented"
   ],
-  "next_action": "Profile and improve the 3D slice, compare raw WebGL2 and Three.js on the same scene, then implement the source-derived progression/content contract.",
+  "next_action": "Continue the 3D renderer experiment with culling/batching and compare raw WebGL2 versus bundled Three.js; in parallel define the source-versioned spell, quest, infusion, objective and boss content contracts.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "c7980a12e582cf3c265b8bbdaf1e7f16eecfcd6b"
