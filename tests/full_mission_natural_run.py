@@ -166,7 +166,8 @@ window.__fullRun = async (maxSeconds) => {
     errors:p.hp<0||!Number.isFinite(p.hp)||!Number.isFinite(game.time)
   };
 };
-"""DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
+"""
+DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
 
 async def main():
     report={"checks":{},"page_errors":[],"console_errors":[],"external_requests":[]}
