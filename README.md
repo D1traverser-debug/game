@@ -28,3 +28,18 @@ The root `index.html` is the current single-file prototype and current runnable 
 
 ## Release rule
 Do not mark the project READY until the complete acceptance matrix is passed against the exact release artifact, including real player-driven full-run completion, genuine boss combat, save/reload, desktop and mobile input, performance, visual review, and independent acceptance. See `docs/RELEASE_GATES.md`.
+
+
+## Repository recovery and mechanical validation
+For a new development session, begin with AGENTS.md, HANDOFF.md, and docs/PROJECT_STATE.json. Read the real development branch and exact commit, not a previous chat summary.
+
+Mechanical checks (developer environment):
+```bash
+python scripts/verify_project_state.py
+python -m unittest discover -s tests -p 'test_*.py' -v
+pip install playwright
+python -m playwright install chromium
+python tests/progression_regression.py
+```
+
+These commands check repository/source integrity and component behavior. They do not establish full 19-minute player-driven completion, source-perfect visual fidelity, actual file:// save/reload, hardware performance, or owner satisfaction. The only user deliverable remains the root standalone HTML when all release gates pass.
