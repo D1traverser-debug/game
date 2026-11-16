@@ -34,7 +34,7 @@ async def run():
   await page.set_content(DOCUMENT,wait_until='domcontentloaded')
   save=await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1'))")
   checks['starter_unlocks']=set(save['unlocks'])=={'astral','loadedDice','tinyTremors','wickedBuzzsaw'}
-  checks['schema_v2']=save['schemaVersion']==2
+  checks['schema_v3']=save['schemaVersion']==3
   await page.locator('#start').click()
   checks['only_reginald_starter']=await page.evaluate("window.__TEST.dump().spells[0].id==='astral'&&window.__TEST.dump().slots===1")
   b=[[1,1],[2,2],[12,2],[13,3],[19,3],[20,4]]
