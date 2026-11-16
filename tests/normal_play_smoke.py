@@ -19,7 +19,7 @@ PROBE = r"""
 window.__normalPlay = async (seconds) => {
   const dt = 0.1;
   let elapsed = 0, ticks = 0, upgrades = 0;
-  while (elapsed < seconds && screen === 'playing' && !game.ended) {
+  while (elapsed < seconds && (screen === 'playing' || screen === 'upgrade') && !game.ended) {
     if (screen === 'upgrade') {
       const opts = game.pending?.opts || [];
       if (!opts.length) break;
