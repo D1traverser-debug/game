@@ -35,5 +35,7 @@ jobs:
         run: python tests/progression_regression.py
       - name: Browser 3D combat, boss and objectives integration
         run: python tests/game3d_integration.py
+      - name: Browser solo spell trials and quest persistence regression
+        run: python tests/trial_unlock_regression.py
 
 # CI is a mechanical + browser component gate, NOT a full player acceptance gate.
