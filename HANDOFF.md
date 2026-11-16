@@ -53,3 +53,12 @@ If the repository head, state file, and handoff disagree, stop and reconcile the
 
 ## Next action
 Perform the full source-grounded audit of the current `index.html` against the requirements and original-game references. Reclassify the baseline QA claims, identify shared root causes at L0–L5, compare architecture alternatives, then implement a test-first vertical slice for the highest-impact gameplay loop. Keep project status `NOT_READY`.
+
+
+## Latest work after AUDIT-001
+- Added experiments/webgl-slice.html: self-contained raw WebGL2 3D scene and instanced renderer prototype.
+- Added tests/webgl-slice-smoke.py and docs/experiments/WEBGL_SLICE_001.md.
+- Technical smoke passed under Chromium 144 + Xvfb/SwiftShader: WebGL2, menu-to-play, zero page/console/WebGL errors, zero external requests.
+- 200-enemy synthetic scene reported ~20 FPS in software rendering. This is not a hardware performance verdict; GPU benchmark remains NOT_TESTED.
+- Current renderer is still rough; no visual acceptance. WebGL 3D + DOM UI is the direction; raw WebGL2 vs bundled Three.js engine choice remains OPEN.
+- Next: profile/cull/batch the 3D slice, compare engine choices on identical content, and then implement the versioned progression contract. Do not replace main index.html yet.
