@@ -38,3 +38,11 @@ Research snapshot date: 2026-11-16. Source versions must be pinned per mechanic.
 - The official announcement feed is dynamic; capture the exact announcement and date when a new behavior is adopted.
 - The reference links above are research starting points, not a claim that the original executable was inspected.
 - We must not copy extracted proprietary assets, source code, animations, sound, music, or game data files. Use independent implementation and original visual/audio assets.
+
+
+## 1.1 / 1.2 progression and visual evidence (added 2026-11-16)
+- Official Update 1.1 notes say the third spell is acquired at player level 13 and the fourth at level 20; a new spell can receive an immediate upgrade, with the third and fourth spells immediately raised to levels 3 and 4. Source: https://steamcommunity.com/app/2904000/announcements/
+- Official 1.2.0.20127 spell patch (2026-10-06) adds Loaded Dice, Tiny Tremors and Wicked Buzzsaw, described as unlocked from the start, each with four augmentations. It also adds 13 augmentations for existing spells. Source: https://steamcommunity.com/app/2904000/announcements/
+- Official Steam screenshots show a 3D top-down arena, modeled characters/enemies, terrain/props, layered spell effects and HUD. Source: https://store.steampowered.com/app/2904000/The_Spell_Brigade/
+- Official 2026-10-22 performance patch explicitly addresses stability/performance in Endless runs. Source: https://steamcommunity.com/app/2904000/announcements/
+- Current implementation's 2D Canvas art and random spell acquisition are not faithful to this evidence.
