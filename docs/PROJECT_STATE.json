@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "EXACT_PROTOTYPE_BASELINE_CAPTURED",
+  "checkpoint": "AUDIT_001_SOURCE_AND_QA_AUDIT_COMPLETE",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -25,7 +25,8 @@
     "Repository discovered and confirmed initially empty",
     "Previous single-file prototype recovered",
     "Previous QA evidence reclassified",
-    "Exact latest 116721-byte HTML source read back from Library and committed to main"
+    "Exact latest 116721-byte HTML source read back from Library and committed to main",
+    "Source-grounded audit confirmed unlock overwrite, random spell acquisition, missing 1.2 spells, synthetic QA oracle and 2D visual mismatch"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -35,8 +36,15 @@
     "Original-game source version and detailed mechanic data not fully pinned",
     "Spell/enemy/objective/boss fidelity incomplete",
     "Visual/audio quality and balance not independently accepted",
-    "Human owner playtest not performed"
+    "Human owner playtest not performed",
+    "All spell unlocks are overwritten at runtime; quest-based unlock model is not implemented",
+    "Spell slots are offered randomly instead of source-derived level milestones",
+    "Three 1.2.0 spells and their augmentations are missing",
+    "Current QA oracle is nondeterministic and includes forced state mutation",
+    "Renderer architecture selected for a controlled WebGL 3D hybrid experiment; not yet implemented"
   ],
-  "next_action": "Audit committed index.html against the requirements and source references; create root-cause records and architecture comparison before the next major implementation.",
-  "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed."
+  "next_action": "Build and test the source-derived progression/content contract, then execute the WebGL 3D vertical-slice experiment on development.",
+  "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
+  "branch": "development",
+  "last_main_baseline_commit": "c7980a12e582cf3c265b8bbdaf1e7f16eecfcd6b"
 }
