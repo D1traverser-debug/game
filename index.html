@@ -364,7 +364,7 @@ function renderResearch(){let box=$('questGrid');if(!box)return;
   save.trialSpellId=btn.dataset.trial;persist();renderResearch();toast('试炼已选择：'+spells.find(x=>x.id===save.trialSpellId).name)});
 }
 
-function makePlayer(){let e=save.enchant;let p={x:0,y:0,r:17,hp:100+(e.maxHp||0)*150/5,maxHp:100+(e.maxHp||0)*150/5,level:1,xp:0,nextXp:18,move:170*(1+(e.speed||0)*.06),damage:1+(e.damage||0)*.05,cast:1+(e.cast||0)*.03,spellSize:1.25+(e.size||0)*.04,crit:.05+(e.crit||0)*.03,critDmg:1.5+(e.critDmg||0)*.064,armor:(e.armor||0)*20/5,regen:(e.regen||0)*3, luck:2+(e.luck||0)*1.0,rerolls:e.reroll||0,banishes:e.banish||0,locks:e.lock||0,dodge:(e.dodge||0)*.04,manaPull:100+(e.manaPull||0)*20,spells:[{...spells[0],cd:spells[0].cd*.88,level:1,cdNow:0,infusions:[],augments:[]}],scrolls:[],kills:0,damageDone:0,casts:0,critHits:0,objectives:0,scrollCount:0,stand:0,invuln:0,stagger:0,lowSpeed:false,hardLessons:false,attune:false,growth:false,manaSiphon:false,vital:false,thick:false,fight:false,elixir:false,healBonus:0,overload:false,damageTaken:0,heal:0,rerollUsed:0,banished:[],lastMove:0,combo:0,ghost:false,ghostUsed:false,ghostTimer:0};return p}
+function makePlayer(){let e=save.enchant;let p={x:0,y:0,r:17,hp:100+(e.maxHp||0)*150/5,maxHp:100+(e.maxHp||0)*150/5,level:1,xp:0,nextXp:18,move:170*(1+(e.speed||0)*.06),damage:1+(e.damage||0)*.05,cast:1+(e.cast||0)*.03,spellSize:1.25+(e.size||0)*.04,crit:.05+(e.crit||0)*.03,critDmg:1.5+(e.critDmg||0)*.064,armor:(e.armor||0)*20/5,regen:(e.regen||0)*3, luck:2+(e.luck||0)*1.0,manaGain:1,rerolls:e.reroll||0,banishes:e.banish||0,locks:e.lock||0,dodge:(e.dodge||0)*.04,manaPull:100+(e.manaPull||0)*20,spells:[{...spells[0],cd:spells[0].cd*.88,level:1,cdNow:0,infusions:[],augments:[]}],scrolls:[],kills:0,damageDone:0,casts:0,critHits:0,objectives:0,scrollCount:0,stand:0,invuln:0,stagger:0,lowSpeed:false,hardLessons:false,attune:false,growth:false,manaSiphon:false,vital:false,thick:false,fight:false,elixir:false,healBonus:0,overload:false,damageTaken:0,heal:0,rerollUsed:0,banished:[],lastMove:0,combo:0,ghost:false,ghostUsed:false,ghostTimer:0};return p}
 function startRun(){game={time:0,world:2600,player:makePlayer(),enemies:[],orbs:[],shots:[],plants:[],ghostImps:[],castSequence:0,ghostDamage:0,ghostTimer:0,fx:[],damageNumbers:[],decor:[],chests:[],hazards:[],boss:null,spawn:0,objective:null,nextObj:0,doneObj:0,nextChest:120,paused:false,ended:false,shake:0,killStreak:0,score:0,randomSeed:1,lockedOption:null,hudTick:0,pendingLevels:0,stats:{}};generateDecor();buildDecorCache(game.decor);for(let i=0;i<12;i++)spawnEnemy(true);document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now();sound(440,.15,'triangle');toast('远征开始：保护自己，收集奥术经验');renderHud()}
 function generateDecor(){let d=game.decor;for(let i=0;i<480;i++){let x=rand(-1250,1250),y=rand(-1000,1000);let r=Math.random();d.push({x,y,type:r<.52?'grass':r<.72?'flower':r<.85?'stone':r<.95?'bush':'tree',s:rand(.55,1.5),rot:rand(0,TAU),c:Math.floor(rand(0,4))})}}
 function spawnEnemy(initial=false,type){if(!game)return;if(game.enemies.filter(e=>!e.dead).length>240)return;let p=game.player,ang=rand(0,TAU),dist=initial?rand(300,700):rand(530,780),x=p.x+Math.cos(ang)*dist,y=p.y+Math.sin(ang)*dist;let t=type||enemyType(game.time);let base={crawler:[34,45,48,18],sprout:[45,62,55,16],ranged:[58,52,62,16],buffer:[90,45,72,17],shield:[150,38,95,22],gnasher:[160,70,126,24],crabladon:[420,50,220,33]};let a=base[t]||base.crawler;let threat=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;let scale=(1+game.time/520)*threat;game.enemies.push({id:Math.random(),type:t,x,y,r:a[3],hp:a[0]*scale,max:a[0]*scale,speed:a[1]*(1+game.time/2400),dmg:a[2]*(1+game.time/1200)*threat,attack:rand(.3,2),heal:rand(1,4),state:'chase',stateT:0,slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0,elite:!initial&&Math.random()<.025+game.time/1800,dead:false,stagger:0})}
@@ -398,7 +398,7 @@ function checkSpellUnlocks(){
  if(additions.length)persist();
 }
 function checkElementUnlocks(){let st=save.stats,req=[['lightning',(st.fire||0)>=777777],['acid',(st.lightningHits||0)>=14400],['ice',(st.acid||0)>=2727272],['dark',(st.iceHits||0)>=11700]];for(let [id,ok] of req){if(ok&&!save.elementUnlocks?.includes(id)){save.elementUnlocks=save.elementUnlocks||[];save.elementUnlocks.push(id);persist();toast('元素研究完成：'+elements[id].name+' 已解锁')}}}
-function addXp(v){if(!Number.isFinite(v)||v<=0)return;let p=game.player;let mult=1+(save.enchant.manaGain||0)*.03;if(p.hardLessons)mult+=.4*(1-p.hp/p.maxHp);p.xp+=v*mult;while(p.xp>=p.nextXp){p.xp-=p.nextXp;p.level++;p.nextXp=Math.floor(p.nextXp*1.24+8);if(p.growth)p.hp=Math.min(p.maxHp,p.hp+p.maxHp*.1);if(save.enchant.regen)p.hp=Math.min(p.maxHp,p.hp+3*save.enchant.regen);game.pendingLevels++}if(screen==='playing'&&game.pendingLevels>0){game.pendingLevels--;offerUpgrade('level')}}
+function addXp(v){if(!Number.isFinite(v)||v<=0)return;let p=game.player;let mult=(p.manaGain||1)*(1+(save.enchant.manaGain||0)*.03);if(p.hardLessons)mult+=.4*(1-p.hp/p.maxHp);p.xp+=v*mult;while(p.xp>=p.nextXp){p.xp-=p.nextXp;p.level++;p.nextXp=Math.floor(p.nextXp*1.24+8);if(p.growth)p.hp=Math.min(p.maxHp,p.hp+p.maxHp*.1);if(save.enchant.regen)p.hp=Math.min(p.maxHp,p.hp+3*save.enchant.regen);game.pendingLevels++}if(screen==='playing'&&game.pendingLevels>0){game.pendingLevels--;offerUpgrade('level')}}
 function chooseElementOptions(){return ['fire',...(save.elementUnlocks||[])]}
 function spellElementOptions(sp){let avail=chooseElementOptions(),options=[];if(sp.infusions.length===0)avail.forEach(id=>options.push({type:'infuse',el:id}));else if(sp.infusions.length===1&&save.doubleInfusionUnlocked)avail.forEach(id=>options.push({type:'infuse',el:id}));return options}
 // Official 1.1 establishes slot 3 at player level 13 and slot 4 at level 20.
@@ -417,11 +417,57 @@ function offerUpgrade(reason){if(screen!=='playing')return;let p=game.player,opt
   game.pending={opts,reason};renderUpgrade();show('upgrade');return;
  }
 let rarity=()=>{let r=Math.random(),luck=p.luck+(save.enchant.luck||0)*1;if(r<.04+luck*.003)return'LEGENDARY';if(r<.29+luck*.007)return'EPIC';if(r<.54+luck*.01)return'RARE';return'COMMON'};
-// spell additions / levels / infusion milestones / augmentations
-for(let i=0;i<3;i++){let existing=pick(p.spells);let op;if(i===0&&spellOfferAvailable(p)){let candidates=pool.filter(s=>!p.spells.some(x=>x.id===s.id));if(candidates.length){let s=game.player.spells.length===1&&save.trialSpellId?candidates.find(c=>c.id===save.trialSpellId)||pick(candidates):pick(candidates);op={kind:'newSpell',spell:s,title:'习得：'+s.name,desc:s.desc,icon:s.icon}}}
-if(!op&&existing&&existing.level<21){if(existing.level===6||existing.level===13){let els=spellElementOptions(existing);if(els.length){let el=pick(els);op={kind:'infuse',spell:existing,el:el.el,title:'元素注入：'+elements[el.el].name,desc:elements[el.el].desc,icon:elements[el.el].icon}}}if(!op)op={kind:'spellLevel',spell:existing,title:existing.name+' 强化',desc:'法术等级提升，伤害与施法效率提高。',icon:existing.icon}}
-if(!op){let stat=pick([{k:'damage',n:'奥术伤害',d:'所有法术伤害提高 10%。',i:'✦'},{k:'speed',n:'迅捷步伐',d:'移动速度提高 8%。',i:'➤'},{k:'crit',n:'精准施法',d:'暴击率提高 5%。',i:'✧'},{k:'critDmg',n:'致命一击',d:'暴击伤害提高 20%。',i:'✹'},{k:'armor',n:'魔法护甲',d:'护甲提高 12 点。',i:'⬡'},{k:'regen',n:'生命再生',d:'每秒恢复 2 点生命。',i:'♡'},{k:'luck',n:'命运眷顾',d:'幸运提高 3 点。',i:'☘'},{k:'magnet',n:'魔力牵引',d:'经验球拾取范围提高 25%。',i:'◎'}]);op={kind:'stat',...stat,title:stat.n,desc:stat.d,icon:stat.i}}
-op.rarity=rarity();opts.push(op)}
+// Source-backed global character upgrades are offered alongside spell improvements.
+const SIZE_UPGRADE_SPELLS=new Set(['sword','solar','bell','hex','necro','blades','rocky','sickle','sprout','talon']);
+const CHARACTER_UPGRADES=[
+ {k:'maxHp',name:'生命锻造 · Vitality Forge',icon:'♡',values:{COMMON:100,RARE:200,EPIC:300,LEGENDARY:400},desc:v=>'最大生命值提高 '+v+'。'},
+ {k:'regen',name:'复苏回响 · Rejuvenating Echo',icon:'✚',values:{COMMON:1,RARE:2,EPIC:3,LEGENDARY:4},desc:v=>'每秒生命恢复提高 '+v+'。'},
+ {k:'armor',name:'秘法屏障 · Mystic Barrier',icon:'⬡',values:{COMMON:16,RARE:26,EPIC:36,LEGENDARY:50},desc:v=>'护甲提高 '+v+'。'},
+ {k:'dodge',name:'迅捷闪避 · Swift Overlay',icon:'➤',values:{COMMON:.04,RARE:.06,EPIC:.09,LEGENDARY:.12},desc:v=>'闪避率提高 '+Math.round(v*100)+'%。'},
+ {k:'speed',name:'疾行涌动 · Quickstep Surge',icon:'➤',values:{COMMON:.08,RARE:.12,EPIC:.18,LEGENDARY:.18},desc:v=>'移动速度提高 '+Math.round(v*100)+'%。'},
+ {k:'damage',name:'泰坦之怒 · Titan’s Fury',icon:'✦',values:{COMMON:.05,RARE:.10,EPIC:.15,LEGENDARY:.20},desc:v=>'所有法术伤害提高 '+Math.round(v*100)+'%。'},
+ {k:'spellSize',name:'巨像恩泽 · Colossal Grace',icon:'◉',values:{RARE:.12,EPIC:.15,LEGENDARY:.18},desc:v=>'法术尺寸提高 '+Math.round(v*100)+'%。'},
+ {k:'cast',name:'迅捷帷幕 · Veil of Haste',icon:'⌁',values:{COMMON:.06,RARE:.09,EPIC:.12,LEGENDARY:.18},desc:v=>'基础施法速度提高 '+Math.round(v*100)+'%。'},
+ {k:'crit',name:'施法精准 · Caster Precision',icon:'✧',values:{COMMON:.04,RARE:.06,EPIC:.09,LEGENDARY:.12},desc:v=>'暴击率提高 '+Math.round(v*100)+'%。'},
+ {k:'critDmg',name:'巫师锋芒 · Wizard’s Edge',icon:'✹',values:{COMMON:.10,RARE:.20,EPIC:.35,LEGENDARY:.50},desc:v=>'暴击伤害提高 '+Math.round(v*100)+'%。'},
+ {k:'manaPull',name:'心智牵引 · Mind’s Reach',icon:'◎',values:{COMMON:.08,RARE:.12,EPIC:.18,LEGENDARY:.24},desc:v=>'经验球牵引范围提高 '+Math.round(v*100)+'%。'},
+ {k:'manaGain',name:'智慧拥抱 · Wisdom’s Embrace',icon:'◇',values:{COMMON:.07,RARE:.12,EPIC:.17,LEGENDARY:.21},desc:v=>'经验获取提高 '+Math.round(v*100)+'%。'},
+ {k:'luck',name:'命运眷顾 · Fortune’s Favor',icon:'☘',values:{COMMON:2,RARE:4,EPIC:6,LEGENDARY:8},desc:v=>'幸运提高 '+v+'。'}
+];
+const usedStats=new Set(),usedSpells=new Set();
+const statOption=tier=>{
+ let pool=CHARACTER_UPGRADES.filter(x=>!usedStats.has(x.k)&&(x.k!=='spellSize'||p.spells.some(sp=>SIZE_UPGRADE_SPELLS.has(sp.id))));
+ if(!pool.length)return null;
+ const def=pick(pool),amount=def.values[tier];
+ if(amount===undefined)return null;
+ usedStats.add(def.k);
+ return {kind:'stat',k:def.k,amount,title:def.name,desc:def.desc(amount),icon:def.icon,rarity:tier};
+};
+const spellOption=()=>{
+ const choices=p.spells.filter(sp=>sp.level<21&&!usedSpells.has(sp.id));
+ if(!choices.length)return null;
+ const existing=pick(choices);usedSpells.add(existing.id);
+ if(existing.level===6||existing.level===13){
+  const els=spellElementOptions(existing);
+  if(els.length){const el=pick(els);return {kind:'infuse',spell:existing,el:el.el,title:'元素注入：'+elements[el.el].name,desc:elements[el.el].desc,icon:elements[el.el].icon};}
+ }
+ return {kind:'spellLevel',spell:existing,title:existing.name+' 强化',desc:'法术等级提升，伤害与施法效率提高。',icon:existing.icon};
+};
+for(let i=0;i<3;i++){
+ const tier=rarity();let op=null;
+ if(i===0&&spellOfferAvailable(p)){
+  const candidates=pool.filter(sp=>!p.spells.some(x=>x.id===sp.id));
+  if(candidates.length){const sp=game.player.spells.length===1&&save.trialSpellId?candidates.find(c=>c.id===save.trialSpellId)||pick(candidates):pick(candidates);op={kind:'newSpell',spell:sp,title:'习得：'+sp.name,desc:sp.desc,icon:sp.icon};}
+ }
+ if(!op){
+  const statChance=i===2?.82:i===1?.48:.30;
+  if(Math.random()<statChance)op=statOption(tier);
+  if(!op)op=spellOption();
+  if(!op)op=statOption(tier);
+ }
+ if(!op)op=randomUpgrade();
+ op.rarity=tier;opts.push(op);
+}
 if(game.lockedOption)opts[0]=game.lockedOption;game.pending={opts,reason};renderUpgrade();show('upgrade');sound(660,.2,'sine')}
 function renderUpgrade(){let q=game.pending;$('upTitle').textContent=q.reason==='scroll'?'卷轴宝藏':q.reason==='objective'?'目标奖励':q.reason==='infusion'?'元素注入':'奥术共鸣';$('upEyebrow').textContent=q.reason==='scroll'?'SCROLL CHEST':q.reason==='objective'?'OBJECTIVE REWARD':'ARCANE IMPROVEMENT';$('upDesc').textContent=q.reason==='scroll'?'选择一张卷轴，为本次远征赋予被动能力。':q.reason==='objective'?'完成目标，选择一种法术专属增幅。':'选择一项强化，改变你的战斗方式。';$('upCards').innerHTML='';q.opts.forEach((op,i)=>{let d=document.createElement('button');d.className='card';d.innerHTML=`<div class="rarity">${op.rarity||'SCROLL'}</div><div class="ico">${op.icon||'✦'}</div><h3>${op.title||op.name}</h3><p>${op.desc}</p>`;d.onclick=()=>applyUpgrade(op);$('upCards').appendChild(d)});$('reroll').textContent='重掷选项　'+(game.player.rerolls||0);$('lock').textContent='锁定首项　'+(game.player.locks||0);$('banish').textContent='放逐　'+(game.player.banishes||0)}
 function applyUpgrade(op){let p=game.player;if(game.lockedOption===op)game.lockedOption=null;if(op.kind==='newSpell'){
@@ -443,7 +489,7 @@ function applyUpgrade(op){let p=game.player;if(game.lockedOption===op)game.locke
  if(op.aug==='tempo')op.spell.cd=Math.max(.35,op.spell.cd*.82);
  if(op.aug==='reach')op.spell.range*=1.2;
  if(op.aug==='seeking')op.spell.dmg*=1.15;
- toast(op.spell.name+' 获得增幅：'+op.title)}else if(op.kind==='stat'){if(op.k==='damage')p.damage*=1.1;if(op.k==='speed')p.move*=1.08;if(op.k==='crit')p.crit+=.05;if(op.k==='critDmg')p.critDmg+=.2;if(op.k==='armor')p.armor+=12;if(op.k==='regen')p.regen+=2;if(op.k==='luck')p.luck+=3;if(op.k==='magnet')p.manaPull*=1.25}else if(op.kind==='scroll'){op.fn(p);p.scrolls.push(op.name);p.scrollCount++;save.stats.scrolls=(save.stats.scrolls||0)+1;toast('获得卷轴：'+op.name)}else if(op.kind==='objective'){if(op.effect)op.effect(p)}game.pending=null;document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';renderHud();sound(520,.09,'triangle');if(game.pendingSpellBonus){offerUpgrade('newSpellBonus')}else if(game.pendingLevels>0){game.pendingLevels--;offerUpgrade('level')}}
+ toast(op.spell.name+' 获得增幅：'+op.title)}else if(op.kind==='stat'){const v=op.amount||0;if(op.k==='maxHp')p.maxHp+=v;if(op.k==='regen')p.regen+=v;if(op.k==='armor')p.armor+=v;if(op.k==='dodge')p.dodge=Math.min(.75,p.dodge+v);if(op.k==='speed')p.move*=1+v;if(op.k==='damage')p.damage*=1+v;if(op.k==='spellSize')p.spellSize*=1+v;if(op.k==='cast')p.cast*=1+v;if(op.k==='crit')p.crit=Math.min(.8,p.crit+v);if(op.k==='critDmg')p.critDmg+=v;if(op.k==='manaPull')p.manaPull*=1+v;if(op.k==='manaGain')p.manaGain=(p.manaGain||1)*(1+v);if(op.k==='luck')p.luck+=v}else if(op.kind==='scroll'){op.fn(p);p.scrolls.push(op.name);p.scrollCount++;save.stats.scrolls=(save.stats.scrolls||0)+1;toast('获得卷轴：'+op.name)}else if(op.kind==='objective'){if(op.effect)op.effect(p)}game.pending=null;document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';renderHud();sound(520,.09,'triangle');if(game.pendingSpellBonus){offerUpgrade('newSpellBonus')}else if(game.pendingLevels>0){game.pendingLevels--;offerUpgrade('level')}}
 $('reroll').onclick=()=>{if(!game?.pending)return;let p=game.player;if(p.rerolls>0){p.rerolls--;p.rerollUsed++}else if(p.hp>20){p.hp-=20}else{toast('资源不足');return}let reason=game.pending.reason;if(reason==='scroll'){let pool=scrolls.filter(s=>!p.scrolls.includes(s.name));let arr=pool.sort(()=>Math.random()-.5).slice(0,3);game.pending.opts=arr.map(s=>({kind:'scroll',name:s.name,title:s.name,desc:s.desc,icon:'▤',fn:s.fn,rarity:'SCROLL'}));renderUpgrade()}else if(reason==='objective'){game.pending.opts.sort(()=>Math.random()-.5);renderUpgrade()}else{screen='playing';offerUpgrade(reason)}sound(600,.08,'triangle')};$('lock').onclick=()=>{let p=game.player;if(!p.locks){toast('没有锁定次数');return}if(!game.pending?.opts?.length)return;game.lockedOption=game.pending.opts[0];p.locks--;toast('已锁定：'+game.lockedOption.title+'，下次升级仍会出现');renderUpgrade()};$('banish').onclick=()=>{let p=game.player;if(!p.banishes){toast('没有放逐次数');return}p.banishes--;let idx=Math.floor(Math.random()*game.pending.opts.length);game.pending.opts.splice(idx,1);game.pending.opts.push(randomUpgrade());renderUpgrade()};function randomUpgrade(){let p=game.player,s=pick(p.spells);return {kind:'spellLevel',spell:s,title:s.name+' 强化',desc:'法术伤害与施法效率提升。',icon:s.icon,rarity:'RARE'}}
 function spellInfusion(sp){return sp.infusions.length>1?{a:sp.infusions[0],b:sp.infusions[1]}:sp.infusions.length?sp.infusions[0]:null}function fireSpell(sp){let p=game.player,t=nearest(p.x,p.y,(sp.kind==='orbit'?540:sp.range*1.5)),el=spellInfusion(sp),castId=++game.castSequence;game.lastCastId=castId;
  if(game.objective?.type==='crab'&&game.objective.crab?.alive){let c=game.objective.crab;if(Math.hypot(c.x-p.x,c.y-p.y)<sp.range*1.5+150)t={...c,type:'crabladon',objectiveCrab:true,dead:false,r:c.r||15};}
