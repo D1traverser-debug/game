@@ -29,7 +29,7 @@ Status at baseline: all requirements below are authoritative project requirement
 | UX-03 | Audio controls, readable sound cues, mute behavior, original sound design | P1 | Sound inventory, mute/volume tests, audio review | PARTIAL |
 | SAVE-01 | Robust save/load, version migration, corruption recovery, reset confirmation | P0 | Actual close/reopen, schema migration, corruption and reset tests | NOT_TESTED |
 | PERF-01 | Target 60 FPS desktop and at least 30 FPS on agreed mobile reference device under representative peak combat load | P0 | Repeatable benchmark on named devices; average and p95 frame time | FAIL_BASELINE |
-| VIS-01 | Original art has readable silhouettes, animation, impact, spell identity, enemy telegraphs and coherent environment | P0 | Screenshot/video review at normal and peak combat density | PARTIAL_3D_NOT_ACCEPTED |
+| VIS-01 | Original art has readable silhouettes, animation, impact, spell identity, enemy telegraphs and coherent environment | P0 | Screenshot/video review at normal and peak combat density | PARTIAL_2_5D_ATLAS_NOT_ACCEPTED |
 | QA-01 | No uncaught runtime errors, softlocks, unfinishable objectives, dead upgrade choices or invalid victory states | P0 | Automated regression, fault injection and player-driven run | NOT_TESTED |
 | RELEASE-01 | Exact release artifact reproducibly built, hashed, offline tested and published | P0 | Build manifest, SHA-256, release URL and clean-machine test | NOT_READY |
 | ACCEPT-01 | Independent technical review and owner playtest; no unresolved P0/P1 defect | P0 | Signed acceptance report and owner approval | NOT_READY |
@@ -39,3 +39,6 @@ Record the game source version/date for every mechanic. Public wiki/community da
 
 ## Baseline truth
 The existing prototype has some menus, combat and progression code. Its previous QA was not a full product acceptance: forced boss damage, synthetic time jumps, mocked storage, and a poor 200-enemy performance result must be labelled accurately. See `QA_BASELINE.md`.
+
+| SPELL-SCOPE-01 | Only Reginald-eligible spells may appear in his research, trial, save unlocks and level-up pool | P0 | Source-backed 18-spell allowlist, legacy-save migration and browser regression | PASS_COMPONENT |
+| ART-RENDER-02 | Atlas-backed enemy sprites and cached static meadow props must be the active renderer, not shadowed dead code | P1 | Runtime atlas draw-call probe, one canonical renderer declaration, 24-tile cache test | PASS_COMPONENT |
