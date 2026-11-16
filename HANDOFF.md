@@ -167,3 +167,11 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Browser container blocks file:// navigation by administrator policy, so actual file-origin localStorage close/reopen remains NOT_TESTED.
 - Full 19-minute mission, naturally defeated boss, source-accurate spell/augmentations, objective variants, real-device performance, audio/art acceptance and owner playtest remain OPEN.
 - CAOS remains read-only; no CAOS files, branches, PRs, configuration or documentation were changed.
+
+## QA repair — 2026-11-17
+- Canonical candidate: development/index.html, product commit `17070bc703b7bd7800b4bb67d6a5c40288a9bfee`, SHA-256 `21fbfcdf3149c5d2eee188a213bf66c3fba5a6b777e7c868a5ddb823a79c0239`, 717368 bytes. PROJECT_STATE is synchronized to the actual CI-computed digest and size.
+- CI found a stale progression assertion expecting save schema v2 although production normalizeSave writes schema v3. The test now asserts v3; other progression checks remain.
+- CI found atlas renderer regression's test-only probe was injected with a literal backslash-n, so `__artProbe` was never defined. Fixed injection to use a real newline; no production game code was changed for this test harness issue.
+- GAME-031 and GAME-032 record these QA defects and repairs; GAME-033 remains OPEN for a full normal-combat mission and natural boss victory. Do not mutate boss HP/time/win state and call that acceptance.
+- Latest CI runs after these corrections: 43917069068 and 43917060710; inspect final job logs before claiming green.
+- Product remains NOT_READY. No CAOS assets or repositories touched.
