@@ -57,7 +57,7 @@ Source version note: the latest fully identified official spell update in this s
 - The community Quests reference lists spell unlock conditions for Solar Pulse, Moonerang, Arcane Broadsword, Aether Beam, Magic Missile, Rocky Road, Aurora Wings, Cardinal Runes, Talon Slash, Falling Stars, Vengeful Sprout, Phantom Blades, Impish Havoc and Bell March.
 - The same quest list reports five infusions unlock Double Infusions; Fire damage 777,777 unlocks Lightning; 14,400 Lightning hits unlock Acid; 2,727,272 Acid damage unlocks Ice; 11,700 Ice hits unlock Dark. Corruption count and all-infusions title are separate quest objectives.
 - Reginald-specific outfit quests: create a Void infusion as Reginald; augment Astral Orbs four times in one mission; collect a Legendary Improvement. These are meta/unlock progression, not extra heroes.
-- The community wiki lists 22 spells; official 1.2 adds 3, so the current referenced catalogue has at least 25. Verify whether Eugenie's Seismic Slam is available to Reginald before including it in his random spell pool.
+- The community wiki lists 22 spells; official 1.2 adds 3, so the current referenced catalogue has at least 25. Seismic Slam is Eugenie's signature spell and is not part of Reginald's eligible catalogue; exclude it from his pool.
 
 ### Infusion matrix
 Basic: Fire, Lightning, Acid, Ice, Dark.
@@ -69,3 +69,20 @@ Official 1.2 fixes Plasma burn damage to account for initial crit, and fixes Flu
 ### Solo-only content boundary
 - Official 1.2 explicitly removed Healing Slam from the augmentation pool in solo play because it is co-op-only. The single-player pool must filter co-op-only upgrades and quests, not merely omit networking.
 - Some quest achievements require teammates (revives, ally healing, friendly-fire against teammate, etc.). They must be marked unavailable/inapplicable in the solo product, or replaced only if the original has a true solo equivalent. Do not silently invent a substitute.
+
+### Reginald solo spell allowlist — source audit 2026-11-17
+The current Reginald-only build exposes 18 spells:
+- Signature: Astral Orbs.
+- 1.2 starters (officially unlocked from the start): Loaded Dice, Tiny Tremors, Wicked Buzzsaw.
+- 14 general spell-quest unlocks: Magic Missile, Solar Pulse, Moonerang, Arcane Broadsword, Aether Beam, Falling Stars, Phantom Blades, Cardinal Runes, Rocky Road, Aurora Wings, Bell March, Vengeful Sprout, Talon Slash, Impish Havoc.
+
+Do not expose other wizard Ascension signatures to Reginald: Hex Bomb (Campanelli), Necro Whirl (Kavin), Spear Barrage (Wizard King), Swirl Sickle (Hatti), Scepter Mesh (Moon Mage), Seismic Slam (Eugenie), and Chthonic Charge (Sun Mage). The prototype's orbital/Astral Orbs+ placeholder is not a verified source spell and is excluded. Save migration must remove any legacy unlock/trial flag for these non-Reginald entries.
+
+Sources:
+- Official 1.2.0.20127 patch announcement (three starters and 13 new augmentations): https://steamcommunity.com/app/2904000/announcements/
+- Spell Quests (14 general spell unlock quests and element/infusion quest conditions): https://thespellbrigade.wiki.gg/wiki/Quests
+- All wizard spells catalogue: https://thespellbrigade.wiki.gg/wiki/Spells
+- Reginald signature and traits: https://thespellbrigade.wiki.gg/wiki/Reginald
+- Ascension signature mapping discussion (secondary corroboration): https://steamcommunity.com/app/2904000/discussions/0/838375062933398814/
+
+The wiki and community discussion are secondary sources. Reconfirm against the target game build where possible. The 1.2 starter status is grounded in the official patch announcement. Do not claim the complete source game contains only 18 spells; this allowlist is specific to the one-hero Reginald product.
