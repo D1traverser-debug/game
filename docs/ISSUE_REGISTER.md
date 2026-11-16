@@ -19,3 +19,10 @@
 | GAME-014 | P0 | Current 2D renderer does not match original 3D visual structure | Steam screenshot review + current Canvas 2D | OPEN | Validate WebGL 3D hybrid vertical slice |
 
 | GAME-015 | P0 | WebGL 3D slice is not yet visually or performance accepted | WEBGL-SLICE-001: 20 FPS on SwiftShader at ~200 entities; hardware untested | OPEN | Improve scene batching/culling and benchmark on real GPU |
+
+| GAME-016 | P0 | Boss encounter pool is incomplete | Original has Sol'phish, Krog'wa and Mul'gath; baseline only implements Sol'phish | OPEN | Research and implement all Verdant Meadows eligible bosses |
+| GAME-017 | P0 | Objective catalogue/variants may be incomplete | 1.1 added variants; current implementation has a simplified set | OPEN | Build versioned objective catalogue and solo acceptance tests |
+| GAME-018 | P1 | Verdant Meadows enemy roster/behaviors are not fully traced | Gnasher, Buffer, Shield Crab, Crabladon, Teethy Worm, Bloat Crab references | OPEN | Build per-enemy behavior/drop matrix and verify spawn schedule |
+| GAME-019 | P0 | Sol'phish encounter lacks source-confirmed summon/stagger details | Wiki describes enemy convergence, red summon circle, targeted runestones, +200% stagger window | OPEN | Implement and test source-derived boss state machine |
+| GAME-020 | P1 | Solo-only upgrade filtering is not source-accurate | Official 1.2 removes Healing Slam from solo augmentation pool | OPEN | Add solo eligibility metadata to every upgrade/quest |
+| GAME-021 | P1 | Persistent quest/meta progression is incomplete | Original includes wizard rank, enchantments, masteries, scroll unlocks, ascension/covenants and Reginald outfits | OPEN | Scope and implement the Reginald-only subset |
