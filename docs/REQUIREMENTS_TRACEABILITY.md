@@ -20,16 +20,16 @@ Status at baseline: all requirements below are authoritative project requirement
 | PROG-04 | Scrolls, chests, rarity, stack limits, rerolls, bans and augment pools are faithful | P1 | Pool/weight/stacking and gameplay tests | NOT_TESTED |
 | PROG-05 | Meta progression, camp enchantments, unlocks, run statistics and reset rules | P1 | Persistence and unlock progression tests | PARTIAL |
 | ENEMY-01 | Enemy roster and behavior are specific to Verdant Meadow | P0 | Per-enemy state machine, target, attack, damage, death/drop tests | PARTIAL |
-| ENEMY-02 | Gnasher burrow, invulnerability while underground, approach, leap and landing damage | P0 | Timed behavior/state tests + combat observation | PARTIAL |
-| MISSION-01 | Objective schedule, spawn bounds, rules, success/fail, timers, bounds, rewards and variants are source-accurate | P0 | Objective-by-objective test matrix; reachable target tests | PARTIAL |
-| BOSS-01 | Sol'phish intro, burst attack, telegraph, stagger, vulnerability, damage and outro | P0 | Real combat, timing and phase tests without forced damage | NOT_TESTED |
+| ENEMY-02 | Gnasher burrow, invulnerability while underground, approach, leap and landing damage | P0 | Timed behavior/state tests + combat observation | PARTIAL_COMPONENT_PASS |
+| MISSION-01 | Objective schedule, spawn bounds, rules, success/fail, timers, bounds, rewards and variants are source-accurate | P0 | Objective-by-objective test matrix; reachable target tests | PARTIAL_9_TYPES_SYNTHETIC |
+| BOSS-01 | Sol'phish intro, burst attack, telegraph, stagger, vulnerability, damage and outro | P0 | Real combat, timing and phase tests without forced damage | PARTIAL_STATE_MACHINE_ONLY |
 | BALANCE-01 | Threat settings, spawn curve, enemy HP/damage, XP/economy and build viability | P0 | Repeated full runs with recorded outcomes and balance analysis | NOT_TESTED |
 | UX-01 | Clear HUD, map navigation, objective feedback, level-up/scroll flow, pause, result and retry | P0 | Usability review and complete player flow | PARTIAL |
 | UX-02 | Keyboard and touch controls; responsive desktop/mobile layouts | P1 | Browser/device matrix and real touch interaction | PARTIAL |
 | UX-03 | Audio controls, readable sound cues, mute behavior, original sound design | P1 | Sound inventory, mute/volume tests, audio review | PARTIAL |
 | SAVE-01 | Robust save/load, version migration, corruption recovery, reset confirmation | P0 | Actual close/reopen, schema migration, corruption and reset tests | NOT_TESTED |
 | PERF-01 | Target 60 FPS desktop and at least 30 FPS on agreed mobile reference device under representative peak combat load | P0 | Repeatable benchmark on named devices; average and p95 frame time | FAIL_BASELINE |
-| VIS-01 | Original art has readable silhouettes, animation, impact, spell identity, enemy telegraphs and coherent environment | P0 | Screenshot/video review at normal and peak combat density | FAIL_BASELINE |
+| VIS-01 | Original art has readable silhouettes, animation, impact, spell identity, enemy telegraphs and coherent environment | P0 | Screenshot/video review at normal and peak combat density | PARTIAL_3D_NOT_ACCEPTED |
 | QA-01 | No uncaught runtime errors, softlocks, unfinishable objectives, dead upgrade choices or invalid victory states | P0 | Automated regression, fault injection and player-driven run | NOT_TESTED |
 | RELEASE-01 | Exact release artifact reproducibly built, hashed, offline tested and published | P0 | Build manifest, SHA-256, release URL and clean-machine test | NOT_READY |
 | ACCEPT-01 | Independent technical review and owner playtest; no unresolved P0/P1 defect | P0 | Signed acceptance report and owner approval | NOT_READY |
