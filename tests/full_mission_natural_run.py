@@ -95,7 +95,7 @@ async def main():
         page.set_default_timeout(180000)
         await page.set_content(DOCUMENT,wait_until="load")
         await page.locator("#start").click()
-        state=await page.evaluate("window.__fullRun(1500)",timeout=180000)
+        state=await asyncio.wait_for(page.evaluate("window.__fullRun(1500)"),timeout=180)
         report["state"]=state
         report["checks"]["reached_nineteen_minute_boss_window"]=state["gameTime"]>=1140 or state["bossSpawned"]
         report["checks"]["boss_naturally_spawned"]=state["bossSpawned"]
