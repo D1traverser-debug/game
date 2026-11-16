@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BOOTSTRAP_BASELINE_CAPTURED",
+  "checkpoint": "EXACT_PROTOTYPE_BASELINE_CAPTURED",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -24,7 +24,8 @@
   "verified": [
     "Repository discovered and confirmed initially empty",
     "Previous single-file prototype recovered",
-    "Previous QA evidence reclassified"
+    "Previous QA evidence reclassified",
+    "Exact latest 116721-byte HTML source read back from Library and committed to main"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
