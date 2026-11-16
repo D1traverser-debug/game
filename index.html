@@ -530,7 +530,18 @@ function updateObjective(dt){
   if(o.variant==='devoted'){if(dist>45){beast.x=clamp(beast.x-Math.cos(a)*95*dt,-1160,1160);beast.y=clamp(beast.y-Math.sin(a)*95*dt,-860,860)}}else if(dist<150){beast.x=clamp(beast.x+Math.cos(a)*110*dt,-1160,1160);beast.y=clamp(beast.y+Math.sin(a)*110*dt,-860,860)}
   if(Math.hypot(beast.x-o.x,beast.y-o.y)<78){beast.alive=false;objectiveProgress(1)}
  }
- if(o.type==='fungi'&&o.objects){for(const mushroom of o.objects){if(!mushroom.alive)continue;let d=Math.hypot(mushroom.x-p.x,mushroom.y-p.y),a=Math.atan2(mushroom.y-p.y,mushroom.x-p.x);if(mushroom.scared&&d<190){mushroom.x=clamp(mushroom.x+Math.cos(a)*75*dt,-1130,1130);mushroom.y=clamp(mushroom.y+Math.sin(a)*75*dt,-810,810)}if(mushroom.explosive&&d<54){mushroom.alive=false;game.hazards.push({x:mushroom.x,y:mushroom.y,r:92,timer:.02,dmg:58,kind:'explosiveMushroom',color:'#e9a36d',life:.6});objectiveProgress(1);toast('爆裂蘑菇引爆！')}}}
+ if(o.type==='fungi'&&o.objects){for(const mushroom of o.objects){if(!mushroom.alive)continue;let d=Math.hypot(mushroom.x-p.x,mushroom.y-p.y),a=Math.atan2(mushroom.y-p.y,mushroom.x-p.x);
+  // Normal and scared fungi are collected by physically walking over them.
+  // Explosive fungi keep their larger proximity trigger and count on detonation.
+  if(mushroom.explosive&&d<54){mushroom.alive=false;game.hazards.push({x:mushroom.x,y:mushroom.y,r:92,timer:.02,dmg:58,kind:'explosiveMushroom',color:'#e9a36d',life:.6});objectiveProgress(1);toast('爆裂蘑菇引爆！');continue}
+  if(d<34){mushroom.alive=false;objectiveProgress(1);continue}
+  if(mushroom.scared&&d<190){mushroom.x=clamp(mushroom.x+Math.cos(a)*75*dt,-1130,1130);mushroom.y=clamp(mushroom.y+Math.sin(a)*75*dt,-810,810)}
+ }}
+ // Soul Sludge is completed by walking over the purple ground patches.
+ if(o.type==='sludge'&&o.objects){for(const patch of o.objects){if(!patch.alive)continue;if(Math.hypot(patch.x-p.x,patch.y-p.y)<36){patch.alive=false;objectiveProgress(1);game.fx.push({x:patch.x,y:patch.y,r:30,life:.32,max:.32,color:'#c58be8',type:'ring'})}}}
+ // Standard unstable cores are collected on contact. Heavy cores use the
+ // explicit pickup-and-carry interaction above and are delivered to the altar.
+ if(o.type==='cores'&&o.variant!=='heavy'&&o.objects){for(const core of o.objects){if(core.alive&&Math.hypot(core.x-p.x,core.y-p.y)<36){core.alive=false;objectiveProgress(1);game.fx.push({x:core.x,y:core.y,r:28,life:.3,max:.3,color:'#8de5ef',type:'ring'})}}}
  if(o.type==='cores'&&o.variant==='heavy'&&game.carriedCore){let core=game.carriedCore;core.x=p.x-22;core.y=p.y+12;if(Math.hypot(p.x-o.x,p.y-o.y)<92){core.alive=false;game.carriedCore=null;objectiveProgress(1);toast('重型法术核心已送达')}}
  if(o.time<=0&&!o.done){toast('目标失败：'+o.name);game.carriedCore=null;game.objective=null}
 }
