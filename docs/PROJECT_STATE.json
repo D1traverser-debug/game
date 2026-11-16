@@ -53,7 +53,8 @@
     "All 3 bosses and 9 objective constructors/update loops passed synthetic local browser component checks on latest source",
     "2026-11-17 local 2.5D art-forward candidate with embedded sprite atlas validated in Playwright desktop 1440x900 and mobile 390x844; both launch, HUD, pause/resume pass with zero page/console errors and zero external requests",
     "2.5D candidate uses embedded sprite atlas and procedural terrain; no external runtime asset dependency",
-    "2.5D candidate does not display NaN in normal 3-second start smoke or 15-second movement/kill smoke"
+    "2.5D candidate does not display NaN in normal 3-second start smoke or 15-second movement/kill smoke",
+    "Follow-up directional movement in 2.5D collected 14 XP and opened an upgrade selection; early 0-XP smoke was caused by not crossing pickup radius, no gameplay code change warranted"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -85,10 +86,9 @@
     "Current textured software rendering often falls below 30 FPS; adaptive rendering lowered resolution, hardware GPU acceptance remains NOT_TESTED",
     "2.5D candidate HTML SHA de29ddd... is a conversation-local artifact and has NOT been committed to GitHub; repository index.html remains older 3D candidate",
     "3D renderer capability check returns unavailable in current Chromium test sandbox; 2.5D is the validated primary renderer, 3D mode is disabled when WebGL2 is unavailable",
-    "15-second normal gameplay smoke recorded 18 kills but 0 XP collected; orbs appeared on the map. XP acquisition and magnet/pickup pacing need focused gameplay investigation",
     "2.5D candidate still needs real 19-minute full-run and natural boss win, save/reload, real-device performance, full spell/infusion/boss/objective fidelity and owner playtest"
   ],
-  "next_action": "Promote the 2.5D art direction as the primary target; investigate XP orb collection/pickup pacing from normal play; add source-faithful enemy/spell/infusion and objective/boss behavior; sync the exact candidate source into GitHub; complete real full-run, persistence, hardware performance and player acceptance.",
+  "next_action": "Continue art-forward 2.5D candidate: source-faithful content and gameplay, then full-run boss victory and persistence/hardware/player acceptance. Synchronize the exact 2.5D HTML bytes into GitHub before claiming repository code is current.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
