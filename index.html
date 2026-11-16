@@ -58,7 +58,17 @@
 .card{min-height:190px}.card:hover{background:linear-gradient(150deg,#38594a,#203d35)}
 #hud .hint{background:linear-gradient(90deg,#0b211ba8,#223f33aa,#0b211ba8);border:1px solid #d1d1aa55}
 @media(max-width:740px){.wizard-poster{max-height:100%}.menu{min-height:auto}.hudright{min-width:0;max-width:41vw}.hudleft{width:42vw}.hudleft,.hudright{padding:8px}.spellslot{width:55px;height:60px}.spellslot .ico{font-size:18px}}
-.stagger-label{display:flex;justify-content:space-between;margin:5px 1px 2px;font-size:9px;color:#e2cfb5}.stagger-track{height:4px;border:1px solid #c7ae8b33;border-radius:4px;background:#0b1619;overflow:hidden}.stagger-track i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6bd1d8,#fff0ba);transition:width .09s linear}</style>
+.stagger-label{display:flex;justify-content:space-between;margin:5px 1px 2px;font-size:9px;color:#e2cfb5}.stagger-track{height:4px;border:1px solid #c7ae8b33;border-radius:4px;background:#0b1619;overflow:hidden}.stagger-track i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6bd1d8,#fff0ba);transition:width .09s linear}
+#scene3d{image-rendering:auto}.gamehud{isolation:isolate}
+@media(max-width:740px){.hudleft,.hudright{background:rgba(11,27,22,.68);backdrop-filter:blur(6px)}.pausebtn{background:#172820ee}}
+
+/* Combat HUD is authoritative while the world is running: prevent title-bar overlap. */
+#game:has(#hud.active) > .top{opacity:0;pointer-events:none}
+#game:has(#hud.active) .hudleft{background:linear-gradient(135deg,rgba(11,26,22,.88),rgba(11,26,22,.16));border:1px solid #eee0b21b;border-radius:13px;padding:15px;top:15px;left:15px}
+#game:has(#hud.active) .hudright{top:15px;right:15px}
+#game:has(#hud.active) .hudcenter{top:20px}
+@media(max-width:740px){#game:has(#hud.active) .hudleft{padding:8px;top:5px;left:5px}#game:has(#hud.active) .hudright{top:5px;right:5px}#game:has(#hud.active) .hudcenter{top:5px}}
+</style>
 </head>
 <body><div id="game"><canvas id="world"></canvas><div class="shade"></div>
 <header class="top"><div class="brand">THE SPELL BRIGADE<small>翠绿草甸 · VERDANT MEADOWS</small></div><div class="topright"><div class="chip">✧ <b id="goldTop">0</b></div><button class="iconbtn" id="sound">♫</button><button class="iconbtn" id="full">⛶</button></div></header>
@@ -85,6 +95,122 @@
 <section class="screen" id="result"><div class="modal panel resultpanel"><div class="eyebrow" id="resultEyebrow">MISSION COMPLETE</div><div class="resulticon" id="resultIcon">✦</div><div class="resulttitle" id="resultTitle">秘境已净化</div><p class="muted" id="resultDesc">你击退了黑暗。</p><div class="statsgrid" id="resultStats"></div><p class="muted">远征金币：<b id="reward" style="color:#efd59d">0</b>　·　总伤害：<b id="totalDamage">0</b></p><div class="actions" style="justify-content:center;margin-top:18px"><button class="primary" id="again">再次远征</button><button class="secondary" id="home">返回主菜单</button></div></div></section>
 <div class="gamehud" id="hud"><div class="hudleft"><div class="herohead"><div class="avatar">✦</div><div><div class="heroname">Reginald</div><div class="herolv">奥术学徒 · LV <b id="level">1</b></div></div></div><div class="barlabel"><span>生命</span><b id="hptext">100 / 100</b></div><div class="bar"><i id="hpbar"></i></div><div class="barlabel"><span>奥术经验</span><b id="xptext">0 / 18</b></div><div class="bar xp"><i id="xpbar"></i></div></div><div class="hudcenter"><div class="timer" id="timer">00:00</div><div class="timerlabel">VERDANT MEADOWS</div><div class="bossbar" id="bossbar"><b id="bossname">SOL'PHISH</b><div class="bar"><i id="bosshp"></i></div><div class="stagger-label"><span>失衡积蓄</span><span id="staggerPct">0%</span></div><div class="stagger-track"><i id="staggerFill"></i></div></div></div><div class="hudright"><div class="killstat"><span id="kills">0</span><small>DEFEATED</small></div><div class="objective"><b id="objtitle">秘境侵蚀</b><p id="objdesc">在魔潮中生存。</p><p class="objnav" id="objnav"></p><div class="objbar"><i id="objbar"></i></div></div></div><div class="spellrow" id="spellrow"></div><div class="hint" id="hint">WASD 移动 · 自动施法 · E 开启宝箱 · ESC 暂停</div><button class="pausebtn" id="pauseBtn">Ⅱ</button></div>
 <div class="mobile" id="joy"><div class="knob" id="knob"></div></div><button class="mobileaction" id="interact">E</button><div class="toast" id="toast"></div></div>
+<script>/* Independent, original 3D world renderer for a single-file, offline game.
+   No external assets, engine, network requests or privileged APIs. */
+(()=>{'use strict';
+function boot3D(){
+ const base=document.getElementById('world');if(!base||window.Game3D)return;
+ const canvas=document.createElement('canvas');canvas.id='scene3d';canvas.setAttribute('aria-hidden','true');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none';base.before(canvas);base.style.zIndex='1';base.style.pointerEvents='none';
+ const gl=canvas.getContext('webgl2',{alpha:false,depth:true,antialias:false,stencil:false,powerPreference:'high-performance'});
+ if(!gl){canvas.remove();window.Game3D={available:false,render:()=>false};return}
+ const VS=`#version 300 es
+ precision highp float;
+ layout(location=0)in vec3 ap;layout(location=1)in vec3 an;layout(location=2)in vec4 vc;
+ layout(location=3)in vec4 m0;layout(location=4)in vec4 m1;layout(location=5)in vec4 m2;layout(location=6)in vec4 m3;layout(location=7)in vec4 ic;
+ uniform mat4 vp;uniform vec3 light;out vec3 color;out float alpha;out float shade;out vec3 pos;
+ void main(){mat4 m=mat4(m0,m1,m2,m3);vec4 world=m*vec4(ap,1.);gl_Position=vp*world;vec3 N=normalize(mat3(m)*an);float d=max(dot(N,normalize(light)),0.);shade=.44+max(d,0.)*.84;pos=world.xyz;color=vc.rgb*ic.rgb;alpha=ic.a;}`;
+ const FS=`#version 300 es
+ precision highp float;
+ in vec3 color;in float alpha;in float shade;in vec3 pos;uniform vec3 camera;out vec4 frag;
+ void main(){vec3 c=color*shade;float fog=clamp((distance(pos,camera)-33.)/50.,0.,.58);c=mix(c,vec3(.18,.33,.24),fog);c=pow(max(c,0.),vec3(.84));frag=vec4(c,alpha);}`;
+ function mkShader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s}
+ const pr=gl.createProgram();gl.attachShader(pr,mkShader(gl.VERTEX_SHADER,VS));gl.attachShader(pr,mkShader(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(pr));gl.useProgram(pr);
+ const vpU=gl.getUniformLocation(pr,'vp'),lightU=gl.getUniformLocation(pr,'light'),cameraU=gl.getUniformLocation(pr,'camera');
+ gl.enable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.disable(gl.CULL_FACE);
+ const PI=Math.PI,T=PI*2, SCALE=.037;
+ const norm=(x,y,z)=>{const l=Math.hypot(x,y,z)||1;return [x/l,y/l,z/l]};
+ function tri(out,a,b,c,col){const ax=b[0]-a[0],ay=b[1]-a[1],az=b[2]-a[2],bx=c[0]-a[0],by=c[1]-a[1],bz=c[2]-a[2],n=norm(ay*bz-az*by,az*bx-ax*bz,ax*by-ay*bx);for(const p of [a,b,c])out.push(...p,...n,...col)}
+ function mesh(out){const vao=gl.createVertexArray(),vb=gl.createBuffer(),ib=gl.createBuffer();gl.bindVertexArray(vao);gl.bindBuffer(gl.ARRAY_BUFFER,vb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(out),gl.STATIC_DRAW);for(let i=0;i<3;i++){gl.enableVertexAttribArray(i);gl.vertexAttribPointer(i,i===2?4:3,gl.FLOAT,false,40,i===0?0:i===1?12:24)}gl.bindBuffer(gl.ARRAY_BUFFER,ib);for(let i=0;i<4;i++){gl.enableVertexAttribArray(i+3);gl.vertexAttribPointer(i+3,4,gl.FLOAT,false,80,16*i);gl.vertexAttribDivisor(i+3,1)}gl.enableVertexAttribArray(7);gl.vertexAttribPointer(7,4,gl.FLOAT,false,80,64);gl.vertexAttribDivisor(7,1);gl.bindVertexArray(null);return{vao,vb,ib,count:out.length/10}}
+ function sphere(lat,lon){let o=[];for(let y=0;y<lat;y++)for(let x=0;x<lon;x++){let a=-PI/2+y*PI/lat,b=a+PI/lat,c=x*T/lon,d=c+T/lon,p=(v,w)=>[Math.cos(v)*Math.cos(w),Math.sin(v),Math.cos(v)*Math.sin(w)];tri(o,p(a,c),p(a,d),p(b,d),[1,1,1,1]);tri(o,p(a,c),p(b,d),p(b,c),[1,1,1,1])}return mesh(o)}
+ function cone(n=10){let o=[];for(let i=0;i<n;i++){let a=i*T/n,b=(i+1)*T/n,p=[Math.cos(a),-1,Math.sin(a)],q=[Math.cos(b),-1,Math.sin(b)],top=[0,1,0];tri(o,p,q,top,[1,1,1,1]);tri(o,[0,-1,0],q,p,[1,1,1,1])}return mesh(o)}
+ function cyl(n=10){let o=[];for(let i=0;i<n;i++){let a=i*T/n,b=(i+1)*T/n,p=[Math.cos(a),-1,Math.sin(a)],q=[Math.cos(b),-1,Math.sin(b)],u=[Math.cos(a),1,Math.sin(a)],v=[Math.cos(b),1,Math.sin(b)];tri(o,p,q,v,[1,1,1,1]);tri(o,p,v,u,[1,1,1,1]);tri(o,[0,1,0],u,v,[1,1,1,1]);tri(o,[0,-1,0],q,p,[1,1,1,1])}return mesh(o)}
+ function plane(size=96,step=40){let o=[];
+  const vertex=(x,z)=>{
+   const lush=.55+.25*Math.sin(x*.19+Math.sin(z*.11))+.14*Math.cos(z*.31-x*.08);
+   const patch=.5+.5*Math.sin(x*.42+z*.14)*Math.cos(z*.38-x*.15);
+   const path=Math.abs(x-Math.sin(z*.19)*2.4);
+   const road=1-Math.min(1,Math.max(0,(path-1.25)/1.0));
+   let r=.27+lush*.14+patch*.045,g=.48+lush*.20+patch*.040,b=.25+lush*.12;
+   if(road>0){r=r*(1-road)+(.48+lush*.035)*road;g=g*(1-road)+(.44+lush*.04)*road;b=b*(1-road)+(.30+lush*.02)*road;}
+   o.push(x,-.16,z,0,1,0,r,g,b,1)
+  };
+  for(let y=0;y<step;y++)for(let x=0;x<step;x++){
+   let u=(x/step-.5)*size,v=(y/step-.5)*size,u2=((x+1)/step-.5)*size,v2=((y+1)/step-.5)*size;
+   vertex(u,v);vertex(u2,v2);vertex(u2,v);vertex(u,v);vertex(u,v2);vertex(u2,v2)
+  }return mesh(o)}
+ function quad(){const o=[];tri(o,[-1,0,-1],[1,0,1],[1,0,-1],[1,1,1,1]);tri(o,[-1,0,-1],[-1,0,1],[1,0,1],[1,1,1,1]);return mesh(o)}
+ const M={sphere:sphere(7,11),small:sphere(5,7),cone:cone(9),cyl:cyl(9),ground:plane(96,40),disk:quad()};
+ const matrices=(x,y,z,sx,sy,sz,r=0)=>{let c=Math.cos(r),s=Math.sin(r);return[c*sx,0,-s*sx,0,0,sy,0,0,s*sz,0,c*sz,0,x,y,z,1]};
+ const instance=(x,y,z,sx,sy,sz,r,col)=>[...matrices(x,y,z,sx,sy,sz,r),...col];
+ function mul(a,b){let o=new Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++)o[c*4+r]=a[r]*b[c*4]+a[r+4]*b[c*4+1]+a[r+8]*b[c*4+2]+a[r+12]*b[c*4+3];return o}
+ function ortho(l,r,b,t,n,f){return[2/(r-l),0,0,0,0,2/(t-b),0,0,0,0,-2/(f-n),0,-(r+l)/(r-l),-(t+b)/(t-b),-(f+n)/(f-n),1]}
+ function lookAt(e,c,u){let z=norm(e[0]-c[0],e[1]-c[1],e[2]-c[2]),x=norm(u[1]*z[2]-u[2]*z[1],u[2]*z[0]-u[0]*z[2],u[0]*z[1]-u[1]*z[0]),y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]];return[x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-(x[0]*e[0]+x[1]*e[1]+x[2]*e[2]),-(y[0]*e[0]+y[1]*e[1]+y[2]*e[2]),-(z[0]*e[0]+z[1]*e[1]+z[2]*e[2]),1]}
+ // Grouping all instances by mesh drastically reduces WebGL draw calls during dense combat.
+ const groups={sphere:[],small:[],cone:[],cyl:[],ground:[],disk:[]};let drawCalls=0,instanceCount=0;
+ const colors={hero:[.36,.45,.86,1],cloak:[.23,.26,.51,1],gold:[1,.78,.37,1],stone:[.60,.59,.46,1],wood:[.39,.29,.18,1],leaf:[.28,.60,.30,1],purple:[.6,.4,.73,1],ice:[.43,.83,1,1],shadow:[.13,.19,.13,.24]};
+ function add(key,x,y,z,sx,sy,sz,r,c){groups[key].push(instance(x,y,z,sx,sy,sz,r,c));instanceCount++}
+ function flush(){drawCalls=0;for(const [name,a] of Object.entries(groups)){if(!a.length)continue;const m=M[name],data=new Float32Array(a.length*20);for(let i=0;i<a.length;i++)data.set(a[i],i*20);gl.bindVertexArray(m.vao);gl.bindBuffer(gl.ARRAY_BUFFER,m.ib);gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW);gl.drawArraysInstanced(gl.TRIANGLES,0,m.count,a.length);gl.bindVertexArray(null);drawCalls++;a.length=0}}
+ function hash(n){let x=Math.sin(n*12.9898+13.2)*43758.5453;return x-Math.floor(x)}
+ function hero(p,t){let x=p.x*SCALE,z=p.y*SCALE,bob=Math.sin(t*7)*(p.lastMove ? .095 : .032),face=p.facing||0;
+  add('disk',x,-.07,z,.79,1,.6,0,colors.shadow);add('cone',x,.52+bob,z,.62,.83,.57,face,colors.hero);add('cyl',x,.37+bob,z,.52,.12,.49,face,[.25,.21,.48,1]);add('cone',x,1.17+bob,z,.41,.5,.41,face,colors.cloak);
+  add('sphere',x,1.67+bob,z,.32,.34,.32,0,[.89,.7,.51,1]);add('cyl',x,1.98+bob,z,.55,.07,.55,0,colors.cloak);add('cone',x,2.43+bob,z,.39,.48,.39,.2,colors.cloak);
+  add('cyl',x,2.12+bob,z,.4,.065,.4,0,colors.gold);add('small',x-.12,1.72+bob,z+.25,.05,.055,.04,0,[.16,.13,.14,1]);add('small',x+.12,1.72+bob,z+.25,.05,.055,.04,0,[.16,.13,.14,1]);
+  add('cyl',x+.55,1.05+bob,z,.065,.85,.065,0,colors.wood);add('cone',x+.55,2.06+bob,z,.15,.42,.14,t*.12,colors.ice);add('small',x+.55,1.82+bob,z,.18,.14,.18,0,[1,.84,.46,1]);
+  add('small',x-.48,1.03+bob,z,.23,.17,.23,0,colors.hero);add('small',x+.38,1.07+bob,z,.18,.18,.17,0,colors.hero);
+  for(let i=0;i<3;i++){let a=t*1.55+i*T/3;add('small',x+Math.cos(a)*1.1,1.27+Math.sin(t*2+i)*.15,z+Math.sin(a)*1.1,.12,.12,.12,0,[.42,.85,1,1]);}
+ }
+ function enemy(e,t){let x=e.x*SCALE,z=e.y*SCALE,scale=Math.max(.48,Math.min(1.35,e.r/21)),r=scale*.52,bur=e.state==='burrow',leap=e.state==='leap';if(Math.abs(x-currentX)>26||Math.abs(z-currentZ)>26)return;
+  add('disk',x,-.07,z,r*1.35,1,r*.8,0,colors.shadow);
+  if(bur){add('disk',x,-.045,z,r*1.5,1,r*1.5,0,[.64,.34,.67,.66]);return}
+  let y=leap?1.15:.55+Math.sin(t*5+e.id*8)*.06;
+  let base=e.type==='gnasher'?[.56,.35,.65,1]:e.type==='shield'?[.58,.54,.45,1]:e.type==='ranged'?[.38,.33,.58,1]:e.type==='buffer'?[.27,.68,.42,1]:e.type==='crabladon'?[.61,.34,.26,1]:e.type==='sprout'?[.47,.69,.35,1]:[.30,.53,.36,1];
+  if(e.hitFlash>0)base=[1,.89,.73,1];if(e.freeze>0)base=[.52,.79,1,1];if(e.burn>0)base=[.89,.54,.28,1];
+  add('sphere',x,y,z,r,r*(e.type==='crabladon'?1.35:1.05),r,0,base);
+  let dir=Math.atan2((e.targetY||0)-e.y,(e.targetX||0)-e.x),fx=Math.cos(dir),fz=Math.sin(dir);
+  if(e.type==='gnasher'||e.type==='crabladon'){add('cone',x-r*.55,y+r*.55,z,.15,.36,.16,0,colors.purple);add('cone',x+r*.55,y+r*.55,z,.15,.36,.16,0,colors.purple)}
+  if(e.type==='ranged'){add('cone',x,y+r*.7,z,r*.67,r*.62,r*.67,0,[.26,.20,.40,1]);}
+  if(e.type==='sprout'||e.type==='buffer'){add('cone',x-r*.55,y+r*.6,z,.16,.28,.16,-.35,colors.leaf);add('cone',x+r*.55,y+r*.6,z,.16,.30,.16,.35,colors.leaf);}
+  add('small',x-r*.3,y+r*.14,z+r*.72,.075,.07,.07,0,[1,.88,.51,1]);add('small',x+r*.3,y+r*.14,z+r*.72,.075,.07,.07,0,[1,.88,.51,1]);
+  if(e.elite)add('small',x,y+r*1.4,z,.15,.13,.15,0,[.94,.74,.37,1]);
+ }
+ function boss(b,t){let x=b.x*SCALE,z=b.y*SCALE,sc=Math.max(1.8,b.r*.037*1.32),name=b.name||'Sol';add('disk',x,-.07,z,sc*1.7,1,sc*1.25,0,colors.shadow);
+  let col=name.includes('Krog')?[.37,.66,.34,1]:name.includes('Mul')?[.61,.37,.66,1]:[.47,.34,.66,1];if(b.hitFlash>0)col=[1,.85,.89,1];
+  add('sphere',x,sc*.64,z,sc,sc*.94,sc*.85,0,col);add('sphere',x,sc*1.51,z,sc*.63,sc*.46,sc*.68,0,col);
+  for(let i=0;i<6;i++){let a=i*T/6+t*.12;add('cone',x+Math.cos(a)*sc*.85,sc*.98,z+Math.sin(a)*sc*.8,sc*.18,sc*.7,sc*.17,a,col)}
+  add('small',x-sc*.30,sc*1.55,z+sc*.53,sc*.18,sc*.2,sc*.16,0,[1,.82,.42,1]);add('small',x+sc*.30,sc*1.55,z+sc*.53,sc*.18,sc*.2,sc*.16,0,[1,.82,.42,1]);
+  if(b.vulnerable>0)for(let i=0;i<7;i++){let a=i*T/7+t*3;add('small',x+Math.cos(a)*sc*1.2,sc*1.6+Math.sin(t*5+i)*.4,z+Math.sin(a)*sc*1.2,.17,.17,.17,0,colors.gold)}
+ }
+ function visualFX(g,t){for(const s of g.shots){if(s.life<=0)continue;let c=s.kind==='enemy'?[.81,.46,.74,1]:s.color&&s.color.includes('ff')?[1,.63,.36,1]:[.50,.80,1,1];let r=(s.r||7)*SCALE;add('small',s.x*SCALE,.7,s.y*SCALE,Math.max(.13,r),Math.max(.13,r),Math.max(.13,r),0,c)}
+  for(const o of g.orbs){if(Math.abs(o.x*SCALE-currentX)>21||Math.abs(o.y*SCALE-currentZ)>21)continue;let c=o.type==='health'?[1,.37,.39,1]:o.type==='magnet'?[.37,.99,.88,1]:o.type==='gold'?[1,.8,.32,1]:o.v>=17?[.86,.50,1,1]:[.44,.86,1,1];add('small',o.x*SCALE,.25+Math.sin(t*3+o.x)*.11,o.y*SCALE,.115,.115,.115,0,c)}
+  for(const h of g.hazards){if(h.life<=0)continue;let x=h.x*SCALE,z=h.y*SCALE;if(Math.abs(x-currentX)>23||Math.abs(z-currentZ)>23)continue;let c=h.kind==='runestone'?[.81,.30,.72,.38]:h.kind==='dice'?[.87,.62,.32,.32]:[1,.76,.30,.32];add('disk',x,-.035,z,h.r*SCALE,1,h.r*SCALE,0,c);if(h.timer>0){let n=6;for(let i=0;i<n;i++){let a=i*T/n+t*.5;add('small',x+Math.cos(a)*h.r*SCALE,.16,z+Math.sin(a)*h.r*SCALE,.13,.16,.13,0,[c[0],c[1],c[2],.75])}}}
+  for(const e of g.fx){if(e.life<=0)continue;if(Math.abs(e.x*SCALE-currentX)>23||Math.abs(e.y*SCALE-currentZ)>23)continue;let q=Math.max(.1,e.life/(e.max||.35)),r=Math.max(.3,(e.r||22)*SCALE*(1+(1-q)*.7));add('disk',e.x*SCALE,-.025,e.y*SCALE,r,1,r,0,[.66,.85,1,q*.31]);}
+  for(const c of g.chests)if(!c.open&&Math.abs(c.x*SCALE-currentX)<21&&Math.abs(c.y*SCALE-currentZ)<21){let x=c.x*SCALE,z=c.y*SCALE;add('sphere',x,.45,z,.52,.45,.40,0,[.52,.31,.16,1]);add('cyl',x,.64,z,.55,.075,.45,0,colors.gold);add('small',x,.98,z,.19,.20,.19,0,colors.gold)}
+  const o=g.objective;if(o&&!o.done){if(o.x!==undefined&&o.y!==undefined){let x=o.x*SCALE,z=o.y*SCALE;add('disk',x,-.03,z,4.1,1,4.1,0,[.88,.75,.36,.18]);for(let i=0;i<7;i++){let a=i*T/7;add('small',x+Math.cos(a)*3.8,.32,z+Math.sin(a)*3.8,.20,.26,.20,0,colors.gold)}}for(const item of o.objects||[])if(item.alive){let x=item.x*SCALE,z=item.y*SCALE;add('cone',x,.42,z,.45,.53,.45,0,[.89,.57,.86,1])}if(o.crab&&o.crab.alive)add('sphere',o.crab.x*SCALE,.65,o.crab.y*SCALE,.72,.63,.67,0,[.88,.53,.20,1])}
+  if(g.bossPending){let b=g.bossPending,x=b.x*SCALE,z=b.y*SCALE;add('disk',x,-.025,z,3.2,1,3.2,0,[.91,.22,.44,.42]);}
+ }
+ let currentX=0,currentZ=0,counter=0,samples=[],fps=0,lastResizeW=0,lastResizeH=0;
+ const stats={available:true,fps:0,drawCalls:0,instances:0,glError:0,resolutionScale:.83};
+ function resize(){let d=Math.min(devicePixelRatio||1,.83);const w=Math.max(1,Math.floor(canvas.clientWidth*d)),h=Math.max(1,Math.floor(canvas.clientHeight*d));if(w!==lastResizeW||h!==lastResizeH){lastResizeW=w;lastResizeH=h;canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h)}}
+ function render(g,t){if(gl.isContextLost())return false;resize();let p=g?.player||{x:0,y:0};currentX=p.x*SCALE;currentZ=p.y*SCALE;let ratio=canvas.width/canvas.height,eye=[currentX+1,26,currentZ+23],center=[currentX,0,currentZ];let viewH=24,viewW=24*ratio;
+  gl.useProgram(pr);gl.uniformMatrix4fv(vpU,false,new Float32Array(mul(ortho(-viewW/2,viewW/2,-viewH/2,viewH/2,.1,190),lookAt(eye,center,[0,1,0]))));gl.uniform3f(lightU,-.40,.83,.43);gl.uniform3f(cameraU,...eye);gl.clearColor(.35,.50,.32,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  add('ground',0,0,0,1,1,1,0,[1,1,1,1]);
+  // Verdant Meadow: scenic tree groves, grass, flowers, ruined stones and old crossroads.
+  const drawDecor=g?.decor||[];for(let i=0;i<drawDecor.length;i++){let d=drawDecor[i],x=d.x*SCALE,z=d.y*SCALE;if(Math.abs(x-currentX)>22||Math.abs(z-currentZ)>22)continue;let f=d.s||1;if(d.type==='tree'){add('cyl',x,.65*f,z,.15*f,.7*f,.15*f,d.rot,colors.wood);add('sphere',x,1.6*f,z,.72*f,.80*f,.72*f,0,[.19+hash(i*.67)*.13,.40+hash(i)*.22,.20+hash(i*.29)*.11,1]);add('sphere',x-.46*f,1.32*f,z+.1*f,.48*f,.58*f,.48*f,0,[.26,.55+hash(i)*.15,.24,1]);}else if(d.type==='bush'){add('sphere',x,.29*f,z,.40*f,.34*f,.4*f,0,colors.leaf)}else if(d.type==='stone'){add('sphere',x,.13*f,z,.28*f,.17*f,.24*f,d.rot,colors.stone)}else if(d.type==='flower'){add('small',x,.15,z,.14,.14,.14,0,i%2?[.92,.65,.72,1]:[1,.88,.51,1])}else if(i%3===0){add('cone',x,.16*f,z,.10*f,.23*f,.10*f,d.rot,[.43,.70,.31,1]);}}
+  // Cobblestones and ruined milestones along the meandering footpath.
+  for(let i=0;i<65;i++){let z=-45+i*1.42,x=Math.sin(z*.19)*2.4+(hash(i*13)-.5)*2.6;
+   if(Math.abs(x-currentX)<21&&Math.abs(z-currentZ)<22){
+    add('sphere',x,-.015,z,.17+hash(i)*.19,.04,.10+hash(i*7)*.22,0,[.48+hash(i)*.10,.45,.36,1]);
+    if(i%14===3)add('cyl',x+1.8,.28,z,.16,.40,.16,hash(i),[.59,.56,.44,1]);
+   }}
+  if(g){for(const e of g.enemies){if(e.dead)continue;if(e.type==='boss')continue;enemy(e,t)}if(g.boss&&!g.boss.dead)boss(g.boss,t);visualFX(g,t);hero(p,t)}
+  flush();stats.drawCalls=drawCalls;stats.instances=instanceCount;instanceCount=0;stats.glError=gl.getError();counter++;if(counter%45===0){stats.fps=Math.round(fps)}return true;
+ }
+ window.Game3D={available:true,render,stats,canvas,setFps(n){stats.fps=n}};
+ canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();window.Game3D.available=false});
+}
+try{boot3D()}catch(err){console.warn('3D renderer initialization failed, preserving 2D fallback',err);window.Game3D={available:false,render:()=>false}}
+})();
+</script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id), canvas=$('world'),ctx=canvas.getContext('2d');
@@ -118,7 +244,8 @@ const spells=[
 {id:'loadedDice',name:'命运骰子',en:'Loaded Dice',icon:'⚄',desc:'掷出大型魔法骰子，根据落地面数引爆。',kind:'dice',dmg:43,cd:4.4,range:390},
 {id:'tinyTremors',name:'微型地震',en:'Tiny Tremors',icon:'▤',desc:'在目标周围接连激发四次小型震荡。',kind:'tremor',dmg:28,cd:3.8,range:310},
 {id:'wickedBuzzsaw',name:'邪刃锯轮',en:'Wicked Buzzsaw',icon:'⚙',desc:'向目标突进的高速旋转锯轮。',kind:'buzzsaw',dmg:46,cd:3.1,range:420}
-];
+ ];
+const SPELL_ID_SET=new Set(spells.map(x=>x.id));
 const elements={fire:{name:'火焰',icon:'🔥',desc:'施加燃烧：每 0.5 秒造成初击伤害的 1/3，持续 1.5 秒。'},lightning:{name:'雷电',icon:'⚡',desc:'电弧跳跃至附近两个敌人，造成初击伤害的 50%。'},acid:{name:'酸液',icon:'☣',desc:'腐蚀目标，使其后续受到的伤害提高 50%，持续 3 秒。'},ice:{name:'寒冰',icon:'❄',desc:'降低敌人移动速度，重复命中可叠加，最多 72%；有几率冻结。'},dark:{name:'暗影',icon:'☾',desc:'积累腐化值，满额后敌人转而攻击其他敌人。'}};
 const combos={fire_fire:'野火',lightning_lightning:'雷霆',acid_acid:'腐蚀',ice_ice:'霜冻',dark_dark:'虚空',fire_lightning:'等离子',fire_acid:'硫磺',fire_ice:'霜咬',dark_fire:'狱火',acid_lightning:'通量',ice_lightning:'微光',dark_lightning:'暗影箭',acid_ice:'瘴气',acid_dark:'疫病',dark_ice:'凋零'};
 const scrolls=[
@@ -176,7 +303,7 @@ function generateDecor(){let d=game.decor;for(let i=0;i<480;i++){let x=rand(-125
 function spawnEnemy(initial=false,type){if(!game)return;if(game.enemies.filter(e=>!e.dead).length>240)return;let p=game.player,ang=rand(0,TAU),dist=initial?rand(300,700):rand(530,780),x=p.x+Math.cos(ang)*dist,y=p.y+Math.sin(ang)*dist;let t=type||enemyType(game.time);let base={crawler:[34,45,48,18],sprout:[45,62,55,16],ranged:[58,52,62,16],buffer:[90,45,72,17],shield:[150,38,95,22],gnasher:[160,70,126,24],crabladon:[420,50,220,33]};let a=base[t]||base.crawler;let threat=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;let scale=(1+game.time/520)*threat;game.enemies.push({id:Math.random(),type:t,x,y,r:a[3],hp:a[0]*scale,max:a[0]*scale,speed:a[1]*(1+game.time/2400),dmg:a[2]*(1+game.time/1200)*threat,attack:rand(.3,2),heal:rand(1,4),state:'chase',stateT:0,slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0,elite:!initial&&Math.random()<.025+game.time/1800,dead:false,stagger:0})}
 function enemyType(t){let r=Math.random();if(t>600&&r<.05)return'crabladon';if(t>360&&r<.13)return'gnasher';if(t>250&&r<.22)return'shield';if(t>170&&r<.28)return'buffer';if(t>90&&r<.43)return'ranged';if(t>35&&r<.65)return'sprout';return'crawler'}
 function nearest(x,y,max=9999){let best=null,bd=max*max;for(let e of game.enemies){if(e.dead||e.state==='burrow')continue;let d=(e.x-x)**2+(e.y-y)**2;if(d<bd){bd=d;best=e}}return best}
-function damageEnemy(e,amount,source='spell',element=null,critAllowed=true){if(!e||e.dead)return;let p=game.player,crit=critAllowed&&Math.random()<p.crit;let dmg=amount*p.damage*(crit?p.critDmg:1);if(e.acid>0)dmg*=1.5;if(e.vulnerable>0)dmg*=3;if(e.type==='shield'&&e.shield>0)dmg*=.35;e.hp-=dmg;p.damageDone+=dmg;save.stats.damage=(save.stats.damage||0)+dmg;if(e.type==='boss')e.stagger=(e.stagger||0)+Math.min(8,dmg*.012);if(crit)p.critHits++;e.hitFlash=.12;game.damageNumbers.push({x:e.x,y:e.y-15,v:dmg,crit,life:.65,el:element});if(element)applyElement(e,element,dmg);if(p.vital&&crit)p.hp=Math.min(p.maxHp,p.hp+dmg*.003);if(e.hp<=0)killEnemy(e)}
+function damageEnemy(e,amount,source='spell',element=null,critAllowed=true){if(!e||e.dead||e.state==='burrow')return;if(SPELL_ID_SET.has(source))e.lastSpellId=source;let p=game.player,crit=critAllowed&&Math.random()<p.crit;let dmg=amount*p.damage*(crit?p.critDmg:1);if(e.acid>0)dmg*=1.5;if(e.vulnerable>0)dmg*=3;if(e.type==='shield'&&e.shield>0)dmg*=.35;e.hp-=dmg;p.damageDone+=dmg;save.stats.damage=(save.stats.damage||0)+dmg;if(e.type==='boss')e.stagger=(e.stagger||0)+Math.min(8,dmg*.012);if(crit)p.critHits++;e.hitFlash=.12;game.damageNumbers.push({x:e.x,y:e.y-15,v:dmg,crit,life:.65,el:element});if(element)applyElement(e,element,dmg);if(p.vital&&crit)p.hp=Math.min(p.maxHp,p.hp+dmg*.003);if(e.hp<=0)killEnemy(e)}
 function applyElement(e,el,dmg){let p=game.player;let ids=typeof el==='object'?[el.a,el.b]:[el];if(typeof el!=='object'){for(let id of ids)if(id){save.stats[id]=(save.stats[id]||0)+dmg;save.stats[id+'Hits']=(save.stats[id+'Hits']||0)+1}}
  e.element=el;if(typeof el==='object'){for(let id of new Set(ids))applyElement(e,id,dmg);e.element=el;e.combo=combos[ids.join('_')]||combos[ids.slice().reverse().join('_')]||'元素融合';
 if(e.combo==='雷霆')damageEnemy(e,dmg*.75,'thunder',null,false);
@@ -192,7 +319,10 @@ if(e.combo==='疫病')e.corruptAcid=true;
 if(e.combo==='凋零')e.corruptIce=true;
 if(['等离子','通量','微光','暗影箭'].includes(e.combo)){let second={等离子:'fire',通量:'acid',微光:'ice',暗影箭:'dark'}[e.combo];let applied=0;for(let o of game.enemies)if(o!==e&&!o.dead&&Math.hypot(o.x-e.x,o.y-e.y)<190){applyElement(o,second,dmg*.5);if(++applied>=2)break}}
 return}if(el==='fire'){e.burn=Math.max(e.burn,1.5);e.burnDmg=Math.max(e.burnDmg||0,dmg/3)}if(el==='lightning'){let chained=0;for(let o of game.enemies){if(o!==e&&!o.dead&&(o.x-e.x)**2+(o.y-e.y)**2<190**2){damageEnemy(o,dmg*.5,'spark',null,false);o.spark=true;if(++chained>=2)break}}}if(el==='acid')e.acid=Math.max(e.acid,3);if(el==='ice'){e.slow=Math.min(e.type==='boss'?.36:.72,e.slow+(e.type==='boss'?.05:.1));}if(el==='dark'){e.corrupt=(e.corrupt||0)+dmg*2;if(e.corrupt>=e.max){e.state='corrupt';e.corrupt=e.max*.5;e.corruptT=20}}checkElementUnlocks()}
-function killEnemy(e){if(e.dead)return;e.dead=true;let p=game.player;p.kills++;save.stats.kills=(save.stats.kills||0)+1;game.killStreak++;let value=e.type==='crabladon'?25:e.type==='gnasher'?10:e.elite?17:Math.random()<.08?10:Math.random()<.25?1:.3;dropOrb(e.x,e.y,value);if(Math.random()<.0132)game.orbs.push({x:e.x,y:e.y,type:'health',v:1,magnet:0});if(Math.random()<.0077)game.orbs.push({x:e.x,y:e.y,type:'magnet',v:1,magnet:0});if(e.type==='buffer'){for(let i=0;i<3;i++)dropOrb(e.x+rand(-10,10),e.y+rand(-10,10),10)}if(e.type==='gnasher'){for(let i=0;i<2;i++)dropOrb(e.x+rand(-10,10),e.y+rand(-10,10),10)}if(e.elite){game.orbs.push({x:e.x,y:e.y,type:'gold',v:3})}game.fx.push({x:e.x,y:e.y,r:5,life:.35,max:.35,type:'burst',color:e.type==='gnasher'?'#b98ad1':'#c9d99b'});if(game.objective&&!game.objective.done&&game.objective.type==='sacrifice'&&Math.hypot(e.x-game.objective.x,e.y-game.objective.y)<125)objectiveProgress(1);checkSpellUnlocks();if(p.kills%100===0)toast('已击败 '+p.kills+' 个敌人');if(e.type==='crabladon')toast('巨蟹倒下了！');if(e.type==='boss')finish(true)}
+function killEnemy(e){if(e.dead)return;e.dead=true;let p=game.player;
+ if(e.lastSpellId==='sprout'&&p.spells.some(x=>x.id==='sprout'&&x.augments.includes('babySprout'))&&Math.random()<.30){
+  const t=nearest(e.x,e.y,420);if(t)game.shots.push({x:e.x,y:e.y,vx:rand(-65,65),vy:rand(-65,65),target:t,life:3,dmg:30,r:9,el:null,kind:'sprout',spellId:'sprout',color:'#a8dc73',speed:300})}
+p.kills++;save.stats.kills=(save.stats.kills||0)+1;game.killStreak++;let value=e.type==='crabladon'?25:e.type==='gnasher'?10:e.elite?17:Math.random()<.08?10:Math.random()<.25?1:.3;dropOrb(e.x,e.y,value);if(Math.random()<.0132)game.orbs.push({x:e.x,y:e.y,type:'health',v:1,magnet:0});if(Math.random()<.0077)game.orbs.push({x:e.x,y:e.y,type:'magnet',v:1,magnet:0});if(e.type==='buffer'){for(let i=0;i<3;i++)dropOrb(e.x+rand(-10,10),e.y+rand(-10,10),10)}if(e.type==='gnasher'){for(let i=0;i<2;i++)dropOrb(e.x+rand(-10,10),e.y+rand(-10,10),10)}if(e.elite){game.orbs.push({x:e.x,y:e.y,type:'gold',v:3})}game.fx.push({x:e.x,y:e.y,r:5,life:.35,max:.35,type:'burst',color:e.type==='gnasher'?'#b98ad1':'#c9d99b'});if(game.objective&&!game.objective.done&&game.objective.type==='sacrifice'&&Math.hypot(e.x-game.objective.x,e.y-game.objective.y)<125)objectiveProgress(1);checkSpellUnlocks();if(p.kills%100===0)toast('已击败 '+p.kills+' 个敌人');if(e.type==='crabladon')toast('巨蟹倒下了！');if(e.type==='boss')finish(true)}
 function dropOrb(x,y,v){if(game.orbs.length>1500)game.orbs.splice(0,100);game.orbs.push({x,y,type:'xp',v,magnet:0})}
 function checkSpellUnlocks(){
  // Source-specific achievements must be emitted by a verified event tracker.
@@ -239,7 +369,11 @@ function applyUpgrade(op){let p=game.player;if(game.lockedOption===op)game.locke
  if(op.mode==='range')op.spell.range*=1.23;
  game.pendingSpellBonus=null;
  toast(op.spell.name+' · 获得专属升级');
- }else if(op.kind==='spellLevel'){op.spell.level++;op.spell.dmg*=1.14;op.spell.cd=Math.max(.55,op.spell.cd*.965);toast(op.spell.name+' 升至 '+op.spell.level+' 级')}else if(op.kind==='infuse'){op.spell.infusions.push(op.el);op.spell.level++;checkElementUnlocks();toast(op.spell.name+' 已注入 '+elements[op.el].name)}else if(op.kind==='spellAugment'){op.spell.augments.push(op.aug);if(op.aug==='surge')op.spell.dmg*=1.25;
+ }else if(op.kind==='spellLevel'){op.spell.level++;op.spell.dmg*=1.14;op.spell.cd=Math.max(.55,op.spell.cd*.965);toast(op.spell.name+' 升至 '+op.spell.level+' 级')}else if(op.kind==='infuse'){op.spell.infusions.push(op.el);op.spell.level++;checkElementUnlocks();toast(op.spell.name+' 已注入 '+elements[op.el].name)}else if(op.kind==='spellAugment'){op.spell.augments.push(op.aug);if(op.aug==='massiveMissile'){op.spell.dmg*=2.2;op.spell.cd*=1.65}
+  if(op.aug==='quakeBurst'){op.spell.dmg*=1.3;op.spell.range*=1.18}
+  if(op.aug==='sawFury')op.spell.dmg*=1.25;
+  if(op.aug==='diceFortune')op.spell.dmg*=1.12;
+  if(op.aug==='surge')op.spell.dmg*=1.25;
  if(op.aug==='tempo')op.spell.cd=Math.max(.35,op.spell.cd*.82);
  if(op.aug==='reach')op.spell.range*=1.2;
  if(op.aug==='seeking')op.spell.dmg*=1.15;
@@ -247,69 +381,153 @@ function applyUpgrade(op){let p=game.player;if(game.lockedOption===op)game.locke
 $('reroll').onclick=()=>{if(!game?.pending)return;let p=game.player;if(p.rerolls>0){p.rerolls--;p.rerollUsed++}else if(p.hp>20){p.hp-=20}else{toast('资源不足');return}let reason=game.pending.reason;if(reason==='scroll'){let pool=scrolls.filter(s=>!p.scrolls.includes(s.name));let arr=pool.sort(()=>Math.random()-.5).slice(0,3);game.pending.opts=arr.map(s=>({kind:'scroll',name:s.name,title:s.name,desc:s.desc,icon:'▤',fn:s.fn,rarity:'SCROLL'}));renderUpgrade()}else if(reason==='objective'){game.pending.opts.sort(()=>Math.random()-.5);renderUpgrade()}else{screen='playing';offerUpgrade(reason)}sound(600,.08,'triangle')};$('lock').onclick=()=>{let p=game.player;if(!p.locks){toast('没有锁定次数');return}if(!game.pending?.opts?.length)return;game.lockedOption=game.pending.opts[0];p.locks--;toast('已锁定：'+game.lockedOption.title+'，下次升级仍会出现');renderUpgrade()};$('banish').onclick=()=>{let p=game.player;if(!p.banishes){toast('没有放逐次数');return}p.banishes--;let idx=Math.floor(Math.random()*game.pending.opts.length);game.pending.opts.splice(idx,1);game.pending.opts.push(randomUpgrade());renderUpgrade()};function randomUpgrade(){let p=game.player,s=pick(p.spells);return {kind:'spellLevel',spell:s,title:s.name+' 强化',desc:'法术伤害与施法效率提升。',icon:s.icon,rarity:'RARE'}}
 function spellInfusion(sp){return sp.infusions.length>1?{a:sp.infusions[0],b:sp.infusions[1]}:sp.infusions.length?sp.infusions[0]:null}function fireSpell(sp){let p=game.player,t=nearest(p.x,p.y,(sp.kind==='orbit'?540:sp.range*1.5)),el=spellInfusion(sp);
  if(sp.id==='astral'&&sp.augments.includes('seeking')){const maxR=sp.range*1.5;const choices=game.enemies.filter(e=>!e.dead&&e.state!=='burrow'&&Math.hypot(e.x-p.x,e.y-p.y)<maxR);if(choices.length)t=choices.reduce((a,b)=>b.hp>a.hp?b:a)}
- const ang=t?Math.atan2(t.y-p.y,t.x-p.x):rand(0,TAU),base=sp.dmg*(1+sp.level*.13),size=p.spellSize*(1+sp.level*.012),range=sp.range*size;
+ const ang=t?Math.atan2(t.y-p.y,t.x-p.x):rand(0,TAU);let base=sp.dmg*(1+sp.level*.13);if(sp.id==='solar'&&sp.augments.includes('solarZenith'))base*=1+Math.min(1.2,p.stand*.08)*sp.augments.filter(a=>a==='solarZenith').length;const size=p.spellSize*(1+sp.level*.012),range=sp.range*size;
  sp.cdNow=sp.cd/p.cast*(1-(p.attune&&p.stand>.5?.2:0));p.casts++;save.stats.casts=(save.stats.casts||0)+1;
-let hit=(e,m=1)=>damageEnemy(e,base*m,'spell',el);
+let hit=(e,m=1)=>damageEnemy(e,base*m,sp.id,el);
 const fx=(x,y,r,life,color,type='ring')=>game.fx.push({x,y,r,life,max:life,color,type});
 if(game.objective&&!game.objective.done){let o=game.objective;if(o.type==='statues'&&o.objects){for(let ob of o.objects)if(ob.alive&&Math.hypot(ob.x-p.x,ob.y-p.y)<range+90){ob.hp=(ob.hp||100)-base*.25;if(ob.hp<=0){ob.alive=false;objectiveProgress(1)}}}if(o.type==='crab'&&o.crab?.alive&&Math.hypot(o.crab.x-p.x,o.crab.y-p.y)<range+90){o.crab.hp-=base*.35;o.crab.x+=Math.cos(ang)*20;o.crab.y+=Math.sin(ang)*20;if(o.crab.hp<=0){o.crab.alive=false;objectiveProgress(1)}}}
 if(sp.kind==='dice'){
- const face=1+Math.floor(Math.random()*6),x=t?t.x:p.x+Math.cos(ang)*220,y=t?t.y:p.y+Math.sin(ang)*220;
- game.hazards.push({x,y,r:55+face*7,timer:.65,dmg:base*(.45+face*.3),el,kind:'dice',face,color:'#e7c99d',life:2});
- game.fx.push({x,y,r:52+face*7,life:.7,max:.7,color:'#e8c689',type:'ring'});
-}else if(sp.kind==='tremor'){
- for(let i=0;i<4;i++){let a=i*TAU/4,x=(t?t.x:p.x+Math.cos(ang)*175)+Math.cos(a)*(32+i*10),y=(t?t.y:p.y+Math.sin(ang)*175)+Math.sin(a)*(32+i*10);
-  game.hazards.push({x,y,r:30+sp.level*1.3,timer:.2+i*.18,dmg:base*.62,el,kind:'tremor',color:'#bea684',life:1.6});}
-}else if(sp.kind==='buzzsaw'){
- if(t)game.shots.push({x:p.x,y:p.y,vx:Math.cos(ang)*300,vy:Math.sin(ang)*300,target:t,life:3,dmg:base*1.3,r:21,el,kind:'homing',saw:true,color:el?elementColor(el):'#d1d7ce',speed:410});
-}else if(sp.kind==='orbit'){let n=1+(sp.augments.includes('orbBurst')?2:0)+Math.floor(sp.level/7);for(let i=0;i<n;i++){let target=t||nearest(p.x,p.y,900);if(!target)continue;let dir=Math.atan2(target.y-p.y,target.x-p.x)+(i-(n-1)/2)*.21;game.shots.push({x:p.x+Math.cos(dir)*16,y:p.y+Math.sin(dir)*16,vx:Math.cos(dir)*260,vy:Math.sin(dir)*260,target,life:2.6,dmg:base*(sp.augments.includes('orbBurst')?.72:1),r:10*size,el,kind:'homing',color:el?elementColor(el):'#98dafa',speed:320,split:Math.min(6,sp.augments.filter(a=>a==='orbSplit').length)})}fx(p.x,p.y,21*size,.28,'#abe4ff')}
-else if(sp.kind==='pulse'||sp.kind==='slam'){let r=(sp.kind==='slam'?125:range)*size;for(let e of game.enemies)if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<r+e.r)hit(e,sp.kind==='slam'?1.5:1);fx(p.x,p.y,r,.5,sp.kind==='slam'?'#c8a879':'#f2d98c')}
-else if(sp.kind==='homing'||sp.kind==='sprout'||sp.kind==='bird'||sp.kind==='burst'){let n=sp.kind==='burst'?5:sp.kind==='bird'?2:sp.kind==='sprout'?2:1;for(let i=0;i<n;i++){let target=t||nearest(p.x,p.y,900);if(!target)continue;game.shots.push({x:p.x,y:p.y,vx:Math.cos(ang+rand(-.2,.2))*rand(250,330),vy:Math.sin(ang+rand(-.2,.2))*rand(250,330),target,life:3,dmg:base*(sp.kind==='burst'?.75:1),r:sp.kind==='bird'?10:6,el,kind:sp.kind,color:el?elementColor(el):'#a6d9ff',speed:sp.kind==='bird'?400:340})}}
-else if(sp.kind==='orbitshot'){let n=4+Math.floor(sp.level/5);for(let i=0;i<n;i++){let a=ang+i*TAU/n;game.shots.push({x:p.x+Math.cos(a)*42,y:p.y+Math.sin(a)*42,vx:Math.cos(a)*250,vy:Math.sin(a)*250,life:1.8,dmg:base*.8,r:8,el,kind:'blade',color:el?elementColor(el):'#d4d9ed'})}}
-else if(sp.kind==='boomerang'||sp.kind==='barrage'||sp.kind==='spear'){let n=sp.kind==='barrage'?5:sp.kind==='spear'?3:1;for(let i=0;i<n;i++){let a=ang+(i-(n-1)/2)*.16;game.shots.push({x:p.x,y:p.y,vx:Math.cos(a)*360,vy:Math.sin(a)*360,life:sp.kind==='boomerang'?2.4:1.5,dmg:base*(sp.kind==='barrage'?.7:1),r:sp.kind==='boomerang'?13:5,el,kind:sp.kind,color:el?elementColor(el):'#e4d18e',return:sp.kind==='boomerang',origin:{x:p.x,y:p.y}})}}
-else if(sp.kind==='slash'||sp.kind==='dash'){if(sp.kind==='dash'){p.x+=Math.cos(ang)*55;p.y+=Math.sin(ang)*55}for(let e of game.enemies){let dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy),a=Math.atan2(dy,dx);if(!e.dead&&d<range&&Math.abs(angleDiff(a,ang))<.85)hit(e,1.3)}fx(p.x+Math.cos(ang)*75,p.y+Math.sin(ang)*75,100,.28,'#f4dfa5','slash')}
-else if(sp.kind==='beam'){if(t){for(let e of game.enemies){if(!e.dead&&pointLineDist(e.x,e.y,p.x,p.y,Math.cos(ang),Math.sin(ang))<20*size&&(e.x-p.x)*Math.cos(ang)+(e.y-p.y)*Math.sin(ang)>0&&Math.hypot(e.x-p.x,e.y-p.y)<range)hit(e,.7)}game.fx.push({x:p.x,y:p.y,tx:p.x+Math.cos(ang)*range,ty:p.y+Math.sin(ang)*range,life:.18,max:.18,color:el?elementColor(el):'#9ce4ff',type:'beam'})}}
-else if(sp.kind==='meteor'||sp.kind==='bell'||sp.kind==='bomb'||sp.kind==='runes'){let n=sp.kind==='runes'?4:sp.kind==='meteor'?2:1;for(let i=0;i<n;i++){let x=t?t.x+rand(-75,75):p.x+Math.cos(ang)*range*.6,y=t?t.y+rand(-75,75):p.y+Math.sin(ang)*range*.6;game.hazards.push({x,y,r:sp.kind==='meteor'?58:sp.kind==='bell'?72:sp.kind==='bomb'?62:46,timer:sp.kind==='meteor'?.75:sp.kind==='bell'?1.3:.5,dmg:base*(sp.kind==='meteor'?1.7:1.2),el,color:el?elementColor(el):'#e7d18f',kind:sp.kind,life:3})}}
+  const count=sp.augments.includes('diceTwin')?2:1;
+  for(let k=0;k<count;k++){let face=1+Math.floor(Math.random()*6),x=(t?t.x:p.x+Math.cos(ang)*220)+rand(-38,38),y=(t?t.y:p.y+Math.sin(ang)*220)+rand(-38,38);
+   let radius=55+face*7+(sp.augments.includes('diceWild')&&face===6?36:0),damage=base*(.45+face*.3)*(sp.augments.includes('diceFortune')?(face>3?1.4:.85):1);
+   game.hazards.push({x,y,r:radius,timer:.65+k*.18,dmg:damage,el,kind:'dice',face,color:'#e7c99d',life:2.5});
+   if(sp.augments.includes('diceEcho'))game.hazards.push({x,y,r:radius*.55,timer:1.15+k*.18,dmg:damage*.42,el,kind:'dice',color:'#e8c689',life:2.5});
+   if(sp.augments.includes('diceWild')&&face===6)game.hazards.push({x,y,r:radius*1.2,timer:.85+k*.18,dmg:damage*.35,el,kind:'dice',color:'#f6ce8a',life:2.5});
+   fx(x,y,radius,.65,'#e8c689');}
+ }else if(sp.kind==='tremor'){
+  let n=sp.augments.includes('quakeAfter')?6:4;
+  for(let i=0;i<n;i++){let a=i*TAU/n,centerX=t?t.x:p.x+Math.cos(ang)*175,centerY=t?t.y:p.y+Math.sin(ang)*175;
+   let x=centerX+Math.cos(a)*(32+i*10),y=centerY+Math.sin(a)*(32+i*10);
+   if(sp.augments.includes('quakeLine')){x=centerX+Math.cos(ang)*(i-2)*44;y=centerY+Math.sin(ang)*(i-2)*44;}
+   game.hazards.push({x,y,r:30+sp.level*1.3,dmg:base*.62,el,timer:.2+i*.18,kind:'tremor',color:'#bea684',life:1.6});
+   if(sp.augments.includes('quakePull'))for(const e of game.enemies){if(e.dead)continue;let d=Math.hypot(e.x-x,e.y-y);if(d>1&&d<170){e.x+=(x-e.x)/d*22;e.y+=(y-e.y)/d*22}}
+  }
+ }else if(sp.kind==='buzzsaw'){
+  if(t){let n=sp.augments.includes('sawTwin')?2:1;
+   for(let i=0;i<n;i++){let a=ang+(i-(n-1)/2)*.25;
+    game.shots.push({x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,target:t,life:3.6,dmg:base*1.3,r:21,el,spellId:sp.id,kind:'homing',saw:true,color:el?elementColor(el):'#d1d7ce',speed:410,pierce:sp.augments.includes('sawReturn')?2:0,sawMagnet:sp.augments.includes('sawMagnet')});}
+  }
+ }else if(sp.kind==='orbit'){let n=1+(sp.augments.includes('orbBurst')?2:0)+Math.floor(sp.level/7);for(let i=0;i<n;i++){let target=t||nearest(p.x,p.y,900);if(!target)continue;let dir=Math.atan2(target.y-p.y,target.x-p.x)+(i-(n-1)/2)*.21;game.shots.push({x:p.x+Math.cos(dir)*16,y:p.y+Math.sin(dir)*16,vx:Math.cos(dir)*260,vy:Math.sin(dir)*260,target,life:2.6,dmg:base*(sp.augments.includes('orbBurst')?.72:1),r:10*size,el,spellId:sp.id,kind:'homing',color:el?elementColor(el):'#98dafa',speed:320,split:Math.min(6,sp.augments.filter(a=>a==='orbSplit').length)})}fx(p.x,p.y,21*size,.28,'#abe4ff')}
+else if(sp.kind==='pulse'||sp.kind==='slam'){let r=(sp.kind==='slam'?125:range)*size*(sp.augments.includes('solarZenith')?1+Math.min(1,p.stand*.08):1);for(let e of game.enemies)if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<r+e.r)hit(e,sp.kind==='slam'?1.5:1);fx(p.x,p.y,r,.5,sp.kind==='slam'?'#c8a879':'#f2d98c')}
+else if(sp.kind==='homing'||sp.kind==='sprout'||sp.kind==='bird'||sp.kind==='burst'){let n=sp.kind==='burst'?5:sp.kind==='bird'?2:sp.kind==='sprout'?2:1;for(let i=0;i<n;i++){let target=t||nearest(p.x,p.y,900);if(!target)continue;game.shots.push({x:p.x,y:p.y,vx:Math.cos(ang+rand(-.2,.2))*rand(250,330),vy:Math.sin(ang+rand(-.2,.2))*rand(250,330),target,life:3,dmg:base*(sp.kind==='burst'?.75:1),r:sp.augments.includes('massiveMissile')?16:sp.kind==='bird'?10:6,el,spellId:sp.id,split:sp.augments.includes('wingSplit')?1:0,kind:sp.kind,color:el?elementColor(el):'#a6d9ff',speed:sp.kind==='bird'?400:340})}}
+else if(sp.kind==='orbitshot'){let n=4+Math.floor(sp.level/5);for(let i=0;i<n;i++){let a=ang+i*TAU/n;game.shots.push({x:p.x+Math.cos(a)*42,y:p.y+Math.sin(a)*42,vx:Math.cos(a)*250,vy:Math.sin(a)*250,life:1.8,dmg:base*.8,r:8,el,kind:'blade',spellId:sp.id,pierce:sp.augments.filter(a=>a==='piercingBlades').length,color:el?elementColor(el):'#d4d9ed'})}}
+else if(sp.kind==='boomerang'||sp.kind==='barrage'||sp.kind==='spear'){let n=sp.kind==='barrage'?5:sp.kind==='spear'?3:1;for(let i=0;i<n;i++){let a=ang+(i-(n-1)/2)*.16;game.shots.push({x:p.x,y:p.y,vx:Math.cos(a)*360,vy:Math.sin(a)*360,life:sp.kind==='boomerang'?2.4:1.5,dmg:base*(sp.kind==='barrage'?.7:1),r:sp.kind==='boomerang'?13:5,el,kind:sp.kind,color:el?elementColor(el):'#e4d18e',return:sp.kind==='boomerang',origin:{x:p.x,y:p.y},spellId:sp.id,wax:sp.augments.filter(a=>a==='waxingMoon').length})}}
+else if(sp.kind==='slash'||sp.kind==='dash'){if(sp.kind==='dash'){p.x+=Math.cos(ang)*55;p.y+=Math.sin(ang)*55}for(let e of game.enemies){let dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy),a=Math.atan2(dy,dx);if(!e.dead&&d<range&&Math.abs(angleDiff(a,ang))<.85)hit(e,1.3)}fx(p.x+Math.cos(ang)*75,p.y+Math.sin(ang)*75,100,.28,'#f4dfa5','slash');if(sp.id==='talon'&&p.nextTalonCount>0){for(const e of game.enemies){if(e.dead)continue;let d=Math.hypot(e.x-p.x,e.y-p.y);if(d<range*1.25)hit(e,.9*p.nextTalonCount)}p.nextTalonCount=0}}
+else if(sp.kind==='beam'){if(t){if(sp.augments.includes('auraBeam'))game.hazards.push({x:t.x,y:t.y,r:88,timer:.2,dmg:base*.65,el,kind:'beamAura',color:'#80d4ef',life:1.7});for(let e of game.enemies){if(!e.dead&&pointLineDist(e.x,e.y,p.x,p.y,Math.cos(ang),Math.sin(ang))<20*size&&(e.x-p.x)*Math.cos(ang)+(e.y-p.y)*Math.sin(ang)>0&&Math.hypot(e.x-p.x,e.y-p.y)<range)hit(e,.7)}game.fx.push({x:p.x,y:p.y,tx:p.x+Math.cos(ang)*range,ty:p.y+Math.sin(ang)*range,life:.18,max:.18,color:el?elementColor(el):'#9ce4ff',type:'beam'})}}
+else if(sp.kind==='meteor'||sp.kind==='bell'||sp.kind==='bomb'||sp.kind==='runes'){let n=sp.kind==='runes'?4:sp.kind==='meteor'?2:1;if(sp.kind==='meteor'&&sp.augments.includes('superStar')&&Math.random()<.27)n++;for(let i=0;i<n;i++){let x=t?t.x+rand(-75,75):p.x+Math.cos(ang)*range*.6,y=t?t.y+rand(-75,75):p.y+Math.sin(ang)*range*.6;game.hazards.push({x,y,r:sp.kind==='meteor'?(i===n-1&&n>2?132:58):sp.kind==='bell'?72:sp.kind==='bomb'?62:46,timer:sp.kind==='meteor'?.75:sp.kind==='bell'?1.3:.5,dmg:base*(sp.kind==='meteor'?1.7:1.2),el,color:el?elementColor(el):'#e7d18f',kind:sp.kind,life:3})}}
 else if(sp.kind==='trail'){for(let i=0;i<3;i++){let x=p.x-Math.cos(ang)*i*34,y=p.y-Math.sin(ang)*i*34;game.hazards.push({x,y,r:36,timer:.1,dmg:base*.7,el,color:'#a3b6a1',kind:'trail',life:3})}}
-else if(sp.kind==='whirl'||sp.kind==='sickle'||sp.kind==='mesh'){let r=sp.kind==='mesh'?range:sp.kind==='sickle'?range:110;for(let e of game.enemies){let d=Math.hypot(e.x-p.x,e.y-p.y);if(!e.dead&&d<r)hit(e,sp.kind==='mesh'?.9:1)}fx(p.x,p.y,r,.35,el?elementColor(el):'#a8c8d4',sp.kind==='mesh'?'mesh':'ring')}
+else if(sp.kind==='whirl'||sp.kind==='sickle'||sp.kind==='mesh'){let r=sp.kind==='mesh'?range:sp.kind==='sickle'?range:110;for(let e of game.enemies){let d=Math.hypot(e.x-p.x,e.y-p.y);if(!e.dead&&d<r){hit(e,sp.kind==='mesh'?.9:1);if(sp.augments.includes('pullingWhirl')){let a=Math.atan2(p.y-e.y,p.x-e.x);e.x+=Math.cos(a)*38;e.y+=Math.sin(a)*38}}}fx(p.x,p.y,r,.35,el?elementColor(el):'#a8c8d4',sp.kind==='mesh'?'mesh':'ring');if(sp.augments.includes('scepterLink'))game.fx.push({x:p.x,y:p.y,tx:p.x+Math.cos(ang)*range,ty:p.y+Math.sin(ang)*range,life:.36,max:.36,color:'#99e3ed',type:'beam'})}
 else if(sp.kind==='imp'){for(let i=0;i<3;i++)game.shots.push({x:p.x+rand(-25,25),y:p.y+rand(-25,25),life:5,dmg:base*.7,r:8,el,kind:'imp',target:t,speed:270,color:'#c3a4d9'})}
 else{if(t)hit(t)}
 }
 function elementColor(e){if(typeof e==='object'&&e)return elementColor(e.a);return {fire:'#ff8b53',lightning:'#b8d7ff',acid:'#a7d56c',ice:'#8de5ed',dark:'#b58bd9'}[e]||'#fff'}function angleDiff(a,b){return Math.atan2(Math.sin(a-b),Math.cos(a-b))}function pointLineDist(px,py,x,y,dx,dy){return Math.abs((px-x)*dy-(py-y)*dx)}
-function startObjective(){let types=['fungi','statues','crab','sacrifice','rift','sludge','cores'];let type=pick(types),names={fungi:'Bewitching Fungi',statues:'Crush the Statues',crab:'Hunt the Golden Crab',sacrifice:'Sacrifice',rift:'Seal the Rift',sludge:'Soul Sludge',cores:'Unstable Spell Cores'};let desc={fungi:'收集散落在草甸中的 19 朵魔化菌菇。',statues:'摧毁地图上 8 座被诅咒的石像。',crab:'追上并击败逃跑的黄金蟹。',sacrifice:'在祭坛区域击败 15 个敌人。',rift:'进入裂隙并保持占据，直到封印完成。',sludge:'穿过紫色灵魂淤泥，净化 12 处污染。',cores:'收集 5 枚不稳定法术核心。'};let o={type,name:names[type],desc:desc[type],progress:0,target:{fungi:19,statues:8,crab:1,sacrifice:15,rift:100,sludge:12,cores:5}[type],time:85,x:clamp(game.player.x+rand(-360,360),-810,810),y:clamp(game.player.y+rand(-300,300),-550,550),done:false,objects:[]};if(type==='crab'){o.target=1;o.crab={x:o.x,y:o.y,r:15,hp:280,alive:true}}else if(type==='rift'){o.x=game.player.x+rand(-280,280);o.y=game.player.y+rand(-230,230)}else if(type==='sacrifice'){o.x=game.player.x+rand(-160,160);o.y=game.player.y+rand(-160,160)}else if(type==='fungi'||type==='cores'||type==='sludge'||type==='statues'){for(let i=0;i<o.target;i++)o.objects.push({x:clamp(o.x+rand(-310,310),-1100,1100),y:clamp(o.y+rand(-270,270),-800,800),hp:100,alive:true})}game.objective=o;toast('新目标：'+o.name);sound(360,.25,'triangle')}
-function objectiveProgress(n=1){let o=game.objective;if(!o||o.done)return;o.progress+=n;if(o.progress>=o.target)completeObjective()}
-function objectiveAugments(active){
- const result=[];
- for(const sp of active){
-   if(sp.id==='astral'){
-     const choices=[
-       {code:'orbBurst',title:'灵球连发 · Orb Burst',desc:'星界灵球改为连续成束释放，显著增加单次施法数量。',icon:'✦'},
-       {code:'orbSplit',title:'灵球分裂 · Orb Split',desc:'灵球命中目标后分裂为两颗次级追踪灵球。最多可强化 6 次。',icon:'✧'},
-       {code:'seeking',title:'索敌灵球 · Seeking Orbs',desc:'灵球优先瞄准生命值最高的目标，基础伤害提高 15%。',icon:'◎'}
-     ];
-     for(const x of choices){if(x.code==='orbSplit'&&sp.augments.filter(a=>a===x.code).length>=6)continue;
-       if(x.code!=='orbSplit'&&sp.augments.includes(x.code))continue;
-       result.push({kind:'spellAugment',spell:sp,aug:x.code,title:x.title,desc:x.desc,icon:x.icon});}
-   }else{
-     const base=[
-       {code:'surge',title:sp.name+' · 奥术激荡',desc:'提高该法术的伤害强度与暴击表现。',icon:'✹'},
-       {code:'tempo',title:sp.name+' · 迅捷施放',desc:'大幅降低该法术冷却时间。',icon:'➶'},
-       {code:'reach',title:sp.name+' · 领域延展',desc:'延长该法术射程并扩大命中范围。',icon:'◉'}
-     ];
-     for(const x of base)result.push({kind:'spellAugment',spell:sp,aug:x.code,title:x.title,desc:x.desc,icon:x.icon});
-   }
+/* Verdant Meadow objective variants and persistent objective-type tracking. */
+function startObjective(){
+ const count=save.stats?.objectives||0;
+ let types=['fungi','statues','crab','rift','sludge',...(count>=5?['sacrifice']:[]),...(count>=12?['cores']:[]),...(count>=25?['brazier']:[]),...(count>=40?['beasts']:[])];
+ // Prefer unique objectives within one run. If all have been tried, replay is allowed.
+ let unseen=types.filter(k=>!game.seenObjectives?.includes(k));if(!unseen.length)unseen=types;
+ let type=pick(unseen);game.seenObjectives=game.seenObjectives||[];game.seenObjectives.push(type);
+ let names={fungi:'魔化菌群',statues:'粉碎石像',crab:'黄金巨蟹',rift:'封印裂隙',sludge:'灵魂淤泥',sacrifice:'鲜血献祭',cores:'失控法术核心',brazier:'魔法火盆',beasts:'法力兽群'};
+ let desc={fungi:'收集19朵魔化菌菇。',statues:'击碎8座石像。',crab:'追逐并击败黄金蟹。',rift:'站在裂隙内，持续完成封印。',sludge:'穿越污染区并净化12处淤泥。',sacrifice:'在献祭法阵内击败15只怪物。',cores:'收集5个不稳定核心。',brazier:'依次点亮4个火盆，靠近并按E。',beasts:'驱赶4只法力兽进入圆形祭坛。'};
+ let target={fungi:19,statues:8,crab:1,rift:100,sludge:12,sacrifice:15,cores:5,brazier:4,beasts:4}[type];
+ let p=game.player,o={type,name:names[type],desc:desc[type],progress:0,target,time:95,x:clamp(p.x+rand(-240,240),-920,920),y:clamp(p.y+rand(-180,180),-670,670),done:false,objects:[],variant:null};
+ let variantsUnlocked=(save.objectiveHistory||{})[type]>0;
+ if(variantsUnlocked&&Math.random()<.45)o.variant=type==='rift'?'multi':type==='sacrifice'?'death':type==='fungi'?pick(['scared','explosive']):type==='crab'?pick(['mother','giant']):type==='statues'?'greater':type==='cores'?'heavy':type==='sludge'?'dark':type==='brazier'?'sequence':type==='beasts'?'devoted':null;
+ if(type==='crab'){o.crab={x:o.x,y:o.y,r:o.variant==='giant'?32:15,hp:o.variant==='giant'?580:280,alive:true}}
+ else if(['fungi','sludge','cores','statues','brazier','beasts'].includes(type)){
+  const n=type==='brazier'||type==='beasts'?4:target;
+  for(let i=0;i<n;i++){
+   let angle=i*TAU/n+rand(-.2,.2),radius=type==='brazier'||type==='beasts'?rand(110,260):rand(80,350);
+   o.objects.push({x:clamp(o.x+Math.cos(angle)*radius,-1130,1130),y:clamp(o.y+Math.sin(angle)*radius,-810,810),hp:type==='statues'?100:1,alive:true,index:i,activated:false});
+  }
  }
- // No non-spell stat rewards: draw three distinct actual spell augmentations.
- for(let i=result.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]]}
- if(result.length<3&&active.length){const sp=active[0];while(result.length<3)result.push({kind:'spellAugment',spell:sp,aug:'surge',title:sp.name+' · 奥术激荡',desc:'提高该法术伤害。',icon:'✹'})}
- return result.slice(0,3);
+ game.objective=o;toast('新目标：'+o.name);sound(360,.25,'triangle');
 }
-function completeObjective(){let o=game.objective;if(!o||o.done)return;o.done=true;game.player.objectives++;save.stats.objectives=(save.stats.objectives||0)+1;game.doneObj++;game.player.hp=Math.min(game.player.maxHp,game.player.hp+20*(1+(game.player.healBonus||0)));let bonus=80+game.doneObj*25;game.bonusGold=(game.bonusGold||0)+bonus;toast('目标完成：'+o.name+' · +'+bonus+' 金币');let opts=objectiveAugments(game.player.spells);game.pending={opts:opts.map(x=>({...x,rarity:'AUGMENT'})),reason:'objective'};renderUpgrade();show('upgrade')}
+function updateObjective(dt){
+ let o=game.objective;if(!o||o.done)return;let p=game.player;o.time-=dt;
+ if(o.type==='rift'){
+  const near=Math.hypot(p.x-o.x,p.y-o.y)<(o.variant==='multi'?86:120);
+  o.progress=clamp(o.progress+(near?1.8:-.8)*dt,0,o.target);if(o.progress>=o.target)completeObjective();
+ }else if(o.type==='crab'&&o.crab?.alive){let c=o.crab,d=Math.hypot(c.x-p.x,c.y-p.y),a=Math.atan2(c.y-p.y,c.x-p.x);c.x=clamp(c.x+Math.cos(a)*dt*70,-1140,1140);c.y=clamp(c.y+Math.sin(a)*dt*70,-820,820);if(d<230&&Math.random()<dt*2)c.x+=Math.cos(a+Math.PI/2)*rand(-20,20);if(c.hp<=0){c.alive=false;objectiveProgress(1)}}
+ else if(o.type==='beasts')for(const beast of o.objects){if(!beast.alive)continue;
+  let dist=Math.hypot(p.x-beast.x,p.y-beast.y),a=Math.atan2(beast.y-p.y,beast.x-p.x);
+  if(dist<150){let move=o.variant==='devoted'?-95:110;beast.x=clamp(beast.x+Math.cos(a)*move*dt,-1160,1160);beast.y=clamp(beast.y+Math.sin(a)*move*dt,-860,860)}
+  if(Math.hypot(beast.x-o.x,beast.y-o.y)<78){beast.alive=false;objectiveProgress(1)}
+ }
+ if(o.time<=0&&!o.done){toast('目标失败：'+o.name);game.objective=null}
+}
+function objectiveItemInteraction(){
+ const o=game?.objective,p=game?.player;if(!o||o.done)return false;
+ if(o.type==='brazier'){
+  const current=o.objects.find(x=>x.alive),c=o.objects.find(x=>x.alive&&Math.hypot(x.x-p.x,x.y-p.y)<80);
+  if(!c)return false;if(o.variant==='sequence'&&c!==current){toast('火盆顺序错误，按符文提示继续');return true}
+  c.alive=false;objectiveProgress(1);sound(520,.1,'triangle');return true;
+ }
+ return false;
+}
+
+function objectiveProgress(n=1){let o=game.objective;if(!o||o.done)return;o.progress+=n;if(o.progress>=o.target)completeObjective()}
+// Source-confirmed 1.2 older-spell augment behaviors, plus distinctly marked
+// prototype augmentations for the 3 new spells (names/effects not source-verified).
+const SOURCE_AUGMENTS={
+ astral:[
+  {code:'orbBurst',title:'灵球连发 · Orb Burst',desc:'灵球连续释放两发额外投射物。',icon:'✦'},
+  {code:'orbSplit',title:'灵球分裂 · Orb Split',desc:'命中后分裂成次级追踪灵球（可叠加）。',icon:'✧',stack:6},
+  {code:'seeking',title:'索敌灵球 · Seeking',desc:'优先攻击生命值最高的敌人，增强伤害。',icon:'◎'}],
+ missile:[{code:'massiveMissile',title:'巨型飞弹 · Massive Missile',desc:'飞弹大幅增大、伤害提高，但减慢施放与飞行速度。',icon:'➶'}],
+ beam:[{code:'auraBeam',title:'光束光环 · Aura Beam',desc:'光束命中区域产生增长的能量场，对附近敌人造成伤害。',icon:'◉'}],
+ sprout:[{code:'babySprout',title:'幼小萌芽 · Baby Sprout',desc:'植物击败敌人时，有机会在死亡地点长出新植物。',icon:'♣'}],
+ talon:[{code:'counterTalon',title:'反击鹰爪 · Counter Talon',desc:'受到伤害后，下次施法额外挥出两爪。',icon:'⌁'}],
+ blades:[{code:'piercingBlades',title:'穿刺之刃 · Piercing Blades',desc:'每柄刀刃额外穿透一名敌人（可叠加）。',icon:'⚔',stack:3}],
+ necro:[{code:'pullingWhirl',title:'牵引旋刃 · Pulling Whirl',desc:'旋刃把附近敌人向中心吸引。',icon:'☠'}],
+ mesh:[{code:'scepterLink',title:'权杖联结 · Scepter Link',desc:'权杖与巫师之间形成伤害光束。',icon:'✣'}],
+ solar:[{code:'solarZenith',title:'极昼顶点 · Solar Zenith',desc:'站立时太阳脉冲持续增长范围与伤害。',icon:'☼',stack:3}],
+ stars:[{code:'superStar',title:'超级坠星 · Super Star',desc:'偶尔出现大范围高伤害巨型坠星。',icon:'✷'}],
+ bell:[{code:'unrungBells',title:'未鸣之钟 · Unrung Bells',desc:'未敲响的魔法钟在寿命结束时也会爆炸，爆炸范围较小。',icon:'♬'}],
+ moon:[{code:'waxingMoon',title:'渐盈之月 · Waxing Moon',desc:'月刃在飞行途中逐渐增大（可叠加）。',icon:'☾',stack:3}],
+ wings:[{code:'wingSplit',title:'翼之分裂 · Wing Split',desc:'灵鸟命中时有概率分裂出小型灵鸟。',icon:'❧'}],
+ loadedDice:[
+  {code:'diceFortune',title:'幸运骰面 · Prototype',desc:'骰面爆炸伤害向高点数倾斜。',icon:'⚄'},
+  {code:'diceTwin',title:'双重投掷 · Prototype',desc:'每次施法额外投掷一枚骰子。',icon:'⚁'},
+  {code:'diceWild',title:'狂野骰子 · Prototype',desc:'六点爆炸范围扩大，概率造成额外冲击。',icon:'✷'},
+  {code:'diceEcho',title:'骰子余震 · Prototype',desc:'骰子爆炸后紧接一次较小的余震。',icon:'◇'}],
+ tinyTremors:[
+  {code:'quakeAfter',title:'余震 · Prototype',desc:'每次微型地震追加两次震动。',icon:'▤'},
+  {code:'quakeLine',title:'断层带 · Prototype',desc:'地震沿目标方向排列，命中面积扩大。',icon:'〰'},
+  {code:'quakePull',title:'地心引力 · Prototype',desc:'地震区域将敌人拉向中心。',icon:'◎'},
+  {code:'quakeBurst',title:'深层共鸣 · Prototype',desc:'地震伤害和半径提高。',icon:'✹'}],
+ wickedBuzzsaw:[
+  {code:'sawTwin',title:'双轮斩 · Prototype',desc:'每次施法发出两枚锯轮。',icon:'⚙'},
+  {code:'sawReturn',title:'回返锯轮 · Prototype',desc:'锯轮折返，穿透并重复打击敌人。',icon:'⟲'},
+  {code:'sawFury',title:'狂怒齿轮 · Prototype',desc:'锯轮连续命中提升伤害，直至失去目标。',icon:'✦'},
+  {code:'sawMagnet',title:'磁力锯轮 · Prototype',desc:'锯轮飞行时拉扯附近敌人。',icon:'◉'}]
+};
+function objectiveAugments(active){
+ const pool=[];
+ for(const sp of active){
+  const options=SOURCE_AUGMENTS[sp.id]||[
+   {code:'surge',title:sp.name+' · 奥术激荡',desc:'显著提高法术伤害。',icon:'✹',stack:2},
+   {code:'tempo',title:sp.name+' · 迅捷施放',desc:'缩短法术冷却。',icon:'➶',stack:2},
+   {code:'reach',title:sp.name+' · 领域延展',desc:'增加范围、效果面积。',icon:'◉',stack:2}
+  ];
+  for(const a of options){const have=sp.augments.filter(x=>x===a.code).length;
+   if(have<(a.stack||1))pool.push({kind:'spellAugment',spell:sp,aug:a.code,title:a.title,desc:a.desc,icon:a.icon});
+  }
+ }
+ for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+ if(pool.length<3){const sp=active[0];if(sp){for(const [id,label] of [['surge','额外伤害'],['tempo','额外施法速度'],['reach','额外影响范围']]){
+  if(pool.length>=3)break;pool.push({kind:'spellAugment',spell:sp,aug:id,title:sp.name+' · '+label,desc:'加强该法术的特定战斗属性。',icon:'✹'});
+ }}}
+ return pool.slice(0,3);
+}
+
+function completeObjective(){let o=game.objective;if(!o||o.done)return;o.done=true;game.player.objectives++;save.stats.objectives=(save.stats.objectives||0)+1;game.doneObj++;save.objectiveHistory=save.objectiveHistory||{};save.objectiveHistory[o.type]=(save.objectiveHistory[o.type]||0)+1;persist();game.player.hp=Math.min(game.player.maxHp,game.player.hp+20*(1+(game.player.healBonus||0)));let bonus=80+game.doneObj*25;game.bonusGold=(game.bonusGold||0)+bonus;toast('目标完成：'+o.name+' · +'+bonus+' 金币');let opts=objectiveAugments(game.player.spells);game.pending={opts:opts.map(x=>({...x,rarity:'AUGMENT'})),reason:'objective'};renderUpgrade();show('upgrade')}
 function spawnChest(){let p=game.player;let a=rand(0,TAU),d=rand(350,550);game.chests.push({x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d,open:false,r:24});toast('发现卷轴宝箱：靠近后按 E 开启')}
-function interact(){if(!game||screen!=='playing')return;let p=game.player;let c=game.chests.find(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);if(c){c.open=true;let pool=scrolls.filter(s=>!p.scrolls.includes(s.name));let arr=pool.sort(()=>Math.random()-.5).slice(0,3).map(s=>({kind:'scroll',name:s.name,title:s.name,desc:s.desc,icon:'▤',fn:s.fn,rarity:'SCROLL'}));game.pending={opts:arr,reason:'scroll'};renderUpgrade();show('upgrade');sound(720,.2,'triangle');return}toast('附近没有可开启的宝箱')}
-function damagePlayer(n,source='enemy'){let p=game.player;if(p.invuln>0)return;if(Math.random()<p.dodge){if(p.evasion)p.hp=Math.min(p.maxHp,p.hp+n*.2);toast('闪避！');return}let armor=p.armor+(p.thick?(1-p.hp/p.maxHp)*90:0);let dmg=Math.max(1,n*(100/(100+armor)));p.hp-=dmg;p.damageTaken+=dmg;p.invuln=.65;if(p.fight)p.fightT=2;game.shake=7;game.fx.push({x:p.x,y:p.y,r:30,life:.25,max:.25,color:'#f48d80',type:'ring'});sound(110,.1,'sawtooth',.02);if(p.hp<=0)finish(false)}
-function updateObjective(dt){let o=game.objective;if(!o||o.done)return;o.time-=dt;if(o.type==='rift'){let near=Math.hypot(game.player.x-o.x,game.player.y-o.y)<90;if(near)o.progress+=dt*1.8;else o.progress=Math.max(0,o.progress-dt*.8);if(o.progress>=o.target)completeObjective()}else if(o.type==='crab'&&o.crab.alive){let c=o.crab,d=Math.hypot(c.x-game.player.x,c.y-game.player.y),a=Math.atan2(c.y-game.player.y,c.x-game.player.x);c.x+=Math.cos(a)*dt*70;c.y+=Math.sin(a)*dt*70;if(d<230&&Math.random()<dt*2)c.x+=Math.cos(a+Math.PI/2)*rand(-20,20);if(c.hp<=0){c.alive=false;objectiveProgress(1)}}if(o.time<=0&&!o.done){toast('目标失败：'+o.name);game.objective=null}}
+function interact(){if(!game||screen!=='playing')return;if(objectiveItemInteraction())return;let p=game.player;let c=game.chests.find(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);if(c){c.open=true;let pool=scrolls.filter(s=>!p.scrolls.includes(s.name));let arr=pool.sort(()=>Math.random()-.5).slice(0,3).map(s=>({kind:'scroll',name:s.name,title:s.name,desc:s.desc,icon:'▤',fn:s.fn,rarity:'SCROLL'}));game.pending={opts:arr,reason:'scroll'};renderUpgrade();show('upgrade');sound(720,.2,'triangle');return}toast('附近没有可开启的宝箱')}
+function damagePlayer(n,source='enemy'){let p=game.player;if(p.invuln>0)return;if(Math.random()<p.dodge){if(p.evasion)p.hp=Math.min(p.maxHp,p.hp+n*.2);toast('闪避！');return}let armor=p.armor+(p.thick?(1-p.hp/p.maxHp)*90:0);let dmg=Math.max(1,n*(100/(100+armor)));p.hp-=dmg;p.damageTaken+=dmg;p.invuln=.65;if(p.fight)p.fightT=2;if(p.spells.some(s=>s.id==='talon'&&s.augments.includes('counterTalon')))p.nextTalonCount=2;game.shake=7;game.fx.push({x:p.x,y:p.y,r:30,life:.25,max:.25,color:'#f48d80',type:'ring'});sound(110,.1,'sawtooth',.02);if(p.hp<=0)finish(false)}
 function update(dt){if(!game||screen!=='playing')return;let g=game,p=g.player;g.time+=dt;if(p.invuln>0)p.invuln-=dt;if(p.fightT>0)p.fightT-=dt;if(p.regen>0)p.hp=Math.min(p.maxHp,p.hp+p.regen*dt);if(p.hp<=0){finish(false);return}
-let mx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+joy.x,my=(keys.KeyS||keys.ArrowDown?1:0)-(keys.KeyW||keys.ArrowUp?1:0)+joy.y;let mag=Math.hypot(mx,my);if(mag>1){mx/=mag;my/=mag}if(mag<.05){p.stand+=dt;p.lastMove=0}else{p.stand=0;p.lastMove=mag}let speed=p.move*(p.lowSpeed?1+(1-p.hp/p.maxHp)*.21:1)*(p.fightT>0?1.3:1);p.x=clamp(p.x+mx*speed*dt,-1200,1200);p.y=clamp(p.y+my*speed*dt,-900,900);
+let mx=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+joy.x,my=(keys.KeyS||keys.ArrowDown?1:0)-(keys.KeyW||keys.ArrowUp?1:0)+joy.y;let mag=Math.hypot(mx,my);if(mag>1){mx/=mag;my/=mag}if(mag<.05){p.stand+=dt;p.lastMove=0}else{p.stand=0;p.lastMove=mag;p.facing=Math.atan2(my,mx)}let speed=p.move*(p.lowSpeed?1+(1-p.hp/p.maxHp)*.21:1)*(p.fightT>0?1.3:1);p.x=clamp(p.x+mx*speed*dt,-1200,1200);p.y=clamp(p.y+my*speed*dt,-900,900);
 // Mission schedule and pressure curve
 if(g.time>=120&&g.nextObj===0){g.nextObj=1;startObjective()}if(g.time>=360&&g.nextObj===1){g.nextObj=2;startObjective()}if(g.time>=660&&g.nextObj===2){g.nextObj=3;startObjective()}if(g.time>=840&&g.nextObj===3){g.nextObj=4;startObjective()}if(g.time>=120&&g.nextChest===120){spawnChest();g.nextChest=660}if(g.time>=660&&g.nextChest===660){spawnChest();g.nextChest=1140}if(g.time>=1140&&g.nextChest===1140){spawnChest();g.nextChest=99999}
 if(g.time>=1140&&!g.boss&&!g.bossPending){g.bossPending={x:p.x+rand(-400,400),y:p.y-520,t:3};toast('警告：裂隙正在召唤深渊首领！')}if(g.bossPending){g.bossPending.t-=dt;g.bossPending.pulse=(g.bossPending.pulse||0)-dt;if(g.bossPending.pulse<=0&&Math.hypot(p.x-g.bossPending.x,p.y-g.bossPending.y)<96){damagePlayer(9,'summon');g.bossPending.pulse=.7}if(g.bossPending.t<=0)spawnBoss()}
@@ -324,33 +542,103 @@ if(e.type==='shield')e.shield=(e.shield||0)>0?e.shield-dt:0;
 if(d<e.r+p.r+3&&e.state!=='corrupt'){e.touch=(e.touch||0)-dt;if(e.touch<=0){damagePlayer(e.dmg*.14*(e.weakness>0?.65:1),'contact');e.touch=.65}}
 }
 g.enemies=g.enemies.filter(e=>!e.dead||e.fade>0);
-// Boss attacks
-if(g.boss&&!g.boss.dead){let b=g.boss,d=Math.hypot(p.x-b.x,p.y-b.y),a=Math.atan2(p.y-b.y,p.x-b.x);b.speed=65+Math.min(140,(b.age||0)*1.7);if(b.vulnerable<=0){b.x+=Math.cos(a)*b.speed*(1-(b.slow||0))*dt;b.y+=Math.sin(a)*b.speed*(1-(b.slow||0))*dt};b.attack-=dt;b.rune-=dt;if(b.attack<=0){b.attack=3.2;g.hazards.push({x:p.x+rand(-70,70),y:p.y+rand(-70,70),r:88,timer:1.25,dmg:32,el:'dark',color:'#d08cae',kind:'runestone',life:2.4,boss:true})}if(b.rune<=0){b.rune=5}if(d<b.r+p.r+8){b.touch=(b.touch||0)-dt;if(b.touch<=0){damagePlayer(32,'boss');b.touch=.9}}if(b.stagger>=100){b.stagger=0;b.staggerT=2.5;b.vulnerable=2.5;toast('首领失衡！抓住输出窗口！')}if(b.vulnerable>0)b.vulnerable-=dt;if(b.hp<=0){b.dead=true;killEnemy(b);finish(true)}}
-v2bossUpdate(dt);
+// Boss attacks: original-source reference logic is isolated by boss archetype.
+updateBossEncounter(dt);
 // spells
 for(let s of p.spells){s.cdNow-=dt;if(s.cdNow<=0)fireSpell(s)}
 // friendly projectiles
-for(let s of g.shots){s.life-=dt;if(s.kind==='enemy'){s.x+=s.vx*dt;s.y+=s.vy*dt;if(Math.hypot(s.x-p.x,s.y-p.y)<p.r+s.r){damagePlayer(s.dmg,'projectile');s.life=0}}else if(s.kind==='imp'){let target=s.target&&!s.target.dead?s.target:nearest(s.x,s.y,500);if(target){let a=Math.atan2(target.y-s.y,target.x-s.x);s.x+=Math.cos(a)*s.speed*dt;s.y+=Math.sin(a)*s.speed*dt;if(Math.hypot(target.x-s.x,target.y-s.y)<target.r+s.r){damageEnemy(target,s.dmg,'imp',s.el);s.life=0}}}else{if(s.return&&s.life<1.2){let a=Math.atan2(s.origin.y-s.y,s.origin.x-s.x);s.vx=Math.cos(a)*390;s.vy=Math.sin(a)*390}s.x+=s.vx*dt;s.y+=s.vy*dt;if(s.target&&!s.target.dead&&['homing','bird','sprout'].includes(s.kind)){let a=Math.atan2(s.target.y-s.y,s.target.x-s.x);s.vx+=(Math.cos(a)*s.speed-s.vx)*Math.min(1,dt*3);s.vy+=(Math.sin(a)*s.speed-s.vy)*Math.min(1,dt*3)}for(let e of g.enemies){if(!e.dead&&e!==s.ignore&&Math.hypot(e.x-s.x,e.y-s.y)<e.r+s.r){damageEnemy(e,s.dmg,'projectile',s.el);if(s.split>0){const n=2+s.split-1;for(let j=0;j<Math.min(n,7);j++){
+for(let s of g.shots){s.life-=dt;if(s.kind==='enemy'){s.x+=s.vx*dt;s.y+=s.vy*dt;if(Math.hypot(s.x-p.x,s.y-p.y)<p.r+s.r){damagePlayer(s.dmg,'projectile');s.life=0}}else if(s.kind==='imp'){let target=s.target&&!s.target.dead?s.target:nearest(s.x,s.y,500);if(target){let a=Math.atan2(target.y-s.y,target.x-s.x);s.x+=Math.cos(a)*s.speed*dt;s.y+=Math.sin(a)*s.speed*dt;if(Math.hypot(target.x-s.x,target.y-s.y)<target.r+s.r){damageEnemy(target,s.dmg,'imp',s.el);s.life=0}}}else{if(s.return&&s.life<1.2){let a=Math.atan2(s.origin.y-s.y,s.origin.x-s.x);s.vx=Math.cos(a)*390;s.vy=Math.sin(a)*390}s.x+=s.vx*dt;s.y+=s.vy*dt;if(s.wax)s.r=Math.min(50,s.r*(1+dt*.25*s.wax));if(s.sawMagnet){for(const e of g.enemies){if(e.dead)continue;let d=Math.hypot(e.x-s.x,e.y-s.y);if(d>1&&d<100){e.x+=(s.x-e.x)/d*15*dt;e.y+=(s.y-e.y)/d*15*dt}}}if(s.target&&!s.target.dead&&['homing','bird','sprout'].includes(s.kind)){let a=Math.atan2(s.target.y-s.y,s.target.x-s.x);s.vx+=(Math.cos(a)*s.speed-s.vx)*Math.min(1,dt*3);s.vy+=(Math.sin(a)*s.speed-s.vy)*Math.min(1,dt*3)}for(let e of g.enemies){if(!e.dead&&e!==s.ignore&&Math.hypot(e.x-s.x,e.y-s.y)<e.r+s.r){damageEnemy(e,s.dmg,s.spellId||'projectile',s.el);if(s.split>0){const n=2+s.split-1;for(let j=0;j<Math.min(n,7);j++){
   const a=(j+1)*TAU/Math.min(n,7);
   const targets=g.enemies.filter(o=>o!==e&&!o.dead&&Math.hypot(o.x-e.x,o.y-e.y)<320);
   const next=targets.length?targets.reduce((q,o)=>Math.hypot(o.x-e.x,o.y-e.y)<Math.hypot(q.x-e.x,q.y-e.y)?o:q):null;
   const pad=e.r+18;
   g.shots.push({x:e.x+Math.cos(a)*pad,y:e.y+Math.sin(a)*pad,vx:Math.cos(a)*185,vy:Math.sin(a)*185,target:next,ignore:e,life:1.2,dmg:s.dmg*.42,r:5,el:s.el,kind:'homing',color:s.color,speed:295,split:0});}
- }if(s.kind==='boomerang')s.dmg*=.7;else{s.life=0;break}}}}}g.shots=g.shots.filter(s=>s.life>0);
+ }if(s.kind==='boomerang')s.dmg*=.7;else if(s.pierce>0){s.pierce--;s.ignore=e;s.dmg*=.85}else{s.life=0;break}}}}}g.shots=g.shots.filter(s=>s.life>0);
 // delayed AoE hazards
-for(let h of g.hazards){h.timer-=dt;h.life-=dt;if(h.timer<=0&&!h.hit){h.hit=true;for(let e of g.enemies)if(!e.dead&&Math.hypot(e.x-h.x,e.y-h.y)<h.r+e.r)damageEnemy(e,h.dmg,'area',h.el);if(Math.hypot(p.x-h.x,p.y-h.y)<h.r+p.r){if(h.kind==='runestone')damagePlayer(h.dmg,'runestone');else if(['meteor','bell','bomb','slam','dice'].includes(h.kind))damagePlayer(h.dmg*.11,'friendlyFire')}game.shake=4}}g.hazards=g.hazards.filter(h=>h.life>0);
+for(let h of g.hazards){h.timer-=dt;h.life-=dt;if(h.timer<=0&&!h.hit){h.hit=true;if(h.kind==='warning')continue;for(let e of g.enemies)if(!e.dead&&!(h.boss&&e.type==='boss'&&h.kind!=='runestone')&&Math.hypot(e.x-h.x,e.y-h.y)<h.r+e.r)damageEnemy(e,h.dmg,'area',h.el);if(Math.hypot(p.x-h.x,p.y-h.y)<h.r+p.r){if(h.kind==='runestone')damagePlayer(h.dmg,'runestone');else if(['meteor','bell','bomb','slam','dice'].includes(h.kind))damagePlayer(h.dmg*.11,'friendlyFire')}game.shake=4}}g.hazards=g.hazards.filter(h=>h.life>0);
 // collect orbs
 for(let o of g.orbs){let d=Math.hypot(o.x-p.x,o.y-p.y);if(o.type==='xp'&&(d<p.manaPull||o.magnet)){let a=Math.atan2(p.y-o.y,p.x-o.x);o.x+=Math.cos(a)*(250+100*(1-d/p.manaPull))*dt;o.y+=Math.sin(a)*(250+100*(1-d/p.manaPull))*dt}if(d<p.r+14){if(o.type==='xp'){addXp(o.v);if(p.manaSiphon&&Math.random()<.15)p.hp=Math.min(p.maxHp,p.hp+1)}if(o.type==='health'){p.hp=Math.min(p.maxHp,p.hp+30);if(p.elixir)p.maxHp+=40}if(o.type==='magnet'){for(let z of g.orbs)if(z.type==='xp')z.magnet=1;toast('魔力磁石：经验球正在聚集')}if(o.type==='gold'){save.gold+=o.v;persist()}o.life=0}}g.orbs=g.orbs.filter(o=>o.life!==0);
 // objective items and crab
-if(g.objective&&!g.objective.done){let o=g.objective;if(o.type==='crab'&&o.crab?.alive){let c=o.crab;if(c.hp<=0){c.alive=false;objectiveProgress(1)}}else if(o.objects){for(let obj of o.objects){if(obj.alive&&o.type!=='statues'&&Math.hypot(obj.x-p.x,obj.y-p.y)<36){obj.alive=false;objectiveProgress(1);sound(600,.04)}}}}updateObjective(dt);
+if(g.objective&&!g.objective.done){let o=g.objective;if(o.type==='crab'&&o.crab?.alive){let c=o.crab;if(c.hp<=0){c.alive=false;objectiveProgress(1)}}else if(o.objects){for(let obj of o.objects){if(obj.alive&&!['statues','brazier','beasts'].includes(o.type)&&Math.hypot(obj.x-p.x,obj.y-p.y)<36){obj.alive=false;objectiveProgress(1);sound(600,.04)}}}}updateObjective(dt);
 // effects and cleanup
 for(let f of g.fx)f.life-=dt;g.fx=g.fx.filter(f=>f.life>0);for(let n of g.damageNumbers){n.life-=dt;n.y-=dt*24}g.damageNumbers=g.damageNumbers.filter(n=>n.life>0);g.shake=Math.max(0,g.shake-dt*22);
 g.hudTick+=dt;if(g.hudTick>=.10){g.hudTick=0;renderHud()}}
-function spawnBoss(){let p=game.player,loc=game.bossPending||{x:p.x+rand(-400,400),y:p.y-520},b={id:'boss',type:'boss',name:"Sol'phish",x:loc.x,y:loc.y,r:52,hp:22000*(selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1),max:22000*(selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1),speed:60,attack:2.5,rune:3,stagger:0,vulnerable:0,dead:false,hitFlash:0,elite:true,burn:0,burnDmg:0,acid:0,slow:0,freeze:0,weakness:0,corrupt:0,corruptT:0};game.boss=b;game.bossPending=null;game.enemies.push(b);toast("Sol'phish 正在穿越裂隙！");sound(75,.7,'sawtooth',.04)}
+/* Boss pool and combat patterns. Krog'wa/Mul'gath mechanics are an independently
+   authored approximation pending source-version frame-by-frame comparison. */
+const BOSS_ARCHETYPES=[
+ {id:'sol',name:"Sol'phish",label:"SOL'PHISH · 深渊之长",hp:22000,r:52,speed:70},
+ {id:'krog',name:"Krog'wa",label:"KROG'WA · 膨胀之王",hp:23500,r:60,speed:77},
+ {id:'mul',name:"Mul'gath",label:"MUL'GATH · 扭曲之主",hp:24000,r:56,speed:73}
+];
+function spawnBoss(){
+ let p=game.player,loc=game.bossPending||{x:p.x+rand(-400,400),y:p.y-520};
+ let archetype=pick(BOSS_ARCHETYPES),mult=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;
+ let b={id:'boss',type:'boss',bossId:archetype.id,name:archetype.name,x:loc.x,y:loc.y,r:archetype.r,hp:archetype.hp*mult,max:archetype.hp*mult,speed:archetype.speed,attack:2.5,rune:4,stagger:0,vulnerable:0,dead:false,hitFlash:0,elite:true,burn:0,burnDmg:0,acid:0,slow:0,freeze:0,weakness:0,corrupt:0,corruptT:0,age:0,phase:'hunt',phaseT:0,healTimer:8,leapTimer:7};
+ save.stats.bossesEncountered=(save.stats.bossesEncountered||0)+1;persist();game.boss=b;game.bossPending=null;game.enemies.push(b);
+ toast(archetype.name+' 正在穿越裂隙！');sound(75,.7,'sawtooth',.04);
+}
+function spawnBossHealer(b){
+ if(game.enemies.filter(e=>!e.dead&&e.bossHealer).length>=5)return;
+ spawnEnemy(false,'buffer');let e=game.enemies[game.enemies.length-1];
+ e.x=b.x+rand(-150,150);e.y=b.y+rand(-145,145);e.hp=e.max=400;e.speed=45;e.dmg=22;e.bossHealer=true;e.elite=false;e.type='buffer';e.state='chase';
+ game.fx.push({x:e.x,y:e.y,r:55,life:.4,max:.4,color:'#c0e6a0',type:'ring'});
+}
+function updateBossEncounter(dt){
+ const g=game,b=g?.boss,p=g?.player;if(!b||b.dead)return;
+ const spec=BOSS_ARCHETYPES.find(x=>x.id===b.bossId)||BOSS_ARCHETYPES[0];
+ b.age=(b.age||0)+dt;b.hitFlash=Math.max(0,(b.hitFlash||0)-dt);b.burn=Math.max(0,(b.burn||0)-dt);b.acid=Math.max(0,(b.acid||0)-dt);
+ b.slow=Math.max(0,(b.slow||0)-dt*.025);b.freeze=Math.max(0,(b.freeze||0)-dt);b.vulnerable=Math.max(0,(b.vulnerable||0)-dt);
+ if(b.burn>0){b.burnTick=(b.burnTick||0)-dt;if(b.burnTick<=0){b.burnTick=.5;damageEnemy(b,b.burnDmg||4,'burn',null,false)}}
+ if(b.stagger>=100){b.stagger=0;b.vulnerable=2.6;b.phase='stagger';b.phaseT=2.6;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
+ let dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx);
+ const status=$('bossname');status.textContent=spec.label+(b.vulnerable>0?' · 失衡 +200%':'');status.style.textShadow=b.vulnerable>0?'0 0 14px #ffd887':'0 2px 9px #060e0d';
+ if(b.vulnerable<=0){
+  if(b.bossId==='sol'){
+   b.speed=spec.speed+Math.min(150,b.age*1.7);
+   b.x+=Math.cos(a)*b.speed*(1-b.slow)*dt;b.y+=Math.sin(a)*b.speed*(1-b.slow)*dt;
+   b.attack-=dt;if(b.attack<=0){b.attack=Math.max(1.5,3.7-b.age*.01);
+    // Rune stones are telegraphed and can hurt enemies and the boss.
+    let x=p.x+rand(-48,48),y=p.y+rand(-48,48);
+    g.hazards.push({x,y,r:85,timer:1.20,dmg:65,el:'dark',color:'#d08cae',kind:'runestone',life:1.85,boss:true});
+   }
+  }else if(b.bossId==='krog'){
+   b.leapTimer-=dt;
+   if(b.phase==='charge'){b.phaseT-=dt;if(b.phaseT<=0){b.x=b.leapX;b.y=b.leapY;b.phase='hunt';
+    g.hazards.push({x:b.x,y:b.y,r:144,timer:.02,dmg:85,el:'acid',kind:'krogLeap',color:'#c9df77',life:.70,boss:true});
+    for(let i=0;i<5;i++){let angle=i*TAU/5;g.hazards.push({x:b.x+Math.cos(angle)*180,y:b.y+Math.sin(angle)*180,r:48,timer:.6,dmg:40,kind:'krogAcid',color:'#9cdb77',life:2.3,boss:true})}
+    toast('Krog’wa 落地：注意环形冲击！');
+   }}else{
+    b.x+=Math.cos(a)*spec.speed*(1-b.slow)*dt;b.y+=Math.sin(a)*spec.speed*(1-b.slow)*dt;
+    if(b.leapTimer<=0){b.leapTimer=7;b.phase='charge';b.phaseT=1.25;b.leapX=p.x;b.leapY=p.y;
+     g.hazards.push({x:p.x,y:p.y,r:132,timer:1.23,dmg:0,kind:'warning',color:'#d7eb8e',life:1.25,boss:true});toast('Krog’wa 准备跳跃！')}
+   }
+  }else if(b.bossId==='mul'){
+   if(b.corruptT>0)b.corruptT-=dt;
+   b.speed=spec.speed+Math.min(60,b.age*.45);
+   b.x+=Math.cos(a)*b.speed*(1-b.slow)*dt;b.y+=Math.sin(a)*b.speed*(1-b.slow)*dt;
+   b.healTimer-=dt;if(b.healTimer<=0){b.healTimer=9;for(let i=0;i<2;i++)spawnBossHealer(b);toast('Mul’gath 召唤了治疗眷属！')}
+   b.attack-=dt;if(b.attack<=0){b.attack=3.7;for(let i=0;i<3;i++){let ang=a+(i-1)*.45;
+    g.shots.push({x:b.x+Math.cos(ang)*b.r,y:b.y+Math.sin(ang)*b.r,vx:Math.cos(ang)*230,vy:Math.sin(ang)*230,life:3,dmg:36,r:11,kind:'enemy',color:'#d6a2f9'})}}
+  }
+ }
+ if(b.bossId==='mul'){
+  // Healing servants can be corrupted: official 1.1 confirms they instead damage Mul'gath.
+  for(const e of g.enemies)if(!e.dead&&e.bossHealer){
+   let dd=Math.hypot(e.x-b.x,e.y-b.y);
+   if(e.corruptT>0&&dd<b.r+e.r+16){damageEnemy(b,b.max*.035,'corruptedHealer',null,false);e.dead=true;continue}
+   if(e.corruptT<=0&&dd<250)b.hp=Math.min(b.max,b.hp+dt*b.max*.0007);
+  }
+ }
+ if(d<b.r+p.r+8&&b.phase!=='charge'){
+  b.touch=(b.touch||0)-dt;if(b.touch<=0){damagePlayer(b.bossId==='krog'?41:32,'boss');b.touch=.9}
+ }
+ if(b.hp<=0&&!b.dead)killEnemy(b);
+}
+
 function pause(){if(screen!=='playing')return;let p=game.player;$('pauseStats').innerHTML=[['等级',p.level],['击杀',p.kills],['伤害',Math.floor(p.damageDone)],['目标',p.objectives]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');show('pause')}
 function resume(){document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now()}
-function finish(win,abandon=false){if(!game||game.ended)return;game.ended=true;let p=game.player;let secs=Math.floor(game.time),gold=Math.floor((p.kills*.12+p.objectives*90+secs*.12)*(1+(save.enchant.bounty||0)*.05));if(win)gold+=600;gold+=(game.bonusGold||0);if(abandon)gold=Math.floor(gold*.35);save.gold+=gold;save.runs++;if(win)save.wins++;save.best=Math.max(save.best||0,secs);persist();$('resultEyebrow').textContent=win?'MISSION COMPLETE':'MISSION FAILED';$('resultIcon').textContent=win?'✦':'☽';$('resultTitle').textContent=win?'秘境已净化':'巫师倒下了';$('resultDesc').textContent=win?'你击败了 Sol\'phish，翠绿草甸暂时恢复了宁静。':abandon?'你放弃了本次远征。':'魔潮吞没了最后的防线。';$('resultStats').innerHTML=[['生存时间',fmt(secs)],['击败敌人',p.kills],['最高等级',p.level],['完成目标',p.objectives],['造成伤害',Math.floor(p.damageDone)],['拾取卷轴',p.scrollCount],['暴击次数',p.critHits],['施法次数',p.casts]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');$('reward').textContent=gold;$('totalDamage').textContent=Math.floor(p.damageDone);$('hud').classList.remove('active');show('result');sound(win?880:90,.5,win?'triangle':'sawtooth')}
-function renderHud(){if(!game)return;let p=game.player;$('level').textContent=p.level;$('hptext').textContent=Math.ceil(p.hp)+' / '+Math.ceil(p.maxHp);$('hpbar').style.width=clamp(p.hp/p.maxHp*100,0,100)+'%';$('xptext').textContent=Math.floor(p.xp)+' / '+p.nextXp;$('xpbar').style.width=clamp(p.xp/p.nextXp*100,0,100)+'%';$('timer').textContent=fmt(game.time);$('kills').textContent=p.kills;$('objtitle').textContent=game.objective&&!game.objective.done?game.objective.name:game.boss?'击败 Sol\'phish':'抵御魔潮';$('objdesc').textContent=game.objective&&!game.objective.done?game.objective.desc:'完成目标，强化咒语，在第十九分钟迎战首领。';let obj=game.objective&&!game.objective.done?game.objective:null,chest=game.chests.find(c=>!c.open);if(obj){let d=Math.round(Math.hypot(obj.x-p.x,obj.y-p.y));$('objnav').textContent='目标方位 '+Math.round(Math.atan2(obj.y-p.y,obj.x-p.x)*180/Math.PI)+'° · '+d+'m · 剩余 '+Math.ceil(obj.time)+'s'}else if(chest){let d=Math.round(Math.hypot(chest.x-p.x,chest.y-p.y));$('objnav').textContent='宝箱方位 '+Math.round(Math.atan2(chest.y-p.y,chest.x-p.x)*180/Math.PI)+'° · '+d+'m'}else $('objnav').textContent='';$('objbar').style.width=(game.objective&&!game.objective.done?clamp(game.objective.progress/game.objective.target*100,0,100):0)+'%';$('bossbar').classList.toggle('show',!!game.boss&&!game.boss.dead);if(game.boss){$('bosshp').style.width=clamp(game.boss.hp/game.boss.max*100,0,100)+'%';$('staggerFill').style.width=clamp(game.boss.stagger||0,0,100)+'%';$('staggerPct').textContent=game.boss.vulnerable>0?'失衡中':Math.floor(clamp(game.boss.stagger||0,0,100))+'%'}$('spellrow').innerHTML=p.spells.map(s=>`<div class="spellslot"><div class="ico">${s.icon}</div><b>${s.name}</b><small>Lv.${s.level}${s.infusions.length?' · '+s.infusions.map(x=>elements[x].name).join('+'):''}</small></div>`).join('')}
+function finish(win,abandon=false){if(!game||game.ended)return;game.ended=true;let p=game.player;let secs=Math.floor(game.time),gold=Math.floor((p.kills*.12+p.objectives*90+secs*.12)*(1+(save.enchant.bounty||0)*.05));if(win)gold+=600;gold+=(game.bonusGold||0);if(abandon)gold=Math.floor(gold*.35);save.gold+=gold;save.runs++;if(win){save.wins++;const id=game.boss?.bossId||'sol';save.bossKills=save.bossKills||{};save.bossKills[id]=(save.bossKills[id]||0)+1;}save.best=Math.max(save.best||0,secs);persist();$('resultEyebrow').textContent=win?'MISSION COMPLETE':'MISSION FAILED';$('resultIcon').textContent=win?'✦':'☽';$('resultTitle').textContent=win?'秘境已净化':'巫师倒下了';$('resultDesc').textContent=win?'你击败了 '+(game.boss?.name||'深渊首领')+'，翠绿草甸暂时恢复了宁静。':abandon?'你放弃了本次远征。':'魔潮吞没了最后的防线。';$('resultStats').innerHTML=[['生存时间',fmt(secs)],['击败敌人',p.kills],['最高等级',p.level],['完成目标',p.objectives],['造成伤害',Math.floor(p.damageDone)],['拾取卷轴',p.scrollCount],['暴击次数',p.critHits],['施法次数',p.casts]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');$('reward').textContent=gold;$('totalDamage').textContent=Math.floor(p.damageDone);$('hud').classList.remove('active');show('result');sound(win?880:90,.5,win?'triangle':'sawtooth')}
+function renderHud(){if(!game)return;let p=game.player;$('level').textContent=p.level;$('hptext').textContent=Math.ceil(p.hp)+' / '+Math.ceil(p.maxHp);$('hpbar').style.width=clamp(p.hp/p.maxHp*100,0,100)+'%';$('xptext').textContent=Math.floor(p.xp)+' / '+p.nextXp;$('xpbar').style.width=clamp(p.xp/p.nextXp*100,0,100)+'%';$('timer').textContent=fmt(game.time);$('kills').textContent=p.kills;$('objtitle').textContent=game.objective&&!game.objective.done?game.objective.name:game.boss?'击败 '+(game.boss.name||'深渊首领'):'抵御魔潮';$('objdesc').textContent=game.objective&&!game.objective.done?game.objective.desc:'完成目标，强化咒语，在第十九分钟迎战首领。';let obj=game.objective&&!game.objective.done?game.objective:null,chest=game.chests.find(c=>!c.open);if(obj){let d=Math.round(Math.hypot(obj.x-p.x,obj.y-p.y));$('objnav').textContent='目标方位 '+Math.round(Math.atan2(obj.y-p.y,obj.x-p.x)*180/Math.PI)+'° · '+d+'m · 剩余 '+Math.ceil(obj.time)+'s'}else if(chest){let d=Math.round(Math.hypot(chest.x-p.x,chest.y-p.y));$('objnav').textContent='宝箱方位 '+Math.round(Math.atan2(chest.y-p.y,chest.x-p.x)*180/Math.PI)+'° · '+d+'m'}else $('objnav').textContent='';$('objbar').style.width=(game.objective&&!game.objective.done?clamp(game.objective.progress/game.objective.target*100,0,100):0)+'%';$('bossbar').classList.toggle('show',!!game.boss&&!game.boss.dead);if(game.boss){$('bosshp').style.width=clamp(game.boss.hp/game.boss.max*100,0,100)+'%';$('staggerFill').style.width=clamp(game.boss.stagger||0,0,100)+'%';$('staggerPct').textContent=game.boss.vulnerable>0?'失衡中':Math.floor(clamp(game.boss.stagger||0,0,100))+'%'}$('spellrow').innerHTML=p.spells.map(s=>`<div class="spellslot"><div class="ico">${s.icon}</div><b>${s.name}</b><small>Lv.${s.level}${s.infusions.length?' · '+s.infusions.map(x=>elements[x].name).join('+'):''}</small></div>`).join('')}
 function drawWorld(){let w=W(),h=H();ctx.clearRect(0,0,w,h);let g=game,p=g?.player;let cx=p?p.x:0,cy=p?p.y:0;ctx.save();let sx=g?.shake?rand(-g.shake,g.shake):0,sy=g?.shake?rand(-g.shake,g.shake):0;ctx.translate(w/2-cx+sx,h/2-cy+sy);
 // meadow base
 let bg=ctx.createRadialGradient(cx,cy,100,cx,cy,1350);bg.addColorStop(0,'#82a96a');bg.addColorStop(.45,'#5d8c58');bg.addColorStop(1,'#294d3e');ctx.fillStyle=bg;ctx.fillRect(cx-w/2-100,cy-h/2-100,w+200,h+200);
@@ -568,25 +856,6 @@ function drawWorld(){
  }
 }
 
-/* Sol'phish: accelerating pursuit, telegraphed runestones, stagger and self-damage. */
-function v2bossUpdate(dt){
- let g=game,b=g?.boss,p=g?.player;if(!b||b.dead)return;
- b.age=(b.age||0)+dt;b.burn=Math.max(0,(b.burn||0)-dt);b.acid=Math.max(0,(b.acid||0)-dt);b.hitFlash=Math.max(0,(b.hitFlash||0)-dt);
- b.slow=Math.max(0,(b.slow||0)-dt*.025);
- if(b.burn>0){b.burnTick=(b.burnTick||0)-dt;if(b.burnTick<=0){b.burnTick=.5;damageEnemy(b,b.burnDmg||4,'burn',null,false)}}
- // Original game's giant boss grows faster with elapsed boss-fight time.
- b.speed=65+Math.min(140,b.age*1.7);
- // Stagger charge is visible; the boss receives +200% damage during stagger.
- const name=$('bossname');name.textContent=b.vulnerable>0?"SOL'PHISH · 失衡 (+200% 伤害)":"SOL'PHISH · 深渊之长";
- const charge=clamp((b.stagger||0)/100,0,1);
- name.style.textShadow=b.vulnerable>0?'0 0 12px #f5d174':'0 2px 9px #060e0d';
- // Slightly warn players when a second stone is called; it is the same canonical attack.
- if(b.age>24){b.rune=(b.rune||0)-dt;if(b.rune<=0){b.rune=7.4;
-   const a=rand(0,TAU),r=rand(85,160);g.hazards.push({x:p.x+Math.cos(a)*r,y:p.y+Math.sin(a)*r,r:85,timer:1.3,dmg:32,color:'#e59ac4',kind:'runestone',life:2.6,boss:true});
-   g.fx.push({x:b.x,y:b.y,r:62,life:.32,max:.32,color:'#f1acc9',type:'ring'});
- }}
-}
-
 /* No audio files: compact procedural soundtrack and controller input. */
 const STUDIO_AUDIO={next:0,step:0};
 function studioTone(freq,duration,volume=.008,wave='triangle'){
@@ -667,7 +936,20 @@ function v2enemy(e){
 }
 
 
-function frame(t){let dt=Math.min(.04,(t-last)/1000||0);last=t;studioController();if(screen==='playing')update(dt);studioMusicTick();drawWorld();requestAnimationFrame(frame)}requestAnimationFrame(frame);
+// Render the same simulation through a true 3D GPU world, retaining the 2D path as fallback.
+const renderClock={count:0,t0:performance.now(),fps:0};
+function drawOverlay3D(){let w=W(),h=H();ctx.clearRect(0,0,w,h);if(!game||!game.player)return;
+ const p=game.player,q=h/24*.037;ctx.save();ctx.textAlign='center';for(const n of game.damageNumbers){let dx=(n.x-p.x)*q,dy=(n.y-p.y)*q*.72;if(Math.abs(dx)>w/2+50||Math.abs(dy)>h/2+50)continue;
+ ctx.globalAlpha=Math.max(0,Math.min(1,n.life/.65));ctx.font=n.crit?'bold 23px Georgia':'bold 15px sans-serif';ctx.strokeStyle='#0c1716';ctx.lineWidth=3;
+ ctx.strokeText(Math.floor(n.v),w/2+dx,h/2+dy-35);ctx.fillStyle=n.crit?'#ffe29a':'#e8f3e7';ctx.fillText(Math.floor(n.v),w/2+dx,h/2+dy-35);}
+ ctx.restore();
+ if(game.objective&&!game.objective.done){let o=game.objective,dx=o.x-p.x,dy=o.y-p.y,dist=Math.hypot(dx,dy);if(dist>390){let a=Math.atan2(dy,dx),rr=Math.min(w,h)*.31;ctx.save();ctx.translate(w/2+Math.cos(a)*rr,h/2+Math.sin(a)*rr);ctx.rotate(a);ctx.shadowColor='#fff0ac';ctx.shadowBlur=18;ctx.fillStyle='#f9dc8b';ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-9,-8);ctx.lineTo(-5,0);ctx.lineTo(-9,8);ctx.closePath();ctx.fill();ctx.restore();}}
+}
+function frame(t){let dt=Math.min(.07,(t-last)/1000||0);last=t;studioController();if(screen==='playing')update(dt);studioMusicTick();
+ if(window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}
+ else drawWorld();
+ renderClock.count++;if(t-renderClock.t0>=1000){renderClock.fps=Math.round(renderClock.count*1000/(t-renderClock.t0));renderClock.count=0;renderClock.t0=t;if(window.Game3D?.available)window.Game3D.setFps(renderClock.fps)}
+ requestAnimationFrame(frame)}requestAnimationFrame(frame);
 // Production build: internal debug mutations are test-only and not shipped.
 
 // Input
