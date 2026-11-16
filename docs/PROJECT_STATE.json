@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "project": "The Spell Brigade — Single-player Browser Recreation",
+  "repository": "D1traverser-debug/game",
+  "checkpoint": "BOOTSTRAP_BASELINE_CAPTURED",
+  "status": "NOT_READY",
+  "updated_at": "2026-11-16",
+  "scope": {
+    "hero": "Reginald",
+    "map": "Verdant Meadow",
+    "players": 1,
+    "multiplayer": false,
+    "ai_teammates": false,
+    "additional_heroes": false,
+    "additional_maps": false,
+    "final_delivery": "single self-contained offline HTML"
+  },
+  "baseline": {
+    "artifact": "index.html",
+    "bytes": 116721,
+    "sha256": "c14e0f3210320453b0b81b6d49fbd55ae372cf36cfe99a91902d089b8672ef3a",
+    "source_status": "prototype_not_release_candidate"
+  },
+  "verified": [
+    "Repository discovered and confirmed initially empty",
+    "Previous single-file prototype recovered",
+    "Previous QA evidence reclassified"
+  ],
+  "failed_or_open": [
+    "200-enemy performance baseline approximately 21.6 FPS",
+    "Real unassisted full-run completion not tested",
+    "Boss defeat was forced by test hook; genuine combat victory not tested",
+    "Real file:// open and localStorage close/reopen not tested",
+    "Original-game source version and detailed mechanic data not fully pinned",
+    "Spell/enemy/objective/boss fidelity incomplete",
+    "Visual/audio quality and balance not independently accepted",
+    "Human owner playtest not performed"
+  ],
+  "next_action": "Audit committed index.html against the requirements and source references; create root-cause records and architecture comparison before the next major implementation.",
+  "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed."
+}
