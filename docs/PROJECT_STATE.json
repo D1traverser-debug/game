@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "PROGRESSION_002_DEBUG_STRIPPED_COMPONENT_PASS",
+  "checkpoint": "GAME_RECOVERY_AND_PROGRESSION_REGRESSION_INSTALLED",
   "status": "NOT_READY",
   "updated_at": "2026-11-16",
   "scope": {
@@ -31,7 +31,11 @@
     "17/17 Playwright component progression checks passed using temporarily injected probes and mocked storage",
     "Web UI smoke passed for desktop/mobile menu, start, pause, HUD and joystick",
     "Committed actual progression code fixes and new spell scaffolds to development; main preserved",
-    "Query-gated window.__QA mutation API stripped from player HTML; regression 17/17 and desktop/mobile UI smoke pass"
+    "Query-gated window.__QA mutation API stripped from player HTML; regression 17/17 and desktop/mobile UI smoke pass",
+    "AGENTS.md cold-start source-of-truth and CAOS read-only boundary created in game repository",
+    "scripts/verify_project_state.py checkpoint guard created; local positive and four negative mutation controls passed",
+    "Playwright regression test made portable and reran 17/17 locally",
+    "GitHub Actions workflow .github/workflows/qa.yml authored for checkpoint guard and browser tests"
   ],
   "failed_or_open": [
     "200-enemy performance baseline approximately 21.6 FPS",
@@ -52,9 +56,11 @@
     "Reginald-only persistent meta/quest subset is not yet implemented",
     "Individual spell-specific quest event trackers remain unimplemented",
     "Second spell-slot level is a provisional research assumption, not a verified source fact",
-    "Loaded Dice, Tiny Tremors and Wicked Buzzsaw initial attacks exist but original augmentations/visuals not accepted"
+    "Loaded Dice, Tiny Tremors and Wicked Buzzsaw initial attacks exist but original augmentations/visuals not accepted",
+    "Fresh-chat autonomous cold-start recovery has not been independently tested",
+    "New GitHub Actions workflow execution has not yet been verified; a YAML file is not evidence of CI success"
   ],
-  "next_action": "Implement and test source-derived spell quest events, current-version three-spell augmentations, and continue 3D renderer integration without sacrificing single-file delivery.",
+  "next_action": "Research/implement source-verified spell quest event tracking and the 1.2 three-spell augmentations; compare 3D renderer candidates under repeatable real GPU tests, then integrate the passing renderer into the complete single HTML.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "c7980a12e582cf3c265b8bbdaf1e7f16eecfcd6b",
