@@ -33,5 +33,7 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Browser progression integration regression
         run: python tests/progression_regression.py
+      - name: Browser 3D combat, boss and objectives integration
+        run: python tests/game3d_integration.py
 
 # CI is a mechanical + browser component gate, NOT a full player acceptance gate.
