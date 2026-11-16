@@ -55,7 +55,7 @@
     "2.5D candidate uses embedded sprite atlas and procedural terrain; no external runtime asset dependency",
     "2.5D candidate does not display NaN in normal 3-second start smoke or 15-second movement/kill smoke",
     "Follow-up directional movement in 2.5D collected 14 XP and opened an upgrade selection; early 0-XP smoke was caused by not crossing pickup radius, no gameplay code change warranted",
-    "2026-11-17 exact 717369-byte art-forward 2.5D single-file candidate committed to development/index.html and fetched back with exact content equality; SHA-256 7c64a2e3b650cfc1b07e314eec6fe07ca1448e791e1ac6198e762cfdfe332cd3",
+    "2026-11-17 exact 717368-byte art-forward 2.5D single-file candidate committed to development/index.html and fetched back with exact content equality; SHA-256 21fbfcdf3149c5d2eee188a213bf66c3fba5a6b777e7c868a5ddb823a79c0239",
     "Removed a later duplicate legacy v2enemy declaration that shadowed the atlas-backed renderer; runtime now calls atlas-backed enemy drawing and uses the embedded 1024x1024 atlas",
     "Pre-baked the 480 static meadow props and seven ruin landmarks into 24 512x512 visible tiles; dynamic actors remain depth-sorted",
     "Reginald spell catalogue is now explicitly scoped to 18 spells: Astral Orbs, three official 1.2 starters, and the 14 general spell-quest unlocks; seven other-wizard/unsupported entries are excluded from unlocks, trial UI, and level-up pool",
@@ -126,16 +126,16 @@
     "historical_only": true
   },
   "latest_local_candidate": {
-    "artifact": "index.html",
-    "delivery_filename": "咒语旅团-单人网页版-2.5D静态场景缓存版.html",
-    "bytes": 717369,
-    "sha256": "7c64a2e3b650cfc1b07e314eec6fe07ca1448e791e1ac6198e762cfdfe332cd3",
+    "artifact": "development/index.html",
+    "delivery_filename": "咒语旅团-当前开发版-单人网页版.html",
+    "bytes": 717368,
+    "sha256": "21fbfcdf3149c5d2eee188a213bf66c3fba5a6b777e7c868a5ddb823a79c0239",
     "source_base": "single-file 2.5D art-forward candidate with embedded 4x4 sprite atlas",
-    "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT",
+    "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
     "product_commit": "17070bc703b7bd7800b4bb67d6a5c40288a9bfee",
     "scope": "Reginald only / Verdant Meadows only / single-player / offline single HTML",
     "tested": "Atlas enemy sprites, 24 static decor cache tiles, 18 Reginald-eligible spells, save migration filtering, 15-second combat and level-up flow, desktop/mobile synthetic stress, no JS/console errors and no external requests",
     "not_tested": "full 19-minute run, natural boss win, real file:// persistence, real hardware performance, source-complete spell effects and owner acceptance"
   },
-  "latest_candidate_ci_status": "PENDING_SCHEMA_V3_ASSERTION_AND_HASH_SYNC"
+  "latest_candidate_ci_status": "PENDING_FOR_17070BC_WITH_CORRECT_GITHUB_BYTES"
 }
