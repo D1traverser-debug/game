@@ -46,3 +46,12 @@ Research snapshot date: 2026-11-16. Source versions must be pinned per mechanic.
 - Official Steam screenshots show a 3D top-down arena, modeled characters/enemies, terrain/props, layered spell effects and HUD. Source: https://store.steampowered.com/app/2904000/The_Spell_Brigade/
 - Official 2026-10-22 performance patch explicitly addresses stability/performance in Endless runs. Source: https://steamcommunity.com/app/2904000/announcements/
 - Current implementation's 2D Canvas art and random spell acquisition are not faithful to this evidence.
+
+## Official 1.2 source reconciliation — 2026-11-17
+The official developer announcement dated 2026-10-06 (patch 1.2.0.20127) confirms:
+- Loaded Dice, Tiny Tremors and Wicked Buzzsaw are start-unlocked.
+- Each of these three new spells has four augmentations.
+- The announcement publishes thirteen new older-spell augmentations by name and effect: Aura Beam, Baby Sprout, Chthonic Pull, Counter Talon, Massive Missile, Piercing Blades, Pulling Whirl, Scepter Link, Solar Zenith, Super Star, Unrung Bells, Waxing Moon and Wing Split.
+- The announcement does not disclose the twelve new-spell augmentation names or detailed effects. Our four choices per new spell are independent original designs; their labels and mechanics must not be represented as exact source data.
+- Solo mode excludes Healing Slam from the augmentation pool.
+Source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026 entry, lines 43–109 when opened on 2026-11-17).
