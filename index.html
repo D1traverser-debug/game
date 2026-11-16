@@ -668,28 +668,7 @@ function v2enemy(e){
 
 
 function frame(t){let dt=Math.min(.04,(t-last)/1000||0);last=t;studioController();if(screen==='playing')update(dt);studioMusicTick();drawWorld();requestAnimationFrame(frame)}requestAnimationFrame(frame);
-if(new URLSearchParams(location.search).has('qa'))window.__QA={
- state:()=>game?{screen,time:game.time,level:game.player.level,hp:game.player.hp,kills:game.player.kills,spells:game.player.spells.map(s=>({id:s.id,l:s.level,infusions:s.infusions})),enemies:game.enemies.filter(e=>!e.dead).length,boss:game.boss&&{hp:game.boss.hp,max:game.boss.max},objective:game.objective?.type,ended:game.ended,shots:game.shots.length}: {screen},
- jump:(time)=>{if(game){game.time=time;update(.04);return window.__QA.state()}},
- giveXp:(amount)=>{if(game){addXp(amount);return window.__QA.state()}},
- spawnBoss:()=>{if(game){spawnBoss();return window.__QA.state()}},
- damageBoss:(v)=>{if(game&&game.boss){damageEnemy(game.boss,v,'qa',null,false);return window.__QA.state()}},
- finish:(win)=>{if(game){finish(win);return window.__QA.state()}},
- start:()=>{startRun();return window.__QA.state()},
- objective:()=>{if(game){startObjective();return window.__QA.state()}},
- pickUpgrade:()=>{if(game?.pending?.opts?.length){applyUpgrade(game.pending.opts[0]);return window.__QA.state()}},
- clearObjective:()=>{if(game?.objective){completeObjective();return window.__QA.state()}},
- populate:(count)=>{if(game){for(let i=game.enemies.length;i<count;i++)spawnEnemy();return window.__QA.state()}},
- runSteps:(count,immortal=false)=>{if(game){if(immortal){game.player.maxHp=1000000;game.player.hp=1000000}let steps=0;for(let i=0;i<count;i++){
-   if(screen==='upgrade'&&game.pending?.opts?.length)applyUpgrade(game.pending.opts[0]);
-   if(screen==='playing'){
-    const side=Math.floor(i/160)%4;keys.KeyW=side===0;keys.KeyD=side===1;keys.KeyS=side===2;keys.KeyA=side===3;
-    update(.04);steps++;
-   }else if(screen==='result')break;
-  }keys={};return {steps,...window.__QA.state()}}},
- save:()=>({gold:save.gold,runs:save.runs,wins:save.wins,best:save.best}),
- finishObjective:(kind)=>{if(game?.objective){game.objective.type=kind;completeObjective();return window.__QA.state()}}
-};
+// Production build: internal debug mutations are test-only and not shipped.
 
 // Input
 addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'){e.preventDefault();if(screen==='playing')pause();else if(screen==='pause')resume()}if(e.code==='KeyE')interact()});addEventListener('keyup',e=>keys[e.code]=false);addEventListener('blur',()=>{keys={};joy.x=joy.y=0;if(screen==='playing')pause()});
