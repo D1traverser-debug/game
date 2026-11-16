@@ -88,3 +88,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - The ?qa-gated window.__QA with time jump / forced boss kill / direct finish no longer ships inside the HTML.
 - tests/progression_regression.py still injects its own isolated temporary test probe into in-memory browser document. All 17 targeted checks passed after the strip; desktop/mobile smoke also passed.
 - All previously documented NOT_TESTED/fidelity gaps remain open. Main stays the old baseline.
+
+
+## Repository-level recovery and test harness (2026-11-16)
+- AGENTS.md added as the root AI development entry: recover exact current GitHub state before acting, preserve owner scope, run evidence-first/decision loop, never alter CAOS.
+- scripts/verify_project_state.py checks product scope, exact candidate SHA and byte count, debug-surface prohibition, and required recovery docs. It prints PASS_MECHANICAL_ONLY, **not** GAME_READY.
+- tests/test_state_guard.py has a positive control and four corruption/mutation tests; all 5 passed locally.
+- tests/progression_regression.py now uses installed Chromium when available, otherwise Playwright's browser; 17/17 locally with temporarily mocked storage.
+- .github/workflows/qa.yml added. Live GitHub Actions execution is not yet verified; do not promote CI to PASS until readback of actual run.
+- The latest product artifact is still development/index.html SHA-256 e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190, size 119417 bytes, product code commit 29492caf5b7db433704f9cfa7543b0e3126b2e6e.
+- Fresh-chat automatic cold-start selection/execution is NOT_TESTED; the handoff protocol is installed, not independently proven.
