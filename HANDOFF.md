@@ -71,3 +71,12 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - There are three named end-run bosses: Sol'phish, Krog'wa and Mul'gath. The current prototype's Sol'phish-only boss is incomplete.
 - Current single-player scope must exclude co-op-only augmentations and teammate-only quests.
 - See docs/MECHANIC_REFERENCE_MATRIX.md and docs/ISSUE_REGISTER.md for expanded content and issues.
+
+## Latest code development (PROGRESSION-002)
+- development/index.html now includes real source-backed progression changes, SHA-256 a4fe8215c491d2139f8345a8f331482cf9d399a9a5d59742b348a08d32f85095 (121294 bytes), implementation commit 656881540ec26c5d60a580baa2ac42ac21128595.
+- The catastrophic force-unlock-on-load assignment was removed; v1-to-v2 save normalization keeps currency/stats and limits untrusted legacy unlocks to 1.2 starters plus recorded quest flags.
+- Slot 3 is gated at level 13, slot 4 at level 20, with immediate upgrade; **slot 2 at level 2 is unverified, temporary**.
+- Added initial attack scaffolds for Loaded Dice, Tiny Tremors, Wicked Buzzsaw; their four individual augmentations and source-accurate numbers/VFX are still OPEN.
+- The local portable Chromium Playwright test passed 17/17 targeted component checks; desktop/mobile interaction smoke passed. Browser navigation is blocked; localStorage was mocked, not a real reload acceptance.
+- Test entry: tests/progression_regression.py. Evidence: docs/experiments/PROGRESSION_002.md.
+- Do not merge into main or announce product-ready; actual full-run, 3D integrated product, all boss types, audio, visual QA and performance remain incomplete.
