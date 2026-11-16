@@ -51,7 +51,7 @@ window.__normalPlay = async (seconds) => {
   return {
     screen,ended:game.ended,time:game.time,kills:game.player.kills,level:game.player.level,
     hp:game.player.hp,maxHp:game.player.maxHp,xp:game.player.xp,nextXp:game.player.nextXp,upgrades,
-    objectiveCount:p.objectives,enemyCount:game.enemies.filter(e=>!e.dead).length
+    objectiveCount:game.player.objectives,enemyCount:game.enemies.filter(e=>!e.dead).length
   };
 };
 """
