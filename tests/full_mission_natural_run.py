@@ -19,70 +19,154 @@ assert SOURCE.count(MARKER) == 1
 PROBE = r"""
 window.__fullRun = async (maxSeconds) => {
   const dt=0.1;
-  let elapsed=0,ticks=0,upgrades=0,interactions=0;
+  let elapsed=0,ticks=0,upgrades=0,interactions=0,lastTrace=0;
+  const trace=[];
   const nearest=(items,p)=>items.filter(x=>x&&x.alive!==false)
     .map(o=>({o,d:Math.hypot(o.x-p.x,o.y-p.y)}))
     .sort((a,b)=>a.d-b.d)[0];
-  while(elapsed<maxSeconds && !game.ended &&
-        (screen==='playing'||screen==='upgrade')) {
+  const objectiveTarget=(o,p)=>{
+    if(!o||o.done)return null;
+    if(o.type==='crab'&&o.crab?.alive)return o.crab;
+    if(o.type==='rift'&&o.nodes?.length){
+      const n=nearest(o.nodes.filter(x=>x.progress<100),p);return n?.o||o;
+    }
+    if(o.type==='cores'&&o.variant==='heavy'){
+      if(game.carriedCore)return o;
+      return nearest(o.objects||[],p)?.o||o;
+    }
+    if(o.type==='brazier'){
+      const wanted=o.variant==='sequence'?o.sequence?.[o.sequenceIndex]:null;
+      const arr=(o.objects||[]).filter(x=>x.alive&&(wanted===null||wanted===undefined||x.index===wanted));
+      return nearest(arr,p)?.o||o;
+    }
+    if(o.type==='beasts'){
+      if(o.variant==='devoted')return o;
+      const beast=nearest(o.objects||[],p)?.o;if(!beast)return o;
+      const dx=beast.x-o.x,dy=beast.y-o.y,d=Math.hypot(dx,dy)||1;
+      return {x:beast.x+dx/d*125,y:beast.y+dy/d*125};
+    }
+    if(o.objects?.length)return nearest(o.objects,p)?.o||o;
+    return o;
+  };
+  const choose=(opts)=>{
+    const scrollPriority=['growth','thick','bulwark','evasion','fight','blood','go','mana','vital','elixir','hard','attune','siphon'];
+    const scroll=opts.filter(x=>x.kind==='scroll').sort((a,b)=>scrollPriority.indexOf(a.name)-scrollPriority.indexOf(b.name))[0];
+    if(scroll)return scroll;
+    const augPriority=['healingSprout','quakeBurst','diceTwin','diceEcho','sawTwin','sawReturn','orbSplit','orbBurst','quakeAfter','quakePull','sawMagnet','seeking','surge','tempo','reach'];
+    const aug=opts.filter(x=>x.kind==='spellAugment').sort((a,b)=>augPriority.indexOf(a.aug)-augPriority.indexOf(b.aug))[0];
+    if(aug)return aug;
+    const statPriority=['regen','armor','speed','damage','crit','critDmg','magnet','luck'];
+    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
+    if(stat)return stat;
+    const newSpell=opts.find(x=>x.kind==='newSpell');
+    if(newSpell)return newSpell;
+    const bonus=opts.find(x=>x.kind==='spellLevelBonus'&&x.mode==='damage')||opts.find(x=>x.kind==='spellLevelBonus');
+    if(bonus)return bonus;
+    const infusion=opts.find(x=>x.kind==='infuse');
+    if(infusion)return infusion;
+    const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
+    return level||opts[0];
+  };
+  while(elapsed<maxSeconds&&!game.ended&&(screen==='playing'||screen==='upgrade')){
     if(screen==='upgrade'){
       const opts=game.pending?.opts||[];
       if(!opts.length)break;
-      // The pilot may only select an option the real UI has offered.
-      const chosen=opts.find(o=>o.kind==='stat'&&['armor','regen','damage','crit'].includes(o.k))
-        ||opts.find(o=>['spellAugment','spellLevel','spellLevelBonus','newSpell'].includes(o.kind))
-        ||opts[0];
-      applyUpgrade(chosen);upgrades++;continue;
+      // Only choose from real cards currently offered by the production game.
+      applyUpgrade(choose(opts));upgrades++;continue;
     }
     const p=game.player;
-    let target=null;
+    let target=null,goalX=0,goalY=0;
     const b=game.boss&&!game.boss.dead?game.boss:null;
     if(b){
-      const d=Math.hypot(b.x-p.x,b.y-p.y)||1;
-      if(d>300)target={x:b.x,y:b.y};
-      else {
-        // Circle-strafe the real boss; attacks remain automatic and unmodified.
-        target={x:p.x+(p.y-b.y)/d*180,y:p.y-(p.x-b.x)/d*180};
+      const dx=b.x-p.x,dy=b.y-p.y,d=Math.hypot(dx,dy)||1;
+      if(d>315){goalX=dx/d;goalY=dy/d;}
+      else if(d<225){goalX=-dx/d;goalY=-dy/d;}
+      else{goalX=-dy/d;goalY=dx/d;}
+    }else{
+      const o=game.objective&&!game.objective.done?game.objective:null;
+      if(o)target=objectiveTarget(o,p);
+      if(!target){
+        const chest=nearest(game.chests.filter(c=>!c.open),p);
+        if(chest&&chest.d<780)target=chest.o;
       }
-    } else if(game.objective&&!game.objective.done){
-      const o=game.objective;
-      if(o.type==='crab'&&o.crab?.alive)target=o.crab;
-      else if(o.objects?.length){
-        const found=nearest(o.objects,p);if(found)target=found.o;
+      if(!target){
+        const orb=nearest(game.orbs.filter(x=>x.type==='xp'),p);
+        if(orb&&orb.d<850)target=orb.o;
       }
-      if(!target&&Number.isFinite(o.x)&&Number.isFinite(o.y))target=o;
+      if(target){
+        const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy)||1;
+        if(d>28){goalX=dx/d;goalY=dy/d;}
+      }else{
+        const a=Math.floor(elapsed/8)*Math.PI/2;
+        goalX=Math.cos(a);goalY=Math.sin(a);
+      }
     }
-    if(!target){
-      const orb=nearest(game.orbs.filter(o=>o.type==='xp'),p);
-      if(orb&&orb.d<700)target=orb.o;
+    // Avoid nearby enemies and incoming enemy projectiles instead of blindly
+    // walking through the crowd to an XP orb. This changes input only.
+    let rx=0,ry=0,minThreat=9999;
+    for(const e of game.enemies){
+      if(e.dead||e.type==='boss')continue;
+      const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;
+      minThreat=Math.min(minThreat,d);
+      if(d<255){
+        const w=((255-d)/255)**1.35*(e.type==='ranged'?1.25:1);
+        rx-=dx/d*w;ry-=dy/d*w;
+      }
     }
-    let dx=0,dy=0;
-    if(target){
-      const d=Math.hypot(target.x-p.x,target.y-p.y)||1;
-      if(d>28){dx=(target.x-p.x)/d;dy=(target.y-p.y)/d;}
-    } else {
-      const a=Math.floor(elapsed/8)*Math.PI/2;dx=Math.cos(a);dy=Math.sin(a);
+    for(const shot of game.shots){
+      if(shot.kind!=='enemy')continue;
+      const dx=p.x-shot.x,dy=p.y-shot.y,d=Math.hypot(dx,dy)||1;
+      if(d<190){const w=(190-d)/190*1.7;rx+=dx/d*w;ry+=dy/d*w;}
     }
-    keys={KeyD:dx>.25,KeyA:dx<-.25,KeyS:dy>.25,KeyW:dy<-.25};
-    const chest=game.chests.find(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);
-    const objectiveItem=game.objective?.type==='brazier'&&game.objective.objects?.some(x=>x.alive&&Math.hypot(x.x-p.x,x.y-p.y)<78);
-    if(chest||objectiveItem){interact();interactions++;}
+    for(const h of game.hazards){
+      if(h.hit||!['warning','runestone','krogLeap','krogAcid'].includes(h.kind))continue;
+      const dx=p.x-h.x,dy=p.y-h.y,d=Math.hypot(dx,dy)||1,range=(h.r||0)+95;
+      if(d<range){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;}
+    }
+    const evade=Math.max(0,Math.min(2.4,(255-minThreat)/110));
+    goalX+=rx*evade;goalY+=ry*evade;
+    // Do not let the pilot pin itself against the map boundary.
+    if(p.x>1010)goalX-=1.2;if(p.x< -1010)goalX+=1.2;
+    if(p.y>735)goalY-=1.2;if(p.y< -735)goalY+=1.2;
+    const mag=Math.hypot(goalX,goalY)||1;goalX/=mag;goalY/=mag;
+    keys={KeyD:goalX>.22,KeyA:goalX<-.22,KeyS:goalY>.22,KeyW:goalY<-.22};
+    const chestNear=game.chests.some(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);
+    const o=game.objective&&!game.objective.done?game.objective:null;
+    let itemNear=false;
+    if(o?.type==='cores'&&o.variant==='heavy'&&!game.carriedCore)
+      itemNear=(o.objects||[]).some(x=>x.alive&&Math.hypot(x.x-p.x,x.y-p.y)<72);
+    if(o?.type==='brazier'){
+      const wanted=o.variant==='sequence'?o.sequence?.[o.sequenceIndex]:null;
+      itemNear=(o.objects||[]).some(x=>x.alive&&(wanted===null||wanted===undefined||x.index===wanted)&&Math.hypot(x.x-p.x,x.y-p.y)<80);
+    }
+    if(chestNear||itemNear){interact();interactions++;}
     update(dt);elapsed+=dt;ticks++;
+    if(game.time-lastTrace>=30){
+      const q=game.player,near=nearest(game.enemies.filter(e=>!e.dead),q);
+      trace.push({t:+game.time.toFixed(1),hp:+q.hp.toFixed(1),maxHp:q.maxHp,level:q.level,
+        kills:q.kills,damageTaken:+q.damageTaken.toFixed(1),armor:+q.armor.toFixed(1),
+        regen:+q.regen.toFixed(1),enemyCount:game.enemies.filter(e=>!e.dead).length,
+        nearestEnemy:near?+near.d.toFixed(1):null,objective:game.objective?.type||null,
+        objectiveProgress:game.objective?.progress||0,spells:q.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()}))});
+      lastTrace=game.time;
+    }
     if(ticks%100===0)await new Promise(r=>setTimeout(r,0));
   }
   keys={};
-  const b=game.boss;
+  const p=game.player,b=game.boss;
   return {
-    screen,ended:game.ended,elapsed,gameTime:game.time,kills:game.player.kills,
-    level:game.player.level,hp:game.player.hp,maxHp:game.player.maxHp,
-    objectives:game.player.objectives,upgrades,interactions,
+    screen,ended:game.ended,elapsed,gameTime:game.time,kills:p.kills,level:p.level,
+    hp:p.hp,maxHp:p.maxHp,damageTaken:p.damageTaken,armor:p.armor,regen:p.regen,
+    objectives:p.objectives,upgrades,interactions,
+    spells:p.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()})),
+    objective:game.objective?.type||null,
     bossSpawned:!!b,bossId:b?.bossId||null,bossHp:b?.hp??null,bossMax:b?.max??null,
     bossDead:!!b?.dead,wins:save.wins||0,losses:save.runs-(save.wins||0),
-    errors:game.player.hp<0||!Number.isFinite(game.player.hp)||!Number.isFinite(game.time)
+    enemyCount:game.enemies.filter(e=>!e.dead).length,trace,
+    errors:p.hp<0||!Number.isFinite(p.hp)||!Number.isFinite(game.time)
   };
 };
-"""
-DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
+"""DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
 
 async def main():
     report={"checks":{},"page_errors":[],"console_errors":[],"external_requests":[]}
