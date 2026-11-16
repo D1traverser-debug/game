@@ -182,3 +182,12 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Product copy for the three new 1.2 spell augmentation sets was polished: the rough “Prototype” label is removed, and Buzzsaw descriptions now match implemented behavior (Piercing Teeth pierces; Heavy Teeth grants +25% base damage; Magnetic Edge pulls enemies; Twin Saw fires two saws).
 - Important fidelity distinction: official 1.2 notes confirm four augmentations for each of the three new spells but do not disclose their names or detailed effects. Those twelve are our own named original adaptations, not source-confirmed exact augmentations. See `docs/MECHANIC_REFERENCE_MATRIX.md` and `docs/REFERENCE_RESEARCH.md`.
 - Current code hash/bytes after the UI polish: `587113d2dcc3641314ff914234c64c9fa61b922a83592d3d6b8a94636ab0f128`, 717383 bytes; product commit `632868c3e16077281758d1db18358317e2af33be`. Checkpoint sync is committed separately; wait for the resulting CI before claiming green.
+
+## Objective collection root-cause repair — 2026-11-17
+- Natural-run trace showed a hard gameplay blocker: Soul Sludge objective progress stayed at 0 because the production update loop had no collection handler. Source reference says Soul Sludge is completed by walking over purple ground patches.
+- Same code audit found normal/scared fungi and standard Spell Cores also lacked contact collection. Added contact collection for these, retained explosive fungi proximity detonation and the distinct heavy-core pickup/carry/delivery interaction.
+- New `tests/objective_collection_regression.py` passes 9/9: normal/scared/explosive fungi, normal/dark sludge, normal/heavy cores, no runtime errors and offline behavior. This is component coverage, not a complete run.
+- The previous natural pilot run died at 154.3s during a Rift objective: 10.7/100 HP, 89.3 damage taken, level 9, 135 kills, Rift progress 53.82/100. No browser errors or external requests. This remains an open gameplay/balance gate.
+- Updated the non-cheating full-run pilot to seek actual health and magnet drops when needed. It still only supplies movement, normal interaction and choices from real upgrade cards; it does not mutate HP, XP, enemy/boss HP, time or victory.
+- Product commit: `ae820ed62f3ad4e27c160cfd6ecc3c91abd9e061`. Exact artifact: 718366 bytes, SHA-256 `46f3c1c5ad7806fe45bc226e2df55b14de19c975182b619dd0db11524841923d`.
+- CAOS remains read-only. `main` remains the preserved baseline; work continues on `development`.
