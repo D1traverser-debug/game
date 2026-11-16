@@ -151,3 +151,19 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Local Playwright tests: desktop 1440x900 and mobile 390x844 each passed start, HUD, pause/resume, no NaN text, no JS/console errors, and zero external requests. 15-second normal play smoke recorded 18 kills; XP remained 0 while orbs were visible. This is a gameplay pacing issue to investigate, not a passing progression test.
 - The 2.5D file has NOT been committed to GitHub. Current repository `development/index.html` remains the older 3D candidate. Do not claim the local candidate is in GitHub until its exact bytes are synchronized and fetched back.
 - Full 19-minute playthrough, genuine boss kill, real localStorage reload, real-device performance, content fidelity and owner acceptance remain NOT_TESTED. Product status stays NOT_READY.
+
+## 2.5D_ATLAS_SCOPE_AND_STATIC_CACHE_008 — Current canonical checkpoint (2026-11-17)
+- Canonical product source is now development/index.html; exact 717369-byte content was read back from GitHub and compared to the source candidate.
+- Product commit: 17070bc703b7bd7800b4bb67d6a5c40288a9bfee.
+- SHA-256: 7c64a2e3b650cfc1b07e314eec6fe07ca1448e791e1ac6198e762cfdfe332cd3.
+- Main remains the preserved earlier baseline. Do not merge or publish while status is NOT_READY.
+- Fixed a real renderer-shadowing bug: a later duplicate v2enemy declaration overrode the intended atlas renderer. It is removed; the 1024x1024 embedded sprite atlas is now used by enemy draw calls.
+- 480 static meadow props and seven ruin landmarks are baked at run start into 24 visible 512x512 tiles. Per-frame dynamic entities remain depth-sorted.
+- Source audit now restricts Reginald to 18 spells: his Astral Orbs, the three official 1.2 starters, and the 14 general spell-quest spells. Hex Bomb, Necro Whirl, Spear Barrage, Swirl Sickle, Scepter Mesh, Seismic Slam and the unsupported orbital placeholder are excluded from research/trials/unlocks.
+- Save normalization now drops non-Reginald spell unlocks, quest flags and trial selections from legacy saves.
+- New CI tests: tests/art_renderer_regression.py and tests/reginald_spell_scope_regression.py; both pass locally (9/9 and 13/13 checks respectively).
+- Normal 15-second movement smoke: 12 kills, XP collected, level 2 reached, upgrade screen opened, 100/100 HP, no runtime errors.
+- Synthetic stress with 197 active enemies: desktop ~48.7 FPS (1440x900), mobile viewport ~60 FPS (390x844). Desktop target remains unmet; headless synthetic benchmark is not a real-device acceptance.
+- Browser container blocks file:// navigation by administrator policy, so actual file-origin localStorage close/reopen remains NOT_TESTED.
+- Full 19-minute mission, naturally defeated boss, source-accurate spell/augmentations, objective variants, real-device performance, audio/art acceptance and owner playtest remain OPEN.
+- CAOS remains read-only; no CAOS files, branches, PRs, configuration or documentation were changed.
