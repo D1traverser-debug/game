@@ -11,6 +11,14 @@
 
 If the repository head, state file, and handoff disagree, stop and reconcile the discrepancy before coding. Do not ask the owner to repeat information already recorded here.
 
+## Current checkpoint (after AUDIT-001)
+- Active development branch: development.
+- Main branch remains the preserved prototype baseline.
+- Latest audit: docs/audits/AUDIT-001_BASELINE_SOURCE_AND_QA.md.
+- Renderer decision: docs/decisions/ADR-001_RENDERER.md; WebGL 3D + DOM UI selected for a bounded vertical-slice experiment, not yet accepted.
+- Mechanic source matrix: docs/MECHANIC_REFERENCE_MATRIX.md.
+- P0 findings include forced unlocks, random spell-slot timing, missing 1.2 spells, fake boss/full-run tests, failed performance, and 2D visual mismatch.
+
 ## Current checkpoint (bootstrap)
 - Repository: `D1traverser-debug/game`
 - Product: single-player browser recreation of The Spell Brigade.
