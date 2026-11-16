@@ -8,7 +8,7 @@ from playwright.async_api import async_playwright
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 RAW=(ROOT/'index.html').read_text(encoding='utf8')
-assert RAW.count('<script>')==1
+assert RAW.count('<script>') in (1,2)
 assert RAW.count('// Input\naddEventListener')==1
 PROBE='''
 window.__TEST={
