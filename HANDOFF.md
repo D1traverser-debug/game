@@ -106,3 +106,9 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Canonical hashes remain main c14e0f3210320453b0b81b6d49fbd55ae372cf36cfe99a91902d089b8672ef3a (116721 B) and dev e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190 (119417 B).
 - See docs/audits/INCIDENT_001_BYTE_FIDELITY.md for evidence, root-cause escalation and re-test requirement.
 - Do not assert byte exactness from parsed Files content; verify remote actual bytes and SHA. Fresh CI status must be read back.
+
+## Verified GitHub CI after byte-fidelity repair
+- Exact candidate build SHA-256 e97ed8770523034ddc71d590a4a7cc3444e8c87811a44f4298910a65597b5190 / product commit 44938fb8557a856d794e7a0ceff45ccd71faedeb.
+- Real GitHub Actions run 43838646149 completed SUCCESS. Both checkpoint (exact file SHA/scope + negative mutation tests) and browser-component (Playwright regression) jobs succeeded.
+- This proves source integrity and scripted component paths only, NOT 3D fidelity, full real gameplay, hardware FPS, file:// persistence or owner approval.
+- If the latest development HEAD differs by documentation-only commits, do not mistake the earlier green run for a run at the later SHA; fetch the latest run when needed.
