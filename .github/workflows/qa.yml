@@ -1,0 +1,37 @@
+name: Game repository integrity and regression
+on:
+  push:
+    branches: [development, main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  checkpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify owner scope and exact artifact checkpoint
+        run: python scripts/verify_project_state.py
+      - name: Run positive and negative checkpoint controls
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+  browser-component:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Browser progression integration regression
+        run: python tests/progression_regression.py
+
+# CI is a mechanical + browser component gate, NOT a full player acceptance gate.
