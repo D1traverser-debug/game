@@ -18,6 +18,8 @@ def instrument(source: str) -> str:
     assert len(re.findall(r"function\s+v2enemy\s*\(", source)) == 1
     assert "function v2buildSprite" not in source
     assert "const V2_SPRITES" not in source
+    assert source.count("function buildDecorCache(decor)") == 1
+    assert "buildDecorCache(game.decor)" in source
     old = "function v2enemy(e){let t=V2.age"
     assert source.count(old) == 1
     source = source.replace(old, "function v2enemy(e){window.__enemySpriteRenders=(window.__enemySpriteRenders||0)+1;let t=V2.age")
@@ -25,7 +27,7 @@ def instrument(source: str) -> str:
 window.__atlasSpriteDraws=0;
 const __originalV2Sprite=v2sprite;
 v2sprite=function(...args){window.__atlasSpriteDraws++;return __originalV2Sprite(...args)};
-window.__artProbe={snapshot:()=>({screen,atlasComplete:V2_ATLAS.complete,atlasWidth:V2_ATLAS.naturalWidth,atlasHeight:V2_ATLAS.naturalHeight,mode:save.renderMode,enemies:game?.enemies.filter(e=>!e.dead).length||0,enemySpriteRenders:window.__enemySpriteRenders||0,atlasSpriteDraws:window.__atlasSpriteDraws||0})};
+window.__artProbe={snapshot:()=>({screen,atlasComplete:V2_ATLAS.complete,atlasWidth:V2_ATLAS.naturalWidth,atlasHeight:V2_ATLAS.naturalHeight,mode:save.renderMode,enemies:game?.enemies.filter(e=>!e.dead).length||0,enemySpriteRenders:window.__enemySpriteRenders||0,atlasSpriteDraws:window.__atlasSpriteDraws||0,cacheTiles:V2.decorTiles?.length||0})};
 """
     return source.replace(marker, probe + "\\n" + marker)
 
@@ -53,6 +55,7 @@ async def main():
         report["checks"]["enemies_spawned"] = state["enemies"] >= 8
         report["checks"]["atlas_enemy_renderer_called"] = state["enemySpriteRenders"] > 0
         report["checks"]["atlas_sprite_draws_occurred"] = state["atlasSpriteDraws"] > 0
+        report["checks"]["static_meadow_cache_baked"] = state["cacheTiles"] == 24
         report["checks"]["no_runtime_errors"] = not report["page_errors"] and not report["console_errors"]
         report["checks"]["no_external_requests"] = not report["external_requests"]
         await browser.close()
