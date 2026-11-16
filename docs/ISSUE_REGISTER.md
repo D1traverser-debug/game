@@ -26,3 +26,7 @@
 | GAME-019 | P0 | Sol'phish encounter lacks source-confirmed summon/stagger details | Wiki describes enemy convergence, red summon circle, targeted runestones, +200% stagger window | OPEN | Implement and test source-derived boss state machine |
 | GAME-020 | P1 | Solo-only upgrade filtering is not source-accurate | Official 1.2 removes Healing Slam from solo augmentation pool | OPEN | Add solo eligibility metadata to every upgrade/quest |
 | GAME-021 | P1 | Persistent quest/meta progression is incomplete | Original includes wizard rank, enchantments, masteries, scroll unlocks, ascension/covenants and Reginald outfits | OPEN | Scope and implement the Reginald-only subset |
+
+| GAME-022 | P0 | Corrected unlock/slot progression still lacks the real individual quest-event trackers | PROGRESSION-002: old blanket unlock removed; 14 source quests only documented | OPEN | Add event-sourced achievements with positive/negative event sequence tests |
+| GAME-023 | P1 | Spell-slot two threshold is a provisional level-2 assumption | No authoritative source version pin for slot two | OPEN | Verify original, then update contract and rerun boundary tests |
+| GAME-024 | P0 | Three new 1.2 spells lack individual augmentations and full audiovisual fidelity | PROGRESSION-002 adds only distinct initial attack behavior | OPEN | Research and implement all 12 source augmentations and spell identities |
