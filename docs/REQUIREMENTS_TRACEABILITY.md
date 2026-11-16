@@ -42,3 +42,7 @@ The existing prototype has some menus, combat and progression code. Its previous
 
 | SPELL-SCOPE-01 | Only Reginald-eligible spells may appear in his research, trial, save unlocks and level-up pool | P0 | Source-backed 18-spell allowlist, legacy-save migration and browser regression | PASS_COMPONENT |
 | ART-RENDER-02 | Atlas-backed enemy sprites and cached static meadow props must be the active renderer, not shadowed dead code | P1 | Runtime atlas draw-call probe, one canonical renderer declaration, 24-tile cache test | PASS_COMPONENT |
+
+| RUN-ACCEPT-02 | 90 seconds of normal combat with real movement and offered upgrade selection, no forced XP/damage/result | P1 | Playwright normal-play smoke; 83 kills, level 8, 8 real upgrades, 100/100 HP, no errors/network | PASS_AUTOMATED_SMOKE_ONLY |
+| SPELL-1.2-ADAPT-01 | Three new 1.2 starter spells have four distinct, functioning augmentations each | P0 | Individual effect probes per augment, not only catalogue counts | PARTIAL_MECHANIC_EXISTS |
+| SOURCE-TRUTH-01 | Officially undocumented new-spell augmentation names/effects must be identified as independent adaptations | P0 | UI copy and source matrix clearly separate source facts from original designs | PASS_DOCUMENTED / UI_POLISH |
