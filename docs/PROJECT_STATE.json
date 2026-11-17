@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "OBJECTIVE_COLLECTION_AND_NATURAL_RUN_009",
+  "checkpoint": "DYNAMIC_ENEMY_PRESSURE_DIRECTOR_010",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -71,7 +71,8 @@
     "New Playwright objective_collection_regression.py passes 9/9 checks for normal/scared/explosive fungi, normal/dark sludge, normal/heavy cores, no runtime errors and offline operation",
     "Objective collection test is synthetic component coverage only; it does not count as full player-run acceptance",
     "Natural-run trace exposed survival failure at 154.3 in-game seconds during a Seal the Rift objective: HP 10.7/100, damage taken 89.3, level 9, 135 kills; no JS errors or external requests",
-    "Full mission pilot now considers real health and magnet orb pickups as player actions; the next CI run will determine whether the rift survival failure is resolved"
+    "Full mission pilot now considers real health and magnet orb pickups as player actions; the next CI run will determine whether the rift survival failure is resolved",
+    "Replaced uncapped time-multiplied wave stacking with a time-scaled population director targeting 18+floor(time/34) living enemies, capped at 64; hard spawn guard now enforces the same cap"
   ],
   "failed_or_open": [
     "Real unassisted full-run completion not tested",
@@ -115,15 +116,15 @@
     "Reginald spell-scope regression probe used the same literal backslash-n injection defect; corrected test harness to insert a real newline",
     "New spell augmentations for Loaded Dice, Tiny Tremors and Wicked Buzzsaw have independent mechanics, but their exact names/effects are not listed in official 1.2 patch notes; they are original adaptations and must remain explicitly distinguished from source-confirmed content",
     "Full natural-run pilot still died at 154.3 seconds before the 19-minute boss window during a Rift objective; health pickup routing was added to the test pilot, but real-player balance and survival remain unverified",
-    "Character upgrade pool still does not yet reproduce the source game's broad global stat choices at each level-up; verify source-backed upgrade offer distribution and implementation"
+    "Character upgrade pool still does not yet reproduce the source game's broad global stat choices at each level-up; verify source-backed upgrade offer distribution and implementation",
+    "Latest non-cheating full-run simulation still died at 440.2 seconds with 241 enemies; population director change has just been committed and must be revalidated"
   ],
-  "next_action": "Continue from the natural-run survival failure. Validate the new health/magnet pickup pilot, audit and correct the global character-upgrade offer pool against source evidence, then iterate objective survival and complete the 19-minute normal-combat boss encounter without forced state mutation. Keep real-device performance, real file-origin save/reload, source-fidelity content and owner playtest as release gates.",
+  "next_action": "Run the full non-cheating mission pilot against the new enemy population director. Inspect time-series for survival, objective completion, build strength and boss behavior. If it survives to the boss, diagnose boss victory without mutating player or boss state. Then independently test browser persistence, real-device performance, source fidelity and owner playtest.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "last_development_product_commit": "ae820ed62f3ad4e27c160cfd6ecc3c91abd9e061",
-  "development_candidate_sha256": "46f3c1c5ad7806fe45bc226e2df55b14de19c975182b619dd0db11524841923d",
-  "development_candidate_bytes": 718366,
+  "development_candidate_sha256": "7341e21f2a94b05460113c1138cb7cf6d29d13f5e8357d85844e2a8d2b1bf47f",
+  "development_candidate_bytes": 721469,
   "last_successful_candidate_ci": {
     "run_id": 43848382432,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/43848382432",
@@ -147,5 +148,5 @@
     "tested": "Atlas renderer, 24 static decor cache tiles, 18 Reginald-eligible spells, save migration filtering, 90-second normal combat, contact collection for fungi/sludge/standard and heavy cores; component browser tests",
     "not_tested": "full 19-minute run, natural boss win, actual file-origin persistence, real hardware performance, complete source-fidelity content, owner acceptance"
   },
-  "latest_candidate_ci_status": "PENDING_OBJECTIVE_COLLECTION_AND_HEALTH_PICKUP_PILOT_REVALIDATION"
+  "latest_candidate_ci_status": "PENDING_DYNAMIC_ENEMY_PRESSURE_REVALIDATION"
 }
