@@ -191,3 +191,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Updated the non-cheating full-run pilot to seek actual health and magnet drops when needed. It still only supplies movement, normal interaction and choices from real upgrade cards; it does not mutate HP, XP, enemy/boss HP, time or victory.
 - Product commit: `ae820ed62f3ad4e27c160cfd6ecc3c91abd9e061`. Exact artifact: 718366 bytes, SHA-256 `46f3c1c5ad7806fe45bc226e2df55b14de19c975182b619dd0db11524841923d`.
 - CAOS remains read-only. `main` remains the preserved baseline; work continues on `development`.
+
+## NATURAL RUN 012 — First non-cheating full mission win (2026-11-17)
+- CI: https://github.com/D1traverser-debug/game/actions/runs/43989883310 — checkpoint and all browser-component steps PASS.
+- The Playwright pilot ran the production update loop, only supplied movement, normal interact, and choices from actually offered cards. It did NOT mutate time, player HP/position/XP, objectives, enemy/boss HP, boss death, result or wins.
+- Natural result: gameTime 1463.17s; Mul'gath spawned after 1140s and was naturally defeated; 732 kills; level 19; 4 objectives; 3 spells; 26 upgrade choices; 462.25/540 HP; armor 52; regen 6; 1 win/0 losses; no JS/console errors or external requests.
+- This is the first complete automated pilot victory. It is not a human player acceptance test.
+- The boss fight lasted about 323 seconds after spawn; compare against source evidence before balancing.
+- Only Mul'gath has a natural full-run win. Sol'phish and Krog'wa full-run victories, owner playtest, file-origin persistence, real hardware performance and full source fidelity remain OPEN.
+- Product status remains NOT_READY; main branch remains preserved; CAOS remains read-only.
+- Evidence: `docs/experiments/NATURAL_RUN_012.md`.
