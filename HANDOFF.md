@@ -226,3 +226,14 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Revision 015 changes only the QA harness and project evidence: default no-trial loadout, Chinese display-name scroll ranking, spell/defense-aware choices, reroll only when critically low and no useful legal option exists, 15-second trace, test-only damage-source logging, and CI seeds 1/2/3.
 - Product `index.html` is unchanged in this revision. The exact product candidate remains `NOT_READY`; no changes to `main` or CAOS.
 - Next: inspect the three-seed CI run. Require natural wins for all seeds and exact `sol`, `krog`, `mul` coverage. If any seed fails, use recorded damage events and 15-second traces to distinguish pilot navigation/card selection from production combat balance. Human owner acceptance, file-origin persistence, real-device performance, audio/visual polish and full source fidelity remain open.
+
+
+## BOSS PILOT 016 — CI #125 root-cause update (2026-11-17)
+- Revision 015 commit: `4b3df2c54937214eeb48ccaac7d9091c68b81b02`; CI: https://github.com/D1traverser-debug/game/actions/runs/44006013545. Checkpoint PASS; browser-component failed at the three-seed natural-run step.
+- Seed 1 died at 469.3s (579 kills, level 17, maxHP 300, armor 9, regen 0). Damage events were repeated enemy projectiles.
+- Seed 2 died at 413.8s (467 kills, level 16, maxHP 400, armor 42, regen 2). Damage sources included projectiles, friendlyFire, contact and a Gnasher leap; raw Gnasher hit 283.8 before armor.
+- Seed 3 died at 115.7s (119 kills, level 9). Four projectiles hit from 111.4s to 115.7s near the map edge.
+- New test-agent root causes: projectile closest-approach sign was inverted; spell-level cards were selected over defensive cards even when offered; no dedicated Gnasher landing-point or own-spell hazard avoidance.
+- Friendly-fire research: the source game intentionally allows caster self-damage by default. Harmony Pact disables self/team damage as an optional covenant. Do not remove self-damage from the default run. See `docs/REFERENCE_RESEARCH.md` and `docs/MECHANIC_REFERENCE_MATRIX.md`.
+- Revision 016 changes only test code and evidence: defense-first when offered, correct projectile approach sign, Gnasher burrow/leap steering, and avoidance of friendly-fire/explosive hazards. Product `index.html` remains unchanged.
+- Next: inspect CI after commit; require three natural wins and exact `sol`, `krog`, `mul` coverage. Do not alter enemy damage until the pilot demonstrably avoids telegraphed attacks. Product remains NOT_READY; main and CAOS untouched.

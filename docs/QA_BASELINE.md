@@ -62,3 +62,27 @@ Latest inspected CI: [run 44003040650](https://github.com/D1traverser-debug/game
 - These are verified QA-harness defects. The run is insufficient evidence to change production balance.
 - Revision 015 removes the trial from this acceptance path, ranks actual displayed scrolls and meaningful spell/defense cards, logs damage sources and objective state, and changes CI to seeds 1/2/3. Result remains PENDING until GitHub Actions readback.
 - This is automated pilot evidence only. It does not establish human fun/UX acceptance, source fidelity, real-device performance, or release readiness.
+
+
+## Three-seed pilot run #125 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44006013545  
+Commit: `4b3df2c54937214eeb48ccaac7d9091c68b81b02`  
+Checkpoint: PASS. Browser-component: FAIL at the natural-run matrix.
+
+| Seed | End time | Level / kills | HP ceiling | Main damage evidence | Result |
+|---|---:|---:|---:|---|---|
+| 1 | 469.3s | 17 / 579 | 300 | Repeated enemy projectiles; 9 armor, 0 regen | Died before boss |
+| 2 | 413.8s | 16 / 467 | 400 | Projectiles, friendlyFire, contact, Gnasher leap (283.8 raw) | Died before boss |
+| 3 | 115.7s | 9 / 119 | 100 | Four projectiles in 4.3s near map edge | Died before objective |
+
+All runs had no page, console or external-network errors. The failure is not a browser-runtime failure.
+
+### Pilot root causes
+- Projectile prediction used the wrong sign for closest approach. With `r = player - projectile`, future separation is `r - v*t`; an approaching projectile has positive `dot(r,v)`.
+- The pilot chose spell levels ahead of available defensive stats, including Dodge and Regen.
+- It did not steer away from Gnasher's recorded leap landing point or its own damaging spell hazards.
+
+### Source-fidelity clarification
+Default friendly fire includes caster self-damage. Optional Harmony Pact disables self/team damage. Preserve the default behavior; do not remove `friendlyFire` to force a green run. Sources: https://steamdb.info/patchnotes/16553491/ and https://steamcommunity.com/app/2904000/discussions/1/4513255804483189926/.
+
+Revision 016 applies test-only corrections. Production balance remains unchanged pending a competent, telegraph-aware pilot rerun.

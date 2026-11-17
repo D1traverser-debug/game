@@ -19,6 +19,7 @@ PROBE=r"""
 // Diagnostic instrumentation exists only in this temporary browser document.
 // It records incoming damage without changing the production damage pipeline.
 window.__damageEvents=[];
+window.__pilotDodgeStats={projectile:0,gnasher:0,hazard:0};
 const __baseDamagePlayer=damagePlayer;
 damagePlayer=function(n,source='enemy'){
   const p=game?.player,o=game?.objective;
@@ -87,7 +88,8 @@ window.__fullRun = async (maxSeconds) => {
     const defensive=opts.filter(x=>x.kind==='stat'&&Object.prototype.hasOwnProperty.call(defensivePriority,x.k))
       .sort((a,b)=>defensivePriority[a.k]-defensivePriority[b.k]);
     const hpRatio=p.hp/Math.max(1,p.maxHp);
-    if(hpRatio<.72&&defensive.length)return defensive[0];
+    // Defense is selected whenever offered; spell upgrades are next priority.
+    if(defensive.length)return defensive[0];
     const augPriority=['healingSprout','quakeBurst','diceTwin','diceEcho','sawTwin','sawReturn','orbSplit','orbBurst','quakeAfter','quakePull','sawMagnet','seeking','surge','tempo','reach'];
     const aug=opts.filter(x=>x.kind==='spellAugment')
       .sort((a,b)=>{const ai=augPriority.indexOf(a.aug),bi=augPriority.indexOf(b.aug);return (ai<0?999:ai)-(bi<0?999:bi)})[0];
@@ -179,6 +181,17 @@ window.__fullRun = async (maxSeconds) => {
         rx-=dx/d*w;ry-=dy/d*w;
       }
     }
+    // Gnasher burrow is a pursuit tell; leap lands at its recorded target point.
+    for(const e of game.enemies){
+      if(e.dead||e.type!=='gnasher')continue;
+      if(e.state==='burrow'){
+        const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;
+        if(d<320){const w=(320-d)/320*2.8;rx+=dx/d*w;ry+=dy/d*w;window.__pilotDodgeStats.gnasher++;}
+      }else if(e.state==='leap'){
+        const tx=e.leapX??e.x,ty=e.leapY??e.y,dx=p.x-tx,dy=p.y-ty,d=Math.hypot(dx,dy)||1;
+        if(d<190){const w=(190-d)/190*3.4;rx+=dx/d*w;ry+=dy/d*w;window.__pilotDodgeStats.gnasher++;}
+      }
+    }
     for(const shot of game.shots){
       if(shot.kind!=='enemy')continue;
       const dx=p.x-shot.x,dy=p.y-shot.y,d=Math.hypot(dx,dy)||1;
@@ -186,7 +199,9 @@ window.__fullRun = async (maxSeconds) => {
       // Predict the closest approach of a live projectile and sidestep its path.
       const vx=shot.vx||0,vy=shot.vy||0,v2=vx*vx+vy*vy;
       if(v2>1){
-        const t=-(dx*vx+dy*vy)/v2;
+        // r = player - projectile; r(t) = r - velocity*t.
+        // Positive dot(r, velocity) means the projectile is approaching.
+        const t=(dx*vx+dy*vy)/v2;
         if(t>0&&t<1.35){
           const cx=dx-vx*t,cy=dy-vy*t,cd=Math.hypot(cx,cy);
           if(cd<92){
@@ -198,15 +213,15 @@ window.__fullRun = async (maxSeconds) => {
             },0);
             const side=danger(p.x+px*90,p.y+py*90)<=danger(p.x-px*90,p.y-py*90)?1:-1;
             const w=(92-cd)/92*2.5;
-            rx+=px*side*w;ry+=py*side*w;
+            rx+=px*side*w;ry+=py*side*w;window.__pilotDodgeStats.projectile++;
           }
         }
       }
     }
     for(const h of game.hazards){
-      if(h.hit||!['warning','runestone','krogLeap','krogAcid'].includes(h.kind))continue;
+      if(h.hit||!['warning','runestone','krogLeap','krogAcid','meteor','bell','bomb','slam','dice','explosiveSprout','explosiveMushroom'].includes(h.kind))continue;
       const dx=p.x-h.x,dy=p.y-h.y,d=Math.hypot(dx,dy)||1,range=(h.r||0)+95;
-      if(d<range){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;}
+      if(d<range){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;window.__pilotDodgeStats.hazard++;}
     }
     const riftHold=activeObjective?.type==='rift'&&target&&Math.hypot(p.x-target.x,p.y-target.y)<(activeObjective.variant==='multi'?55:92);
     const evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.18:1);
@@ -253,6 +268,7 @@ window.__fullRun = async (maxSeconds) => {
     scrolls:p.scrolls.slice(),rerolls:p.rerolls,
     position:{x:+p.x.toFixed(1),y:+p.y.toFixed(1)},
     damageEvents:window.__damageEvents.slice(-80),
+    pilotDodgeStats:{...window.__pilotDodgeStats},
     trialSpellId:save.trialSpellId||null,
     objective:game.objective?.type||null,
     bossSpawned:!!b,bossId:b?.bossId||null,bossHp:b?.hp??null,bossMax:b?.max??null,

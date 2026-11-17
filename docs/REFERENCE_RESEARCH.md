@@ -55,3 +55,10 @@ The official developer announcement dated 2026-10-06 (patch 1.2.0.20127) confirm
 - The announcement does not disclose the twelve new-spell augmentation names or detailed effects. Our four choices per new spell are independent original designs; their labels and mechanics must not be represented as exact source data.
 - Solo mode excludes Healing Slam from the augmentation pool.
 Source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026 entry, lines 43–109 when opened on 2026-11-17).
+
+
+## Friendly fire and self-damage — source reconciliation (2026-11-17)
+- The original game can damage the caster with their own spells when default friendly fire is active.
+- The official 0.7.0 update introduced Harmony Pact, which disables friendly fire so players cannot hurt themselves or teammates. This is an optional run modifier, not the default baseline. Source: https://steamdb.info/patchnotes/16553491/
+- A developer response confirms that self/team damage is deliberate and that specific augmentations can convert friendly-fire damage into healing. Source: https://steamcommunity.com/app/2904000/discussions/1/4513255804483189926/
+- Therefore the prototype's `friendlyFire` damage from meteor/bell/bomb/slam/dice hazards is not automatically a production bug. The natural-run pilot must dodge these hazards. A Harmony Pact selector is a separate source-fidelity backlog item; do not silently disable self-damage in the default run.

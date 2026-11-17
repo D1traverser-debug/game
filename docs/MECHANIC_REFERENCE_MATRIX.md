@@ -93,3 +93,10 @@ The wiki and community discussion are secondary sources. Reconfirm against the t
 - Only the Reginald-eligible subset belongs in this one-hero product. Non-Reginald signature spells and their augmentations remain excluded.
 - The four augmentations for each 1.2 starter are our own named, original gameplay adaptations because official notes provide only the count, not their source names/effects. Do not label those twelve as source-faithful. Their actual mechanics must be tested individually.
 - Official source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026, patch 1.2.0.20127); the same feed's 22 Oct 2026 performance patch makes high-entity stability a first-class quality requirement.
+
+
+### Friendly fire / Harmony Pact
+| Mechanic | Current baseline | Evidence | Implementation rule |
+|---|---|---|---|
+| Caster self-damage | Default friendly fire can damage the caster with their own spell hazards | Official Harmony Pact patch notes say the covenant prevents damage to self and teammates; developer response confirms default self/team damage is intentional | Preserve self-damage in the default baseline; pilot must evade; do not misclassify `friendlyFire` damage as a bug |
+| Harmony Pact | Optional covenant disables friendly fire | https://steamdb.info/patchnotes/16553491/ | Track as a separate source-fidelity feature; add only if run modifiers are in the single-player scope |

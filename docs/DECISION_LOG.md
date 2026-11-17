@@ -47,3 +47,10 @@
 - The pilot may only supply normal movement, ordinary interaction, and selections from cards actually offered by production. It may not set time, HP, XP, objective progress, enemy/boss state, or victory.
 - Card ranking must use actual option identifiers or exact displayed labels. If the pilot fails, incoming damage, build choices, objective progress and movement must be inspected before attributing the result to production balance.
 - Automated pilot success is not human owner acceptance and does not waive source-fidelity, performance, persistence, visual/audio or release gates.
+
+
+## D-009 — Preserve default self-damage and model optional Harmony Pact (ACCEPTED)
+- The default game rule permits caster self-damage from friendly-fire spell hazards; this is intentional source behavior, not an accidental test artifact.
+- Harmony Pact is a separate covenant that disables damage to self and teammates. It is a backlog feature to scope, not an implicit global default.
+- Natural-run acceptance must avoid self-damage hazards through movement and build decisions. It must not silently suppress production damage to obtain a green run.
+- Evidence: official 0.7.0 patch notes https://steamdb.info/patchnotes/16553491/ and developer response https://steamcommunity.com/app/2904000/discussions/1/4513255804483189926/.
