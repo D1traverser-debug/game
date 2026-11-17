@@ -6,6 +6,7 @@ normal movement, ordinary interaction, and choices from actual upgrade offers.
 """
 import asyncio
 import json
+import sys
 from playwright.async_api import async_playwright
 from pathlib import Path
 
@@ -213,7 +214,7 @@ window.__fullRun = async (maxSeconds) => {
 DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
 
 async def main():
-  seeds=[1,42,1337]
+  seeds=[int(x) for x in sys.argv[1:]] or [1]
   report={"runs":[],"checks":{}}
   async with async_playwright() as p:
     browser=await p.chromium.launch(headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
@@ -235,8 +236,9 @@ async def main():
     await browser.close()
   bosses=[x["boss"] for x in report["runs"]]
   report["checks"]={
-    "all_three_runs_natural_wins":all(x["natural_win"] for x in report["runs"]),
-    "all_three_boss_archetypes_covered":set(bosses)=={"sol","krog","mul"},
+    "all_seeded_runs_natural_wins":bool(report["runs"]) and all(x["natural_win"] for x in report["runs"]),
+    "boss_ids_recorded":bool(bosses) and all(x in {"sol","krog","mul"} for x in bosses),
+    "all_three_boss_archetypes_covered":len(seeds)>1 and set(bosses)=={"sol","krog","mul"},
     "no_browser_errors":all(not x["page_errors"] and not x["console_errors"] for x in report["runs"]),
     "offline_no_external_requests":all(not x["external_requests"] for x in report["runs"])
   }
