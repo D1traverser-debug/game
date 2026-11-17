@@ -268,3 +268,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Upgrade chooser bug: `newSpell` returned before defensive options were checked; seed 3 selected a new spell despite Dodge being offered.
 - Projectile predictor checked up to 1.35s, but emergency activation was restricted to 0.85s/72 units and avoidance was scaled by nearby-enemy pressure.
 - Revision 019 changes test harness only: landing-point escape scoring, defensive/sustain card precedence, independent projectile/hazard emergency activation, and damage-time telemetry. Product HTML unchanged.
+
+
+## BOSS PILOT 020 — CI #129 root-cause update (2026-11-17)
+- CI #129: https://github.com/D1traverser-debug/game/actions/runs/44012660542. Checkpoint and short browser regressions PASS; seeds 2 and 3 naturally win, seed 1 fails.
+- Seed 1 died at 412.4s (level 16, 471 kills, 200 max HP, 36 armor, 2 regen). Final Gnasher hit was 287.1 raw at (1145.2,650.0); nearest Gnasher was 18.6 units away with target (1157.2,637.9). Only 13 leap-safe frames were recorded.
+- Seed 2 naturally defeated Krog'wa at 1265.9s: level 22, 1657 kills, 3 objectives, 591.6/800 HP.
+- Seed 3 naturally defeated Mul'gath at 1265.7s: level 22, 1617 kills, 2 objectives, 247.1/400 HP.
+- Boss coverage is `krog` and `mul`; `sol` remains missing. No browser, console or external-network errors.
+- Seed 1 trace showed a Gnasher leap at y=863.7 with only 36.3 units of lower-edge clearance; selected escape vector was (0.92,0.38). The prior controller selected one Gnasher and recomputed its heading every frame, allowing threat switching and poor boundary-limited displacement.
+- Revision 020 locks an escape heading per Gnasher attack phase, scores all active leap landing points, includes actual post-clamp travel, and records exact attacker identity. Product HTML unchanged.

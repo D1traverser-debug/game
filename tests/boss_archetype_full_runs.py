@@ -19,12 +19,14 @@ PROBE=r"""
 // Diagnostic instrumentation exists only in this temporary browser document.
 // It records incoming damage without changing the production damage pipeline.
 window.__damageEvents=[];
+window.__gnasherHits=[];
 window.__pilotDodgeStats={projectile:0,gnasher:0,gnasherBurrow:0,gnasherLeap:0,gnasherLeapSafeFrames:0,hazard:0,boundary:0,rift:0,criticalEscape:0};
 const __baseDamagePlayer=damagePlayer;
 damagePlayer=function(n,source='enemy'){
   const p=game?.player,o=game?.objective;
-  const gnasher=(game?.enemies||[]).filter(e=>!e.dead&&e.type==='gnasher')
-    .map(e=>({e,d:p?Math.hypot(e.x-p.x,e.y-p.y):9999})).sort((a,b)=>a.d-b.d)[0];
+  const nearGnashers=(game?.enemies||[]).filter(e=>!e.dead&&e.type==='gnasher')
+    .map(e=>({e,d:p?Math.hypot(e.x-p.x,e.y-p.y):9999})).filter(x=>x.d<240).sort((a,b)=>a.d-b.d);
+  const gnasher=nearGnashers[0];
   const nearestProjectile=(game?.shots||[]).filter(s=>s.kind==='enemy').map(s=>{
     const dx=(p?.x||0)-s.x,dy=(p?.y||0)-s.y,vx=s.vx||0,vy=s.vy||0,v2=vx*vx+vy*vy;
     const t=v2>1?(dx*vx+dy*vy)/v2:0;
@@ -38,6 +40,7 @@ damagePlayer=function(n,source='enemy'){
     playerMove:p?+p.move.toFixed(1):null,lastMove:p?+p.lastMove.toFixed(2):null,
     facing:p?+p.facing.toFixed(2):null,invuln:p?+p.invuln.toFixed(2):null,
     nearestGnasher:gnasher?{state:gnasher.e.state,stateT:+(gnasher.e.stateT||0).toFixed(2),distance:+gnasher.d.toFixed(1),x:+gnasher.e.x.toFixed(1),y:+gnasher.e.y.toFixed(1),leapX:Number.isFinite(gnasher.e.leapX)?+gnasher.e.leapX.toFixed(1):null,leapY:Number.isFinite(gnasher.e.leapY)?+gnasher.e.leapY.toFixed(1):null,dmg:+gnasher.e.dmg.toFixed(1)}:null,
+    nearbyGnashers:nearGnashers.slice(0,6).map(x=>({state:x.e.state,stateT:+(x.e.stateT||0).toFixed(2),distance:+x.d.toFixed(1),x:+x.e.x.toFixed(1),y:+x.e.y.toFixed(1),leapX:Number.isFinite(x.e.leapX)?+x.e.leapX.toFixed(1):null,leapY:Number.isFinite(x.e.leapY)?+x.e.leapY.toFixed(1):null,dmg:+x.e.dmg.toFixed(1)})),
     nearestProjectile:nearestProjectile||null
   });
   return __baseDamagePlayer(n,source);
@@ -194,51 +197,65 @@ window.__fullRun = async (maxSeconds) => {
         rx-=dx/d*w;ry-=dy/d*w;
       }
     }
-    // Gnasher's leap lands at the captured leapX/leapY point, not at its
-    // current interpolated position. Choose a safe escape heading for the full
-    // 0.55s leap window and make it override objective/loot steering.
-    let gnasherThreat=false,gnasherEscapeX=0,gnasherEscapeY=0,gnasherMode=null;
+    // Score escape against every active Gnasher leap target. A single
+    // selected target made the heading oscillate as different Gnashers became
+    // nearest; the direction is now locked for each individual attack phase.
+    let gnasherThreat=false,gnasherEscapeX=0,gnasherEscapeY=0,gnasherMode=null,gnasherStateT=null;
+    window.__gnasherEscapeLocks=window.__gnasherEscapeLocks||Object.create(null);
     const activeGnashers=game.enemies.filter(e=>!e.dead&&e.type==='gnasher'&&(e.state==='burrow'||e.state==='leap'))
       .map(e=>({e,d:Math.hypot(e.x-p.x,e.y-p.y),landingD:e.state==='leap'?Math.hypot(p.x-(e.leapX??e.x),p.y-(e.leapY??e.y)):Infinity}))
-      .sort((a,b)=>(a.e.state==='leap'?0:1)-(b.e.state==='leap'?0:1)||Math.min(a.d,a.landingD)-Math.min(b.d,b.landingD));
-    const activeGnasher=activeGnashers[0];
-    if(activeGnasher&&((activeGnasher.e.state==='leap'&&Math.min(activeGnasher.d,activeGnasher.landingD)<430)||(activeGnasher.e.state==='burrow'&&activeGnasher.d<560))){
+      .sort((a,b)=>(a.e.state==='leap'?0:1)-(b.e.state==='leap'?0:1)||(a.e.stateT||0)-(b.e.stateT||0)||Math.min(a.d,a.landingD)-Math.min(b.d,b.landingD));
+    const leapThreats=activeGnashers.filter(x=>x.e.state==='leap'&&Math.min(x.d,x.landingD)<500);
+    const burrowThreats=activeGnashers.filter(x=>x.e.state==='burrow'&&x.d<600);
+    const activeGnasher=leapThreats[0]||burrowThreats[0];
+    if(activeGnasher){
       const e=activeGnasher.e,leaping=e.state==='leap';
-      const tx=leaping?(e.leapX??e.x):p.x,ty=leaping?(e.leapY??e.y):p.y;
+      const tx=leaping?(e.leapX??e.x):null,ty=leaping?(e.leapY??e.y):null;
       const pathX=leaping?tx-e.x:p.x-e.x,pathY=leaping?ty-e.y:p.y-e.y,pathD=Math.hypot(pathX,pathY)||1;
       const preferredX=-pathY/pathD,preferredY=pathX/pathD;
-      const step=Math.max(80,(p.move||220)*.55);
-      let bestScore=-Infinity;
-      for(let k=0;k<16;k++){
-        const a=k*Math.PI/8,dx=Math.cos(a),dy=Math.sin(a);
-        const nx=clamp(p.x+dx*step,-1180,1180),ny=clamp(p.y+dy*step,-880,880);
-        const landingDistance=leaping?Math.hypot(nx-tx,ny-ty):0;
-        let nearestEnemy=360;
-        for(const other of game.enemies){
-          if(other===e||other.dead||other.type==='boss')continue;
-          nearestEnemy=Math.min(nearestEnemy,Math.hypot(other.x-nx,other.y-ny));
+      const moveSpeed=(p.move||220)*(game.carriedCore&&game.carriedCore.alive?.58:1)*
+        (p.lowSpeed?1+(1-p.hp/Math.max(1,p.maxHp))*.21:1)*(p.fightT>0?1.3:1);
+      const step=Math.max(80,moveSpeed*.55),lockKey=String(e.id);
+      let lock=window.__gnasherEscapeLocks[lockKey];
+      const lockValid=lock&&lock.state===e.state&&(!leaping||(Math.abs(lock.targetX-tx)<.1&&Math.abs(lock.targetY-ty)<.1));
+      if(!lockValid){
+        let bestScore=-Infinity,bestX=0,bestY=0;
+        for(let k=0;k<24;k++){
+          const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);
+          const nx=clamp(p.x+dx*step,-1200,1200),ny=clamp(p.y+dy*step,-900,900);
+          const travel=Math.hypot(nx-p.x,ny-p.y);
+          const landingDistance=leaping&&leapThreats.length
+            ?Math.min(...leapThreats.map(x=>Math.hypot(nx-(x.e.leapX??x.e.x),ny-(x.e.leapY??x.e.y)))):0;
+          let nearestEnemy=420;
+          for(const other of game.enemies){
+            if(other===e||other.dead||other.type==='boss')continue;
+            nearestEnemy=Math.min(nearestEnemy,Math.hypot(other.x-nx,other.y-ny));
+          }
+          let hazardPenalty=0;
+          for(const h of game.hazards){
+            if(h.hit||!Number.isFinite(h.timer)||h.timer>1.4)continue;
+            const hd=Math.hypot(nx-h.x,ny-h.y),hr=(h.r||0)+p.r+35;
+            if(hd<hr)hazardPenalty+=(hr-hd)*.75;
+          }
+          let projectilePenalty=0;
+          for(const shot of game.shots){
+            if(shot.kind!=='enemy')continue;
+            const sx=shot.x+(shot.vx||0)*.55,sy=shot.y+(shot.vy||0)*.55;
+            const sd=Math.hypot(nx-sx,ny-sy),sr=(shot.r||6)+p.r+28;
+            if(sd<sr)projectilePenalty+=(sr-sd)*.9;
+          }
+          const edgeClearance=Math.min(1200-Math.abs(nx),900-Math.abs(ny));
+          const lateral=dx*preferredX+dy*preferredY;
+          const score=(leaping?landingDistance*1.8:0)+travel*1.4+
+            Math.min(nearestEnemy,320)*.12+Math.min(edgeClearance,300)*.20+
+            lateral*(leaping?5:18)-hazardPenalty-projectilePenalty;
+          if(score>bestScore){bestScore=score;bestX=dx;bestY=dy;}
         }
-        let hazardPenalty=0;
-        for(const h of game.hazards){
-          if(h.hit||!Number.isFinite(h.timer)||h.timer>1.4)continue;
-          const hd=Math.hypot(nx-h.x,ny-h.y),hr=(h.r||0)+p.r+35;
-          if(hd<hr)hazardPenalty+=(hr-hd)*.65;
-        }
-        let projectilePenalty=0;
-        for(const shot of game.shots){
-          if(shot.kind!=='enemy')continue;
-          const sx=shot.x+(shot.vx||0)*.55,sy=shot.y+(shot.vy||0)*.55;
-          const sd=Math.hypot(nx-sx,ny-sy),sr=(shot.r||6)+p.r+28;
-          if(sd<sr)projectilePenalty+=(sr-sd)*.8;
-        }
-        const edgeClearance=Math.min(1200-Math.abs(nx),900-Math.abs(ny));
-        const lateral=dx*preferredX+dy*preferredY;
-        const score=(leaping?landingDistance*1.25:0)+lateral*42+
-          Math.min(nearestEnemy,300)*.12+Math.min(edgeClearance,260)*.12-
-          hazardPenalty-projectilePenalty;
-        if(score>bestScore){bestScore=score;gnasherEscapeX=dx;gnasherEscapeY=dy;}
+        lock={state:e.state,targetX:tx,targetY:ty,x:bestX,y:bestY};
+        window.__gnasherEscapeLocks[lockKey]=lock;
       }
-      gnasherThreat=true;gnasherMode=leaping?'leap':'burrow';
+      gnasherEscapeX=lock.x;gnasherEscapeY=lock.y;
+      gnasherThreat=true;gnasherMode=leaping?'leap':'burrow';gnasherStateT=+(e.stateT||0).toFixed(2);
       window.__pilotDodgeStats.gnasher++;
       if(leaping){window.__pilotDodgeStats.gnasherLeap++;if(activeGnasher.landingD>60)window.__pilotDodgeStats.gnasherLeapSafeFrames++;}
       else window.__pilotDodgeStats.gnasherBurrow++;
@@ -331,8 +348,9 @@ window.__fullRun = async (maxSeconds) => {
         position:{x:+q.x.toFixed(1),y:+q.y.toFixed(1)},
         target:target?{kind:target.type||target.kind||'objective',x:+target.x.toFixed(1),y:+target.y.toFixed(1)}:null,
         edgeDistance:Math.min(1200-Math.abs(q.x),900-Math.abs(q.y)),
-        imminentProjectile,imminentHazard,gnasherThreat,gnasherMode,
+        imminentProjectile,imminentHazard,gnasherThreat,gnasherMode,gnasherStateT,
         gnasherEscape:{x:+gnasherEscapeX.toFixed(2),y:+gnasherEscapeY.toFixed(2)},
+        activeGnasher:activeGnasher?{state:activeGnasher.e.state,stateT:+(activeGnasher.e.stateT||0).toFixed(2),distance:+activeGnasher.d.toFixed(1),landingX:Number.isFinite(activeGnasher.e.leapX)?+activeGnasher.e.leapX.toFixed(1):null,landingY:Number.isFinite(activeGnasher.e.leapY)?+activeGnasher.e.leapY.toFixed(1):null}:null,
         healthOrbs:game.orbs.filter(x=>x.type==='health').length,magnetOrbs:game.orbs.filter(x=>x.type==='magnet').length,objective:game.objective?.type||null,
         objectiveProgress:game.objective?.progress||0,objectiveTarget:game.objective?.target||0,
         objectiveDone:!!game.objective?.done,objectiveVariant:game.objective?.variant||null,
@@ -354,6 +372,7 @@ window.__fullRun = async (maxSeconds) => {
     position:{x:+p.x.toFixed(1),y:+p.y.toFixed(1)},
     damageEvents:window.__damageEvents.slice(-80),
     pilotDodgeStats:{...window.__pilotDodgeStats},
+    gnasherHits:window.__gnasherHits.slice(-80),
     trialSpellId:save.trialSpellId||null,
     objective:game.objective?.type||null,
     bossSpawned:!!b,bossId:b?.bossId||null,bossHp:b?.hp??null,bossMax:b?.max??null,
@@ -363,7 +382,10 @@ window.__fullRun = async (maxSeconds) => {
   };
 };
 """
-DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
+const GNASHER_HIT="if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');";
+assert SOURCE.split(GNASHER_HIT).length===2,"Gnasher hit instrumentation anchor must occur exactly once";
+DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER).replace(GNASHER_HIT,
+  "if(Math.hypot(p.x-e.x,p.y-e.y)<60){window.__gnasherHits.push({t:+g.time.toFixed(1),id:e.id,state:e.state,stateT:+e.stateT.toFixed(2),x:+e.x.toFixed(1),y:+e.y.toFixed(1),leapX:+e.leapX.toFixed(1),leapY:+e.leapY.toFixed(1),playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),distance:+Math.hypot(p.x-e.x,p.y-e.y).toFixed(1),dmg:+e.dmg.toFixed(1)});damagePlayer(e.dmg*1.7,'gnasher');}")
 
 async def main():
   seeds=[int(x) for x in sys.argv[1:]] or [1,2,3]

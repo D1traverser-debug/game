@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "MULTI_BOSS_PILOT_GNASHER_LEAP_ESCAPE_019",
+  "checkpoint": "MULTI_BOSS_PILOT_GNASHER_LOCK_020",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -109,7 +109,13 @@
     "Seed 3 died at 373.9s with HP 0, level 16, 450 kills, 300 max HP, 32 armor, 1 regen. Gnasher hits of 280.1 and 280.4 raw landed at 372.3s and 373.9s.",
     "Source inspection confirms Gnasher's burrow tracks the player at 3x speed for 1.25s, then stores leapX/leapY and moves to that fixed landing point for 0.55s; damage is dealt if the player is within 60 units. Prior pilot incorrectly steered from the Gnasher's interpolated current position rather than scoring escape from its fixed landing point.",
     "Upgrade audit found choose() returned a newSpell before checking defensive stats; seed 3 selected wickedBuzzsaw at 220s even though Dodge was offered. This contradicted the intended defense-first policy.",
-    "Projectile emergency detection only covered t<0.85 and miss distance<72, despite the predictor considering shots up to 1.35s; it also scaled projectile avoidance by nearby-enemy pressure."
+    "Projectile emergency detection only covered t<0.85 and miss distance<72, despite the predictor considering shots up to 1.35s; it also scaled projectile avoidance by nearby-enemy pressure.",
+    "CI #129 / commit 2deee6e: checkpoint PASS; browser progression, 90-second combat smoke, objective collection and character upgrade regressions PASS; two of three natural runs won.",
+    "Seed 1 died at 412.4s (level 16, 471 kills, maxHP 200, armor 36, regen 2). Final Gnasher hit was 287.1 raw at player position (1145.2,650.0); nearest Gnasher was 18.6 units away and its recorded leap target was (1157.2,637.9). Only 13 Gnasher leap-safe frames were recorded; escape headings changed as the active threat changed.",
+    "Seed 2 naturally defeated Krog'wa at 1265.9s: level 22, 1657 kills, 3 objectives, 591.6/800 HP, 89 armor, 6 regen.",
+    "Seed 3 naturally defeated Mul'gath at 1265.7s: level 22, 1617 kills, 2 objectives, 247.1/400 HP, 26 armor, 10 regen.",
+    "Natural boss coverage now includes krog and mul, but not sol. No browser, console or external-network errors.",
+    "Seed 1 trace at 391.2s showed a Gnasher leap while the player was at y=863.7 (36.3 units from the lower map edge); chosen escape vector was (0.92,0.38), with limited boundary clearance. The prior scoring also selected only one active Gnasher and recomputed the direction every frame."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -165,9 +171,10 @@
     "BOSS_PILOT_016 pending CI: correct projectile approach-time sign, choose defense whenever offered, steer away from Gnasher burrow/leap and friendly-fire hazards, and record dodge counters. No production balance changes made.",
     "BOSS_PILOT_017 pending CI: hard inward boundary steering, safe loot targeting, Rift tangential evasion, critical-health escape, and lateral Gnasher sidesteps. Two of three seeds remain unvalidated; boss coverage is incomplete.",
     "BOSS_PILOT_018 pending CI: imminent projectile/Gnasher threats suspend objective/loot pursuit, emergency Rift dodges are permitted, hard boundary correction is restricted to the actual clamp, and Gnasher escape uses stronger lateral movement.",
-    "BOSS_PILOT_019 pending CI: choose a scored safe heading away from Gnasher leapX/leapY, suspend interactions during Gnasher attacks, make defensive/sustain cards outrank new spells, and let predicted projectile/hazard threats activate evasion independently of enemy proximity."
+    "BOSS_PILOT_019 pending CI: choose a scored safe heading away from Gnasher leapX/leapY, suspend interactions during Gnasher attacks, make defensive/sustain cards outrank new spells, and let predicted projectile/hazard threats activate evasion independently of enemy proximity.",
+    "BOSS_PILOT_020 pending CI: combine all active Gnasher leap landing points, lock one escape direction per Gnasher attack phase, score actual displacement after world-boundary clamping, and record the exact Gnasher attacker on every hit. Two boss archetypes now have natural wins; Sol'phish remains unverified."
   ],
-  "next_action": "Inspect CI after BOSS_PILOT_019. Require three natural wins and exact sol/krog/mul coverage. Read damage-time Gnasher leap target/stateT and nearest projectile telemetry to validate the escape controller. If still failing, isolate projectile, hazard and Gnasher control in separate deterministic encounter tests before any production tuning. Keep index.html unchanged and product NOT_READY.",
+  "next_action": "Inspect CI after BOSS_PILOT_020. Validate seed 1 survival and exact attacker/landing telemetry. Then find a deterministic seed that naturally wins against Sol'phish while retaining Krog'wa and Mul'gath wins; do not relax the full-run gate. Keep production index.html unchanged and product NOT_READY.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -193,5 +200,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_019"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_020"
 }

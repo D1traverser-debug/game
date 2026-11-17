@@ -78,3 +78,11 @@
 - Defensive stats and sustain scrolls must not be silently outranked by a new-spell offer when survival is the active gate.
 - Projectile/hazard avoidance activation must not depend solely on nearby-enemy distance.
 - This decision governs the QA pilot only. Production enemy damage and behavior remain unchanged pending source fidelity and human playtest evidence.
+
+
+## D-013 — Lock Gnasher escape per attack and score all landing zones (ACCEPTED)
+- A Gnasher leap is a fixed-point landing attack. The pilot must maximize separation from all simultaneously active landing points, not just the nearest enemy's current position.
+- Recomputing the selected direction every frame can oscillate when multiple Gnashers change rank. Lock the chosen heading for that individual attack phase.
+- Score actual movement after world-boundary clamping; a nominal heading that only yields a few pixels of displacement is not a valid escape.
+- Exact attacker identity and all nearby Gnasher landing targets must be captured when a hit occurs.
+- This is test-agent policy only. Do not modify production Gnasher damage or telegraphs until a competent agent and owner playtest demonstrate a production defect.

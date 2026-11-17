@@ -128,3 +128,16 @@ Checkpoint: PASS. Short browser regressions: PASS. Three-seed natural-run matrix
 | 3 | 373.9s | Two Gnasher hits (280.1/280.4 raw) |
 
 No browser, console or external-network errors. Source review identified fixed Gnasher landing-point mechanics and a defensive-card precedence bug in the test pilot. Revision 019 corrects the pilot and adds telemetry; product HTML remains unchanged.
+
+
+## Natural-run pilot #129 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44012660542  
+Checkpoint: PASS. Short browser regressions: PASS. Natural-run matrix: FAIL (2/3 wins).
+
+| Seed | Outcome | Boss | Evidence |
+|---|---|---|---|
+| 1 | Death at 412.4s | None | Gnasher hit 287.1 raw; player was 18.6 units from recorded landing target; only 13 leap-safe frames |
+| 2 | Natural win at 1265.9s | Krog'wa | Level 22; 1657 kills; 3 objectives; 591.6/800 HP |
+| 3 | Natural win at 1265.7s | Mul'gath | Level 22; 1617 kills; 2 objectives; 247.1/400 HP |
+
+No browser, console or external-network errors. Exact boss coverage currently lacks Sol'phish. Revision 020 targets multi-Gnasher threat switching and escape displacement near world boundaries; product HTML remains unchanged.
