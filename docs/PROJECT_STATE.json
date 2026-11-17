@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "SINGLE_CLOCK_NATURAL_BOSS_COVERAGE_028",
+  "checkpoint": "BALANCED_PILOT_NATURAL_BOSS_COVERAGE_029",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -149,7 +149,11 @@
     "CI #137: seed 1 died at 492.97s (level 16, 508 kills, 1 objective); seed 2 naturally defeated Krog'wa at 1196.4s; seed 3 died at 123.87s (level 8, 107 kills, 0 objectives). Seed 9 naturally spawned Krog'wa but was only a scout; seeds 10/11 died during Mul'gath attempts; seed 12 naturally defeated Mul'gath at 1206.33s.",
     "CI #137 had no page errors, console errors or external requests. Same seed 1 changed from a natural Krog'wa win in CI #136 to death at 492.97s in CI #137.",
     "Root cause confirmed by source inspection: the browser production requestAnimationFrame loop continued calling update(SIM_STEP) while the test agent independently called update(0.1), creating two concurrent simulation clocks and nondeterministic Math.random consumption. The previous test logs also serialized unbounded traces and exceeded useful log size.",
-    "Revision 028 changes only the QA harness: gate production-frame updates during manual simulation, count manual ticks and blocked RAF updates, assert one simulation clock and same-seed replay, and compact failure diagnostics. Production index.html remains unchanged."
+    "Revision 028 changes only the QA harness: gate production-frame updates during manual simulation, count manual ticks and blocked RAF updates, assert one simulation clock and same-seed replay, and compact failure diagnostics. Production index.html remains unchanged.",
+    "CI #138 (run 44032832722, commit 2920ae4): checkpoint, progression, 90-second smoke, objective and upgrade regressions PASS. Single-clock assertion PASS; seed-1 replay was exactly identical; browser/console errors and external requests were zero.",
+    "CI #138 natural-run matrix: seed 1 deterministically died at 376.8s (level 13, 340 kills, 1 objective, 1200 max HP, only Astral/Loaded Dice at low levels); seed 2 naturally defeated Mul'gath at 1264.1s; seed 3 naturally defeated Sol'phish at 1213.6s. No natural Krog'wa win in this run.",
+    "CI #138 seed 1 upgrade trace confirms the pilot chose repeated max-HP cards despite healthy HP, then chose Swift Overlay/dodge over an available Wicked Buzzsaw new-spell card. This is a QA-agent policy defect, not evidence of a production balance defect.",
+    "Revision 029 changes only the test pilot's upgrade policy: healthy runs prioritize new spells, spell levels, augmentations and offensive stats; defensive stats become conditional on low HP or an absence of stronger options. It adds an assertion that a healthy new-spell offer is accepted."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -205,9 +209,9 @@
     "BOSS_PILOT_016 pending CI: correct projectile approach-time sign, choose defense whenever offered, steer away from Gnasher burrow/leap and friendly-fire hazards, and record dodge counters. No production balance changes made.",
     "BOSS_PILOT_017 pending CI: hard inward boundary steering, safe loot targeting, Rift tangential evasion, critical-health escape, and lateral Gnasher sidesteps. Two of three seeds remain unvalidated; boss coverage is incomplete.",
     "BOSS_PILOT_018 pending CI: imminent projectile/Gnasher threats suspend objective/loot pursuit, emergency Rift dodges are permitted, hard boundary correction is restricted to the actual clamp, and Gnasher escape uses stronger lateral movement.",
-    "BOSS_PILOT_028 pending CI: enforce one simulation clock in the browser pilot by blocking RAF-driven update calls while allowing manual 0.1s ticks; assert manual tick count equals harness tick count and seed 1 replay is identical; compact traces and diagnostics. Verify natural boss coverage. No production HTML or balance changes."
+    "BOSS_PILOT_029 pending CI: rebalance QA-agent upgrade choice so healthy builds prioritize new spells, spell levels, augmentations and damage/cast/crit before defensive fallback; keep sustain/defense priority when HP is low; assert healthy new-spell offers are accepted. Verify natural wins for baseline seeds 1/2/3 and same-run Sol/Krog/Mul coverage. No production HTML or balance changes."
   ],
-  "next_action": "Inspect CI #138. Confirm the single-clock and same-seed replay assertions pass. Seeds 1/2/3 remain mandatory full natural wins; candidate seeds 4-12 must naturally spawn and defeat any missing boss archetype. Require winning IDs sol/krog/mul, no browser/console errors and zero external requests. Keep product NOT_READY.",
+  "next_action": "Inspect CI #139. Verify single-clock and same-seed replay remain PASS, and the healthy-new-spell policy assertion passes. Baseline seeds 1/2/3 must all naturally win. Candidate seeds must naturally spawn and defeat any missing archetype, requiring winning IDs sol/krog/mul in one CI run. Keep product NOT_READY.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -233,5 +237,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_028"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_029"
 }

@@ -343,3 +343,10 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Confirmed root cause: `__fullRun` manually called `update(0.1)` while the live production RAF loop continued calling `update(SIM_STEP)`. This double-advanced game state and consumed Math.random from two clocks.
 - Revision 028 gates RAF-driven update calls in the temporary QA document, counts manual ticks and blocked RAF calls, asserts single-clock operation and identical seed-1 replay, and limits output to compact state plus recent evidence.
 - No production `index.html` or balance change. CI #138 is pending. Product remains NOT_READY; same-run Sol/Krog/Mul wins, source fidelity, real-origin save/reload, real-device performance and owner playtest remain open.
+
+
+## BOSS PILOT 029 — balanced upgrade policy (2026-11-17)
+- CI #138: https://github.com/D1traverser-debug/game/actions/runs/44032832722. Single-clock and same-seed replay gates PASS; seed 1 died at 376.8s, seed 2 naturally defeated Mul'gath at 1264.1s, seed 3 naturally defeated Sol'phish at 1213.6s. No natural Krog'wa victory in the run.
+- Seed 1 reached 1200 max HP but only had Astral/Loaded Dice at low levels. At 348.1s it was offered Wicked Buzzsaw but selected dodge, confirming the pilot's unconditional defensive priority was suppressing offensive progression.
+- Revision 029 changes only the QA pilot: prioritize new spells/levels/augments/offensive stats when healthy; choose sustain/defense when HP is low; add a healthy-new-spell selection assertion.
+- No production HTML or combat balance changes. CI #139 pending. Product remains NOT_READY.

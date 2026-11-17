@@ -223,3 +223,18 @@ Checkpoint, progression, 90-second normal-play, objective and upgrade regression
 | 12 | Natural Mul'gath win at 1206.33s | Level 23, 2242 kills, 3 objectives |
 
 The same seed 1 had naturally defeated Krog'wa in CI #136 at 1259.5s, but died at 492.97s in CI #137. Root cause was confirmed in the test architecture: the manual agent called `update(0.1)` while the production `requestAnimationFrame` loop also called `update(SIM_STEP)`. The two clocks advanced one game concurrently and consumed seeded randomness in different orders. Revision 028 gates production-frame updates during manual simulation, adds a one-clock assertion and same-seed replay, and compacts logs. This is a test-harness correction, not a production gameplay change.
+
+
+## Natural-run pilot #138 — deterministic outcomes and upgrade-policy defect (2026-11-17)
+Run: https://github.com/D1traverser-debug/game/actions/runs/44032832722  
+Checkpoint, progression, 90-second normal-play, objective and upgrade regressions: PASS. Single-clock assertion: PASS. Same-seed seed-1 replay: PASS (identical signature). Browser/console errors and external requests: zero. Natural-run matrix: FAIL.
+
+| Seed | Outcome | Boss | Evidence |
+|---|---|---|---|
+| 1 | Death at 376.8s | None | Level 13, 340 kills, 1 objective, 1200 max HP, only Astral and Loaded Dice; last hit was a Gnasher leap for 280.5 damage |
+| 2 | Natural win at 1264.1s | Mul'gath | Level 21, 1610 kills, 3 objectives, 484.4/800 HP |
+| 3 | Natural win at 1213.6s | Sol'phish | Level 21, 1655 kills, 3 objectives, 253.5/400 HP |
+| 6 | Scout only | Mul'gath | Boss naturally spawned at 1142.9s; no victory claimed |
+| 9–10 | Scout only | Sol'phish | Boss naturally spawned at 1142.9s; no victory claimed |
+
+The single-clock correction made the run deterministic. Seed 1's upgrade log then exposed a pilot defect: defensive max-HP cards were selected even when health was full, and a healthy offer containing a new Wicked Buzzsaw spell was rejected in favor of dodge. Revision 029 changes only the pilot's choice policy and adds a regression assertion. No production balance changes.

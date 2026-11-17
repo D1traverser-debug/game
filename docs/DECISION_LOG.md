@@ -145,3 +145,11 @@
 - Repeat at least one seeded run in a fresh browser context and require identical outcome signatures.
 - Keep deterministic RNG seeding and compact per-run diagnostics. Do not change production balance or game code to compensate for a test-harness race.
 - A same-seed result that changes between CI runs invalidates natural-run evidence until the clock ownership is fixed and replayed.
+
+
+## D-022 — Preserve offensive progression in the QA pilot while gating defense by actual risk (ACCEPTED)
+- A test pilot is not competent merely because it maximizes survivability stats; it must maintain sufficient damage progression to control the encounter population.
+- When HP is healthy, prioritize new spell acquisition, spell levels, spell augmentations, infusions and direct damage/cast/critical stats before defensive fallback.
+- When HP is low, sustain scrolls and defensive upgrades may take priority. Do not remove defensive choices; make them conditional on observed risk.
+- Record HP ratio at every real upgrade offer and assert that a healthy new-spell offer is selected. Keep the pilot limited to actual offered cards and legal game inputs.
+- This is test-agent strategy only. Do not change production damage, enemy pressure, boss HP or player balance from an automated pilot failure alone.

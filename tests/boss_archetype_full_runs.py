@@ -97,11 +97,13 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     return o;
   };
   const choose=(opts,p)=>{
-    const defensivePriority={maxHp:0,regen:1,armor:2,dodge:3};
+    // Defensive cards are conditional: do not sacrifice the build's damage curve
+    // when the wizard is healthy. The old unconditional branch selected max HP,
+    // armor or dodge even when a new spell or spell level was offered.
+    const defensivePriority={regen:0,armor:1,maxHp:2,dodge:3};
     const defensive=opts.filter(x=>x.kind==='stat'&&Object.prototype.hasOwnProperty.call(defensivePriority,x.k))
       .sort((a,b)=>defensivePriority[a.k]-defensivePriority[b.k]);
     const hpRatio=p.hp/Math.max(1,p.maxHp);
-    // Sustain scrolls and defensive stats must outrank a new spell when survival is at risk.
     const sustainNames=new Set(['健康成长','壁垒','厚皮','闪避疗愈','致命回响','魔力虹吸','魔力汲取','目标馈赠']);
     const scrollPriority={
       '健康成长':0,'壁垒':1,'厚皮':2,'闪避疗愈':3,'致命回响':4,
@@ -113,8 +115,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       .sort((a,b)=>(scrollPriority[a.name]??99)-(scrollPriority[b.name]??99));
     const sustainScroll=scrolls.find(x=>sustainNames.has(x.name));
     if(hpRatio<.80&&sustainScroll)return sustainScroll;
-    if(defensive.length)return defensive[0];
-    if(sustainScroll)return sustainScroll;
+    if(hpRatio<.62&&defensive.length)return defensive[0];
     const newSpell=opts.find(x=>x.kind==='newSpell');
     if(newSpell)return newSpell;
     if(scrolls.length)return scrolls[0];
@@ -128,12 +129,13 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     if(infusion)return infusion;
     const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
     if(level)return level;
-    if(defensive.length)return defensive[0];
-    // Spell levels and augmentations outrank marginal economy/mobility stats.
+    // With health under control, take direct damage/cast/crit growth before
+    // marginal defense. Defensive fallback remains available when no offense exists.
     const statPriority={damage:0,cast:1,crit:2,critDmg:3,spellSize:4,speed:5,manaGain:6,manaPull:7,luck:8};
     const stat=opts.filter(x=>x.kind==='stat')
       .sort((a,b)=>(statPriority[a.k]??99)-(statPriority[b.k]??99))[0];
     if(stat)return stat;
+    if(defensive.length)return defensive[0];
     return opts[0];
   };
   while(elapsed<maxSeconds&&!game.ended&&(screen==='playing'||screen==='upgrade')&&!(stopAtBossSpawn&&game.boss&&!game.boss.dead)){
@@ -150,7 +152,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       // Only choose from real cards currently offered by the production game.
       const rerollsBefore=game.player.rerolls||0;
       const choice=choose(opts,game.player);
-      upgradeLog.push({t:+game.time.toFixed(1),rerollsBefore,offered:opts.map(x=>({kind:x.kind,k:x.k,name:x.name,aug:x.aug,spell:x.spell?.id,title:x.title,rarity:x.rarity})),selected:{kind:choice.kind,k:choice.k,name:choice.name,aug:choice.aug,spell:choice.spell?.id},rerollsAfter:game.player.rerolls||0});
+      upgradeLog.push({t:+game.time.toFixed(1),hpRatio:+(game.player.hp/Math.max(1,game.player.maxHp)).toFixed(3),rerollsBefore,offered:opts.map(x=>({kind:x.kind,k:x.k,name:x.name,aug:x.aug,spell:x.spell?.id,title:x.title,rarity:x.rarity})),selected:{kind:choice.kind,k:choice.k,name:choice.name,aug:choice.aug,spell:choice.spell?.id},rerollsAfter:game.player.rerolls||0});
       applyUpgrade(choice);upgrades++;continue;
     }
     const p=game.player;
@@ -409,6 +411,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     bossSpawned:!!b,bossId:b?.bossId||null,bossHp:b?.hp??null,bossMax:b?.max??null,
     bossDead:!!b?.dead,wins:save.wins||0,losses:save.runs-(save.wins||0),
     enemyCount:game.enemies.filter(e=>!e.dead).length,trace,
+    newSpellChoiceViolations:upgradeLog.filter(x=>x.offered.some(o=>o.kind==='newSpell')&&x.hpRatio>=.80&&x.selected.kind!=='newSpell').length,
     errors:p.hp<0||!Number.isFinite(p.hp)||!Number.isFinite(game.time)
   };
 };
@@ -462,7 +465,7 @@ async def main():
         "bossSpawned":state["bossSpawned"],"bossId":state["bossId"],"bossHp":state["bossHp"],
         "bossMax":state["bossMax"],"bossDead":state["bossDead"],"wins":state["wins"],
         "losses":state["losses"],"enemyCount":state["enemyCount"],"errors":state["errors"],
-        "pilotDodgeStats":state["pilotDodgeStats"],
+        "pilotDodgeStats":state["pilotDodgeStats"],"newSpellChoiceViolations":state["newSpellChoiceViolations"],
         "recentDamageEvents":state["damageEvents"][-10:],"recentGnasherHits":state["gnasherHits"][-10:],
         "recentTrace":state["trace"][-10:],"recentUpgrades":state["upgradeLog"][-10:]
       }
@@ -512,6 +515,7 @@ async def main():
     "all_three_boss_archetypes_naturally_defeated":winning_bosses==valid_bosses,
     "manual_simulation_is_single_clock":all(x["state"]["simulationHarness"]["manualTicks"]==x["state"]["tickCount"] and x["state"]["simulationHarness"]["blockedFrameUpdates"]>0 for x in report["runs"]) and report["same_seed_replay"]["simulationHarness"]["manualTicks"]==report["same_seed_replay"]["tickCount"] and report["same_seed_replay"]["simulationHarness"]["blockedFrameUpdates"]>0,
     "same_seed_replay_is_identical":report["same_seed_replay"]["matches"],
+    "healthy_new_spell_offers_are_taken":all(x["state"]["newSpellChoiceViolations"]==0 for x in report["runs"]),
     "replay_has_no_browser_errors_or_external_requests":not report["same_seed_replay"]["page_errors"] and not report["same_seed_replay"]["console_errors"] and not report["same_seed_replay"]["external_requests"],
     "all_attempted_runs_no_browser_errors":all(not x["page_errors"] and not x["console_errors"] for x in report["runs"]),
     "offline_no_external_requests":all(not x["external_requests"] for x in report["runs"])
