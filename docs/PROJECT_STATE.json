@@ -202,16 +202,18 @@
     "Added engine-independent .NET Standard 2.1 simulation core foundation: fixed-step clock, deterministic PCG RNG and configurable damage/friendly-fire/invulnerability pipeline; CI verification pending.",
     "Engine-independent Game.Core (.NET Standard 2.1) builds successfully in GitHub Actions; 12/12 deterministic contracts pass for fixed-step clock, pause/backlog, PCG RNG, friendly fire, self-damage, invulnerability, lethal transitions and max-health capacity.",
     "Full-game branch CI #44142826420 passed 11/11 jobs: checkpoint, core simulation and nine legacy browser regression jobs.",
-    "Added typed monotonic simulation event buffer and host-side player command envelope validation to Game.Core; tests added, CI pending."
+    "Added typed monotonic simulation event buffer and host-side player command envelope validation to Game.Core; tests added, CI pending.",
+    "Full-game branch CI #44143534101 passed 11/11 jobs; core simulation/event/network input contracts passed 20/20; all nine legacy browser regression jobs passed.",
+    "Unity project skeleton committed with Editor 6000.3.27f2, URP 17.3.0 manifest dependency, and local Game.Core UPM package. Unity Editor package resolution and native build remain NOT_TESTED."
   ],
   "failed_or_open": [
-    "Unity 6.3 LTS editor project, URP configuration, package manifest and native Windows build have not yet been created or validated.",
+    "Unity project skeleton is committed at unity/ with Editor 6000.3.27f2 and URP 17.3.0 dependency; opening the project, package resolution, URP asset assignment and native Windows build remain NOT_TESTED.",
     "1–4 player online co-op transport/session, host snapshots, lobby/relay, reconnect, friendly-fire replication, revive and four-client stress are not implemented; only the pure input-envelope validation contract exists.",
     "Full wizard/realm/spell/element/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented.",
     "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
     "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested."
   ],
-  "next_action": "Run the expanded .NET core suite. If green, implement source-qualified elemental status contracts and spell execution primitives, then create the Unity 6.3 LTS project and wire the host-authoritative session adapter.",
+  "next_action": "Open unity/ with Unity 6000.3.27f2 or a later security-patched 6.3 LTS patch, verify local Game.Core and URP package resolution, create and commit URP/quality/input settings, then author the first polished original hero/realm vertical slice. Continue extending Game.Core only where required by source-qualified gameplay/network rules.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -240,7 +242,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PASS_CORE_FOUNDATION_12_OF_12_AND_LEGACY_REGRESSIONS_44142826420",
+  "latest_candidate_ci_status": "PASS_CORE_20_OF_20_AND_LEGACY_REGRESSIONS_44143534101",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -357,7 +359,18 @@
     "target_framework": "netstandard2.1",
     "test_project": "tests/core/Game.Core.Tests.csproj",
     "test_runner": "dotnet 8 console contracts; no external NuGet packages",
-    "contracts": "12/12 PASS in CI #44142826420",
-    "status": "FOUNDATION_VERIFIED_NOT_FULL_SIMULATION"
+    "contracts": "20/20 PASS in CI #44143534101",
+    "status": "FOUNDATION_AND_INPUT_EVENT_CONTRACTS_VERIFIED_NOT_FULL_SIMULATION"
+  },
+  "unity_project": {
+    "path": "unity/",
+    "editor": "6000.3.27f2",
+    "render_pipeline": "URP 17.3.0",
+    "local_core_package": "../src/core",
+    "skeleton": "COMMITTED",
+    "editor_opened": false,
+    "package_resolution": "NOT_TESTED",
+    "urp_assets": "NOT_CREATED",
+    "windows_build": "NOT_TESTED"
   }
 }

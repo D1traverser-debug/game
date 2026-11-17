@@ -40,7 +40,7 @@ This repository is the durable source of truth for product scope, source-version
 
 ## Engine-independent simulation core
 
-`src/core` contains the deterministic C# simulation kernel, targeted at .NET Standard 2.1 for Unity integration. It is built and tested separately from Unity presentation and network providers. See `src/core/README.md`.
+`src/core` contains the deterministic C# simulation kernel, targeted at .NET Standard 2.1 and packaged as a local UPM package for Unity. It is built and tested separately from Unity presentation and network providers. The native project lives in `unity/`. See `src/core/README.md` and `unity/README.md`.
 
 ## Production rule
 

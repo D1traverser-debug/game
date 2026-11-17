@@ -365,3 +365,10 @@ The first full-game branch run verified the new scope metadata and the exact leg
 CI [44142826420](https://github.com/D1traverser-debug/game/actions/runs/44142826420) passed 11/11 jobs. The new .NET Standard 2.1 core compiled successfully; the standalone .NET 8 contract runner passed 12/12 tests covering fixed-step ticks, pause-time discard, backlog preservation, same-seed PCG streams, bounded integer sampling, friendly-fire allow/block, self-damage policy, invulnerability, lethal transition, invalid damage and max-health capacity restoration. The checkpoint guard passed and all nine legacy browser regression jobs passed.
 
 Evidence boundary: this verifies foundational domain code only. It does not verify a Unity Editor project, native build, spell/element content, 1–4 player networking, production art/audio, full runs, performance or owner acceptance.
+
+
+## Core event/network command contracts and Unity project skeleton (2026-11-18)
+
+CI [44143534101](https://github.com/D1traverser-debug/game/actions/runs/44143534101) passed 11/11 jobs. The engine-independent core passed 20/20 contracts: fixed-step time, pause/backlog, PCG RNG, damage/friendly fire/invulnerability, monotonic event sequencing, and player input envelope validation. The checkpoint and all nine legacy browser regressions passed.
+
+Unity project skeleton is committed with Editor 6000.3.27f2 and URP 17.3.0 dependency, but Editor package resolution and native build have not been tested. The core event/command extension is still pending CI.

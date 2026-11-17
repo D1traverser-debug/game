@@ -17,7 +17,7 @@ The repository—not chat summaries—is the canonical source of truth. The acti
 - Solo and 1–4 player online co-op are production targets.
 - Full current-version content target: complete wizard roster, all documented realms, spells, elements and combinations, augmentations, scrolls, quests, objectives/variants, enemies/bosses, trials/covenants and meta progression.
 - Windows PC first; keyboard/mouse and controller. Console/cross-play is a later gate.
-- Production engine direction: Unity 6.3 LTS + URP, pending vertical-slice falsification.
+- Production engine direction: Unity 6.3 LTS + URP. Minimum pinned security-patched Editor: `6000.3.27f2`; update only to a later patched 6000.3 LTS version after release-note review and CI.
 - Original IP and assets: do not copy proprietary source, extracted game data, character designs, original art, animation, fonts, UI expression, writing, music, voice, or recordings. Independently implement gameplay systems and create original content.
 - The old requirements "Reginald only", "Verdant Meadows only", "single-player only", and "single offline HTML" are superseded for the full-game branch. They remain historical constraints for the legacy browser prototype only.
 - CAOS is a read-only methodological reference. Never modify CAOS code, repo, branches, PRs, files, Skills, plugins, docs, configuration, or data.

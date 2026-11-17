@@ -78,6 +78,10 @@ namespace Game.Core.Networking
 
             if (!activePlayerIds.Contains(command.PlayerId))
                 return new CommandValidationResult(CommandValidationOutcome.UnknownPlayer);
+            if (command.Sequence < 0)
+                return new CommandValidationResult(CommandValidationOutcome.DuplicateOrOutOfOrder);
+            if (command.ClientTick < 0)
+                return new CommandValidationResult(CommandValidationOutcome.TickOutsideWindow);
             if (_lastSequence.TryGetValue(command.PlayerId, out var last) && command.Sequence <= last)
                 return new CommandValidationResult(CommandValidationOutcome.DuplicateOrOutOfOrder);
             if (command.ClientTick < hostTick - _maxPastTicks || command.ClientTick > hostTick + _maxFutureTicks)

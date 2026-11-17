@@ -26,6 +26,8 @@ var tests = new List<(string Name, Action Run)>
     ("stale_and_future_commands_are_rejected", StaleAndFutureCommandsAreRejected),
     ("invalid_movement_is_rejected", InvalidMovementIsRejected),
     ("unknown_button_bits_are_rejected", UnknownButtonBitsAreRejected),
+    ("negative_sequence_is_rejected", NegativeSequenceIsRejected),
+    ("negative_client_tick_is_rejected", NegativeClientTickIsRejected),
 };
 
 var failures = 0;
@@ -239,6 +241,22 @@ static void UnknownButtonBitsAreRejected()
     var players = new HashSet<int> { 1 };
     var command = new Game.Core.Networking.PlayerInputCommand(1, 1, 100, 0, 0, (Game.Core.Networking.PlayerButtons)32768);
     Assert.Equal(Game.Core.Networking.CommandValidationOutcome.InvalidButtons, validator.Validate(command, players, 100).Outcome);
+}
+
+static void NegativeSequenceIsRejected()
+{
+    var validator = new Game.Core.Networking.PlayerCommandValidator();
+    var players = new HashSet<int> { 1 };
+    var command = new Game.Core.Networking.PlayerInputCommand(1, -1, 100, 0, 0, Game.Core.Networking.PlayerButtons.None);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.DuplicateOrOutOfOrder, validator.Validate(command, players, 100).Outcome);
+}
+
+static void NegativeClientTickIsRejected()
+{
+    var validator = new Game.Core.Networking.PlayerCommandValidator();
+    var players = new HashSet<int> { 1 };
+    var command = new Game.Core.Networking.PlayerInputCommand(1, 1, -1, 0, 0, Game.Core.Networking.PlayerButtons.None);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.TickOutsideWindow, validator.Validate(command, players, 100).Outcome);
 }
 
 static class Assert

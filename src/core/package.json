@@ -1,0 +1,7 @@
+{
+  "name": "com.d1traverser.game-core",
+  "displayName": "Game Core",
+  "version": "0.1.0",
+  "description": "Engine-independent deterministic simulation core for the full-game project.",
+  "unity": "6000.3"
+}

@@ -89,3 +89,13 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 - Added `PlayerInputCommand`, allowed button flags and `PlayerCommandValidator` for registered-player membership, monotonic sequence, host tick window, finite bounded movement and valid input bits.
 - These are engine-independent contracts, not a transport, lobby, anti-cheat solution or complete co-op implementation.
 - Eight new deterministic tests added; CI pending.
+
+
+## Unity project skeleton — committed (Editor validation pending)
+
+- Pinned minimum Editor: Unity 6.3 LTS `6000.3.27f2`, the security-patched 6.3 LTS version published 2026-10-30.
+- URP dependency declared: 17.3.0.
+- Local UPM package `com.d1traverser.game-core` points to `../src/core`; code is organized under `src/core/Runtime` with `Game.Core.asmdef`.
+- `unity/ProjectSettings/ProjectVersion.txt` and `unity/Packages/manifest.json` committed.
+- Editor has not been launched in this environment. Package resolution, URP asset assignment, scene import and Windows build are NOT_TESTED.
+- The core command validator now rejects negative sequence and client tick values. Expanded test suite: 22 contracts expected; CI pending.

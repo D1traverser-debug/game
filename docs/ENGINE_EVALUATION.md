@@ -17,12 +17,12 @@ The full-game directive now targets 1–4 online co-op, native PC, authored 3D m
 
 ## Selected baseline
 
-- Unity 6.3 LTS, URP, C#.
+- Unity 6.3 LTS Editor `6000.3.27f2` minimum security-patched baseline, URP 17.3.0, C#.
 - Use ScriptableObjects for authored content data; keep simulation logic independent from renderer/UI.
 - Evaluate Netcode for GameObjects and Unity Lobby/Relay for the first 4-player spike. Keep the transport/session layer abstract so Steam Networking or another provider can be compared without rewriting simulation.
 - Use Blender as editable source for original models/rigs; Unity import pipeline for runtime assets.
 - Use Unity AudioMixer and event-driven audio initially; add middleware only if a measured requirement justifies it.
-- Pin exact editor and package versions only after the first project is opened and package compatibility is verified.
+- Editor is pinned to `6000.3.27f2`, the security-patched Unity 6.3 LTS release dated 2026-10-30. URP 17.3.0 is declared as a project dependency and must be resolved/read back in the Editor before acceptance. Do not enable URP Compatibility Mode; use RenderGraph. Pin any later patch only after reviewing release/security notes and rerunning the full build/test matrix.
 
 ## Vertical-slice falsifiers
 
@@ -36,6 +36,8 @@ Revisit the engine decision if:
 ## Current official references
 
 - Unity 6.3 LTS support and support window: https://unity.com/releases/unity-6/support
+- Unity 6000.3.27f2 release notes/security fixes: https://unity.com/releases/editor/whats-new/6000.3.27f2
+- Unity security advisory lists 6000.3.27f2 as the patched 6.3 LTS version: https://gw-prd.hexagon.unity.com/security/unity-emudhra-compromise
 - Unity 6.3 LTS feature/production notes: https://unity.com/blog/unity-6-3-lts-is-now-available
 - Unity Multiplayer services (Lobby, Matchmaker, Relay, Netcode): https://docs.unity.com/en-us/multiplayer
 - Netcode for GameObjects compatibility: https://mp-docs.dl.it.unity3d.com/netcode/current/about/

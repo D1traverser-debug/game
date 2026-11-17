@@ -1,14 +1,30 @@
 # Unity Production Project
 
-Target editor: Unity 6.3 LTS (exact patch to be pinned after the first editor install). Render pipeline: URP. Language: C#.
+**Editor:** Unity 6.3 LTS, minimum pinned patch `6000.3.27f2`  
+**Render pipeline:** URP 17.3.0  
+**Core package:** local UPM package `com.d1traverser.game-core` from `../src/core`  
+**Target:** Windows PC first.
 
-This folder will contain the native production project. It is intentionally not populated with unverified placeholder scenes/scripts yet. First create/open the editor project, pin package versions, verify the URP template and build a clean Windows player. Then add runtime modules and assets incrementally.
+The project skeleton and package manifest are committed. The Editor has not yet been launched against this checkout, so package resolution, generated URP assets, scene import and Windows player build remain NOT_TESTED.
 
-Required first milestone:
-1. Unity project opens without package errors.
-2. Clean Windows development build launches.
-3. Edit-mode and play-mode tests run in CI.
-4. A 4-client network test scene can host/join and exchange authoritative movement/state.
-5. Build and test manifests record exact editor/package versions.
+## Open
 
-The legacy browser game remains in the repository root and on `development`; do not import its monolithic script as the new architecture.
+1. Install Unity Hub and Unity Editor `6000.3.27f2` or a later security-patched 6000.3 LTS patch.
+2. Add this repository's `unity/` folder as an existing project.
+3. Allow Package Manager to resolve URP and the local Game Core package.
+4. Confirm URP 17.3.0 appears in Package Manager. Create a URP Pipeline Asset with Universal Renderer and assign it under Project Settings > Graphics and Quality. Commit the generated pipeline/renderer assets and settings.
+5. Install Windows Build Support (IL2CPP) through Unity Hub.
+6. Do not add placeholder primitive scenes as finished content. The first scene is part of the production vertical slice and must follow the art bible.
+
+## Structure
+
+- `Assets/Art`: original character, enemy, realm and prop source/imports.
+- `Assets/Audio`: original music, SFX, ambience and mix assets.
+- `Assets/Scenes`: authored production scenes.
+- `Assets/Settings`: URP, quality, input and volume settings.
+- `Assets/Prefabs`: production prefabs.
+- `Assets/Editor`: validated project tooling.
+- `Packages/manifest.json`: pinned dependencies.
+- `ProjectSettings/ProjectVersion.txt`: pinned Editor version.
+
+The legacy browser prototype remains outside this project. Do not copy its monolithic script into Unity.
