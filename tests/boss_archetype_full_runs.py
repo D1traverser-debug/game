@@ -26,7 +26,7 @@ window.__setRunSeed=(seed)=>{
 
 window.__fullRun = async (maxSeconds) => {
   const dt=0.1;
-  let elapsed=0,ticks=0,upgrades=0,interactions=0,lastTrace=0;
+  let elapsed=0,ticks=0,upgrades=0,interactions=0,lastTrace=0,upgradeLog=[];
   const trace=[];
   const nearest=(items,p)=>items.filter(x=>x&&x.alive!==false)
     .map(o=>({o,d:Math.hypot(o.x-p.x,o.y-p.y)}))
@@ -81,7 +81,7 @@ window.__fullRun = async (maxSeconds) => {
       const opts=game.pending?.opts||[];
       if(!opts.length)break;
       // Only choose from real cards currently offered by the production game.
-      applyUpgrade(choose(opts));upgrades++;continue;
+      const choice=choose(opts);upgradeLog.push({t:+game.time.toFixed(1),offered:opts.map(x=>({kind:x.kind,k:x.k,name:x.name,aug:x.aug,spell:x.spell?.id})),selected:{kind:choice.kind,k:choice.k,name:choice.name,aug:choice.aug,spell:choice.spell?.id}});applyUpgrade(choice);upgrades++;continue;
     }
     const p=game.player;
     let target=null,goalX=0,goalY=0;
@@ -202,7 +202,7 @@ window.__fullRun = async (maxSeconds) => {
   return {
     screen,ended:game.ended,elapsed,gameTime:game.time,kills:p.kills,level:p.level,
     hp:p.hp,maxHp:p.maxHp,damageTaken:p.damageTaken,armor:p.armor,regen:p.regen,
-    objectives:p.objectives,upgrades,interactions,
+    objectives:p.objectives,upgrades,interactions,upgradeLog,
     spells:p.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()})),
     objective:game.objective?.type||null,
     bossSpawned:!!b,bossId:b?.bossId||null,bossHp:b?.hp??null,bossMax:b?.max??null,
