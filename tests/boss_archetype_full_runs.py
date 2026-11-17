@@ -67,7 +67,7 @@ window.__setRunSeed=(seed)=>{
 };
 
 window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
-  const dt=1/30,stepsPerDecision=3;
+  const dt=1/30,stepsPerDecision=1;
   const manualStart=window.__simulationHarness.manualTicks,blockedStart=window.__simulationHarness.blockedFrameUpdates;
   let elapsed=0,ticks=0,upgrades=0,interactions=0,lastTrace=0,lastYield=0,upgradeLog=[];
   const trace=[];
@@ -99,13 +99,17 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     return o;
   };
   const choose=(opts,p)=>{
-    // Defensive cards are conditional: do not sacrifice the build's damage curve
-    // when the wizard is healthy. The old unconditional branch selected max HP,
-    // armor or dodge even when a new spell or spell level was offered.
-    const defensivePriority={regen:0,armor:1,maxHp:2,dodge:3};
+    const hpRatio=p.hp/Math.max(1,p.maxHp);
+    // Preserve the level-13/20 spell-slot milestones, but do not build a glass cannon.
+    // Defense targets are modest and are selected only while the corresponding stat is deficient.
+    const defensivePriority={maxHp:0,armor:1,regen:2,dodge:3};
     const defensive=opts.filter(x=>x.kind==='stat'&&Object.prototype.hasOwnProperty.call(defensivePriority,x.k))
       .sort((a,b)=>defensivePriority[a.k]-defensivePriority[b.k]);
-    const hpRatio=p.hp/Math.max(1,p.maxHp);
+    const defensiveNeed=defensive.filter(x=>
+      (x.k==='maxHp'&&p.maxHp<300)||
+      (x.k==='armor'&&p.armor<36)||
+      (x.k==='regen'&&p.regen<2)||
+      (x.k==='dodge'&&p.dodge<.12));
     const sustainNames=new Set(['健康成长','壁垒','厚皮','闪避疗愈','致命回响','魔力虹吸','魔力汲取','目标馈赠']);
     const scrollPriority={
       '健康成长':0,'壁垒':1,'厚皮':2,'闪避疗愈':3,'致命回响':4,
@@ -116,10 +120,12 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     const scrolls=opts.filter(x=>x.kind==='scroll')
       .sort((a,b)=>(scrollPriority[a.name]??99)-(scrollPriority[b.name]??99));
     const sustainScroll=scrolls.find(x=>sustainNames.has(x.name));
-    if(hpRatio<.80&&sustainScroll)return sustainScroll;
-    if(hpRatio<.62&&defensive.length)return defensive[0];
+    if(hpRatio<.45&&defensive.length)return defensive[0];
     const newSpell=opts.find(x=>x.kind==='newSpell');
     if(newSpell)return newSpell;
+    if(hpRatio<.82&&sustainScroll)return sustainScroll;
+    if(hpRatio<.62&&defensive.length)return defensive[0];
+    if(defensiveNeed.length)return defensiveNeed[0];
     if(scrolls.length)return scrolls[0];
     const augPriority=['healingSprout','quakeBurst','diceTwin','diceEcho','sawTwin','sawReturn','orbSplit','orbBurst','quakeAfter','quakePull','sawMagnet','seeking','surge','tempo','reach'];
     const aug=opts.filter(x=>x.kind==='spellAugment')
@@ -131,8 +137,6 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     if(infusion)return infusion;
     const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
     if(level)return level;
-    // With health under control, take direct damage/cast/crit growth before
-    // marginal defense. Defensive fallback remains available when no offense exists.
     const statPriority={damage:0,cast:1,crit:2,critDmg:3,spellSize:4,speed:5,manaGain:6,manaPull:7,luck:8};
     const stat=opts.filter(x=>x.kind==='stat')
       .sort((a,b)=>(statPriority[a.k]??99)-(statPriority[b.k]??99))[0];
@@ -184,7 +188,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       }
       // Health pickups are real drops and must be considered by the pilot.
       const health=nearest(game.orbs.filter(x=>x.type==='health'&&Math.abs(x.x)<1120&&Math.abs(x.y)<820),p);
-      if(health&&p.hp<p.maxHp-5&&health.d<(p.hp<45?700:p.hp<75?420:0))target=health.o;
+      if(health&&p.hp<p.maxHp-5&&health.d<(p.hp<45?900:p.hp<75?650:p.hp<p.maxHp*.9?420:0))target=health.o;
       if(!target){
         const magnet=nearest(game.orbs.filter(x=>x.type==='magnet'&&Math.abs(x.x)<1120&&Math.abs(x.y)<820),p);
         if(magnet&&magnet.d<260)target=magnet.o;
@@ -229,8 +233,11 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       const lateralX=-pathY/pathD,lateralY=pathX/pathD;
       const awayD=Math.hypot(p.x-tx,p.y-ty)||1;
       const awayX=leaping?(p.x-tx)/awayD:lateralX,awayY=leaping?(p.y-ty)/awayD:lateralY;
-      const preferredX=leaping?awayX*.78+lateralX*.22:lateralX;
-      const preferredY=leaping?awayY*.78+lateralY*.22:lateralY;
+      const enemyD=Math.hypot(p.x-e.x,p.y-e.y)||1;
+      // During burrow the Gnasher tracks the wizard; create radial separation instead of orbiting it.
+      const burrowAwayX=(p.x-e.x)/enemyD,burrowAwayY=(p.y-e.y)/enemyD;
+      const preferredX=leaping?awayX*.78+lateralX*.22:burrowAwayX;
+      const preferredY=leaping?awayY*.78+lateralY*.22:burrowAwayY;
       const moveSpeed=(p.move||220)*(game.carriedCore&&game.carriedCore.alive?.58:1)*
         (p.lowSpeed?1+(1-p.hp/Math.max(1,p.maxHp))*.21:1)*(p.fightT>0?1.3:1);
       const criticalHealth=p.hp/Math.max(1,p.maxHp)<.55;
@@ -292,10 +299,10 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
         // r = player - projectile; r(t) = r - velocity*t.
         // Positive dot(r, velocity) means the projectile is approaching.
         const t=(dx*vx+dy*vy)/v2;
-        if(t>0&&t<1.8){
+        if(t>0&&t<2.4){
           const cx=dx-vx*t,cy=dy-vy*t,cd=Math.hypot(cx,cy);
-          if(t>.05&&t<1.8&&cd<110)imminentProjectile=true;
-          if(cd<110){
+          if(t>.05&&t<2.4&&cd<130)imminentProjectile=true;
+          if(cd<130){
             const speed=Math.sqrt(v2),px=-vy/speed,py=vx/speed;
             const danger=(x,y)=>game.enemies.reduce((sum,e)=>{
               if(e.dead||e.type==='boss')return sum;
@@ -303,7 +310,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
               return sum+(q<230?(230-q)/230:0);
             },0);
             const side=danger(p.x+px*90,p.y+py*90)<=danger(p.x-px*90,p.y-py*90)?1:-1;
-            const w=(110-cd)/110*2.8;
+            const w=(130-cd)/130*3.2;
             rx+=px*side*w;ry+=py*side*w;
             projectileRx+=px*side*w;projectileRy+=py*side*w;
             window.__pilotDodgeStats.projectile++;
@@ -328,7 +335,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       window.__pilotDodgeStats.rift++;
     }
     let evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.72:1);
-    if(imminentProjectile)evade=Math.max(evade,1.55);
+    if(imminentProjectile)evade=Math.max(evade,2.0);
     if(imminentHazard)evade=Math.max(evade,1.35);
     if(gnasherThreat){
       // A Gnasher leap is a fixed landing-point attack; use the scored escape
@@ -336,7 +343,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       // Gnasher avoidance must not suppress an independent projectile/hazard
       // dodge. Blend both emergency vectors; a close predicted projectile can
       // temporarily dominate the heading instead of being ignored.
-      const projectileWeight=imminentProjectile?2.8:1.6;
+      const projectileWeight=imminentProjectile?4.0:2.0;
       const hazardWeight=imminentHazard?1.8:1.0;
       goalX=gnasherEscapeX+projectileRx*projectileWeight+hazardRx*hazardWeight;
       goalY=gnasherEscapeY+projectileRy*projectileWeight+hazardRy*hazardWeight;
@@ -486,6 +493,7 @@ async def main():
         "losses":state["losses"],"enemyCount":state["enemyCount"],"errors":state["errors"],
         "pilotDodgeStats":state["pilotDodgeStats"],"newSpellChoiceViolations":state["newSpellChoiceViolations"],
         "recentDamageEvents":state["damageEvents"][-10:],"recentGnasherHits":state["gnasherHits"][-10:],
+        "recentGnasherLeapSamples":state["gnasherLeapSamples"][-30:],
         "recentTrace":state["trace"][-10:],"recentUpgrades":state["upgradeLog"][-10:]
       }
       item={"seed":seed,"phase":phase,"boss":state["bossId"],"natural_win":natural_win,"state":compact_state,
