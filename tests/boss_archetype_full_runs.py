@@ -19,14 +19,17 @@ PROBE=r"""
 // Diagnostic instrumentation exists only in this temporary browser document.
 // It records incoming damage without changing the production damage pipeline.
 window.__damageEvents=[];
-window.__pilotDodgeStats={projectile:0,gnasher:0,hazard:0};
+window.__pilotDodgeStats={projectile:0,gnasher:0,hazard:0,boundary:0,rift:0};
 const __baseDamagePlayer=damagePlayer;
 damagePlayer=function(n,source='enemy'){
   const p=game?.player,o=game?.objective;
+  const gnasher=(game?.enemies||[]).filter(e=>!e.dead&&e.type==='gnasher')
+    .map(e=>({e,d:p?Math.hypot(e.x-p.x,e.y-p.y):9999})).sort((a,b)=>a.d-b.d)[0];
   window.__damageEvents.push({
     t:+(game?.time||0).toFixed(1),source,amount:+Number(n).toFixed(1),
     hpBefore:p?+p.hp.toFixed(1):null,x:p?+p.x.toFixed(1):null,y:p?+p.y.toFixed(1):null,
-    objective:o?.type||null,objectiveProgress:o?.progress||0
+    objective:o?.type||null,objectiveProgress:o?.progress||0,
+    nearestGnasher:gnasher?{state:gnasher.e.state,distance:+gnasher.d.toFixed(1),x:+gnasher.e.x.toFixed(1),y:+gnasher.e.y.toFixed(1)}:null
   });
   return __baseDamagePlayer(n,source);
 };
@@ -151,14 +154,14 @@ window.__fullRun = async (maxSeconds) => {
         if(chest&&chest.d<780)target=chest.o;
       }
       // Health pickups are real drops and must be considered by the pilot.
-      const health=nearest(game.orbs.filter(x=>x.type==='health'),p);
+      const health=nearest(game.orbs.filter(x=>x.type==='health'&&Math.abs(x.x)<1120&&Math.abs(x.y)<820),p);
       if(health&&p.hp<p.maxHp-5&&health.d<(p.hp<45?700:p.hp<75?420:0))target=health.o;
       if(!target){
-        const magnet=nearest(game.orbs.filter(x=>x.type==='magnet'),p);
+        const magnet=nearest(game.orbs.filter(x=>x.type==='magnet'&&Math.abs(x.x)<1120&&Math.abs(x.y)<820),p);
         if(magnet&&magnet.d<260)target=magnet.o;
       }
       if(!target){
-        const orb=nearest(game.orbs.filter(x=>x.type==='xp'),p);
+        const orb=nearest(game.orbs.filter(x=>x.type==='xp'&&Math.abs(x.x)<1120&&Math.abs(x.y)<820),p);
         if(orb&&orb.d<850)target=orb.o;
       }
       if(target){
@@ -181,15 +184,27 @@ window.__fullRun = async (maxSeconds) => {
         rx-=dx/d*w;ry-=dy/d*w;
       }
     }
-    // Gnasher burrow is a pursuit tell; leap lands at its recorded target point.
+    // Gnasher's burrow is faster than the player: combine retreat with a
+    // lateral sidestep. During leap, use the visible enemy position and keep
+    // moving sideways; do not rely on its hidden target coordinate.
     for(const e of game.enemies){
       if(e.dead||e.type!=='gnasher')continue;
+      const side=(Number(e.id||0)%2===0)?1:-1;
       if(e.state==='burrow'){
         const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;
-        if(d<320){const w=(320-d)/320*2.8;rx+=dx/d*w;ry+=dy/d*w;window.__pilotDodgeStats.gnasher++;}
+        if(d<390){
+          const nx=dx/d,ny=dy/d,w=(390-d)/390*3.8;
+          rx+=nx*w*.65-ny*side*w*1.9;ry+=ny*w*.65+nx*side*w*1.9;
+          window.__pilotDodgeStats.gnasher++;
+        }
       }else if(e.state==='leap'){
-        const tx=e.leapX??e.x,ty=e.leapY??e.y,dx=p.x-tx,dy=p.y-ty,d=Math.hypot(dx,dy)||1;
-        if(d<190){const w=(190-d)/190*3.4;rx+=dx/d*w;ry+=dy/d*w;window.__pilotDodgeStats.gnasher++;}
+        let dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy);
+        if(d<1){const a=side*Math.PI/2;dx=Math.cos(a);dy=Math.sin(a);d=1;}
+        if(d<230){
+          const nx=dx/d,ny=dy/d,w=(230-d)/230*4.4;
+          rx+=nx*w*.55-ny*side*w*2.1;ry+=ny*w*.55+nx*side*w*2.1;
+          window.__pilotDodgeStats.gnasher++;
+        }
       }
     }
     for(const shot of game.shots){
@@ -223,12 +238,30 @@ window.__fullRun = async (maxSeconds) => {
       const dx=p.x-h.x,dy=p.y-h.y,d=Math.hypot(dx,dy)||1,range=(h.r||0)+95;
       if(d<range){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;window.__pilotDodgeStats.hazard++;}
     }
-    const riftHold=activeObjective?.type==='rift'&&target&&Math.hypot(p.x-target.x,p.y-target.y)<(activeObjective.variant==='multi'?55:92);
-    const evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.18:1);
+    const riftDist=target?Math.hypot(p.x-target.x,p.y-target.y):Infinity;
+    const riftRadius=activeObjective?.variant==='multi'?55:92;
+    const riftHold=activeObjective?.type==='rift'&&target&&riftDist<riftRadius;
+    if(riftHold&&riftDist>1){
+      // Keep the capture position while allowing tangential dodges; remove
+      // only the outward radial component that would reset Rift progress.
+      const nx=(p.x-target.x)/riftDist,ny=(p.y-target.y)/riftDist;
+      const outward=rx*nx+ry*ny;
+      if(outward>0){rx-=nx*outward;ry-=ny*outward;}
+      window.__pilotDodgeStats.rift++;
+    }
+    let evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.32:1);
+    if(p.hp/Math.max(1,p.maxHp)<.30&&minThreat<200){
+      const threat=nearest(game.enemies.filter(e=>!e.dead&&e.type!=='boss'),p);
+      if(threat){goalX=(p.x-threat.o.x)/(threat.d||1);goalY=(p.y-threat.o.y)/(threat.d||1);}
+      evade=Math.max(evade,1.8);
+    }
     goalX+=rx*evade;goalY+=ry*evade;
-    // Do not let the pilot pin itself against the map boundary.
-    if(p.x>1010)goalX-=1.2;if(p.x< -1010)goalX+=1.2;
-    if(p.y>735)goalY-=1.2;if(p.y< -735)goalY+=1.2;
+    // Hard inward steering prevents a target or a summed avoidance vector
+    // from pinning the pilot against the clamped world boundary.
+    if(p.x>980){goalX=Math.min(goalX,-.9);window.__pilotDodgeStats.boundary++;}
+    if(p.x< -980){goalX=Math.max(goalX,.9);window.__pilotDodgeStats.boundary++;}
+    if(p.y>720){goalY=Math.min(goalY,-.9);window.__pilotDodgeStats.boundary++;}
+    if(p.y< -720){goalY=Math.max(goalY,.9);window.__pilotDodgeStats.boundary++;}
     const mag=Math.hypot(goalX,goalY)||1;goalX/=mag;goalY/=mag;
     keys={KeyD:goalX>.22,KeyA:goalX<-.22,KeyS:goalY>.22,KeyW:goalY<-.22};
     const chestNear=game.chests.some(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);
@@ -248,7 +281,11 @@ window.__fullRun = async (maxSeconds) => {
         kills:q.kills,damageTaken:+q.damageTaken.toFixed(1),armor:+q.armor.toFixed(1),
         regen:+q.regen.toFixed(1),damage:+q.damage.toFixed(2),cast:+q.cast.toFixed(2),crit:+q.crit.toFixed(2),
         spellCount:q.spells.length,enemyCount:game.enemies.filter(e=>!e.dead).length,
-        nearestEnemy:near?+near.d.toFixed(1):null,healthOrbs:game.orbs.filter(x=>x.type==='health').length,magnetOrbs:game.orbs.filter(x=>x.type==='magnet').length,objective:game.objective?.type||null,
+        nearestEnemy:near?+near.d.toFixed(1):null,
+        position:{x:+q.x.toFixed(1),y:+q.y.toFixed(1)},
+        target:target?{kind:target.type||target.kind||'objective',x:+target.x.toFixed(1),y:+target.y.toFixed(1)}:null,
+        edgeDistance:Math.min(1200-Math.abs(q.x),900-Math.abs(q.y)),
+        healthOrbs:game.orbs.filter(x=>x.type==='health').length,magnetOrbs:game.orbs.filter(x=>x.type==='magnet').length,objective:game.objective?.type||null,
         objectiveProgress:game.objective?.progress||0,objectiveTarget:game.objective?.target||0,
         objectiveDone:!!game.objective?.done,objectiveVariant:game.objective?.variant||null,
         objectiveTime:game.objective?+game.objective.time.toFixed(1):null,

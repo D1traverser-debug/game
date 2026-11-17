@@ -237,3 +237,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Friendly-fire research: the source game intentionally allows caster self-damage by default. Harmony Pact disables self/team damage as an optional covenant. Do not remove self-damage from the default run. See `docs/REFERENCE_RESEARCH.md` and `docs/MECHANIC_REFERENCE_MATRIX.md`.
 - Revision 016 changes only test code and evidence: defense-first when offered, correct projectile approach sign, Gnasher burrow/leap steering, and avoidance of friendly-fire/explosive hazards. Product `index.html` remains unchanged.
 - Next: inspect CI after commit; require three natural wins and exact `sol`, `krog`, `mul` coverage. Do not alter enemy damage until the pilot demonstrably avoids telegraphed attacks. Product remains NOT_READY; main and CAOS untouched.
+
+
+## BOSS PILOT 017 — CI #126 readback (2026-11-17)
+- Revision 016 commit: `63da60b639dac6f73e7ecd1254acee10b4deff55`; CI: https://github.com/D1traverser-debug/game/actions/runs/44007214721. Checkpoint and all short browser regressions passed; natural-run matrix failed.
+- Seed 1 completed a natural Krog'wa win at 1259.7s, level 21, 1479 kills, four level-5 spells, 1000 max HP and 167 HP remaining.
+- Seed 2 died at 767.3s at the map corner (-1200,-900). Rift progress repeatedly reset; final damage was stacked projectile/contact. The boundary correction of 1.2 was too weak to override an outward target vector.
+- Seed 3 died at 1062.8s to a Gnasher hit (402.7 raw). Retreat-only avoidance did not create enough lateral displacement during burrow/leap.
+- Revision 017 changes only test-agent input/diagnostics: hard inward boundary steering, safe loot targets, Rift tangential avoidance, critical-health escape, lateral Gnasher sidesteps, and target/position/edge telemetry. Product HTML remains unchanged.
+- Separate product gap: the current Krog'wa and Mul'gath attack sets remain incomplete versus source evidence. Track under GAME-042; do not conflate test-agent fixes with boss content fidelity.
+- Next: inspect CI #127. Product remains NOT_READY; main and CAOS untouched.

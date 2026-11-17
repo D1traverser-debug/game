@@ -39,3 +39,7 @@ Default friendly fire intentionally allows caster self-damage. Optional Harmony 
 ## Acceptance
 
 Pending CI readback. Require three natural wins, exact boss coverage `sol`/`krog`/`mul`, no browser errors and no external requests. A pass remains automated-agent evidence only; human owner playtest, source fidelity, real-device performance, file-origin persistence and visual/audio acceptance remain open.
+
+
+## CI #126 result
+Revision 016 improved one deterministic path to a natural Krog'wa victory, but the matrix remains failed: seed 2 edge-locked during Rift and seed 3 died to Gnasher. Revision 017 supersedes the current pending state with hard edge escape, tangential Rift movement, critical-health escape and lateral Gnasher sidesteps. See BOSS_PILOT_017.md.

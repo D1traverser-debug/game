@@ -54,3 +54,11 @@
 - Harmony Pact is a separate covenant that disables damage to self and teammates. It is a backlog feature to scope, not an implicit global default.
 - Natural-run acceptance must avoid self-damage hazards through movement and build decisions. It must not silently suppress production damage to obtain a green run.
 - Evidence: official 0.7.0 patch notes https://steamdb.info/patchnotes/16553491/ and developer response https://steamcommunity.com/app/2904000/discussions/1/4513255804483189926/.
+
+
+## D-010 — Keep the natural-run pilot out of map-edge and objective deadlocks (ACCEPTED)
+- Loot targets outside a safe interior envelope must not pull the pilot into an unreachable world boundary.
+- When near a clamped world edge, inward movement is a hard constraint, not a weak additive preference.
+- During Rift capture, remove outward radial dodge force while preserving tangential movement; objective progress must not be reset by avoidable steering drift.
+- Gnasher avoidance must include lateral movement during burrow/leap, not only direct retreat.
+- These are QA-agent controls only. Do not change production map bounds, objective rules or enemy damage without separate source/player evidence.

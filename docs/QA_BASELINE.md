@@ -86,3 +86,19 @@ All runs had no page, console or external-network errors. The failure is not a b
 Default friendly fire includes caster self-damage. Optional Harmony Pact disables self/team damage. Preserve the default behavior; do not remove `friendlyFire` to force a green run. Sources: https://steamdb.info/patchnotes/16553491/ and https://steamcommunity.com/app/2904000/discussions/1/4513255804483189926/.
 
 Revision 016 applies test-only corrections. Production balance remains unchanged pending a competent, telegraph-aware pilot rerun.
+
+
+## Natural-run pilot #126 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44007214721  
+Commit: `63da60b639dac6f73e7ecd1254acee10b4deff55`  
+Checkpoint: PASS. Short browser regressions: PASS. Three-seed natural-run matrix: FAIL.
+
+| Seed | Outcome | Evidence |
+|---|---|---|
+| 1 | Natural Krog'wa win | 1259.7s; level 21; 1479 kills; 4 spells at level 5; 1000 max HP; 167 HP remaining |
+| 2 | Death before boss | 767.3s at (-1200,-900); Rift progress reset; stacked projectile/contact damage; boundary steering failed to escape corner |
+| 3 | Death before boss | 1062.8s; Gnasher raw hit 402.7; retreat-only avoidance did not create enough lateral displacement |
+
+All runs had no page errors, console errors or external requests. Only boss ID `krog` was recorded. Exact three-boss coverage remains unproven.
+
+Revision 017 adds hard inward steering, safe loot targeting, Rift tangential evasion, critical-health escape and lateral Gnasher sidesteps. Product HTML remains unchanged. Separately, GAME-042 records incomplete boss attack fidelity: official notes mention Krog'wa tornadoes/tongue-smash; community gameplay evidence shows Mul'gath grid spikes, rock walls, orb absorption and spin attacks. These product mechanics remain open.

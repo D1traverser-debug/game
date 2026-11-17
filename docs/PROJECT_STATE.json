@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "MULTI_BOSS_PILOT_EVASION_016",
+  "checkpoint": "MULTI_BOSS_PILOT_EDGE_ESCAPE_017",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -93,7 +93,12 @@
     "Seed 2 died at 413.8s (level 16, 467 kills, maxHP 400, armor 42, regen 2); damage included projectiles, friendlyFire, contact and a Gnasher leap (283.8 raw before armor).",
     "Seed 3 died at 115.7s (level 9, 119 kills); four projectile hits landed from 111.4s to 115.7s near the map edge.",
     "Source reconciliation confirms default friendly fire can damage the caster; Harmony Pact is an optional covenant that disables self/team damage. Current friendlyFire events are not automatically a production defect.",
-    "Pilot audit found projectile approach-time sign inverted, defensive cards skipped when spell-level cards were present, and no dedicated Gnasher landing-point or own-hazard avoidance."
+    "Pilot audit found projectile approach-time sign inverted, defensive cards skipped when spell-level cards were present, and no dedicated Gnasher landing-point or own-hazard avoidance.",
+    "CI #126 / commit 63da60b: checkpoint PASS; browser progression, 90-second combat smoke, objective collection and character upgrade regressions PASS; natural-run matrix FAIL.",
+    "Seed 1 naturally defeated Krog'wa at 1259.7s: level 21, 1479 kills, 4 spells at level 5, 1000 max HP, 167 HP remaining; boss ID recorded as krog.",
+    "Seed 2 died at 767.3s near the world corner (-1200,-900) after Rift progress repeatedly reset; final damage was stacked projectile/contact hits. Agent was stuck at the clamped boundary despite a weak 1.2 steering correction.",
+    "Seed 3 died at 1062.8s to a Gnasher hit (402.7 raw damage) after the agent had accumulated dodge events; retreat-only Gnasher steering did not create enough lateral displacement during burrow/leap.",
+    "CI #126 observed boss coverage only for krog; seeds 2 and 3 died before boss. No browser, console or external-network errors."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -146,9 +151,10 @@
     "Seeded natural full mission seed 1 failed at gameTime 121.17s before boss spawn; player HP 0/100 after taking 131.0 damage, only 2 spells equipped, 0 armor/regen, 0 objectives completed. Trace shows HP 100 at 90.2s then 13 at 120.3s during sludge objective. No JS/console/network errors.",
     "After moving defensive stat cards ahead of spell-level/augment picks, seed 1 survived longer to 167.87s with 400 max HP and 2 regen, but died at the Rift objective; progress only 35.7%, objectives completed 0, HP 0, damageTaken 402.88, no boss spawned. Trace confirms the pilot's threat-evasion vector repeatedly leaves the required capture radius.",
     "BOSS_PILOT_015 changes are pending CI validation: corrected no-trial loadout, evidence-based card ranking, incoming-damage diagnostics, and a three-seed natural-run matrix. Product balance must not be changed solely from the previous weak-pilot failure.",
-    "BOSS_PILOT_016 pending CI: correct projectile approach-time sign, choose defense whenever offered, steer away from Gnasher burrow/leap and friendly-fire hazards, and record dodge counters. No production balance changes made."
+    "BOSS_PILOT_016 pending CI: correct projectile approach-time sign, choose defense whenever offered, steer away from Gnasher burrow/leap and friendly-fire hazards, and record dodge counters. No production balance changes made.",
+    "BOSS_PILOT_017 pending CI: hard inward boundary steering, safe loot targeting, Rift tangential evasion, critical-health escape, and lateral Gnasher sidesteps. Two of three seeds remain unvalidated; boss coverage is incomplete."
   ],
-  "next_action": "Inspect CI after BOSS_PILOT_016. Verify projectile dodge counters, Gnasher landing-zone avoidance, and friendly-fire hazard avoidance without changing default self-damage. Require three natural wins and exact sol/krog/mul coverage. If deaths persist, inspect source-specific damage and player-visible telegraphs before changing production damage. Keep product NOT_READY.",
+  "next_action": "Inspect CI after BOSS_PILOT_017. Confirm seed 2 can complete Rift without progress reset or edge lock and seed 3 can evade Gnasher without a direct state mutation. Require natural wins and exact sol/krog/mul coverage. Then prioritize P0 source fidelity: current Krog'wa lacks official tornado/tongue-smash behavior; current Mul'gath lacks observed grid/rock-wall/spin attacks and full phase behavior. Do not claim product readiness.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -174,5 +180,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_016"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_017"
 }
