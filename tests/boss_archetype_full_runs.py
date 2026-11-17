@@ -85,10 +85,19 @@ window.__fullRun = async (maxSeconds) => {
     let target=null,goalX=0,goalY=0;
     const b=game.boss&&!game.boss.dead?game.boss:null;
     if(b){
-      const dx=b.x-p.x,dy=b.y-p.y,d=Math.hypot(dx,dy)||1;
-      if(d>315){goalX=dx/d;goalY=dy/d;}
-      else if(d<225){goalX=-dx/d;goalY=-dy/d;}
-      else{goalX=-dy/d;goalY=dx/d;}
+      // Mul'gath's healing servants are a priority target: official patch notes
+      // state they heal Mul'gath and can be corrupted to damage him on collision.
+      const healer=b.bossId==='mul'?nearest(game.enemies.filter(e=>e.bossHealer),p):null;
+      if(healer){
+        const dx=healer.o.x-p.x,dy=healer.o.y-p.y,d=Math.hypot(dx,dy)||1;
+        if(d>92){goalX=dx/d;goalY=dy/d;}
+        else{goalX=-dy/d;goalY=dx/d;}
+      }else{
+        const dx=b.x-p.x,dy=b.y-p.y,d=Math.hypot(dx,dy)||1;
+        if(d>315){goalX=dx/d;goalY=dy/d;}
+        else if(d<225){goalX=-dx/d;goalY=-dy/d;}
+        else{goalX=-dy/d;goalY=dx/d;}
+      }
     }else{
       const o=game.objective&&!game.objective.done?game.objective:null;
       if(o)target=objectiveTarget(o,p);
@@ -119,7 +128,7 @@ window.__fullRun = async (maxSeconds) => {
     // walking through the crowd to an XP orb. This changes input only.
     let rx=0,ry=0,minThreat=9999;
     for(const e of game.enemies){
-      if(e.dead||e.type==='boss')continue;
+      if(e.dead||e.type==='boss'||(e.bossHealer&&game.boss?.bossId==='mul'))continue;
       const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;
       minThreat=Math.min(minThreat,d);
       if(d<255){
