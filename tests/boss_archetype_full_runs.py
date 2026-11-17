@@ -84,7 +84,7 @@ window.__fullRun = async (maxSeconds) => {
       const choice=choose(opts);upgradeLog.push({t:+game.time.toFixed(1),offered:opts.map(x=>({kind:x.kind,k:x.k,name:x.name,aug:x.aug,spell:x.spell?.id})),selected:{kind:choice.kind,k:choice.k,name:choice.name,aug:choice.aug,spell:choice.spell?.id}});applyUpgrade(choice);upgrades++;continue;
     }
     const p=game.player;
-    let target=null,goalX=0,goalY=0;
+    let target=null,goalX=0,goalY=0,activeObjective=null;
     const b=game.boss&&!game.boss.dead?game.boss:null;
     if(b){
       // Mul'gath's healing servants are a priority target: official patch notes
@@ -102,6 +102,7 @@ window.__fullRun = async (maxSeconds) => {
       }
     }else{
       const o=game.objective&&!game.objective.done?game.objective:null;
+      activeObjective=o;
       if(o)target=objectiveTarget(o,p);
       if(!target){
         const chest=nearest(game.chests.filter(c=>!c.open),p);
@@ -167,7 +168,8 @@ window.__fullRun = async (maxSeconds) => {
       const dx=p.x-h.x,dy=p.y-h.y,d=Math.hypot(dx,dy)||1,range=(h.r||0)+95;
       if(d<range){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;}
     }
-    const evade=Math.max(0,Math.min(2.4,(255-minThreat)/110));
+    const riftHold=activeObjective?.type==='rift'&&target&&Math.hypot(p.x-target.x,p.y-target.y)<(activeObjective.variant==='multi'?55:92);
+    const evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.18:1);
     goalX+=rx*evade;goalY+=ry*evade;
     // Do not let the pilot pin itself against the map boundary.
     if(p.x>1010)goalX-=1.2;if(p.x< -1010)goalX+=1.2;
