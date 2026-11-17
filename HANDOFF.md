@@ -418,3 +418,16 @@ Next action: verify the metadata-rebaseline CI run. If the checkpoint passes, in
 - The test now preserves `kind` and `spell` and checks that the trial spell is not offered as a duplicate `newSpell`, while remaining equipped exactly once after accepting a level-up card.
 - No production HTML or balance changes were made for this test defect. Corrected full CI is pending.
 - Recovery boundary remains unchanged: CAOS is read-only; main baseline preserved; product status NOT_READY.
+
+
+## RECOVERY CHECKPOINT — FULL DETERMINISTIC CI PASS (2026-11-17)
+
+- Current product/test commit: `26726036397b71a0b77fbdb837d54ee59509b89f`.
+- Exact player artifact remains unchanged: `index.html`, 729,501 bytes, SHA-256 `41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee`.
+- CI run 44064686910: checkpoint PASS; all nine browser regression jobs PASS.
+- Boss Encounter regression: 15/15 PASS.
+- Trial Unlock regression: PASS after a test-only correction distinguishing `newSpell` from `spellLevel` options.
+- No production game code or numerical tuning was changed to address the flaky assertion.
+- Project status remains **NOT_READY**.
+
+Next action is no longer CI repair. Perform normal-speed visual inspection of every boss warning against the active hitbox, validate actual player counterplay and lifecycle edge cases, then obtain an owner-controlled boss playtest. Keep exact timings/damage provisional until source evidence and play review support tuning. CAOS remains read-only.

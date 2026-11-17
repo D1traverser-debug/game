@@ -173,7 +173,9 @@
     "CI run 44062145086: all nine independent browser regression jobs passed, including boss_encounter_regression 15/15, trial unlock, normal-play smoke, progression, objective collection, character upgrades, 3D integration, atlas renderer and Reginald spell scope; zero browser page errors and zero external requests.",
     "CI run 44062145086 checkpoint guard alone failed because PROJECT_STATE.json still recorded the prior artifact SHA/byte count; exact current candidate metadata is now rebaselined. Product remains NOT_READY.",
     "CI run 44064015142 on docs-only commit 75eb495d: artifact checkpoint PASS with exact 729501-byte SHA 41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee; boss regression 15/15 PASS and eight of nine browser jobs PASS.",
-    "CI 44064015142 trial_unlock_regression exposed a flaky test assertion: the probe returned only spell IDs and could not distinguish a newSpell offer from a spellLevel offer for the already-equipped trial spell. Source inspection confirms the production trial spell is equipped at run start; the failed assertion was test-only."
+    "CI 44064015142 trial_unlock_regression exposed a flaky test assertion: the probe returned only spell IDs and could not distinguish a newSpell offer from a spellLevel offer for the already-equipped trial spell. Source inspection confirms the production trial spell is equipped at run start; the failed assertion was test-only.",
+    "CI run 44064686910 on development commit 26726036397b71a0b77fbdb837d54ee59509b89f: exact artifact checkpoint PASS and all nine independent browser regression jobs PASS; exact candidate SHA-256 41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee, 729501 bytes.",
+    "Boss encounter regression passed 15/15 on the exact candidate; trial unlock regression passed after the test was corrected to distinguish newSpell offers from spellLevel cards. No production HTML or balance change was needed for the test-harness correction."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -232,21 +234,21 @@
     "Boss attack timings, radii, projectile speeds and damage values remain provisional adaptations; source evidence does not pin exact current-version numerical values.",
     "Natural full-run victories for Sol'phish, Krog'wa and Mul'gath are not demonstrated on the exact 729501-byte candidate; prior wins across separate historical runs do not satisfy same-run coverage."
   ],
-  "next_action": "Rerun the corrected trial regression and full deterministic CI. After all jobs pass, perform normal-speed visual review of boss telegraphs/hitboxes and owner-controlled boss playtest; do not tune provisional values before that review.",
+  "next_action": "Conduct normal-speed visual inspection of every boss telegraph against its active hitbox, then test dodge/counterplay, pause, invulnerability and phase-transition cancellation. Obtain an owner-controlled boss playtest before tuning provisional numerical values. Keep the product NOT_READY until all P0/P1 and human acceptance gates pass.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
   "development_candidate_sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
   "development_candidate_bytes": 729501,
   "last_successful_candidate_ci": {
-    "run_id": 44053362404,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44053362404",
-    "commit": "ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd",
+    "run_id": 44064686910,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44064686910",
+    "commit": "26726036397b71a0b77fbdb837d54ee59509b89f",
     "checkpoint": "PASS",
     "browser_component": "PASS",
     "browser_content_visual": "PASS",
-    "covered_product_artifact_sha256": "632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29",
-    "meaning": "Checkpoint and all eight independent browser regression jobs passed: progression, 90-second normal-play smoke, objective collection, character upgrades, 3D integration, solo trial unlock, atlas renderer and Reginald spell scope. Component/regression evidence only; no full human run or product acceptance."
+    "covered_product_artifact_sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
+    "meaning": "Exact 729501-byte candidate passed checkpoint and all nine independent browser regression jobs: progression, 90-second normal-play smoke, objective collection, character upgrades, 3D integration, trial unlock, atlas renderer, Reginald spell scope and boss encounter. Boss regression 15/15. Component/regression evidence only; not human full-run or product acceptance."
   },
   "latest_local_candidate": {
     "artifact": "development/index.html",
@@ -256,21 +258,23 @@
     "source_base": "2.5D art-forward single-file candidate with embedded 4x4 sprite atlas, 24 static decor cache tiles, progression/objective fixes and source-informed boss attack state machines",
     "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
     "scope": "Reginald only / Verdant Meadow only / single-player / offline single HTML",
-    "tested": "CI run 44064015142 on docs-only commit 75eb495d: checkpoint PASS; eight of nine browser regression jobs PASS including boss regression 15/15; trial unlock failed one flaky assertion. Root cause: test reported only spell ID and treated an existing spell's level-up card as a new-spell offer. Production artifact was unchanged; test assertion has been corrected to distinguish option kind.",
-    "not_tested": "Human owner playtest; source-accurate timing/damage; attack-by-attack visual parity and player counterplay in both render paths; natural full-run wins for all three bosses on this exact artifact; pause/invulnerability/phase-cancellation edge cases; real file-origin persistence; real hardware performance; final visual/audio acceptance."
+    "tested": "CI run 44064686910 on commit 26726036397b71a0b77fbdb837d54ee59509b89f: exact artifact checkpoint PASS; all nine browser regression jobs PASS; boss encounter 15/15; trial unlock regression passes with the corrected kind-aware assertion; build reproducibility PASS.",
+    "not_tested": "Human owner playtest; source-accurate timing/damage; attack-by-attack visual parity and player counterplay in both render paths; pause/invulnerability/phase-cancellation edge cases; natural full-run wins for all three bosses on this exact artifact; real file-origin persistence; real hardware performance; final visual/audio acceptance."
   },
-  "latest_candidate_ci_status": "CHECKPOINT_PASS; ONE_TRIAL_TEST_ASSERTION_FLAKY; TEST_FIX_COMMITTED_PENDING_RERUN",
-  "last_verified_development_commit": "75eb495d585dd36f713abd6304dcf463e4f1a1a0",
+  "latest_candidate_ci_status": "PASS_CHECKPOINT_AND_ALL_NINE_BROWSER_REGRESSIONS; COMPONENT_TESTED_NOT_PRODUCT_ACCEPTED",
+  "last_verified_development_commit": "26726036397b71a0b77fbdb837d54ee59509b89f",
   "last_verified_ci_run": {
-    "run_id": 44064015142,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44064015142",
-    "commit": "75eb495d585dd36f713abd6304dcf463e4f1a1a0",
-    "conclusion": "failure_one_flaky_trial_test_assertion",
+    "run_id": 44064686910,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44064686910",
+    "commit": "26726036397b71a0b77fbdb837d54ee59509b89f",
+    "conclusion": "success",
     "checkpoint": "PASS",
-    "browser_component": "PASS_WITH_TRIAL_ASSERTION_FAILURE",
-    "browser_content_visual": "PASS_WITH_TRIAL_ASSERTION_FAILURE",
+    "browser_component": "PASS",
+    "browser_content_visual": "PASS",
+    "browser_jobs_passed": 9,
+    "browser_jobs_total": 9,
+    "boss_regression": "15/15 PASS",
     "artifact_sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
-    "artifact_bytes": 729501,
-    "failure_root_cause": "trial_unlock_regression conflated a spellLevel card for an already-equipped trial spell with a newSpell card; the random spell-level offer made the old assertion flaky."
+    "artifact_bytes": 729501
   }
 }

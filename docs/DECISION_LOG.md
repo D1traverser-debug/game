@@ -232,3 +232,9 @@
 
 **Falsifiers / review**
 - If the corrected test fails, inspect actual option kinds and player spell state before changing production code.
+
+
+**Validation update — CI 44064686910**
+- The corrected kind-aware trial assertion passed.
+- The exact artifact checkpoint and all nine browser regression jobs passed; boss encounter probes passed 15/15.
+- No production game or balance change was required. D-028 is resolved at the test-harness level.

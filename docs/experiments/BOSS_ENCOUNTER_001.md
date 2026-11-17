@@ -43,3 +43,10 @@ Next: verify the metadata-rebaseline CI run; then capture every boss attack at n
 ## Follow-up CI evidence
 
 CI run 44064015142 verified the exact artifact checkpoint and again passed the 15/15 boss regression. Eight of nine browser jobs passed. The sole failure was an unrelated flaky trial-unlock test assertion that conflated `spellLevel` and `newSpell` option kinds; it did not indicate a boss or production-artifact regression. The test harness correction and full rerun are pending.
+
+
+## Final deterministic CI result
+
+CI run 44064686910 on commit `26726036397b71a0b77fbdb837d54ee59509b89f` passed the exact artifact checkpoint and all nine browser regression jobs. The boss suite passed 15/15. The corrected trial unlock suite also passed; its prior failure was an option-kind ambiguity in the test harness, not a production defect. The HTML artifact remained unchanged at 729,501 bytes and SHA-256 `41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee`.
+
+This closes the deterministic CI repair gate only. Visual parity, human counterplay, pause/invulnerability/phase-cancellation edges, natural full-run wins on this exact artifact and owner acceptance remain open.

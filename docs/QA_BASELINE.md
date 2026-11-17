@@ -310,3 +310,20 @@ Artifact unchanged: 729,501 bytes; SHA-256 `41545a842ec17236896fb2edff63e1ac92c1
 - Test correction: retain both option `kind` and spell ID; assert Solar is not re-offered as a `newSpell` duplicate and remains equipped exactly once after accepting a level-up choice. No production HTML or balance change.
 
 The corrected full CI run is pending. Product remains **NOT_READY**; boss visual parity, real counterplay, source-exact tuning and human acceptance remain open.
+
+
+## CI 44064686910 — full deterministic matrix green after trial assertion repair (2026-11-17)
+
+Run: https://github.com/D1traverser-debug/game/actions/runs/44064686910  
+Development commit: `26726036397b71a0b77fbdb837d54ee59509b89f`  
+Artifact unchanged: 729,501 bytes; SHA-256 `41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee`.
+
+- Reproducible build and exact artifact checkpoint: PASS.
+- All nine browser regression jobs: PASS.
+- Boss encounter: 15/15 deterministic component checks PASS.
+- Trial unlock: PASS with the corrected kind-aware offer assertion.
+- Normal-play smoke, progression, objective collection, character upgrades, 3D integration, atlas renderer and Reginald spell scope: PASS.
+
+The flaky trial assertion was repaired in the test harness only. It now distinguishes a `newSpell` option from a `spellLevel` option for an already-equipped temporary trial spell. No production HTML, boss code, balance values or CAOS assets were changed by that repair.
+
+**Evidence boundary:** this establishes deterministic build and component/regression coverage on the exact artifact. It does not establish human full-run completion, exact source fidelity, readable/avoidable boss attacks, complete pause/invulnerability/phase-cancellation behavior, real file-origin persistence, real-device performance, or final visual/audio acceptance. Product remains **NOT_READY**.
