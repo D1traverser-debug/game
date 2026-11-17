@@ -209,3 +209,10 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Updated test-only selection policy: when defensive/stat cards are actually offered, choose them before spell augments/levels. No production HP, armor, regen, enemy count, mission time, boss state or win state is mutated.
 - New CI run `44002364988` is pending/running; check its browser-component result and especially the seeded full mission before claiming progress.
 - If seed 1 still fails, record actual upgrade offer sets and objective route trace; do not simply loosen pass criteria. Next objective is repeatable natural wins for all three boss archetypes, then owner-controlled playtest.
+
+## Seed-1 full-run investigation update — 2026-11-17
+- Run `44002364988` after defensive stat priority: survived to 167.87s, maxHP 400, regen 2, HP 0, damageTaken 402.88, objective Rift progress only 35.7%, objectives 0, boss not spawned. Runtime/console/network errors zero.
+- Root cause for pilot behavior: Rift capture requires staying within 120 units (multi-node variant uses 82); pilot's enemy evasion repeatedly pushes it outside the capture radius. This is a test-agent navigation conflict, not proof of a production softlock.
+- Added upgrade offer/selection logging to `tests/boss_archetype_full_runs.py`.
+- Adjusted test-only steering: while inside Rift capture radius, threat-evasion vector is damped to 18% so player remains in the legitimate capture area. No direct objective progress or player stats are changed.
+- Latest CI should be checked after commit `104bad238bf461cacd98304f9260a5fa3deca606`. Continue investigating until a natural complete run reaches and defeats the boss; never weaken the pass condition.
