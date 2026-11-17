@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BALANCED_PILOT_NATURAL_BOSS_COVERAGE_029",
+  "checkpoint": "RENDER_RNG_ISOLATION_FIXED_STEP_PILOT_030",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -153,7 +153,10 @@
     "CI #138 (run 44032832722, commit 2920ae4): checkpoint, progression, 90-second smoke, objective and upgrade regressions PASS. Single-clock assertion PASS; seed-1 replay was exactly identical; browser/console errors and external requests were zero.",
     "CI #138 natural-run matrix: seed 1 deterministically died at 376.8s (level 13, 340 kills, 1 objective, 1200 max HP, only Astral/Loaded Dice at low levels); seed 2 naturally defeated Mul'gath at 1264.1s; seed 3 naturally defeated Sol'phish at 1213.6s. No natural Krog'wa win in this run.",
     "CI #138 seed 1 upgrade trace confirms the pilot chose repeated max-HP cards despite healthy HP, then chose Swift Overlay/dodge over an available Wicked Buzzsaw new-spell card. This is a QA-agent policy defect, not evidence of a production balance defect.",
-    "Revision 029 changes only the test pilot's upgrade policy: healthy runs prioritize new spells, spell levels, augmentations and offensive stats; defensive stats become conditional on low HP or an absence of stronger options. It adds an assertion that a healthy new-spell offer is accepted."
+    "Revision 029 changes only the test pilot's upgrade policy: healthy runs prioritize new spells, spell levels, augmentations and offensive stats; defensive stats become conditional on low HP or an absence of stronger options. It adds an assertion that a healthy new-spell offer is accepted.",
+    "CI #139 / commit 60c9ee1: single-clock manual tick and healthy-new-spell assertions passed, but same-seed replay failed; baseline seeds 1/2/3 and candidates 4-12 all died before boss spawn.",
+    "CI #139 confirmed that manual update calls were gated from RAF, but the renderer remained active. Source inspection found drawWorld screen-shake offsets calling rand() twice per frame, sharing the seeded Math.random stream with enemy/objective/boss generation and upgrade offers. Frame-rate-dependent rendering therefore still changed gameplay RNG.",
+    "Revision 030 changes only the temporary QA document: screen shake uses deterministic time-based offsets, render-phase Math.random calls are counted and required to be zero, and the pilot now advances three production-sized 1/30-second fixed updates per 0.1-second input decision. Production index.html remains unchanged."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -209,9 +212,9 @@
     "BOSS_PILOT_016 pending CI: correct projectile approach-time sign, choose defense whenever offered, steer away from Gnasher burrow/leap and friendly-fire hazards, and record dodge counters. No production balance changes made.",
     "BOSS_PILOT_017 pending CI: hard inward boundary steering, safe loot targeting, Rift tangential evasion, critical-health escape, and lateral Gnasher sidesteps. Two of three seeds remain unvalidated; boss coverage is incomplete.",
     "BOSS_PILOT_018 pending CI: imminent projectile/Gnasher threats suspend objective/loot pursuit, emergency Rift dodges are permitted, hard boundary correction is restricted to the actual clamp, and Gnasher escape uses stronger lateral movement.",
-    "BOSS_PILOT_029 pending CI: rebalance QA-agent upgrade choice so healthy builds prioritize new spells, spell levels, augmentations and damage/cast/crit before defensive fallback; keep sustain/defense priority when HP is low; assert healthy new-spell offers are accepted. Verify natural wins for baseline seeds 1/2/3 and same-run Sol/Krog/Mul coverage. No production HTML or balance changes."
+    "BOSS_PILOT_030 pending CI: require zero render-phase RNG calls, fixed 1/30 simulation steps, manual tick count equals simulation tick count, blocked RAF updates observed, identical seed-1 replay, healthy new-spell choices, natural baseline wins 1/2/3, and same-run natural Sol/Krog/Mul victories. No production HTML or balance changes."
   ],
-  "next_action": "Inspect CI #139. Verify single-clock and same-seed replay remain PASS, and the healthy-new-spell policy assertion passes. Baseline seeds 1/2/3 must all naturally win. Candidate seeds must naturally spawn and defeat any missing archetype, requiring winning IDs sol/krog/mul in one CI run. Keep product NOT_READY.",
+  "next_action": "Inspect CI #140. First verify renderRandomCalls is zero, the 1/30 fixed-step pilot matches production SIM_STEP, manual ticks equal simulation ticks, and seed-1 replay is identical. Then inspect natural survival and boss coverage. Do not change production balance based on a QA harness failure.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -237,5 +240,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_029"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_030"
 }

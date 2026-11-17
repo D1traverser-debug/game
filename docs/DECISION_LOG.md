@@ -153,3 +153,11 @@
 - When HP is low, sustain scrolls and defensive upgrades may take priority. Do not remove defensive choices; make them conditional on observed risk.
 - Record HP ratio at every real upgrade offer and assert that a healthy new-spell offer is selected. Keep the pilot limited to actual offered cards and legal game inputs.
 - This is test-agent strategy only. Do not change production damage, enemy pressure, boss HP or player balance from an automated pilot failure alone.
+
+
+## D-023 — Rendering must not consume the deterministic simulation RNG (ACCEPTED)
+- The gameplay RNG stream is seeded for repeatable simulations. Rendering must not advance that stream.
+- CI #139 showed that blocking RAF simulation updates was insufficient: `drawWorld()` still called `rand()` twice per frame for screen-shake offsets, making spawns, drops, objectives and boss selection depend on browser frame cadence.
+- In the temporary QA document only, use deterministic time-based screen-shake offsets and instrument all render calls to `Math.random`; require zero render-phase RNG calls.
+- Advance the manual pilot at the production `SIM_STEP=1/30`, using three simulation steps per 0.1-second input decision. Require manual tick count to equal simulation tick count.
+- Keep production `index.html`, game balance and source behavior unchanged. Re-run identical seed 1 in a fresh browser context and require the outcome signature to match.

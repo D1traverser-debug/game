@@ -22,10 +22,11 @@ window.__damageEvents=[];
 window.__gnasherHits=[];
 window.__gnasherLeapSamples=[];
 window.__pilotDodgeStats={projectile:0,gnasher:0,gnasherBurrow:0,gnasherLeap:0,gnasherLeapSafeFrames:0,hazard:0,boundary:0,rift:0,criticalEscape:0};
-// The production RAF loop must render but must not advance simulation during a manual QA run.
-// Otherwise frame-driven update(SIM_STEP) races this harness's update(dt), consuming seeded RNG twice.
-window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0};
+// The production RAF loop may render, but must neither advance simulation nor consume its RNG.
+// drawWorld screen shake previously consumed the same rand() stream used by spawns and upgrades.
+window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};
 window.__manualTick=false;
+window.__renderPhase=false;
 const __uncontrolledUpdate=update;
 update=function(dt){
   if(window.__manualTick){window.__simulationHarness.manualTicks++;return __uncontrolledUpdate(dt);}
@@ -56,18 +57,19 @@ damagePlayer=function(n,source='enemy'){
   return __baseDamagePlayer(n,source);
 };
 window.__setRunSeed=(seed)=>{
-  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0};window.__manualTick=false;
+  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};window.__manualTick=false;window.__renderPhase=false;
   let state=seed>>>0;
   Math.random=()=>{
+    if(window.__renderPhase)window.__simulationHarness.renderRandomCalls++;
     state=(Math.imul(1664525,state)+1013904223)>>>0;
     return state/4294967296;
   };
 };
 
 window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
-  const dt=0.1;
+  const dt=1/30,stepsPerDecision=3;
   const manualStart=window.__simulationHarness.manualTicks,blockedStart=window.__simulationHarness.blockedFrameUpdates;
-  let elapsed=0,ticks=0,upgrades=0,interactions=0,lastTrace=0,upgradeLog=[];
+  let elapsed=0,ticks=0,upgrades=0,interactions=0,lastTrace=0,lastYield=0,upgradeLog=[];
   const trace=[];
   const nearest=(items,p)=>items.filter(x=>x&&x.alive!==false)
     .map(o=>({o,d:Math.hypot(o.x-p.x,o.y-p.y)}))
@@ -364,8 +366,11 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     }
     if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}
     window.__manualTick=true;
-    try{update(dt);}finally{window.__manualTick=false;}
-    elapsed+=dt;ticks++;
+    try{
+      for(let step=0;step<stepsPerDecision&&screen==='playing'&&!game.ended;step++){
+        update(dt);elapsed+=dt;ticks++;
+      }
+    }finally{window.__manualTick=false;}
     if(game.time-lastTrace>=15){
       const q=game.player,near=nearest(game.enemies.filter(e=>!e.dead),q);
       trace.push({t:+game.time.toFixed(1),hp:+q.hp.toFixed(1),maxHp:q.maxHp,level:q.level,
@@ -389,13 +394,14 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
         spells:q.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()}))});
       lastTrace=game.time;
     }
-    if(ticks%100===0)await new Promise(r=>setTimeout(r,0));
+    if(ticks-lastYield>=300){lastYield=ticks;await new Promise(r=>setTimeout(r,0));}
   }
   keys={};
   const p=game.player,b=game.boss;
   return {
     screen,ended:game.ended,elapsed,gameTime:game.time,tickCount:ticks,
-    simulationHarness:{manualTicks:window.__simulationHarness.manualTicks-manualStart,blockedFrameUpdates:window.__simulationHarness.blockedFrameUpdates-blockedStart},
+    simulationHarness:{manualTicks:window.__simulationHarness.manualTicks-manualStart,blockedFrameUpdates:window.__simulationHarness.blockedFrameUpdates-blockedStart,renderRandomCalls:window.__simulationHarness.renderRandomCalls},
+    renderRandomCalls:window.__simulationHarness.renderRandomCalls,simulationStepSeconds:dt,
     kills:p.kills,level:p.level,
     hp:p.hp,maxHp:p.maxHp,damageTaken:p.damageTaken,armor:p.armor,regen:p.regen,
     objectives:p.objectives,upgrades,interactions,upgradeLog,
@@ -418,8 +424,17 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
 """
 GNASHER_HIT="if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');"
 assert SOURCE.count(GNASHER_HIT)==1,"Gnasher hit instrumentation anchor must occur exactly once"
-DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER).replace(GNASHER_HIT,
-  "if(Math.hypot(p.x-e.x,p.y-e.y)<60){window.__gnasherHits.push({t:+g.time.toFixed(1),id:e.id,state:e.state,stateT:+e.stateT.toFixed(2),x:+e.x.toFixed(1),y:+e.y.toFixed(1),leapX:+e.leapX.toFixed(1),leapY:+e.leapY.toFixed(1),playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),distance:+Math.hypot(p.x-e.x,p.y-e.y).toFixed(1),dmg:+e.dmg.toFixed(1)});damagePlayer(e.dmg*1.7,'gnasher');}")
+DRAW_SHAKE="let sx=g?.shake?rand(-g.shake,g.shake):0,sy=g?.shake?rand(-g.shake,g.shake):0;"
+FRAME_RENDER="if(save.renderMode==='3d'&&window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}\n else drawWorld();"
+assert SOURCE.count(DRAW_SHAKE)==1,"screen-shake RNG anchor must occur exactly once"
+assert SOURCE.count(FRAME_RENDER)==1,"render path anchor must occur exactly once"
+DETERMINISTIC_SHAKE="let sx=g?.shake?Math.sin(g.time*37)*g.shake:0,sy=g?.shake?Math.cos(g.time*41)*g.shake:0;"
+TRACKED_RENDER="window.__renderPhase=true;try{if(save.renderMode==='3d'&&window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}else drawWorld();}finally{window.__renderPhase=false;}"
+DOCUMENT=(SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
+  .replace(GNASHER_HIT,"if(Math.hypot(p.x-e.x,p.y-e.y)<60){window.__gnasherHits.push({t:+g.time.toFixed(1),id:e.id,state:e.state,stateT:+e.stateT.toFixed(2),x:+e.x.toFixed(1),y:+e.y.toFixed(1),leapX:+e.leapX.toFixed(1),leapY:+e.leapY.toFixed(1),playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),distance:+Math.hypot(p.x-e.x,p.y-e.y).toFixed(1),dmg:+e.dmg.toFixed(1)});damagePlayer(e.dmg*1.7,'gnasher');}")
+  .replace(DRAW_SHAKE,DETERMINISTIC_SHAKE)
+  .replace(FRAME_RENDER,TRACKED_RENDER))
+assert "rand(-g.shake,g.shake)" not in DOCUMENT,"render RNG source remains in test document"
 
 async def main():
   seeds=[int(x) for x in sys.argv[1:]] or list(range(1,13))
@@ -457,10 +472,10 @@ async def main():
       compact_state={
         "screen":state["screen"],"ended":state["ended"],"elapsed":round(state["elapsed"],1),
         "gameTime":round(state["gameTime"],1),"tickCount":state["tickCount"],
-        "simulationHarness":state["simulationHarness"],"kills":state["kills"],"level":state["level"],
+        "simulationHarness":state["simulationHarness"],"renderRandomCalls":state["renderRandomCalls"],"simulationStepSeconds":state["simulationStepSeconds"],"kills":state["kills"],"level":state["level"],
         "hp":round(state["hp"],1),"maxHp":state["maxHp"],"damageTaken":round(state["damageTaken"],1),
         "armor":state["armor"],"regen":state["regen"],"objectives":state["objectives"],
-        "upgrades":state["upgrades"],"interactions":state["interactions"],"spells":state["spells"],
+        "upgrades":state["upgrades"],"interactions":state["interactions"],"position":state["position"],"rerolls":state["rerolls"],"pilotDodgeStats":state["pilotDodgeStats"],"newSpellChoiceViolations":state["newSpellChoiceViolations"],"spells":state["spells"],
         "scrolls":state["scrolls"],"rerolls":state["rerolls"],"position":state["position"],
         "bossSpawned":state["bossSpawned"],"bossId":state["bossId"],"bossHp":state["bossHp"],
         "bossMax":state["bossMax"],"bossDead":state["bossDead"],"wins":state["wins"],
@@ -489,7 +504,7 @@ async def main():
     await replay_page.evaluate("(seed)=>window.__setRunSeed(seed)",1)
     await replay_page.locator("#start").click()
     replay_state=await asyncio.wait_for(replay_page.evaluate("window.__fullRun(1500,false)"),timeout=180)
-    replay_fields=["screen","ended","elapsed","gameTime","tickCount","kills","level","hp","maxHp","damageTaken","armor","regen","objectives","bossId","bossDead","wins","enemyCount","spells","scrolls"]
+    replay_fields=["screen","ended","elapsed","gameTime","tickCount","kills","level","hp","maxHp","damageTaken","armor","regen","objectives","bossId","bossDead","wins","enemyCount","spells","scrolls","upgrades","interactions","position","rerolls","pilotDodgeStats","newSpellChoiceViolations","renderRandomCalls","simulationStepSeconds"]
     first_seed_one=next(x["state"] for x in report["runs"] if x["seed"]==1)
     replay_signature={k:replay_state[k] for k in replay_fields}
     for k in ("elapsed","gameTime","hp","damageTaken"):
@@ -514,6 +529,8 @@ async def main():
     "boss_ids_recorded_and_valid":all(x in valid_bosses for x in all_boss_ids),
     "all_three_boss_archetypes_naturally_defeated":winning_bosses==valid_bosses,
     "manual_simulation_is_single_clock":all(x["state"]["simulationHarness"]["manualTicks"]==x["state"]["tickCount"] and x["state"]["simulationHarness"]["blockedFrameUpdates"]>0 for x in report["runs"]) and report["same_seed_replay"]["simulationHarness"]["manualTicks"]==report["same_seed_replay"]["tickCount"] and report["same_seed_replay"]["simulationHarness"]["blockedFrameUpdates"]>0,
+    "render_path_does_not_consume_seeded_rng":all(x["state"]["renderRandomCalls"]==0 for x in report["runs"]) and report["same_seed_replay"]["repeat"]["renderRandomCalls"]==0,
+    "production_fixed_step_is_used":all(abs(x["state"]["simulationStepSeconds"]-(1/30))<1e-12 for x in report["runs"]) and abs(report["same_seed_replay"]["repeat"]["simulationStepSeconds"]-(1/30))<1e-12,
     "same_seed_replay_is_identical":report["same_seed_replay"]["matches"],
     "healthy_new_spell_offers_are_taken":all(x["state"]["newSpellChoiceViolations"]==0 for x in report["runs"]),
     "replay_has_no_browser_errors_or_external_requests":not report["same_seed_replay"]["page_errors"] and not report["same_seed_replay"]["console_errors"] and not report["same_seed_replay"]["external_requests"],

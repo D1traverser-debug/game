@@ -350,3 +350,10 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Seed 1 reached 1200 max HP but only had Astral/Loaded Dice at low levels. At 348.1s it was offered Wicked Buzzsaw but selected dodge, confirming the pilot's unconditional defensive priority was suppressing offensive progression.
 - Revision 029 changes only the QA pilot: prioritize new spells/levels/augments/offensive stats when healthy; choose sustain/defense when HP is low; add a healthy-new-spell selection assertion.
 - No production HTML or combat balance changes. CI #139 pending. Product remains NOT_READY.
+
+
+## BOSS PILOT 030 — render RNG isolation and production fixed-step simulation (2026-11-17)
+- CI #139: https://github.com/D1traverser-debug/game/actions/runs/44033773725. Single-clock and healthy-new-spell policy assertions passed, but seed-1 replay differed and all seeds 1-12 died before boss spawn; no boss coverage was recorded.
+- Further root cause: revision 028 correctly blocked RAF-driven `update(SIM_STEP)`, but left the renderer active. `drawWorld()` consumed the same seeded `Math.random` twice per rendered frame for screen-shake offsets. The number of rendered frames therefore changed gameplay RNG and boss/upgrade outcomes.
+- Revision 030 changes only `tests/boss_archetype_full_runs.py` and governance records. The temporary browser document gives screen shake deterministic time-based offsets, instruments render-phase random calls and requires zero. Manual simulation now advances three production-sized `1/30` steps per 0.1-second pilot decision.
+- Production `index.html`, combat balance and CAOS remain unchanged. CI #140 pending. Product remains **NOT_READY**.
