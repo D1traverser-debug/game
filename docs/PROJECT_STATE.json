@@ -232,9 +232,9 @@
     "Real file-origin save/reload, corrupted-save recovery, visual/audio review, human full-run acceptance and source-fidelity review remain NOT_TESTED or PARTIAL.",
     "Boss attack timings, radii, projectile speeds and damage values remain provisional adaptations; source evidence does not pin exact current-version numerical values.",
     "Natural full-run victories for Sol'phish, Krog'wa and Mul'gath are not demonstrated on the exact 729501-byte candidate; prior wins across separate historical runs do not satisfy same-run coverage.",
-    "Boss telegraph lifecycle repair is committed but pending CI; human normal-speed readability, dodge/counterplay, source-exact timings/damage and full boss acceptance remain NOT_TESTED."
+    "Boss telegraph lifecycle repair passes deterministic CI (26/26 boss checks; 10/10 jobs). Human normal-speed readability, dodge/counterplay, source-exact timings/damage, full natural victory, hardware performance and final visual/audio acceptance remain NOT_TESTED."
   ],
-  "next_action": "After deterministic CI passes, obtain an owner-controlled boss playtest at normal speed in 2.5D and 3D where available. Verify every attack's warning readability, dodge/counterplay, pause, invulnerability, freeze and phase cancellation. Do not tune provisional numerical values before that review.",
+  "next_action": "Perform owner-controlled normal-speed boss playtest in 2.5D and WebGL2 where available. For all nine attack cards, verify warning readability, hitbox alignment, dodge/counterplay, and pause/invulnerability/freeze/phase/stagger cancellation. Only then consider numerical tuning. Product remains NOT_READY.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -258,10 +258,10 @@
     "source_base": "2.5D art-forward single-file candidate with shape-aware boss telegraphs, snapshotted attack origins, committed telegraph positions and synchronized cancellation",
     "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
     "scope": "Reginald only / Verdant Meadow only / single-player / offline single HTML",
-    "tested": "CI pending on new boss telegraph lifecycle candidate; previous exact-artifact baseline passed 9/9 browser jobs.",
-    "not_tested": "Human owner boss playtest; source-accurate timing/damage; subjective warning readability and dodge/counterplay; real file-origin persistence; real hardware performance; final visual/audio acceptance."
+    "tested": "Exact development/index.html candidate: reproducible build/checkpoint PASS; all 10/10 GitHub Actions jobs PASS; Boss Encounter 26/26 deterministic checks PASS; all nine boss attack telegraphs exercised through 2.5D and available WebGL2 render paths; zero browser page errors and zero external requests.",
+    "not_tested": "Owner-controlled normal-speed boss playtest; human readability and actual dodge/counterplay for each attack; exact source-game timings/damage; full natural boss victory; real file-origin persistence; real hardware performance; final visual/audio acceptance."
   },
-  "latest_candidate_ci_status": "PENDING_CI_BOSS_TELEGRAPH_LIFECYCLE_REPAIR",
+  "latest_candidate_ci_status": "PASS_CI_44131377996",
   "last_verified_development_commit": "26726036397b71a0b77fbdb837d54ee59509b89f",
   "last_verified_ci_run": {
     "run_id": 44064686910,

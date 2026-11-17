@@ -336,3 +336,15 @@ Red run: [CI 44128548427](https://github.com/D1traverser-debug/game/actions/runs
 The repair centralizes each attack warning as one token-owned payload containing the immutable attack geometry. 2.5D and WebGL2 renderers now draw by geometry kind (circle, line, grid, radial, target and pull). Cancellation removes the matching warning. Pull and projectile launch positions use the snapshot; the boss holds position during telegraph/active. Freeze cancels a pending telegraph rather than allowing an unannounced delayed hit.
 
 This is deterministic component/render-path smoke evidence, not human visual acceptance. Owner playtest, actual dodge/counterplay, exact source timing/damage, full-run victories, hardware performance and final visual/audio acceptance remain open. Product remains **NOT_READY**.
+
+
+## Boss telegraph lifecycle repair — green CI (2026-11-18)
+
+Green run: [CI 44131377996](https://github.com/D1traverser-debug/game/actions/runs/44131377996), commit `f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709`.
+
+- All 10/10 workflow jobs passed, including reproducible build/checkpoint, normal-play smoke, progression, objective collection, character upgrades, trial unlock, 3D integration, Reginald spell scope, art renderer, and boss encounter regression.
+- Boss Encounter regression: 26/26 checks passed. The previously failing homing-projectile-origin assertion was corrected to account for the actual volley spread angle while still checking the immutable launch origin and position snapshot.
+- All nine boss attack telegraphs rendered in the 2.5D path and, when available, the WebGL2 path.
+- Zero browser page errors and zero external requests.
+
+**Acceptance boundary:** green deterministic CI does not establish human readability at normal speed, actual dodge/counterplay, source-exact timing/damage, a natural full boss victory, real file-origin persistence, real-device performance, or final visual/audio acceptance. GAME-048 remains open; product remains **NOT_READY**.

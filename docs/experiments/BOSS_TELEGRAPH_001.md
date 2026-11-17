@@ -42,3 +42,15 @@ CI #44128548427 (commit 3efbbe965246bb2eae212a4e8bbf635853adbe15):
 ## Acceptance boundary
 
 Passing deterministic tests does not prove that warnings are readable at normal speed or that a human can dodge every attack. Owner-controlled playtest, source-exact timing/damage, natural full-run boss victories, real file-origin persistence, hardware performance and final visual/audio acceptance remain open. Product status remains **NOT_READY**.
+
+
+## CI closeout — 2026-11-18
+
+Green run: [44131377996](https://github.com/D1traverser-debug/game/actions/runs/44131377996), commit `f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709`.
+
+- 10/10 workflow jobs passed, including build/checkpoint.
+- Boss Encounter: 26/26 checks passed; all nine attack telegraphs exercised in 2.5D and available WebGL2 paths.
+- Zero page errors; zero external requests.
+- The homing-origin test now computes the first spread projectile's expected launch coordinate instead of incorrectly expecting the unspread centerline. Production game artifact was not changed by this test-only correction.
+
+Human readability, real-player dodge/counterplay, exact source timing/damage, natural full boss victory, hardware performance and final visual/audio acceptance remain untested. Product remains **NOT_READY**.

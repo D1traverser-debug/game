@@ -441,3 +441,14 @@ Next action is no longer CI repair. Perform normal-speed visual inspection of ev
 - Candidate repair: unique attack token; one warning payload carrying the exact geometry; cancellation removes that token's warning; freeze/phase/stagger cancellation; snapshotted pull/projectile origins; boss position commitment during telegraph/active; shape-aware 2.5D and WebGL2 warning rendering.
 - Exact candidate artifact: `index.html`, 734011 bytes, SHA-256 `7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9`. Build/CI pending.
 - Next: verify full deterministic CI, then owner-controlled normal-speed boss playtest. Do not tune provisional numerical values until warning readability and counterplay are reviewed. Product remains **NOT_READY**.
+
+
+## BOSS TELEGRAPH LIFECYCLE REPAIR — GREEN CI (2026-11-18)
+
+- Branch: `development`; green commit: `f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709`.
+- CI run `44131377996`: **10/10 jobs PASS**. Checkpoint/reproducible build passed.
+- Boss Encounter regression: **26/26 PASS**. All nine attack telegraphs exercised through 2.5D and available WebGL2 render paths. Zero page errors; zero external requests.
+- The previous 25/26 result was an incorrect test expectation: the homing volley has a spread angle. The assertion now computes the first projectile's actual expected angle and still verifies the snapshotted launch origin after boss movement.
+- Production artifact remains unchanged by that test-only correction. `development/index.html`: 734011 bytes; SHA-256 `7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9`.
+- Remaining gate: owner-controlled normal-speed playtest for all nine attacks, warning/hitbox alignment, actual dodge/counterplay, lifecycle edge cases and final visual/audio acceptance. Exact timing/damage remain provisional. Product remains **NOT_READY**.
+- `main` and CAOS assets/repository remain read-only.
