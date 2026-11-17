@@ -245,3 +245,17 @@ Run: https://github.com/D1traverser-debug/game/actions/runs/44035681214
 Checkpoint, progression, 90-second normal-play, objective collection and character-upgrade regressions: PASS. Natural-run pilot: FAIL during source preflight before browser creation. No natural-run seeds executed.
 
 The preflight correctly found that the temporary test document still contained `rand(-g.shake,g.shake)`. Revision 030 replaced the legacy 2D renderer's two screen-shake RNG calls, but missed two equivalent calls in the atlas-backed 2.5D renderer's camera translation. Revision 031 replaces both renderer paths with deterministic time-based offsets in the temporary QA document. No production game failure or balance regression can be inferred from CI #140.
+
+
+## CI #141 — classify the long-run pilot as exploratory telemetry (2026-11-17)
+
+Run: https://github.com/D1traverser-debug/game/actions/runs/44043697224  
+Development commit: 698fa9150eba673f33419aec3de1467273e2caeb
+
+- Checkpoint: PASS.
+- Progression, 90-second normal-play smoke, objective collection and character upgrade regressions: PASS.
+- Adaptive 24-seed natural-play pilot: FAIL. Required baseline seeds 1/2/3 died at 286.1s, 514.5s and 468.9s; none reached the 19-minute boss window. No natural boss wins were recorded.
+- Harness integrity checks: single simulation clock PASS; render RNG isolation PASS; production 1/30 fixed step PASS; identical fresh-context seed-1 replay PASS; healthy new-spell selection PASS; no browser/console errors PASS; no external requests PASS.
+- Five independent tests after the pilot were skipped because the long-run pilot was placed in the same sequential blocking job.
+- Interpretation: this is a reproducible failure of the current scripted pilot/game interaction, not proof of human impossibility and not evidence that a specific production damage or health value should be changed.
+- Decision: split deterministic blocking regressions from long-horizon heuristic exploration. The latter runs nightly or manually and preserves per-seed JSON telemetry. Human play acceptance remains a separate release gate.

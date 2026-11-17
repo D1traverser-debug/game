@@ -168,3 +168,22 @@
 - CI #140 showed that replacing the legacy 2D screen-shake calls was insufficient: the second renderer still called `rand()` twice per frame for camera X/Y shake.
 - In the temporary QA document, replace screen-shake randomness in both renderers with deterministic time-based offsets. Keep a source assertion that no `rand(-g.shake,g.shake)` call remains and a runtime counter requiring zero render-phase `Math.random` calls.
 - Do not modify production render behavior merely to make the test pass. Keep production `index.html` and combat balance unchanged until a separate product requirement justifies a production change.
+
+
+## D-025 — Separate deterministic CI gates from heuristic long-run exploration (ACCEPTED)
+
+**Evidence**
+- CI #141 (run 44043697224, development commit 698fa9150eba673f33419aec3de1467273e2caeb) passed the checkpoint and the first four browser regressions.
+- The adaptive 24-seed natural-play job then failed its required baseline: seeds 1/2/3 died at 286.1s, 514.5s and 468.9s, before the 19-minute boss window. No natural boss victory was recorded.
+- The same run passed single-clock ownership, render-RNG isolation, fixed 1/30 simulation step, identical seed-1 replay, healthy new-spell choice, browser-error and offline-request checks.
+- Because the heuristic pilot failed, five unrelated deterministic/content-renderer tests were skipped by the sequential job. The run did not establish that a human cannot complete the game.
+
+**Decision**
+- Keep deterministic checkpoint and bounded browser regressions as blocking CI.
+- Move the long-horizon heuristic pilot to a separate nightly/manual workflow and preserve its JSON report as an artifact.
+- Keep pilot failures visible and actionable, but classify them as exploratory evidence until corroborated by a production defect or human play.
+- Never modify production damage, HP, spawn rates or boss mechanics solely to satisfy the heuristic pilot.
+
+**Falsifiers / review**
+- If the exploratory agent becomes a validated representative player model with documented skill envelope and independent correlation to human outcomes, its role may be reconsidered.
+- Any future change to the pilot must retain legal inputs, no state mutation, deterministic replay and complete per-seed evidence.

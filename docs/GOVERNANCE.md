@@ -47,3 +47,12 @@ Before a write: record target branch/head, files, expected postconditions, and r
 
 ## 7. Release authority
 The assistant may research, design, implement, test, and prepare a release candidate. It cannot self-certify user satisfaction or claim final acceptance in place of the owner. `READY_FOR_OWNER_PLAYTEST` and `OWNER_ACCEPTED` are distinct statuses.
+
+
+## 8. CI gate classification
+
+- **Blocking gates:** deterministic source contracts, negative controls, bounded browser integration, and repeatable component regressions.
+- **Exploratory telemetry:** heuristic/autonomous long-run agents, adaptive seed searches, and broad balance sweeps. Run them on a separate schedule or manual dispatch and preserve their full reports.
+- Exploratory telemetry may create or reprioritize hypotheses; it cannot independently authorize a production balance change or certify player acceptance.
+- A failed exploratory run must be decomposed into agent policy, test harness, game navigation/objective, combat balance and source-fidelity hypotheses before assigning a production defect.
+- A successful exploratory run is still not a substitute for a human player completing the game.

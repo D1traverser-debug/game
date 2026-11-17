@@ -1,0 +1,32 @@
+name: Natural-play exploratory telemetry
+on:
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exploratory-full-runs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Run seeded natural-play boss archetype exploration
+        run: python tests/boss_archetype_full_runs.py 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 > natural-play-report.json
+      - name: Preserve per-seed exploration report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: natural-play-report
+          path: natural-play-report.json
+          if-no-files-found: warn
