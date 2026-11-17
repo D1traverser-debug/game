@@ -83,6 +83,7 @@ async def main():
   commitment=await page.evaluate("__BOSS_QA.commitment()");c["boss_commits_position_during_telegraph"]=commitment["stationary"]
   paused=await page.evaluate("__BOSS_QA.pauseClock()");c["pause_freezes_attack_and_warning_clocks"]=paused["timeUnchanged"] and paused["attackTimerUnchanged"] and paused["warningLifeUnchanged"]
   invuln=await page.evaluate("__BOSS_QA.invulnerability()");c["invulnerability_blocks_attack_once"]=invuln["blocked"] and invuln["notReplayed"] and invuln["resolved"]
+  # Exercise every attack shape through the available render paths; this is smoke, not human acceptance.
   rendered=await page.evaluate("__BOSS_QA.renderAll()");c["all_nine_attack_telegraphs_render"]=rendered["twoD"]==9 and (not rendered["has3D"] or rendered["threeD"]==9)
   c["no_runtime_exceptions"]=not outcome["page_errors"];c["no_external_requests"]=not outcome["requests"]
   await browser.close()
