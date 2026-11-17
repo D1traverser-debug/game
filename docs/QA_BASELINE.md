@@ -348,3 +348,8 @@ Green run: [CI 44131377996](https://github.com/D1traverser-debug/game/actions/ru
 - Zero browser page errors and zero external requests.
 
 **Acceptance boundary:** green deterministic CI does not establish human readability at normal speed, actual dodge/counterplay, source-exact timing/damage, a natural full boss victory, real file-origin persistence, real-device performance, or final visual/audio acceptance. GAME-048 remains open; product remains **NOT_READY**.
+
+
+## Scope rebaseline — full-game branch (2026-11-18)
+
+The legacy browser candidate's green CI (10/10 jobs, Boss Encounter 26/26) is retained as prototype evidence. It does not satisfy the expanded full-game target. Native Unity build, original art/audio, full content breadth, 1–4 player networking, controller hardware, real full runs, real save/load, performance and independent acceptance are all NOT_TESTED. Do not reuse the legacy green status as a full-game release signal.

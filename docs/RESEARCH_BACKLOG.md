@@ -30,3 +30,15 @@ Research must produce observable mechanics and testable rules, not just descript
 - Trace common enemy roster and XP drop tables: Buffer, Shield Crab, Crabladon, Teethy Worm, Bloat Crab, Gnasher and remaining common types.
 - Implement solo-only content filters; exclude Healing Slam and other co-op-only content.
 - Add Reginald outfit quests, Wizard Rank, Enchantments, Masteries, Scroll unlocks, Ascension/Covenant subset that remains meaningful in solo play.
+
+
+## Full-game production research — 2026-11-18
+
+- Pin the latest source version before each content freeze; check for the announced post-1.2 major update.
+- Reconcile the full wizard roster (community guide reports 15) and every wizard's passive, stats, signature spell, unlock quest and co-op-specific interactions.
+- Reconcile all four realms and their layout variants, hazards, destructible props, enemy rosters, objectives and boss eligibility.
+- Build complete spell/augmentation catalogues; include the three 1.2 spells and distinguish official effects from undocumented adaptations.
+- Build the seven-element and ten-pair interaction matrix; confirm stacking, status, crit, friendly-fire and co-op rules.
+- Map co-op rules: friendly fire, revive, team objectives, individual/shared level-up timing, disconnect/reconnect and player death/return.
+- Research current scroll, trial, covenant, mastery, enchantment, rank, quest, outfit and achievement progression.
+- Record gameplay timing and damage only when supported by current-version observation; do not inherit provisional prototype numbers.

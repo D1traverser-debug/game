@@ -75,3 +75,23 @@ Source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026 entry, lines
 - Rift capture must yield to imminent projectile threats. CI #127 seed 2 reached 70.32 progress but died after repeated projectiles because evasion was damped too heavily.
 - Gnasher avoidance must suspend objective/resource pursuit during burrow/leap. CI #127 seed 3 continued pursuing Soul Sludge and XP while repeated leap attacks landed.
 - These are pilot-control defects, not proof of production balance. Keep product damage/objective values unchanged pending a competent natural-run test.
+
+
+## Full-game scope rebaseline — 2026-11-18
+
+**Official sources**
+- Steam product page: https://store.steampowered.com/app/2904000/The_Spell_Brigade/?l=schinese — product description explicitly states 1–4 player online co-op, team objectives, friendly fire and spell synergies; feature list includes solo, online co-op and cross-platform multiplayer.
+- Official announcement feed: https://steamcommunity.com/app/2904000/announcements/
+- Update 1.1 Realm Sweep (2026-09-02): https://steamcommunity.com/app/2904000/announcements/ — Eugenie, Seismic Slam, 10 quests, objective variants, realm/map variants, destructible props and map improvements.
+- Update 1.2.0.20127 (2026-10-06): Loaded Dice, Tiny Tremors, Wicked Buzzsaw, four augmentations per new spell, and 13 named older-spell augmentations.
+- Performance patch (2026-10-22): stability and performance work for Endless runs.
+
+**Community inventory — provisional**
+- Wizard guide: https://thespellbrigade.wiki/wizards/ reports 15 playable wizards.
+- Map guide: https://thespellbrigade.wiki/guides/maps/ lists four realms: Verdant Meadows, Frozen Ancients, Pyrestorm Pit and Astral Riftlands.
+- Elements guide: https://thespellbrigade.wiki/spells/elements/ reports seven elements and ten dual-element combinations.
+- The wiki homepage has a conflicting summary count of three maps while its detailed map guide lists four realms. Use four as the current research target, preserve the discrepancy, and verify against the pinned in-game version before freezing the catalogue.
+- The community guide's 78 achievements and content counts are not official specifications; verify before claiming exact parity.
+
+**Version policy**
+The working source snapshot is the latest official material located by 2026-11-18: Update 1.1 (2026-09-02), spell patch 1.2.0.20127 (2026-10-06), and performance patch (2026-10-22). The Oct 6 announcement says a larger update was planned for later in 2026; check the official feed before each content freeze for a later release. Do not rely on the 1.0 wiki alone.

@@ -249,3 +249,26 @@
 **Trade-off:** The boss pauses movement briefly while committing to an attack. This is an adaptation-level readability rule, not a claim about exact original-game animation timing. Numeric timings, radii and damage remain provisional.
 
 **Falsifiers:** Any warning visible after its attack is canceled; an attack resolving after its warning has expired; a pull/projectile origin differing from the warning snapshot; an attack that cannot be avoided with plausible movement; or renderer disagreement between 2.5D and available WebGL2.
+
+
+## D-030 — Owner expands the product to full-game scope (2026-11-18)
+
+**Status:** ACCEPTED for the `full-game` branch.
+
+**Decision:** The former constraints of one wizard, one realm, single-player only, and one offline HTML file apply only to the legacy browser prototype. The active product target is a complete original-IP 3D roguelite with solo and 1–4 player online co-op, full current-version content breadth, Windows PC first, keyboard/mouse and controller.
+
+**Evidence:** The owner explicitly requested a complete game substitute and authorized copying gameplay mechanics. The official Steam page describes 1–4 player online co-op and team objectives. Current community inventory reports 15 wizards, four realms, seven elements and ten dual-element combinations; those counts remain provisional until reconciled against a pinned source version.
+
+**Trade-off:** This invalidates the old single-file/offline architecture as the final delivery architecture. The old prototype remains useful as a mechanics reference and regression artifact. No code or assets are copied wholesale into the new runtime.
+
+**Falsifiers:** If the owner later narrows the scope to a solo-only browser game, revise the charter explicitly; do not silently retain both incompatible delivery contracts.
+
+## D-031 — Unity 6.3 LTS + URP selected for production vertical slice (2026-11-18)
+
+**Status:** SELECTED_FOR_VERTICAL_SLICE; production lock is conditional on measured evidence.
+
+**Decision:** Use Unity 6.3 LTS, URP and C# for a native Windows PC vertical slice. Evaluate Netcode for GameObjects and a lobby/relay transport behind an abstraction. Use host-authoritative simulation for gameplay-critical state. Keep the browser prototype separate.
+
+**Rationale:** The new scope needs authored 3D models/rigs/animation, layered VFX, audio tooling, native PC builds, controller support and 1–4 player networking. Unity 6.3 LTS is the current LTS with support through December 2027. Unity documents URP/Shader Graph/VFX Graph improvements and integrated multiplayer services. Godot remains a viable lower-cost alternative with ENet high-level networking, but would require more bespoke lobby/relay/service integration for internet co-op.
+
+**Falsifiers:** Reject or revise the engine decision if a bounded 4-client slice cannot meet the agreed performance/network targets, if the asset pipeline is not usable by the project owner, or if the required license/service cost is unacceptable. Do not build the full roster before the spike passes.
