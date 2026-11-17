@@ -102,4 +102,4 @@
 
 | GAME-056 | P0 | Unity production project is not yet editor-validated | Unity 6000.3.27f2 project skeleton, URP 17.3.0 dependency and local Game.Core package are committed; no Editor launch, package resolution, URP asset or native build evidence yet | IN_PROGRESS | Open unity/ in the pinned Editor, resolve packages, create URP settings, build a clean Windows player and capture exact Editor/package/build evidence |
 
-| QA-006 | P1 | Unity project skeleton is not yet mechanically checked in CI | Editor version, URP dependency, local UPM path, asmdef, .NET target and Unity ignore rules are committed but not yet checked by a dedicated guard | IN_PROGRESS | Add a standard-library Python integrity guard; keep Editor package resolution as a separate NOT_TESTED gate |
+| QA-006 | P1 | Unity project structure guard misread standard case-insensitive .gitignore globs | CI #44144743422 passed 13/17 checks; four failures were validator false negatives for [Ll]ibrary/, [Tt]emp/, [Oo]bj/ and [Bb]uilds/ | FIXED_IN_VALIDATOR_PENDING_CI | Match the exact glob patterns and require a green rerun; Editor package resolution remains separate NOT_TESTED gate |

@@ -49,8 +49,13 @@ require("core_runtime_has_no_unityengine_dependency", not uses_unity)
 assets_readme = UNITY / "Assets" / "README.md"
 require("unity_assets_root_present", assets_readme.exists())
 gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
-for entry in ("Library/", "Temp/", "Obj/", "Builds/"):
-    require(f"gitignore_{entry.rstrip('/')}", entry in gitignore)
+for name, pattern in (
+    ("Library", "[Ll]ibrary/"),
+    ("Temp", "[Tt]emp/"),
+    ("Obj", "[Oo]bj/"),
+    ("Builds", "[Bb]uilds/"),
+):
+    require(f"gitignore_{name}", pattern in gitignore)
 
 result = {
     "pass": all(checks.values()),

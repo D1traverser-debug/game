@@ -108,3 +108,10 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 - Unity Editor pinned to `6000.3.27f2`, URP 17.3.0 dependency declared, local package path `file:../src/core`.
 - Editor has not been launched. URP asset assignment, scene, Windows build, controller, networking, production art/audio and playtest remain NOT_TESTED.
 - Next: validate Unity project/package structure in CI, then open with the pinned Editor.
+
+
+## Unity structure guard correction — CI pending
+
+- First run #44144743422 verified 13/17 checks. Only four ignore-rule checks failed because the script expected literal names while the .gitignore correctly uses case-insensitive patterns.
+- Updated the validator to match the exact patterns already committed. No Unity project files or production code changed.
+- Rerun pending; Editor package resolution remains NOT_TESTED.

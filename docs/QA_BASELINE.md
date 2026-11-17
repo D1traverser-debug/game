@@ -379,3 +379,8 @@ Unity project skeleton is committed with Editor 6000.3.27f2 and URP 17.3.0 depen
 CI [44144343912](https://github.com/D1traverser-debug/game/actions/runs/44144343912) passed 11/11 jobs. Game.Core now lives under `src/core/Runtime` as a local UPM package; .NET Standard 2.1 build passed and 22/22 contracts passed. The Unity project pins Editor 6000.3.27f2 and URP 17.3.0.
 
 The Editor has not been launched. Package resolution, URP pipeline asset assignment, scene creation, native Windows build, controller input and runtime are NOT_TESTED. A project-structure guard is being added separately.
+
+
+## Unity project structure guard — first run (2026-11-18)
+
+The first Unity structure job (#44144743422) passed 13/17 checks. The four failures were false negatives in the checker: the repository uses Unity's standard case-insensitive .gitignore globs `[Ll]ibrary/`, `[Tt]emp/`, `[Oo]bj/`, and `[Bb]uilds/`, while the script searched for literal directory names. The validator now checks the actual glob patterns. Project version, URP dependency, local package path, asmdef, .NET target, source layout and engine-independence all passed. Rerun pending.
