@@ -22,6 +22,7 @@ window.__damageEvents=[];
 window.__gnasherHits=[];
 window.__gnasherLeapSamples=[];
 window.__pilotDodgeStats={projectile:0,gnasher:0,gnasherBurrow:0,gnasherLeap:0,gnasherLeapSafeFrames:0,hazard:0,boundary:0,rift:0,criticalEscape:0};
+window.__pilotHeading={x:0,y:0};
 // The production RAF loop may render, but must neither advance simulation nor consume its RNG.
 // drawWorld screen shake previously consumed the same rand() stream used by spawns and upgrades.
 window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};
@@ -49,7 +50,7 @@ damagePlayer=function(n,source='enemy'){
     hpBefore:p?+p.hp.toFixed(1):null,x:p?+p.x.toFixed(1):null,y:p?+p.y.toFixed(1):null,
     objective:o?.type||null,objectiveProgress:o?.progress||0,
     playerMove:p?+p.move.toFixed(1):null,lastMove:p?+p.lastMove.toFixed(2):null,
-    facing:p?+p.facing.toFixed(2):null,invuln:p?+p.invuln.toFixed(2):null,
+    facing:p?+p.facing.toFixed(2):null,invuln:p?+p.invuln.toFixed(2):null,carriedCore:!!game?.carriedCore?.alive,moveSpeed:p?+p.move.toFixed(1):null,
     nearestGnasher:gnasher?{state:gnasher.e.state,stateT:+(gnasher.e.stateT||0).toFixed(2),distance:+gnasher.d.toFixed(1),x:+gnasher.e.x.toFixed(1),y:+gnasher.e.y.toFixed(1),leapX:Number.isFinite(gnasher.e.leapX)?+gnasher.e.leapX.toFixed(1):null,leapY:Number.isFinite(gnasher.e.leapY)?+gnasher.e.leapY.toFixed(1):null,dmg:+gnasher.e.dmg.toFixed(1)}:null,
     nearbyGnashers:nearGnashers.slice(0,6).map(x=>({state:x.e.state,stateT:+(x.e.stateT||0).toFixed(2),distance:+x.d.toFixed(1),x:+x.e.x.toFixed(1),y:+x.e.y.toFixed(1),leapX:Number.isFinite(x.e.leapX)?+x.e.leapX.toFixed(1):null,leapY:Number.isFinite(x.e.leapY)?+x.e.leapY.toFixed(1):null,dmg:+x.e.dmg.toFixed(1)})),
     nearestProjectile:nearestProjectile||null
@@ -57,7 +58,7 @@ damagePlayer=function(n,source='enemy'){
   return __baseDamagePlayer(n,source);
 };
 window.__setRunSeed=(seed)=>{
-  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};window.__manualTick=false;window.__renderPhase=false;
+  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};window.__manualTick=false;window.__renderPhase=false;window.__pilotHeading={x:0,y:0};
   let state=seed>>>0;
   Math.random=()=>{
     if(window.__renderPhase)window.__simulationHarness.renderRandomCalls++;
@@ -334,32 +335,120 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       if(outward>0){rx-=nx*outward;ry-=ny*outward;}
       window.__pilotDodgeStats.rift++;
     }
-    let evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.72:1);
-    if(imminentProjectile)evade=Math.max(evade,2.0);
-    if(imminentHazard)evade=Math.max(evade,1.35);
+    const hpRatio=p.hp/Math.max(1,p.maxHp);
     if(gnasherThreat){
-      // A Gnasher leap is a fixed landing-point attack; use the scored escape
-      // heading directly instead of blending it back toward the objective.
-      // Gnasher avoidance must not suppress an independent projectile/hazard
-      // dodge. Blend both emergency vectors; a close predicted projectile can
-      // temporarily dominate the heading instead of being ignored.
-      const projectileWeight=imminentProjectile?4.0:2.0;
-      const hazardWeight=imminentHazard?1.8:1.0;
-      goalX=gnasherEscapeX+projectileRx*projectileWeight+hazardRx*hazardWeight;
-      goalY=gnasherEscapeY+projectileRy*projectileWeight+hazardRy*hazardWeight;
+      // Keep the escape intent clean; the planner below resolves simultaneous threats.
+      goalX=gnasherEscapeX;goalY=gnasherEscapeY;
     }else{
-      if(p.hp/Math.max(1,p.maxHp)<.55&&minThreat<320){
+      let evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.72:1);
+      if(imminentProjectile)evade=Math.max(evade,2.0);
+      if(imminentHazard)evade=Math.max(evade,1.35);
+      if(hpRatio<.55&&minThreat<320){
         const threat=nearest(game.enemies.filter(e=>!e.dead&&e.type!=='boss'),p);
         if(threat){goalX=(p.x-threat.o.x)/(threat.d||1);goalY=(p.y-threat.o.y)/(threat.d||1);}
         evade=Math.max(evade,2.6);window.__pilotDodgeStats.criticalEscape++;
       }
       goalX+=rx*evade;goalY+=ry*evade;
     }
-    // Hard inward steering only at the actual clamped edge. Perimeter objectives remain reachable.
-    if(p.x>1160){goalX=Math.min(goalX,-.9);window.__pilotDodgeStats.boundary++;}
-    if(p.x< -1160){goalX=Math.max(goalX,.9);window.__pilotDodgeStats.boundary++;}
-    if(p.y>860){goalY=Math.min(goalY,-.9);window.__pilotDodgeStats.boundary++;}
-    if(p.y< -860){goalY=Math.max(goalY,.9);window.__pilotDodgeStats.boundary++;}
+    // Unified short-horizon planner: score candidate headings against projectiles,
+    // every active Gnasher, hazards, enemy contact, objectives and map boundaries.
+    // This avoids vector cancellation and corner traps from independently blended forces.
+    const edgeNow=Math.min(1200-Math.abs(p.x),900-Math.abs(p.y));
+    const emergency=gnasherThreat||imminentProjectile||imminentHazard||minThreat<190||edgeNow<180;
+    if(emergency){
+      const moveSpeed=(p.move||220)*(game.carriedCore&&game.carriedCore.alive?.58:1)*
+        (p.lowSpeed?1+(1-p.hp/Math.max(1,p.maxHp))*.21:1)*(p.fightT>0?1.3:1);
+      const horizon=.7;
+      const desiredD=Math.hypot(goalX,goalY)||1;
+      const desiredX=goalX/desiredD,desiredY=goalY/desiredD;
+      const previous=window.__pilotHeading||{x:desiredX,y:desiredY};
+      let bestScore=-Infinity,bestX=desiredX,bestY=desiredY;
+      for(let k=0;k<24;k++){
+        const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);
+        const nx=clamp(p.x+dx*moveSpeed*horizon,-1200,1200);
+        const ny=clamp(p.y+dy*moveSpeed*horizon,-900,900);
+        let score=(dx*desiredX+dy*desiredY)*28+
+          (dx*(previous.x||0)+dy*(previous.y||0))*11;
+        if(target){
+          const beforeDistance=Math.hypot(target.x-p.x,target.y-p.y);
+          const afterDistance=Math.hypot(target.x-nx,target.y-ny);
+          score+=Math.max(-120,Math.min(120,beforeDistance-afterDistance))*.28;
+        }
+        // Gnasher leap landing points are fixed during the tell. Evaluate all
+        // simultaneous leaps at their actual remaining impact times.
+        for(const threat of leapThreats){
+          const e=threat.e,t=Math.max(0,Math.min(horizon,e.stateT||0));
+          const fx=clamp(p.x+dx*moveSpeed*t,-1200,1200);
+          const fy=clamp(p.y+dy*moveSpeed*t,-900,900);
+          const landingD=Math.hypot(fx-(e.leapX??e.x),fy-(e.leapY??e.y));
+          const safe=92;
+          if(landingD<safe)score-=(safe-landingD)*4.8;
+          else score+=Math.min(landingD-safe,100)*.025;
+        }
+        // During burrow the Gnasher tracks the wizard. Prefer headings that
+        // maintain separation from every burrowing Gnasher, not just the nearest.
+        for(const threat of burrowThreats){
+          const e=threat.e,d=Math.max(1,threat.d);
+          const awayX=(p.x-e.x)/d,awayY=(p.y-e.y)/d;
+          const weight=Math.max(0,1-d/650);
+          score+=(dx*awayX+dy*awayY)*24*weight;
+          const chaseTime=Math.min(horizon,Math.max(.03,e.stateT||.03));
+          const closing=Math.max(0,(e.speed*3-moveSpeed)*chaseTime);
+          const predictedGap=Math.max(0,d-closing);
+          if(predictedGap<115)score-=(115-predictedGap)*.42;
+        }
+        // Predict relative motion, not a perpendicular force. This handles
+        // crossing shots and multiple projectiles without their vectors cancelling.
+        for(const shot of game.shots){
+          if(shot.kind!=='enemy')continue;
+          const rx0=p.x-shot.x,ry0=p.y-shot.y;
+          const rvx=dx*moveSpeed-(shot.vx||0),rvy=dy*moveSpeed-(shot.vy||0);
+          const rv2=rvx*rvx+rvy*rvy;
+          if(rv2<1)continue;
+          const t=Math.max(0,Math.min(horizon,-(rx0*rvx+ry0*rvy)/rv2));
+          const miss=Math.hypot(rx0+rvx*t,ry0+rvy*t);
+          const safe=(shot.r||6)+p.r+34;
+          if(miss<safe+24)score-=(safe+24-miss)*4.4;
+          else score+=Math.min(miss-safe,120)*.018;
+        }
+        // Timed hazards are evaluated at their trigger time.
+        for(const h of game.hazards){
+          if(h.hit||!Number.isFinite(h.timer)||h.timer>horizon+.2||
+            !['warning','runestone','krogLeap','krogAcid','meteor','bell','bomb','slam','dice','explosiveSprout','explosiveMushroom'].includes(h.kind))continue;
+          const ht=Math.max(0,Math.min(horizon,h.timer));
+          const hx=clamp(p.x+dx*moveSpeed*ht,-1200,1200);
+          const hy=clamp(p.y+dy*moveSpeed*ht,-900,900);
+          const hd=Math.hypot(hx-h.x,hy-h.y),safe=(h.r||0)+p.r+42;
+          if(hd<safe)score-=(safe-hd)*2.8;
+        }
+        // Predict enemy approach over the same horizon.
+        for(const e of game.enemies){
+          if(e.dead||e.type==='boss'||e.state==='burrow'||e.state==='leap')continue;
+          const ex0=p.x-e.x,ey0=p.y-e.y,ed=Math.hypot(ex0,ey0)||1;
+          const es=(e.speed||0)*Math.max(0,1-(e.slow||0));
+          const ex=e.x+ex0/ed*es*horizon,ey=e.y+ey0/ed*es*horizon;
+          const contactD=Math.hypot(nx-ex,ny-ey),safe=e.r+p.r+30;
+          if(contactD<safe)score-=(safe-contactD)*1.5;
+          else if(contactD<safe+55)score-=(safe+55-contactD)*.18;
+        }
+        // Reward moving inward; do not hard-steer toward an edge while dodging.
+        const edgeAfter=Math.min(1200-Math.abs(nx),900-Math.abs(ny));
+        score+=(edgeAfter-edgeNow)*1.35;
+        if(edgeAfter<28)score-=(28-edgeAfter)*3.5;
+        if(score>bestScore){bestScore=score;bestX=dx;bestY=dy;}
+      }
+      goalX=bestX;goalY=bestY;
+      window.__pilotHeading={x:goalX,y:goalY};
+    }else{
+      // Outside emergencies, softly turn inward before reaching the hard clamp.
+      if(p.x>1120){goalX=Math.min(goalX,-.65);window.__pilotDodgeStats.boundary++;}
+      if(p.x< -1120){goalX=Math.max(goalX,.65);window.__pilotDodgeStats.boundary++;}
+      if(p.y>820){goalY=Math.min(goalY,-.65);window.__pilotDodgeStats.boundary++;}
+      if(p.y< -820){goalY=Math.max(goalY,.65);window.__pilotDodgeStats.boundary++;}
+      const desiredD=Math.hypot(goalX,goalY)||1;
+      goalX/=desiredD;goalY/=desiredD;
+      window.__pilotHeading={x:goalX,y:goalY};
+    }
     const mag=Math.hypot(goalX,goalY)||1;goalX/=mag;goalY/=mag;
     keys={KeyD:goalX>.22,KeyA:goalX<-.22,KeyS:goalY>.22,KeyW:goalY<-.22};
     const chestNear=game.chests.some(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);
@@ -385,7 +474,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
         regen:+q.regen.toFixed(1),damage:+q.damage.toFixed(2),cast:+q.cast.toFixed(2),crit:+q.crit.toFixed(2),
         spellCount:q.spells.length,enemyCount:game.enemies.filter(e=>!e.dead).length,
         nearestEnemy:near?+near.d.toFixed(1):null,
-        position:{x:+q.x.toFixed(1),y:+q.y.toFixed(1)},
+        position:{x:+q.x.toFixed(1),y:+q.y.toFixed(1)},carriedCore:!!game.carriedCore?.alive,moveSpeed:+q.move.toFixed(1),
         target:target?{kind:target.type||target.kind||'objective',x:+target.x.toFixed(1),y:+target.y.toFixed(1)}:null,
         edgeDistance:Math.min(1200-Math.abs(q.x),900-Math.abs(q.y)),
         imminentProjectile,imminentHazard,gnasherThreat,gnasherMode,gnasherStateT,
@@ -420,7 +509,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     gnasherHits:window.__gnasherHits.slice(-80),
     gnasherLeapSamples:window.__gnasherLeapSamples.slice(-120),
     trialSpellId:save.trialSpellId||null,
-    objective:game.objective?.type||null,
+    objective:game.objective?.type||null,carriedCore:!!game.carriedCore?.alive,
     bossSpawned:!!b,bossId:b?.bossId||null,bossHp:b?.hp??null,bossMax:b?.max??null,
     bossDead:!!b?.dead,wins:save.wins||0,losses:save.runs-(save.wins||0),
     enemyCount:game.enemies.filter(e=>!e.dead).length,trace,
@@ -487,7 +576,7 @@ async def main():
         "hp":round(state["hp"],1),"maxHp":state["maxHp"],"damageTaken":round(state["damageTaken"],1),
         "armor":state["armor"],"regen":state["regen"],"objectives":state["objectives"],
         "upgrades":state["upgrades"],"interactions":state["interactions"],"position":state["position"],"rerolls":state["rerolls"],"pilotDodgeStats":state["pilotDodgeStats"],"newSpellChoiceViolations":state["newSpellChoiceViolations"],"spells":state["spells"],
-        "scrolls":state["scrolls"],"rerolls":state["rerolls"],"position":state["position"],
+        "scrolls":state["scrolls"],"rerolls":state["rerolls"],"position":state["position"],"carriedCore":state["carriedCore"],
         "bossSpawned":state["bossSpawned"],"bossId":state["bossId"],"bossHp":state["bossHp"],
         "bossMax":state["bossMax"],"bossDead":state["bossDead"],"wins":state["wins"],
         "losses":state["losses"],"enemyCount":state["enemyCount"],"errors":state["errors"],
