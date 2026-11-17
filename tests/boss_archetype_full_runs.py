@@ -382,8 +382,8 @@ window.__fullRun = async (maxSeconds) => {
   };
 };
 """
-const GNASHER_HIT="if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');";
-assert SOURCE.split(GNASHER_HIT).length===2,"Gnasher hit instrumentation anchor must occur exactly once";
+GNASHER_HIT="if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');"
+assert SOURCE.count(GNASHER_HIT)==1,"Gnasher hit instrumentation anchor must occur exactly once"
 DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER).replace(GNASHER_HIT,
   "if(Math.hypot(p.x-e.x,p.y-e.y)<60){window.__gnasherHits.push({t:+g.time.toFixed(1),id:e.id,state:e.state,stateT:+e.stateT.toFixed(2),x:+e.x.toFixed(1),y:+e.y.toFixed(1),leapX:+e.leapX.toFixed(1),leapY:+e.leapY.toFixed(1),playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),distance:+Math.hypot(p.x-e.x,p.y-e.y).toFixed(1),dmg:+e.dmg.toFixed(1)});damagePlayer(e.dmg*1.7,'gnasher');}")
 

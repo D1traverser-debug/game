@@ -278,3 +278,9 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Boss coverage is `krog` and `mul`; `sol` remains missing. No browser, console or external-network errors.
 - Seed 1 trace showed a Gnasher leap at y=863.7 with only 36.3 units of lower-edge clearance; selected escape vector was (0.92,0.38). The prior controller selected one Gnasher and recomputed its heading every frame, allowing threat switching and poor boundary-limited displacement.
 - Revision 020 locks an escape heading per Gnasher attack phase, scores all active leap landing points, includes actual post-clamp travel, and records exact attacker identity. Product HTML unchanged.
+
+
+## BOSS PILOT 021 — CI #130 harness correction (2026-11-17)
+- CI #130: https://github.com/D1traverser-debug/game/actions/runs/44013848128. Checkpoint PASS; browser progression/short regressions PASS; natural-run step did not execute.
+- Failure was a Python SyntaxError at line 385: a JavaScript `const GNASHER_HIT` declaration had been inserted outside the Python-generated document string.
+- Revision 021 stores the JavaScript anchor/replacement as Python string variables and injects it into the temporary browser document. This is a harness-only correction; product HTML remains unchanged.

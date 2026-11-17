@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "MULTI_BOSS_PILOT_GNASHER_LOCK_020",
+  "checkpoint": "MULTI_BOSS_PILOT_GNASHER_LOCK_021",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -115,7 +115,8 @@
     "Seed 2 naturally defeated Krog'wa at 1265.9s: level 22, 1657 kills, 3 objectives, 591.6/800 HP, 89 armor, 6 regen.",
     "Seed 3 naturally defeated Mul'gath at 1265.7s: level 22, 1617 kills, 2 objectives, 247.1/400 HP, 26 armor, 10 regen.",
     "Natural boss coverage now includes krog and mul, but not sol. No browser, console or external-network errors.",
-    "Seed 1 trace at 391.2s showed a Gnasher leap while the player was at y=863.7 (36.3 units from the lower map edge); chosen escape vector was (0.92,0.38), with limited boundary clearance. The prior scoring also selected only one active Gnasher and recomputed the direction every frame."
+    "Seed 1 trace at 391.2s showed a Gnasher leap while the player was at y=863.7 (36.3 units from the lower map edge); chosen escape vector was (0.92,0.38), with limited boundary clearance. The prior scoring also selected only one active Gnasher and recomputed the direction every frame.",
+    "CI #130 / commit 18004b4: checkpoint PASS; natural-run test did not execute because the Python harness failed to parse line 385. Root cause: a JavaScript `const` declaration was inserted outside the Python-generated browser document string. No product/browser behavior result can be inferred from this run."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -172,9 +173,10 @@
     "BOSS_PILOT_017 pending CI: hard inward boundary steering, safe loot targeting, Rift tangential evasion, critical-health escape, and lateral Gnasher sidesteps. Two of three seeds remain unvalidated; boss coverage is incomplete.",
     "BOSS_PILOT_018 pending CI: imminent projectile/Gnasher threats suspend objective/loot pursuit, emergency Rift dodges are permitted, hard boundary correction is restricted to the actual clamp, and Gnasher escape uses stronger lateral movement.",
     "BOSS_PILOT_019 pending CI: choose a scored safe heading away from Gnasher leapX/leapY, suspend interactions during Gnasher attacks, make defensive/sustain cards outrank new spells, and let predicted projectile/hazard threats activate evasion independently of enemy proximity.",
-    "BOSS_PILOT_020 pending CI: combine all active Gnasher leap landing points, lock one escape direction per Gnasher attack phase, score actual displacement after world-boundary clamping, and record the exact Gnasher attacker on every hit. Two boss archetypes now have natural wins; Sol'phish remains unverified."
+    "BOSS_PILOT_020 pending CI: combine all active Gnasher leap landing points, lock one escape direction per Gnasher attack phase, score actual displacement after world-boundary clamping, and record the exact Gnasher attacker on every hit. Two boss archetypes now have natural wins; Sol'phish remains unverified.",
+    "BOSS_PILOT_021 pending CI: correct the Python-to-JavaScript instrumentation boundary, then rerun the multi-Gnasher escape controller. CI #130 is a harness syntax failure, not a gameplay result."
   ],
-  "next_action": "Inspect CI after BOSS_PILOT_020. Validate seed 1 survival and exact attacker/landing telemetry. Then find a deterministic seed that naturally wins against Sol'phish while retaining Krog'wa and Mul'gath wins; do not relax the full-run gate. Keep production index.html unchanged and product NOT_READY.",
+  "next_action": "Inspect CI after BOSS_PILOT_021. First require the Python harness to parse and short browser regressions to pass, then evaluate natural-run survival and exact attacker telemetry. Preserve the two existing natural boss wins as evidence only; still require exact sol/krog/mul coverage. Keep product index.html unchanged and NOT_READY.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -200,5 +202,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_020"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_021"
 }

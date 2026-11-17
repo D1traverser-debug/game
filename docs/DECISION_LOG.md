@@ -86,3 +86,9 @@
 - Score actual movement after world-boundary clamping; a nominal heading that only yields a few pixels of displacement is not a valid escape.
 - Exact attacker identity and all nearby Gnasher landing targets must be captured when a hit occurs.
 - This is test-agent policy only. Do not modify production Gnasher damage or telegraphs until a competent agent and owner playtest demonstrate a production defect.
+
+
+## D-014 — Keep browser instrumentation inside its host-language string (ACCEPTED)
+- Test-only JavaScript injected into a browser document must be represented as Python string data in the Python harness; raw JavaScript declarations must never appear at Python module scope.
+- Add an exact-one-occurrence anchor assertion before replacing production source in the temporary document.
+- A Python parse failure invalidates the run; do not interpret it as a gameplay result.

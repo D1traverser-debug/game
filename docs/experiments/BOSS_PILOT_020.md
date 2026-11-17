@@ -30,3 +30,7 @@ Seed 1's trace showed a Gnasher leap while the player was at y=863.7, only 36.3 
 ## Acceptance
 
 Pending CI readback. Require three natural wins and exact `sol`/`krog`/`mul` coverage. Keep production `index.html` unchanged. Product remains **NOT_READY**.
+
+
+## CI #130 execution status
+The first attempt to validate this revision did not execute the natural-run matrix. The Python harness failed at line 385 because the injected JavaScript declaration was outside the Python string. CI checkpoint passed; no gameplay conclusion can be drawn. Revision 021 corrects this host-language boundary.

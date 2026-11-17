@@ -141,3 +141,10 @@ Checkpoint: PASS. Short browser regressions: PASS. Natural-run matrix: FAIL (2/3
 | 3 | Natural win at 1265.7s | Mul'gath | Level 22; 1617 kills; 2 objectives; 247.1/400 HP |
 
 No browser, console or external-network errors. Exact boss coverage currently lacks Sol'phish. Revision 020 targets multi-Gnasher threat switching and escape displacement near world boundaries; product HTML remains unchanged.
+
+
+## Natural-run pilot #130 — harness failure
+Run: https://github.com/D1traverser-debug/game/actions/runs/44013848128  
+Checkpoint: PASS. Short browser regressions: PASS. Natural-run matrix: NOT EXECUTED.
+
+Python failed to parse the test file at line 385 because JavaScript instrumentation was inserted outside the Python string that constructs the temporary browser document. This is a test-harness syntax failure, not a gameplay failure. Revision 021 corrects the Python/JavaScript boundary.
