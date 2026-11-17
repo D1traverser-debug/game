@@ -285,3 +285,9 @@
 **Boundary:** This kernel intentionally does not freeze armor formulas, damage multipliers, spell timings, element interactions or progression values without source-version evidence. It is not a playable game.
 
 **Falsifiers:** If the library cannot be referenced cleanly by the pinned Unity editor or if profiling shows a material integration/performance problem, revisit the boundary with a measured alternative.
+
+
+**Validation update — CI 44142826420**
+- `Game.Core.csproj` compiles under .NET SDK 8 for .NET Standard 2.1.
+- 12/12 deterministic contracts pass.
+- Core remains intentionally small; exact damage/armor formulas, statuses, element pairs and spell timing are not frozen without source evidence.

@@ -199,7 +199,9 @@
     "Selected Unity 6.3 LTS + URP for a controlled native PC vertical slice; not yet implemented or validated.",
     "Current 734011-byte browser candidate and 10/10 CI remain legacy prototype evidence only.",
     "Full-game branch CI #44141825172 passed 10/10 jobs after correcting the negative-control fixture; checkpoint guard confirms the expanded scope and exact legacy artifact, and all nine legacy browser regression jobs pass.",
-    "Added engine-independent .NET Standard 2.1 simulation core foundation: fixed-step clock, deterministic PCG RNG and configurable damage/friendly-fire/invulnerability pipeline; CI verification pending."
+    "Added engine-independent .NET Standard 2.1 simulation core foundation: fixed-step clock, deterministic PCG RNG and configurable damage/friendly-fire/invulnerability pipeline; CI verification pending.",
+    "Engine-independent Game.Core (.NET Standard 2.1) builds successfully in GitHub Actions; 12/12 deterministic contracts pass for fixed-step clock, pause/backlog, PCG RNG, friendly fire, self-damage, invulnerability, lethal transitions and max-health capacity.",
+    "Full-game branch CI #44142826420 passed 11/11 jobs: checkpoint, core simulation and nine legacy browser regression jobs."
   ],
   "failed_or_open": [
     "Unity 6.3 LTS editor project, URP configuration, package manifest and native Windows build have not yet been created or validated.",
@@ -208,7 +210,7 @@
     "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
     "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested."
   ],
-  "next_action": "Run the new .NET core contract suite in GitHub Actions. After green, extend the simulation core with typed gameplay events, elemental status contracts and host-authoritative session commands; then bootstrap Unity 6.3 LTS and connect the core to the first vertical slice.",
+  "next_action": "Extend Game.Core with typed simulation events, element/status contracts and validated player input/session commands. Then create/open the Unity 6.3 LTS URP project and connect one polished hero/realm/spell vertical slice to the tested core. Validate host-authoritative 4-client combat before expanding content.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -237,7 +239,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PASS_FULL_GAME_SCOPE_GUARD_AND_LEGACY_REGRESSIONS_ONLY_44141825172",
+  "latest_candidate_ci_status": "PASS_CORE_FOUNDATION_12_OF_12_AND_LEGACY_REGRESSIONS_44142826420",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -336,5 +338,25 @@
     "checkpoint": "PASS_MECHANICAL_ONLY",
     "legacy_browser_regressions": "9/9 PASS",
     "meaning": "Full-game scope metadata and legacy prototype integrity were checked; legacy browser regression jobs passed. No Unity project/build, multiplayer, art/audio or full-game acceptance is implied."
+  },
+  "last_full_game_ci": {
+    "run_id": 44142826420,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44142826420",
+    "commit": "aace5c6c223d0532260fb99c7a93d6accc2774be",
+    "conclusion": "success",
+    "jobs_passed": 11,
+    "jobs_total": 11,
+    "core_simulation_contracts": "12/12 PASS",
+    "checkpoint": "PASS",
+    "legacy_browser_regressions": "9/9 PASS",
+    "meaning": "Engine-independent core contracts compile and pass; full-game scope guard and legacy browser regression pass. No Unity Editor project/native build, network play, production assets or full-game acceptance is implied."
+  },
+  "core_simulation": {
+    "project": "src/core/Game.Core.csproj",
+    "target_framework": "netstandard2.1",
+    "test_project": "tests/core/Game.Core.Tests.csproj",
+    "test_runner": "dotnet 8 console contracts; no external NuGet packages",
+    "contracts": "12/12 PASS in CI #44142826420",
+    "status": "FOUNDATION_VERIFIED_NOT_FULL_SIMULATION"
   }
 }

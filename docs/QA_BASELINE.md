@@ -358,3 +358,10 @@ The legacy browser candidate's green CI (10/10 jobs, Boss Encounter 26/26) is re
 ## Full-game scope-guard first CI run — 2026-11-18
 
 The first full-game branch run verified the new scope metadata and the exact legacy artifact successfully. One negative-control test failed because it still changed `multiplayer` from false to true, which was the old prototype assumption and is now the correct full-game scope. This was a stale test fixture, not a product or scope-guard failure. The fixture now mutates multiplayer from true to false and adds an active-branch drift negative control. CI #44141825172 then passed 10/10 jobs. This validates only scope metadata, the legacy artifact checkpoint and legacy browser regression suite; no native Unity product was tested.
+
+
+## Engine-independent simulation core — green CI (2026-11-18)
+
+CI [44142826420](https://github.com/D1traverser-debug/game/actions/runs/44142826420) passed 11/11 jobs. The new .NET Standard 2.1 core compiled successfully; the standalone .NET 8 contract runner passed 12/12 tests covering fixed-step ticks, pause-time discard, backlog preservation, same-seed PCG streams, bounded integer sampling, friendly-fire allow/block, self-damage policy, invulnerability, lethal transition, invalid damage and max-health capacity restoration. The checkpoint guard passed and all nine legacy browser regression jobs passed.
+
+Evidence boundary: this verifies foundational domain code only. It does not verify a Unity Editor project, native build, spell/element content, 1–4 player networking, production art/audio, full runs, performance or owner acceptance.

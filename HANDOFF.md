@@ -71,3 +71,13 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 - Added central `DamagePipeline` with independently configurable friendly-fire/self-damage policy and invulnerability gate. Exact armor and damage formulas remain unfrozen pending source research.
 - Added standalone .NET 8 contract runner with 12 deterministic tests.
 - GitHub Actions now builds the core and runs the contract runner. Await CI before marking the foundation PASS.
+
+
+## Engine-independent simulation core — GREEN CI (2026-11-18)
+
+- Commit: `aace5c6c223d0532260fb99c7a93d6accc2774be`.
+- CI [44142826420](https://github.com/D1traverser-debug/game/actions/runs/44142826420): **11/11 jobs PASS**.
+- `src/core/Game.Core.csproj` targets .NET Standard 2.1 and compiles cleanly.
+- Standalone .NET 8 test runner: **12/12 PASS** (fixed-step/pause/backlog, seeded PCG RNG, friendly fire, self-damage, invulnerability, lethal transition, invalid damage, max-health capacity).
+- Checkpoint guard and all nine legacy browser regression jobs passed.
+- No Unity project/native build or full-game gameplay/network/asset acceptance exists yet.
