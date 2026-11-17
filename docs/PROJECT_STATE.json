@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "NATURAL_MULGATH_BOSS_WIN_012",
+  "checkpoint": "SPELL_TRIAL_ACTUAL_LOADOUT_FIX_013",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -79,7 +79,8 @@
     "Non-cheating full mission Playwright pilot reached the 19-minute boss window and naturally defeated Mul'gath at gameTime 1463.17 seconds; no HP/time/XP/enemy/boss/objective/victory mutation",
     "Natural run result: 732 kills, level 19, 4 objectives completed, 3 spells equipped, 26 upgrades selected from actual offers, 462.25/540 HP remaining, 52 armor, 6 regen, 1 recorded win and 0 losses",
     "Full mission run completed with zero JavaScript page errors, zero console errors and zero external network requests",
-    "GitHub Actions run 43989883310 passed both checkpoint and all browser-component steps, including the new natural full mission boss win"
+    "GitHub Actions run 43989883310 passed both checkpoint and all browser-component steps, including the new natural full mission boss win",
+    "Fixed selected one-run spell trial being saved by camp UI but omitted from makePlayer loadout; trial spell is now equipped at run start and selection consumed once"
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -127,14 +128,15 @@
     "Natural boss victory verified only for Mul'gath in one automated pilot; Sol'phish and Krog'wa natural full-run wins still need verification",
     "Automated pilot is not a human player; owner-controlled full run, subjective combat feel, readability and fun remain unaccepted",
     "Mul'gath boss phase took roughly 323 seconds after the 19-minute spawn; compare boss duration and healing-servant pressure against source evidence before tuning",
-    "Full-run test is a scripted movement/upgrade policy; repeat with alternate builds and all three boss archetypes"
+    "Full-run test is a scripted movement/upgrade policy; repeat with alternate builds and all three boss archetypes",
+    "Seeded full-mission natural run seed 1 died at 167.8 seconds before boss; root cause investigation and pilot strategy refinement underway; not a boss-mechanics failure"
   ],
   "next_action": "Run additional non-cheating full missions with reproducible seeds to naturally defeat Sol'phish and Krog'wa; inspect Mul'gath's 323-second fight duration against official references; then test human-facing input, visual clarity, save/reload, performance on real devices and owner acceptance. Keep status NOT_READY until these gates pass.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "development_candidate_sha256": "2d9c2cf2e406e68d098a2ade01b3c7bd7805b9b5942f4e5f588b798222b6493a",
-  "development_candidate_bytes": 721554,
+  "development_candidate_sha256": "6f10aba4ad7ce3303e13db29cff50169f91771b395cabff9ee484231d00c2c8e",
+  "development_candidate_bytes": 721829,
   "last_successful_candidate_ci": {
     "run_id": 43989883310,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/43989883310",
@@ -155,5 +157,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PASS_MECHANICAL_AND_AUTOMATED_MULGATH_FULL_RUN; HUMAN_ACCEPTANCE_PENDING"
+  "latest_candidate_ci_status": "PENDING_FULL_MISSION_AND_TRIAL_LOADOUT_REGRESSION"
 }
