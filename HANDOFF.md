@@ -140,3 +140,12 @@ The previous brief's "seven elements + ten combinations" wording was too definit
 - Cooldown advances in simulation ticks; no target does not consume cooldown.
 - Output is deterministic projectile spawn data; projectile travel/collision, damage integration, element/status/augmentation logic and non-projectile spell behaviors remain open.
 - Ten new contract tests added; CI pending.
+
+
+## Automatic spell execution kernel — GREEN CI (2026-11-18)
+
+- CI [44145957567](https://github.com/D1traverser-debug/game/actions/runs/44145957567): **12/12 jobs PASS**.
+- Game.Core: **32/32 contracts PASS**.
+- Unity project structure: **17/17 PASS**.
+- Spell core now supports nearest/lowest-health-ratio/seeded-random target selection, range filtering, tick cooldowns, single/spread/radial projectile spawn data.
+- This is a deterministic domain kernel, not a complete spell system. Projectile movement/collision, lifetime/pierce, element/status effects, augmentations, Unity scene/VFX/SFX and network integration remain open.

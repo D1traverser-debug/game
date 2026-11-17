@@ -211,7 +211,9 @@
     "Committed Unity 6000.3.27f2 project version and URP 17.3.0 package dependency; Editor has not been opened.",
     "Unity project structure guard passed 17/17 checks in CI #44144872368: patched Editor version/revision, URP dependency, local Game.Core UPM path, asmdef, .NET Standard target, engine-independent sources and Unity ignore rules.",
     "Full-game branch CI #44144872368 passed 12/12 jobs; Game.Core passed 22/22 contracts; all nine legacy browser regression jobs passed.",
-    "Added data-driven SpellDefinition/SpellRuntimeState and automatic target selection/projectile spawn kernel; CI pending."
+    "Added data-driven SpellDefinition/SpellRuntimeState and automatic target selection/projectile spawn kernel; CI pending.",
+    "Added data-driven spell execution kernel with nearest, lowest-health-ratio and seeded-random targeting; range filtering; cooldown ticks; single/spread/radial projectile spawn patterns. CI #44145957567 passed 32/32 core contracts.",
+    "Full-game branch CI #44145957567 passed 12/12 jobs, including Unity project structure 17/17 and nine legacy browser regressions."
   ],
   "failed_or_open": [
     "Unity project skeleton is committed at unity/ with Editor 6000.3.27f2 and URP 17.3.0 dependency; opening the project, package resolution, URP asset assignment and native Windows build remain NOT_TESTED.",
@@ -221,7 +223,7 @@
     "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested.",
     "Spell kernel does not yet implement projectile simulation/collision, status/element effects, augmentations, non-projectile spell behaviors or source-complete content catalogue."
   ],
-  "next_action": "Run the expanded core suite. After green, implement projectile simulation/collision and damage/event integration, then build the first original vertical-slice spell trio in Unity with authored VFX/SFX.",
+  "next_action": "Implement fixed-tick projectile travel, swept collision, pierce/lifetime and DamagePipeline integration. Keep spell-specific effects and element/infusion behavior separate and source-qualified. Then wire the first spell trio into the Unity vertical slice with original VFX/SFX.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -250,7 +252,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PASS_UNITY_STRUCTURE_17_OF_17_CORE_22_OF_22_44144872368",
+  "latest_candidate_ci_status": "PASS_SPELL_CORE_32_OF_32_UNITY_STRUCTURE_17_OF_17_44145957567",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -351,24 +353,24 @@
     "meaning": "Full-game scope metadata and legacy prototype integrity were checked; legacy browser regression jobs passed. No Unity project/build, multiplayer, art/audio or full-game acceptance is implied."
   },
   "last_full_game_ci": {
-    "run_id": 44144872368,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44144872368",
-    "commit": "2ea8869afe4bcdd41f069d6e3d600c1ad8708e13",
+    "run_id": 44145957567,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44145957567",
+    "commit": "fc8377eec2ce2621980e49715bf2b446ceaf9a56",
     "conclusion": "success",
     "jobs_passed": 12,
     "jobs_total": 12,
-    "core_simulation_contracts": "22/22 PASS",
+    "core_simulation_contracts": "32/32 PASS",
     "unity_project_structure": "17/17 PASS",
     "checkpoint": "PASS",
     "legacy_browser_regressions": "9/9 PASS",
-    "meaning": "Unity project file/package structure is internally consistent; core contracts compile/pass; legacy browser regressions pass. Unity Editor package resolution, URP asset creation, native build and full-game acceptance remain untested."
+    "meaning": "Core spell targeting/cooldown/projectile pattern contracts compile and pass; Unity project file structure passes; legacy browser regression passes. No Unity Editor/native build or human full-game acceptance."
   },
   "core_simulation": {
     "project": "src/core/Game.Core.csproj",
     "target_framework": "netstandard2.1",
     "test_project": "tests/core/Game.Core.Tests.csproj",
     "test_runner": "dotnet 8 console contracts; no external NuGet packages",
-    "contracts": "22/22 PASS in CI #44144872368",
+    "contracts": "32/32 PASS in CI #44145957567",
     "status": "FOUNDATION_AND_INPUT_EVENT_CONTRACTS_VERIFIED_NOT_FULL_SIMULATION"
   },
   "unity_project": {

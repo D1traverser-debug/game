@@ -391,3 +391,10 @@ The first Unity structure job (#44144743422) passed 13/17 checks. The four failu
 CI [44144872368](https://github.com/D1traverser-debug/game/actions/runs/44144872368) passed 12/12 jobs. The Unity project structure guard passed 17/17 checks: security-patched Editor version/revision, URP package dependency, local Game.Core UPM path, package metadata, engine-independent asmdef, .NET Standard 2.1 target, runtime source layout, Unity ignore rules and Assets root. Game.Core passed 22/22 contracts; all nine legacy browser regression jobs passed.
 
 This still does not launch Unity Editor. Package resolution, URP pipeline asset creation/assignment, scene import, native Windows build, 4-player runtime, art/audio and human full-game acceptance remain NOT_TESTED.
+
+
+## Automatic spell execution kernel — green CI (2026-11-18)
+
+CI [44145957567](https://github.com/D1traverser-debug/game/actions/runs/44145957567) passed 12/12 jobs. Game.Core passed 32/32 contracts. Ten new spell tests verify nearest-target selection, ally/dead/out-of-range filtering, lowest-health-ratio targeting, seeded-random targeting, cooldown gating, symmetric spread, targetless radial patterns, no-target cooldown behavior, invalid pattern rejection and deterministic projectile spawn output. Unity project structure remains 17/17; all nine legacy browser regressions pass.
+
+Evidence boundary: projectile movement/collision, piercing/lifetime, elemental/status effects, augmentations, Unity scene integration, original art/audio and network runtime remain NOT_TESTED.
