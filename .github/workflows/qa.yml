@@ -14,6 +14,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Verify single-file build reproducibility
+        run: python scripts/build_game.py --check
       - name: Verify owner scope and exact artifact checkpoint
         run: python scripts/verify_project_state.py
       - name: Run positive and negative checkpoint controls
