@@ -62,3 +62,11 @@
 - During Rift capture, remove outward radial dodge force while preserving tangential movement; objective progress must not be reset by avoidable steering drift.
 - Gnasher avoidance must include lateral movement during burrow/leap, not only direct retreat.
 - These are QA-agent controls only. Do not change production map bounds, objective rules or enemy damage without separate source/player evidence.
+
+
+## D-011 — Emergency threat priority overrides objective progress (ACCEPTED)
+- Immediate incoming projectiles and Gnasher burrow/leap threats outrank objective capture and optional loot.
+- Rift containment is a normal objective preference, not an absolute movement lock; imminent lethal tells may justify a temporary exit.
+- Hard inward boundary steering activates only near the actual world clamp. Perimeter objectives remain reachable.
+- When Gnasher is in a burrow/leap sequence, suspend objective and loot pursuit and use a lateral escape vector.
+- These are automated QA-agent rules only. Do not change production objective radius, map bounds or enemy damage without separate source/player evidence.

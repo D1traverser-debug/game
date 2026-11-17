@@ -247,3 +247,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Revision 017 changes only test-agent input/diagnostics: hard inward boundary steering, safe loot targets, Rift tangential avoidance, critical-health escape, lateral Gnasher sidesteps, and target/position/edge telemetry. Product HTML remains unchanged.
 - Separate product gap: the current Krog'wa and Mul'gath attack sets remain incomplete versus source evidence. Track under GAME-042; do not conflate test-agent fixes with boss content fidelity.
 - Next: inspect CI #127. Product remains NOT_READY; main and CAOS untouched.
+
+
+## BOSS PILOT 018 — CI #127 conflict analysis (2026-11-17)
+- CI #127: https://github.com/D1traverser-debug/game/actions/runs/44008420760. Checkpoint and short browser regressions PASS; three-seed natural-run matrix FAIL.
+- Seed 1 died at 376.4s near the fungi objective (-968,709). The 980/720 hard boundary margin blocked a valid objective at y=810; contact/projectile hits finished the player.
+- Seed 2 died at 168.9s in Rift with 70.32 progress. The .32 evasion multiplier and outward-vector suppression made projectile dodging too weak; repeated shots landed.
+- Seed 3 died at 515.2s during Soul Sludge after repeated Gnasher burrow/leap hits. The agent still pursued objective/resources while Gnasher was in its attack sequence.
+- Revision 018 prioritizes imminent projectiles and Gnasher over objectives, permits emergency Rift dodges, applies hard boundary correction only near actual clamp, and suspends loot/objective pursuit during Gnasher threat.
+- Product HTML remains unchanged. Boss content fidelity GAME-042 remains separate and unresolved.
+- Next: inspect CI #128; do not relax tests or alter production damage to force green.

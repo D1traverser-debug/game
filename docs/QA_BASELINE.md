@@ -102,3 +102,16 @@ Checkpoint: PASS. Short browser regressions: PASS. Three-seed natural-run matrix
 All runs had no page errors, console errors or external requests. Only boss ID `krog` was recorded. Exact three-boss coverage remains unproven.
 
 Revision 017 adds hard inward steering, safe loot targeting, Rift tangential evasion, critical-health escape and lateral Gnasher sidesteps. Product HTML remains unchanged. Separately, GAME-042 records incomplete boss attack fidelity: official notes mention Krog'wa tornadoes/tongue-smash; community gameplay evidence shows Mul'gath grid spikes, rock walls, orb absorption and spin attacks. These product mechanics remain open.
+
+
+## Natural-run pilot #127 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44008420760  
+Checkpoint: PASS. Short browser regressions: PASS. Three-seed natural-run matrix: FAIL.
+
+| Seed | End time | Objective | Failure evidence |
+|---|---:|---|---|
+| 1 | 376.4s | Fungi | Died near (-968,709); early boundary override blocked a valid objective at y=810; repeated contact/projectile hits |
+| 2 | 168.9s | Rift | Progress reached 70.32; repeated projectiles landed while Rift evasion was suppressed |
+| 3 | 515.2s | Soul Sludge | Repeated Gnasher burrow/leap hits while the pilot continued objective/resource pursuit |
+
+All runs had no page errors, console errors or external requests. Revision 018 changes only test-agent priority and diagnostics; product HTML remains unchanged.

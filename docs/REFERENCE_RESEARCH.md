@@ -68,3 +68,10 @@ Source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026 entry, lines
 - **Krog'wa:** official EA Update 13 notes state that Krog'wa has tornado attacks and that its tongue-smash attack can be used against enemies when corrupted; the same notes say tornado damage was increased. Sources: https://steamdb.info/patchnotes/20496068/ and https://store.steampowered.com/news/posts/?enddate=1761142398&feed=steam_community_announcements. The current prototype implements a leap/acid-ring sequence only, so this is a confirmed content gap.
 - **Mul'gath:** official 1.1 notes confirm healing minions and that corrupted minions can damage Mul'gath on collision. A gameplay transcript also shows spike-grid attacks, rock walls, orb absorption/healing and a spinning multi-head attack. The transcript is observational community evidence, not an official specification: https://www.dailymotion.com/video/xa9kq46. The current prototype has a projectile fan and healer minions but no verified full phase/attack set.
 - Exact phase timing, hitboxes, damage, and telegraph durations remain UNKNOWN_PENDING_READBACK. Capture current-version gameplay and corroborate before freezing numbers.
+
+
+## Natural-run priority evidence — CI #127 (2026-11-17)
+- The x=980/y=720 hard-boundary margin blocked a valid fungi objective at y=810; revision 018 moves hard correction to the actual world clamp (x=±1160, y=±860).
+- Rift capture must yield to imminent projectile threats. CI #127 seed 2 reached 70.32 progress but died after repeated projectiles because evasion was damped too heavily.
+- Gnasher avoidance must suspend objective/resource pursuit during burrow/leap. CI #127 seed 3 continued pursuing Soul Sludge and XP while repeated leap attacks landed.
+- These are pilot-control defects, not proof of production balance. Keep product damage/objective values unchanged pending a competent natural-run test.

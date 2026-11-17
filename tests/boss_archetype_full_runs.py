@@ -19,7 +19,7 @@ PROBE=r"""
 // Diagnostic instrumentation exists only in this temporary browser document.
 // It records incoming damage without changing the production damage pipeline.
 window.__damageEvents=[];
-window.__pilotDodgeStats={projectile:0,gnasher:0,hazard:0,boundary:0,rift:0};
+window.__pilotDodgeStats={projectile:0,gnasher:0,hazard:0,boundary:0,rift:0,criticalEscape:0};
 const __baseDamagePlayer=damagePlayer;
 damagePlayer=function(n,source='enemy'){
   const p=game?.player,o=game?.objective;
@@ -184,29 +184,31 @@ window.__fullRun = async (maxSeconds) => {
         rx-=dx/d*w;ry-=dy/d*w;
       }
     }
-    // Gnasher's burrow is faster than the player: combine retreat with a
-    // lateral sidestep. During leap, use the visible enemy position and keep
-    // moving sideways; do not rely on its hidden target coordinate.
+    // Gnasher is a hard threat: while burrowing or leaping, suspend objective
+    // and loot pursuit and use retreat plus a lateral escape vector.
+    let gnasherThreat=false;
     for(const e of game.enemies){
       if(e.dead||e.type!=='gnasher')continue;
       const side=(Number(e.id||0)%2===0)?1:-1;
       if(e.state==='burrow'){
         const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;
-        if(d<390){
-          const nx=dx/d,ny=dy/d,w=(390-d)/390*3.8;
-          rx+=nx*w*.65-ny*side*w*1.9;ry+=ny*w*.65+nx*side*w*1.9;
-          window.__pilotDodgeStats.gnasher++;
+        if(d<470){
+          const nx=dx/d,ny=dy/d,w=(470-d)/470*4.6;
+          rx+=nx*w*.8-ny*side*w*2.8;ry+=ny*w*.8+nx*side*w*2.8;
+          gnasherThreat=true;window.__pilotDodgeStats.gnasher++;
         }
       }else if(e.state==='leap'){
         let dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy);
-        if(d<1){const a=side*Math.PI/2;dx=Math.cos(a);dy=Math.sin(a);d=1;}
-        if(d<230){
-          const nx=dx/d,ny=dy/d,w=(230-d)/230*4.4;
-          rx+=nx*w*.55-ny*side*w*2.1;ry+=ny*w*.55+nx*side*w*2.1;
-          window.__pilotDodgeStats.gnasher++;
+        if(d<320){
+          if(d<1){const a=side*Math.PI/2;dx=Math.cos(a);dy=Math.sin(a);d=1;}
+          const nx=dx/d,ny=dy/d,w=(320-d)/320*5.2;
+          rx+=nx*w*.55-ny*side*w*3.4;ry+=ny*w*.55+nx*side*w*3.4;
+          gnasherThreat=true;window.__pilotDodgeStats.gnasher++;
         }
       }
     }
+    if(gnasherThreat)target=null;
+    let imminentProjectile=false;
     for(const shot of game.shots){
       if(shot.kind!=='enemy')continue;
       const dx=p.x-shot.x,dy=p.y-shot.y,d=Math.hypot(dx,dy)||1;
@@ -219,6 +221,7 @@ window.__fullRun = async (maxSeconds) => {
         const t=(dx*vx+dy*vy)/v2;
         if(t>0&&t<1.35){
           const cx=dx-vx*t,cy=dy-vy*t,cd=Math.hypot(cx,cy);
+          if(t>.05&&t<.85&&cd<72)imminentProjectile=true;
           if(cd<92){
             const speed=Math.sqrt(v2),px=-vy/speed,py=vx/speed;
             const danger=(x,y)=>game.enemies.reduce((sum,e)=>{
@@ -241,27 +244,28 @@ window.__fullRun = async (maxSeconds) => {
     const riftDist=target?Math.hypot(p.x-target.x,p.y-target.y):Infinity;
     const riftRadius=activeObjective?.variant==='multi'?55:92;
     const riftHold=activeObjective?.type==='rift'&&target&&riftDist<riftRadius;
-    if(riftHold&&riftDist>1){
-      // Keep the capture position while allowing tangential dodges; remove
-      // only the outward radial component that would reset Rift progress.
+    if(riftHold&&riftDist>1&&!imminentProjectile&&!gnasherThreat){
+      // Preserve capture position only when no imminent lethal tell exists.
       const nx=(p.x-target.x)/riftDist,ny=(p.y-target.y)/riftDist;
       const outward=rx*nx+ry*ny;
       if(outward>0){rx-=nx*outward;ry-=ny*outward;}
       window.__pilotDodgeStats.rift++;
     }
-    let evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.32:1);
-    if(p.hp/Math.max(1,p.maxHp)<.30&&minThreat<200){
+    let evade=Math.max(0,Math.min(2.4,(255-minThreat)/110))*(riftHold?.72:1);
+    if(imminentProjectile)evade=Math.max(evade,1.55);
+    if(gnasherThreat)evade=Math.max(evade,2.2);
+    if(p.hp/Math.max(1,p.maxHp)<.30&&minThreat<240){
       const threat=nearest(game.enemies.filter(e=>!e.dead&&e.type!=='boss'),p);
       if(threat){goalX=(p.x-threat.o.x)/(threat.d||1);goalY=(p.y-threat.o.y)/(threat.d||1);}
-      evade=Math.max(evade,1.8);
+      evade=Math.max(evade,2.0);window.__pilotDodgeStats.criticalEscape++;
     }
+    if(gnasherThreat){goalX=0;goalY=0;}
     goalX+=rx*evade;goalY+=ry*evade;
-    // Hard inward steering prevents a target or a summed avoidance vector
-    // from pinning the pilot against the clamped world boundary.
-    if(p.x>980){goalX=Math.min(goalX,-.9);window.__pilotDodgeStats.boundary++;}
-    if(p.x< -980){goalX=Math.max(goalX,.9);window.__pilotDodgeStats.boundary++;}
-    if(p.y>720){goalY=Math.min(goalY,-.9);window.__pilotDodgeStats.boundary++;}
-    if(p.y< -720){goalY=Math.max(goalY,.9);window.__pilotDodgeStats.boundary++;}
+    // Hard inward steering only at the actual clamped edge. Perimeter objectives remain reachable.
+    if(p.x>1160){goalX=Math.min(goalX,-.9);window.__pilotDodgeStats.boundary++;}
+    if(p.x< -1160){goalX=Math.max(goalX,.9);window.__pilotDodgeStats.boundary++;}
+    if(p.y>860){goalY=Math.min(goalY,-.9);window.__pilotDodgeStats.boundary++;}
+    if(p.y< -860){goalY=Math.max(goalY,.9);window.__pilotDodgeStats.boundary++;}
     const mag=Math.hypot(goalX,goalY)||1;goalX/=mag;goalY/=mag;
     keys={KeyD:goalX>.22,KeyA:goalX<-.22,KeyS:goalY>.22,KeyW:goalY<-.22};
     const chestNear=game.chests.some(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);
@@ -285,6 +289,7 @@ window.__fullRun = async (maxSeconds) => {
         position:{x:+q.x.toFixed(1),y:+q.y.toFixed(1)},
         target:target?{kind:target.type||target.kind||'objective',x:+target.x.toFixed(1),y:+target.y.toFixed(1)}:null,
         edgeDistance:Math.min(1200-Math.abs(q.x),900-Math.abs(q.y)),
+        imminentProjectile,gnasherThreat,
         healthOrbs:game.orbs.filter(x=>x.type==='health').length,magnetOrbs:game.orbs.filter(x=>x.type==='magnet').length,objective:game.objective?.type||null,
         objectiveProgress:game.objective?.progress||0,objectiveTarget:game.objective?.target||0,
         objectiveDone:!!game.objective?.done,objectiveVariant:game.objective?.variant||null,
