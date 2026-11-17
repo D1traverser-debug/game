@@ -32,6 +32,10 @@ The full-game branch targets a native Windows PC game built with Unity 6.3 LTS a
 
 The domain simulation lives in `src/core` as a .NET Standard 2.1 library. It owns fixed-step time, gameplay RNG and combat rules. Unity presentation, audio, UI and network transports consume core state/events; they do not own or mutate the rules. The core is tested with a standalone .NET 8 contract runner so it can be verified before the Unity Editor project is available.
 
+## Typed events and command validation
+
+The core exposes immutable, monotonic simulation events for presentation/audio/network adapters. Host-side command validation rejects unknown players, replayed/out-of-order sequences, stale/future ticks, invalid movement vectors and unknown button bits. This is an input-envelope gate, not a complete anti-cheat system or a transport implementation.
+
 ## Simulation and networking boundary
 
 Gameplay-critical state is owned by the host/server. Clients submit input intent and receive authoritative snapshots/events. Rendering, audio, camera shake, particles and UI may observe simulation events but cannot mutate simulation or consume gameplay RNG. See `NETWORK_ARCHITECTURE.md`.

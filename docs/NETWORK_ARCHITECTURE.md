@@ -17,6 +17,8 @@ Support solo and 2–4 player online co-op. The game is a high-entity-count acti
 
 ## 3. Replication strategy
 
+The engine-independent core now defines a host-side player-command envelope validator and an immutable, monotonic simulation event buffer. The validator checks player membership, sequence order, tick window, finite bounded movement and known input bits. Transport adapters must still authenticate the session member and serialize/deserialize safely; the core validator does not replace transport security.
+
 Replicate compact events for discrete changes (spell cast, projectile spawn, hit, status application, objective progress, revive, boss phase) and snapshots/deltas for continuous state. Pool networked entities and use interest/visibility rules only where they preserve gameplay correctness. Measure bandwidth before choosing update rates.
 
 ## 4. Session and transport

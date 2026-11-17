@@ -201,16 +201,17 @@
     "Full-game branch CI #44141825172 passed 10/10 jobs after correcting the negative-control fixture; checkpoint guard confirms the expanded scope and exact legacy artifact, and all nine legacy browser regression jobs pass.",
     "Added engine-independent .NET Standard 2.1 simulation core foundation: fixed-step clock, deterministic PCG RNG and configurable damage/friendly-fire/invulnerability pipeline; CI verification pending.",
     "Engine-independent Game.Core (.NET Standard 2.1) builds successfully in GitHub Actions; 12/12 deterministic contracts pass for fixed-step clock, pause/backlog, PCG RNG, friendly fire, self-damage, invulnerability, lethal transitions and max-health capacity.",
-    "Full-game branch CI #44142826420 passed 11/11 jobs: checkpoint, core simulation and nine legacy browser regression jobs."
+    "Full-game branch CI #44142826420 passed 11/11 jobs: checkpoint, core simulation and nine legacy browser regression jobs.",
+    "Added typed monotonic simulation event buffer and host-side player command envelope validation to Game.Core; tests added, CI pending."
   ],
   "failed_or_open": [
     "Unity 6.3 LTS editor project, URP configuration, package manifest and native Windows build have not yet been created or validated.",
-    "1–4 player online co-op, host authority, lobby/relay, reconnect, friendly-fire replication, revive and four-client stress are not implemented.",
+    "1–4 player online co-op transport/session, host snapshots, lobby/relay, reconnect, friendly-fire replication, revive and four-client stress are not implemented; only the pure input-envelope validation contract exists.",
     "Full wizard/realm/spell/element/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented.",
     "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
     "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested."
   ],
-  "next_action": "Extend Game.Core with typed simulation events, element/status contracts and validated player input/session commands. Then create/open the Unity 6.3 LTS URP project and connect one polished hero/realm/spell vertical slice to the tested core. Validate host-authoritative 4-client combat before expanding content.",
+  "next_action": "Run the expanded .NET core suite. If green, implement source-qualified elemental status contracts and spell execution primitives, then create the Unity 6.3 LTS project and wire the host-authoritative session adapter.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",

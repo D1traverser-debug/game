@@ -17,7 +17,15 @@ var tests = new List<(string Name, Action Run)>
     ("invulnerability_blocks_damage", InvulnerabilityBlocksDamage),
     ("lethal_damage_transitions_once_to_dead", LethalDamageTransitionsOnceToDead),
     ("invalid_damage_is_rejected", InvalidDamageIsRejected),
-    ("max_health_upgrade_can_restore_added_capacity", MaxHealthUpgradeCanRestoreAddedCapacity)
+    ("max_health_upgrade_can_restore_added_capacity", MaxHealthUpgradeCanRestoreAddedCapacity),
+    ("simulation_events_are_monotonic_and_drainable", SimulationEventsAreMonotonicAndDrainable),
+    ("simulation_event_time_cannot_move_backwards", SimulationEventTimeCannotMoveBackwards),
+    ("valid_player_command_is_accepted", ValidPlayerCommandIsAccepted),
+    ("unknown_player_command_is_rejected", UnknownPlayerCommandIsRejected),
+    ("duplicate_player_command_is_rejected", DuplicatePlayerCommandIsRejected),
+    ("stale_and_future_commands_are_rejected", StaleAndFutureCommandsAreRejected),
+    ("invalid_movement_is_rejected", InvalidMovementIsRejected),
+    ("unknown_button_bits_are_rejected", UnknownButtonBitsAreRejected),
 };
 
 var failures = 0;
@@ -153,6 +161,84 @@ static void MaxHealthUpgradeCanRestoreAddedCapacity()
     player.SetMaxHealth(140, true);
     Assert.Equal(100.0f, player.Health, 1e-5f);
     Assert.Equal(140.0f, player.MaxHealth, 1e-5f);
+}
+
+static void SimulationEventsAreMonotonicAndDrainable()
+{
+    var buffer = new Game.Core.Events.SimulationEventBuffer();
+    var first = buffer.Publish(4, Game.Core.Events.SimulationEventType.SpellCast, 1, -1, "spell.arc", 1, 2, 3);
+    var second = buffer.Publish(4, Game.Core.Events.SimulationEventType.DamageResolved, 1, 2, "damage.fire", 12, 5, 6);
+    Assert.Equal(0L, first.Sequence);
+    Assert.Equal(1L, second.Sequence);
+    Assert.Equal(2, buffer.Count);
+    var drained = buffer.Drain();
+    Assert.Equal(2, drained.Length);
+    Assert.Equal(0, buffer.Count);
+    Assert.Equal(2L, buffer.NextSequence);
+}
+
+static void SimulationEventTimeCannotMoveBackwards()
+{
+    var buffer = new Game.Core.Events.SimulationEventBuffer();
+    buffer.Publish(10, Game.Core.Events.SimulationEventType.SpellCast);
+    var threw = false;
+    try { buffer.Publish(9, Game.Core.Events.SimulationEventType.DamageResolved); }
+    catch (InvalidOperationException) { threw = true; }
+    Assert.True(threw, "event time moved backwards without rejection");
+}
+
+static void ValidPlayerCommandIsAccepted()
+{
+    var validator = new Game.Core.Networking.PlayerCommandValidator();
+    var players = new HashSet<int> { 1, 2, 3, 4 };
+    var command = new Game.Core.Networking.PlayerInputCommand(2, 1, 100, 0.6f, 0.8f,
+        Game.Core.Networking.PlayerButtons.CastPrimary | Game.Core.Networking.PlayerButtons.Dodge);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.Accepted, validator.Validate(command, players, 100).Outcome);
+}
+
+static void UnknownPlayerCommandIsRejected()
+{
+    var validator = new Game.Core.Networking.PlayerCommandValidator();
+    var players = new HashSet<int> { 1, 2, 3, 4 };
+    var command = new Game.Core.Networking.PlayerInputCommand(5, 1, 100, 0, 0, Game.Core.Networking.PlayerButtons.None);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.UnknownPlayer, validator.Validate(command, players, 100).Outcome);
+}
+
+static void DuplicatePlayerCommandIsRejected()
+{
+    var validator = new Game.Core.Networking.PlayerCommandValidator();
+    var players = new HashSet<int> { 1 };
+    var command = new Game.Core.Networking.PlayerInputCommand(1, 7, 100, 0, 0, Game.Core.Networking.PlayerButtons.None);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.Accepted, validator.Validate(command, players, 100).Outcome);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.DuplicateOrOutOfOrder, validator.Validate(command, players, 100).Outcome);
+}
+
+static void StaleAndFutureCommandsAreRejected()
+{
+    var validator = new Game.Core.Networking.PlayerCommandValidator(maxPastTicks: 10, maxFutureTicks: 2);
+    var players = new HashSet<int> { 1 };
+    var stale = new Game.Core.Networking.PlayerInputCommand(1, 1, 89, 0, 0, Game.Core.Networking.PlayerButtons.None);
+    var future = new Game.Core.Networking.PlayerInputCommand(1, 2, 103, 0, 0, Game.Core.Networking.PlayerButtons.None);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.TickOutsideWindow, validator.Validate(stale, players, 100).Outcome);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.TickOutsideWindow, validator.Validate(future, players, 100).Outcome);
+}
+
+static void InvalidMovementIsRejected()
+{
+    var validator = new Game.Core.Networking.PlayerCommandValidator();
+    var players = new HashSet<int> { 1 };
+    var tooFast = new Game.Core.Networking.PlayerInputCommand(1, 1, 100, 1.0f, 1.0f, Game.Core.Networking.PlayerButtons.None);
+    var nan = new Game.Core.Networking.PlayerInputCommand(1, 2, 100, float.NaN, 0.0f, Game.Core.Networking.PlayerButtons.None);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.InvalidMovement, validator.Validate(tooFast, players, 100).Outcome);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.InvalidMovement, validator.Validate(nan, players, 100).Outcome);
+}
+
+static void UnknownButtonBitsAreRejected()
+{
+    var validator = new Game.Core.Networking.PlayerCommandValidator();
+    var players = new HashSet<int> { 1 };
+    var command = new Game.Core.Networking.PlayerInputCommand(1, 1, 100, 0, 0, (Game.Core.Networking.PlayerButtons)32768);
+    Assert.Equal(Game.Core.Networking.CommandValidationOutcome.InvalidButtons, validator.Validate(command, players, 100).Outcome);
 }
 
 static class Assert

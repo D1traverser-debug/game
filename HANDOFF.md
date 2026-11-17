@@ -81,3 +81,11 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 - Standalone .NET 8 test runner: **12/12 PASS** (fixed-step/pause/backlog, seeded PCG RNG, friendly fire, self-damage, invulnerability, lethal transition, invalid damage, max-health capacity).
 - Checkpoint guard and all nine legacy browser regression jobs passed.
 - No Unity project/native build or full-game gameplay/network/asset acceptance exists yet.
+
+
+## Typed events and network input validation — CI pending
+
+- Added immutable `SimulationEvent` and single-threaded monotonic `SimulationEventBuffer` for deterministic presentation/audio/network observation.
+- Added `PlayerInputCommand`, allowed button flags and `PlayerCommandValidator` for registered-player membership, monotonic sequence, host tick window, finite bounded movement and valid input bits.
+- These are engine-independent contracts, not a transport, lobby, anti-cheat solution or complete co-op implementation.
+- Eight new deterministic tests added; CI pending.
