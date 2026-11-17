@@ -431,3 +431,13 @@ Next action: verify the metadata-rebaseline CI run. If the checkpoint passes, in
 - Project status remains **NOT_READY**.
 
 Next action is no longer CI repair. Perform normal-speed visual inspection of every boss warning against the active hitbox, validate actual player counterplay and lifecycle edge cases, then obtain an owner-controlled boss playtest. Keep exact timings/damage provisional until source evidence and play review support tuning. CAOS remains read-only.
+
+
+## BOSS TELEGRAPH LIFECYCLE REPAIR — 2026-11-18 (CI pending)
+
+- Preserved `main` at `eace4cb66f282d35c663f3a13d6e39ff8a15e0b8`; all work remains on `development`. CAOS parent assets and repository remain read-only.
+- Test-first red run: CI `44128548427` on `3efbbe965246bb2eae212a4e8bbf635853adbe15`. The previous 15 boss checks passed; seven of ten new lifecycle/geometry checks failed. Pause and invulnerability checks passed. No page errors or external requests.
+- Root causes: warning hazards were independent of the attack instance; phase/stagger only nulled the attack pointer; freeze paused attack time but not warning lifetime; pull/projectiles used the boss's later position; boss movement continued while geometry was snapshotted.
+- Candidate repair: unique attack token; one warning payload carrying the exact geometry; cancellation removes that token's warning; freeze/phase/stagger cancellation; snapshotted pull/projectile origins; boss position commitment during telegraph/active; shape-aware 2.5D and WebGL2 warning rendering.
+- Exact candidate artifact: `index.html`, 734011 bytes, SHA-256 `7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9`. Build/CI pending.
+- Next: verify full deterministic CI, then owner-controlled normal-speed boss playtest. Do not tune provisional numerical values until warning readability and counterplay are reviewed. Product remains **NOT_READY**.

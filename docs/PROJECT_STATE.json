@@ -2,9 +2,9 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "DETERMINISTIC_CI_SPLIT_AND_PARALLEL_MATRIX_PASS_001",
+  "checkpoint": "BOSS_TELEGRAPH_LIFECYCLE_REPAIR_001",
   "status": "NOT_READY",
-  "updated_at": "2026-11-17",
+  "updated_at": "2026-11-18",
   "scope": {
     "hero": "Reginald",
     "map": "Verdant Meadow",
@@ -230,16 +230,16 @@
     "Natural-play exploratory pilot remains unresolved: CI #141 seeds 1/2/3 died before boss spawn and recorded zero natural wins. It is no longer a blocking CI gate; obtain additional telemetry and an owner-controlled run before production balance changes.",
     "Performance remains below the 60 FPS desktop target in the software-rendered stress baseline; real hardware benchmarking and draw-cost profiling remain open.",
     "Real file-origin save/reload, corrupted-save recovery, visual/audio review, human full-run acceptance and source-fidelity review remain NOT_TESTED or PARTIAL.",
-    "Boss attack state machines and 15/15 deterministic component probes are implemented, but attack-by-attack visual readability, rendered-telegraph/hitbox parity, counterplay, pause/invulnerability/phase-cancellation behavior and human play acceptance remain open.",
     "Boss attack timings, radii, projectile speeds and damage values remain provisional adaptations; source evidence does not pin exact current-version numerical values.",
-    "Natural full-run victories for Sol'phish, Krog'wa and Mul'gath are not demonstrated on the exact 729501-byte candidate; prior wins across separate historical runs do not satisfy same-run coverage."
+    "Natural full-run victories for Sol'phish, Krog'wa and Mul'gath are not demonstrated on the exact 729501-byte candidate; prior wins across separate historical runs do not satisfy same-run coverage.",
+    "Boss telegraph lifecycle repair is committed but pending CI; human normal-speed readability, dodge/counterplay, source-exact timings/damage and full boss acceptance remain NOT_TESTED."
   ],
-  "next_action": "Conduct normal-speed visual inspection of every boss telegraph against its active hitbox, then test dodge/counterplay, pause, invulnerability and phase-transition cancellation. Obtain an owner-controlled boss playtest before tuning provisional numerical values. Keep the product NOT_READY until all P0/P1 and human acceptance gates pass.",
+  "next_action": "After deterministic CI passes, obtain an owner-controlled boss playtest at normal speed in 2.5D and 3D where available. Verify every attack's warning readability, dodge/counterplay, pause, invulnerability, freeze and phase cancellation. Do not tune provisional numerical values before that review.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "development_candidate_sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
-  "development_candidate_bytes": 729501,
+  "development_candidate_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
+  "development_candidate_bytes": 734011,
   "last_successful_candidate_ci": {
     "run_id": 44064686910,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/44064686910",
@@ -253,15 +253,15 @@
   "latest_local_candidate": {
     "artifact": "development/index.html",
     "delivery_filename": "咒语旅团-当前开发版-单人网页版.html",
-    "bytes": 729501,
-    "sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
-    "source_base": "2.5D art-forward single-file candidate with embedded 4x4 sprite atlas, 24 static decor cache tiles, progression/objective fixes and source-informed boss attack state machines",
+    "bytes": 734011,
+    "sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
+    "source_base": "2.5D art-forward single-file candidate with shape-aware boss telegraphs, snapshotted attack origins, committed telegraph positions and synchronized cancellation",
     "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
     "scope": "Reginald only / Verdant Meadow only / single-player / offline single HTML",
-    "tested": "CI run 44064686910 on commit 26726036397b71a0b77fbdb837d54ee59509b89f: exact artifact checkpoint PASS; all nine browser regression jobs PASS; boss encounter 15/15; trial unlock regression passes with the corrected kind-aware assertion; build reproducibility PASS.",
-    "not_tested": "Human owner playtest; source-accurate timing/damage; attack-by-attack visual parity and player counterplay in both render paths; pause/invulnerability/phase-cancellation edge cases; natural full-run wins for all three bosses on this exact artifact; real file-origin persistence; real hardware performance; final visual/audio acceptance."
+    "tested": "CI pending on new boss telegraph lifecycle candidate; previous exact-artifact baseline passed 9/9 browser jobs.",
+    "not_tested": "Human owner boss playtest; source-accurate timing/damage; subjective warning readability and dodge/counterplay; real file-origin persistence; real hardware performance; final visual/audio acceptance."
   },
-  "latest_candidate_ci_status": "PASS_CHECKPOINT_AND_ALL_NINE_BROWSER_REGRESSIONS; COMPONENT_TESTED_NOT_PRODUCT_ACCEPTED",
+  "latest_candidate_ci_status": "PENDING_CI_BOSS_TELEGRAPH_LIFECYCLE_REPAIR",
   "last_verified_development_commit": "26726036397b71a0b77fbdb837d54ee59509b89f",
   "last_verified_ci_run": {
     "run_id": 44064686910,

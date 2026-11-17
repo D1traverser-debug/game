@@ -29,7 +29,7 @@ function bossPhaseForHealth(b){
 function bossSyncPhase(b){
  const next=bossPhaseForHealth(b),old=b.phaseIndex||0;b.phaseCount=b.bossId==='sol'?1:3;
  if(next<=old)return false;
- b.phaseIndex=next;b.phaseTransitionTimer=1.15;b.attackInstance=null;b.attackCooldown=1.25;
+ b.phaseIndex=next;b.phaseTransitionTimer=1.15;bossCancelAttack(b);b.attackCooldown=1.25;
  if(b.bossId==='krog'&&next>=1&&!b.fieldActive){
   b.fieldActive=true;b.fieldCenter={x:game.player.x,y:game.player.y};b.fieldRadius=600;
   b.fieldHazard={x:b.fieldCenter.x,y:b.fieldCenter.y,r:b.fieldRadius,timer:99999,life:99999,dmg:0,kind:'warning',color:'#80e2e6',boss:true};
@@ -63,31 +63,38 @@ function bossAttackGeometry(b,def,p){
   return{kind:'grid',points:offsets.slice(0,count).map(([x,y])=>({x:p.x+x,y:p.y+y,r:def.radius+phase*5}))};
  }
  if(def.shape==='radial')return{kind:'radial',x:b.x,y:b.y,r:def.radius+phase*14};
- return{kind:'target',x:p.x,y:p.y,r:def.radius||58};
+ return{kind:'target',x:p.x,y:p.y,r:def.radius||58,originX:b.x,originY:b.y};
 }
 function bossEmitTelegraph(instance){
- const g=game,geo=instance.geometry,def=instance.def;
- if(geo.kind==='line'){
-  const dx=geo.tx-geo.x,dy=geo.ty-geo.y,len=Math.hypot(dx,dy),steps=Math.max(2,Math.ceil(len/78));
-  for(let i=0;i<=steps;i++){const q=i/steps;g.hazards.push({x:geo.x+dx*q,y:geo.y+dy*q,r:geo.width*.48,timer:def.telegraph,life:def.telegraph+.08,dmg:0,kind:'warning',color:def.color,boss:true})}
- }else if(geo.kind==='grid'){
-  for(const q of geo.points)g.hazards.push({x:q.x,y:q.y,r:q.r,timer:def.telegraph,life:def.telegraph+.08,dmg:0,kind:'warning',color:def.color,boss:true});
- }else g.hazards.push({x:geo.x,y:geo.y,r:geo.r||58,timer:def.telegraph,life:def.telegraph+.08,dmg:0,kind:'warning',color:def.color,boss:true});
+ const geo=instance.geometry,def=instance.def,first=geo.points?.[0]||{};
+ game.hazards.push({x:geo.x??first.x??0,y:geo.y??first.y??0,r:geo.r??first.r??(geo.width||116)*.5,
+  timer:def.telegraph,life:def.telegraph+.08,dmg:0,kind:'warning',color:def.color,boss:true,
+  bossAttackToken:instance.token,bossAttackId:instance.id,bossShape:geo.kind,bossGeometry:geo,
+  bossAttackCount:def.count+(def.phaseCount||0)*instance.phaseIndex});
 }
 function bossBeginAttack(b,def){
- const a={id:def.id,def,geometry:bossAttackGeometry(b,def,game.player),stage:'telegraph',timer:def.telegraph,phaseIndex:b.phaseIndex||0,resolved:false,hitOnce:false};
+ const token=(b.attackToken||0)+1;b.attackToken=token;
+ const a={id:def.id,token,def,geometry:bossAttackGeometry(b,def,game.player),stage:'telegraph',timer:def.telegraph,phaseIndex:b.phaseIndex||0,resolved:false,hitOnce:false};
  b.attackInstance=a;bossEmitTelegraph(a);return a;
 }
+function bossCancelAttack(b,cooldown=0){
+ const a=b?.attackInstance;if(!a)return false;
+ game.hazards=game.hazards.filter(h=>h.bossAttackToken!==a.token);
+ b.attackInstance=null;
+ if(cooldown>0)b.attackCooldown=Math.max(b.attackCooldown||0,cooldown);
+ return true;
+}
 function bossFireProjectiles(b,a){
- const def=a.def,geo=a.geometry,phase=b.phaseIndex||0,count=def.count+(def.phaseCount||0)*phase;
- const base=Math.atan2((geo.y??game.player.y)-b.y,(geo.x??game.player.x)-b.x);
+ const def=a.def,geo=a.geometry,phase=a.phaseIndex??b.phaseIndex??0,count=def.count+(def.phaseCount||0)*phase;
+ const originX=geo.kind==='radial'?geo.x:(geo.originX??b.x),originY=geo.kind==='radial'?geo.y:(geo.originY??b.y);
+ const targetX=geo.x??game.player.x,targetY=geo.y??game.player.y,base=Math.atan2(targetY-originY,targetX-originX);
  for(let i=0;i<count;i++){
   const angle=geo.kind==='radial'?i*TAU/count:base+(i-(count-1)/2)*.17,speed=def.speed||190;
-  game.shots.push({x:b.x+Math.cos(angle)*(b.r+8),y:b.y+Math.sin(angle)*(b.r+8),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:4.8,dmg:def.damage,r:9,kind:def.effect==='homing'?'enemyHoming':'enemy',speed,turnRate:def.turnRate||1.6,color:def.color,owner:'boss'});
+  game.shots.push({x:originX+Math.cos(angle)*(b.r+8),y:originY+Math.sin(angle)*(b.r+8),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:4.8,dmg:def.damage,r:9,kind:def.effect==='homing'?'enemyHoming':'enemy',speed,turnRate:def.turnRate||1.6,color:def.color,owner:'boss'});
  }
 }
 function bossApplyPull(b,a,dt){
- const geo=a.geometry,p=game.player,dx=b.x-p.x,dy=b.y-p.y,dist=Math.hypot(dx,dy)||1,def=a.def;
+ const geo=a.geometry,p=game.player,dx=geo.x-p.x,dy=geo.y-p.y,dist=Math.hypot(dx,dy)||1,def=a.def;
  if(dist<geo.r){const strength=.35+.65*(1-dist/geo.r),step=def.pullSpeed*strength*dt;p.x+=dx/dist*step;p.y+=dy/dist*step;if(dist<118&&!a.hitOnce){a.hitOnce=true;damagePlayer(def.damage,'bossInhale')}}
 }
 function bossResolveAttack(b,a,dt){
@@ -99,19 +106,16 @@ function bossResolveAttack(b,a,dt){
  a.resolved=true;
 }
 function bossUpdateAttack(b,dt){
- if(b.phaseTransitionTimer>0||b.vulnerable>0||b.freeze>0)return;
+ if(b.phaseTransitionTimer>0||b.vulnerable>0||b.freeze>0){if(b.attackInstance?.stage==='telegraph')bossCancelAttack(b,.65);return}
  if(!b.attackInstance){
   b.attackCooldown=Math.max(0,(b.attackCooldown||0)-dt);
   if(b.attackCooldown<=0){const defs=BOSS_ATTACK_DEFS[b.bossId]||BOSS_ATTACK_DEFS.sol,def=defs[(b.attackSequence||0)%defs.length];b.attackSequence=(b.attackSequence||0)+1;bossBeginAttack(b,def)}
-  return;
+  return
  }
  const a=b.attackInstance;
  if(a.stage==='telegraph'){a.timer-=dt;if(a.timer<=0){a.stage='active';a.timer=a.def.active;bossResolveAttack(b,a,dt)}}
- else if(a.stage==='active'){
-  if(a.def.effect==='pull')bossResolveAttack(b,a,dt);
-  a.timer-=dt;
-  if(a.timer<=0){a.stage='recovery';a.timer=a.def.recovery;game.fx.push({x:b.x,y:b.y,r:b.r*2.1,life:.3,max:.3,color:a.def.color,type:'burst'})}
- }else if(a.stage==='recovery'){a.timer-=dt;if(a.timer<=0){b.attackCooldown=a.def.cooldown;b.attackInstance=null}}
+ else if(a.stage==='active'){if(a.def.effect==='pull')bossResolveAttack(b,a,dt);a.timer-=dt;if(a.timer<=0){a.stage='recovery';a.timer=a.def.recovery;game.fx.push({x:b.x,y:b.y,r:b.r*2.1,life:.3,max:.3,color:a.def.color,type:'burst'})}}
+ else if(a.stage==='recovery'){a.timer-=dt;if(a.timer<=0){b.attackCooldown=a.def.cooldown;b.attackInstance=null}}
 }
 function bossUpdateHomingProjectile(s,dt,p){
  const dx=p.x-s.x,dy=p.y-s.y,dist=Math.hypot(dx,dy)||1,speed=s.speed||180,blend=Math.min(1,dt*(s.turnRate||1.6));
@@ -156,10 +160,10 @@ function updateBossEncounter(dt){
  if(b.burn>0){b.burnTick=(b.burnTick||0)-dt;if(b.burnTick<=0){b.burnTick=.5;damageEnemy(b,b.burnDmg||4,'burn',null,false)}}
  if(b.dead)return;
  bossSyncPhase(b);
- if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;b.attackInstance=null;b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
+ if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;bossCancelAttack(b);b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
  b.phaseTransitionTimer=Math.max(0,(b.phaseTransitionTimer||0)-dt);
  const dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx);
- if(b.vulnerable<=0&&b.freeze<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);b.x+=Math.cos(a)*speed*(1-b.slow)*dt;b.y+=Math.sin(a)*speed*(1-b.slow)*dt}
+ const committedAttack=!!b.attackInstance&&(b.attackInstance.stage==='telegraph'||b.attackInstance.stage==='active');if(b.vulnerable<=0&&b.freeze<=0&&!committedAttack&&b.phaseTransitionTimer<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);b.x+=Math.cos(a)*speed*(1-b.slow)*dt;b.y+=Math.sin(a)*speed*(1-b.slow)*dt}
  bossApplyMagneticField(b,dt);bossUpdateMulMinions(b,dt);if(b.dead)return;bossUpdateAttack(b,dt);
  const phaseText=b.phaseCount>1?' · 阶段 '+((b.phaseIndex||0)+1)+'/'+b.phaseCount:'';
  const headText=b.bossId==='mul'?' · '+(b.headCount||1)+'首':'';

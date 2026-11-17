@@ -171,6 +171,19 @@ function boot3D(){
  const groups={sphere:[],small:[],cone:[],cyl:[],ground:[],disk:[]};let drawCalls=0,instanceCount=0;
  const colors={hero:[.36,.45,.86,1],cloak:[.23,.26,.51,1],gold:[1,.78,.37,1],stone:[.60,.59,.46,1],wood:[.39,.29,.18,1],leaf:[.28,.60,.30,1],purple:[.6,.4,.73,1],ice:[.43,.83,1,1],shadow:[.13,.19,.13,.24]};
  function add(key,x,y,z,sx,sy,sz,r,c){groups[key].push(instance(x,y,z,sx,sy,sz,r,c));instanceCount++}
+ function warningColor(hex,alpha){const m=/^#?([0-9a-f]{6})$/i.exec(String(hex||''));if(!m)return[1,.76,.30,alpha];const v=parseInt(m[1],16);return[((v>>16)&255)/255,((v>>8)&255)/255,(v&255)/255,alpha]}
+ function addBossWarning(h,currentX,currentZ){
+  const g=h.bossGeometry,pad=game?.player?.r||0,c=warningColor(h.color,h.timer>0?.42:.18),soft=[c[0],c[1],c[2],.12];
+  const visible=(x,y)=>Math.abs(x*SCALE-currentX)<=23&&Math.abs(y*SCALE-currentZ)<=23;
+  const disk=(x,y,r,col=c)=>{if(visible(x,y)){const s=Math.max(.045,r*SCALE);add('disk',x*SCALE,-.035,y*SCALE,s,1,s,0,col)}};
+  const dot=(x,y,col=c)=>{if(visible(x,y))add('small',x*SCALE,.16,y*SCALE,.12,.13,.12,0,col)};
+  if(h.bossShape==='line'){const dx=g.tx-g.x,dy=g.ty-g.y,len=Math.hypot(dx,dy),steps=Math.max(2,Math.ceil(len/54)),r=g.width*.5+pad;for(let i=0;i<=steps;i++){const q=i/steps;disk(g.x+dx*q,g.y+dy*q,r)}}
+  else if(h.bossShape==='grid'){for(const q of g.points)disk(q.x,q.y,q.r+pad)}
+  else if(h.bossShape==='radial'){dot(g.x,g.y);const count=Math.max(1,h.bossAttackCount||8),len=Math.max(320,Math.min(460,(g.r||160)*2.4));for(let i=0;i<count;i++){const a=i*T/count;for(let d=45;d<=len;d+=55)dot(g.x+Math.cos(a)*d,g.y+Math.sin(a)*d)}}
+  else if(h.bossShape==='target'){disk(g.x,g.y,g.r||58,soft);const r=g.r||58;for(let i=0;i<4;i++){const a=i*T/4;dot(g.x+Math.cos(a)*r,g.y+Math.sin(a)*r)}}
+  else if(h.bossShape==='pull'){disk(g.x,g.y,g.r,soft);for(let i=0;i<8;i++){const a=i*T/8;dot(g.x+Math.cos(a)*g.r*.82,g.y+Math.sin(a)*g.r*.82)}}
+  else disk(g.x,g.y,(g.r||58)+pad,soft);
+ }
  function flush(){drawCalls=0;for(const [name,a] of Object.entries(groups)){if(!a.length)continue;const m=M[name],data=new Float32Array(a.length*20);gl.uniform1f(groundU,name==='ground'?1:0);for(let i=0;i<a.length;i++)data.set(a[i],i*20);gl.bindVertexArray(m.vao);gl.bindBuffer(gl.ARRAY_BUFFER,m.ib);gl.bufferData(gl.ARRAY_BUFFER,data,gl.DYNAMIC_DRAW);gl.drawArraysInstanced(gl.TRIANGLES,0,m.count,a.length);gl.bindVertexArray(null);drawCalls++;a.length=0}}
  function hash(n){let x=Math.sin(n*12.9898+13.2)*43758.5453;return x-Math.floor(x)}
  function hero(p,t){let x=p.x*SCALE,z=p.y*SCALE,bob=Math.sin(t*7)*(p.lastMove ? .095 : .032),face=p.facing||0;
@@ -204,7 +217,7 @@ function boot3D(){
  }
  function visualFX(g,t){for(const s of g.shots){if(s.life<=0)continue;let c=s.kind==='enemy'||s.kind==='enemyHoming'?[.81,.46,.74,1]:s.color&&s.color.includes('ff')?[1,.63,.36,1]:[.50,.80,1,1];let r=(s.r||7)*SCALE;add('small',s.x*SCALE,.7,s.y*SCALE,Math.max(.13,r),Math.max(.13,r),Math.max(.13,r),0,c)}
   for(const o of g.orbs){if(Math.abs(o.x*SCALE-currentX)>21||Math.abs(o.y*SCALE-currentZ)>21)continue;let c=o.type==='health'?[1,.37,.39,1]:o.type==='magnet'?[.37,.99,.88,1]:o.type==='gold'?[1,.8,.32,1]:o.v>=17?[.86,.50,1,1]:[.44,.86,1,1];add('small',o.x*SCALE,.25+Math.sin(t*3+o.x)*.11,o.y*SCALE,.115,.115,.115,0,c)}
-  for(const h of g.hazards){if(h.life<=0)continue;let x=h.x*SCALE,z=h.y*SCALE;if(Math.abs(x-currentX)>23||Math.abs(z-currentZ)>23)continue;let c=h.kind==='runestone'?[.81,.30,.72,.38]:h.kind==='dice'?[.87,.62,.32,.32]:[1,.76,.30,.32];add('disk',x,-.035,z,h.r*SCALE,1,h.r*SCALE,0,c);if(h.timer>0){let n=6;for(let i=0;i<n;i++){let a=i*T/n+t*.5;add('small',x+Math.cos(a)*h.r*SCALE,.16,z+Math.sin(a)*h.r*SCALE,.13,.16,.13,0,[c[0],c[1],c[2],.75])}}}
+  for(const h of g.hazards){if(h.life<=0)continue;if(h.bossGeometry){addBossWarning(h,currentX,currentZ);continue}let x=h.x*SCALE,z=h.y*SCALE;if(Math.abs(x-currentX)>23||Math.abs(z-currentZ)>23)continue;let c=h.kind==='runestone'?[.81,.30,.72,.38]:h.kind==='dice'?[.87,.62,.32,.32]:[1,.76,.30,.32];add('disk',x,-.035,z,h.r*SCALE,1,h.r*SCALE,0,c);if(h.timer>0){let n=6;for(let i=0;i<n;i++){let a=i*T/n+t*.5;add('small',x+Math.cos(a)*h.r*SCALE,.16,z+Math.sin(a)*h.r*SCALE,.13,.16,.13,0,[c[0],c[1],c[2],.75])}}}
   for(const plant of g.plants||[]){if(Math.abs(plant.x*SCALE-currentX)>23||Math.abs(plant.y*SCALE-currentZ)>23)continue;let x=plant.x*SCALE,z=plant.y*SCALE,scale=Math.max(.55,plant.r/18);add('cyl',x,.36,z,.09,.38,.09,0,[.25,.48,.24,1]);add('sphere',x-.22,.55,z,.26*scale,.16*scale,.17*scale,-.45,[.38,.72,.31,1]);add('sphere',x+.22,.58,z,.26*scale,.16*scale,.17*scale,.45,[.48,.82,.37,1]);add('small',x,.78,z,.13,.14,.13,0,[.91,.77,.45,1])}
   for(const imp of g.ghostImps||[]){let a=imp.angle+(t||0)*.45,x=(g.player.x+Math.cos(a)*100)*SCALE,z=(g.player.y+Math.sin(a)*100)*SCALE;add('sphere',x,.82,z,.20,.24,.20,0,[.70,.53,.91,.85]);add('cone',x,.56,z,.16,.24,.16,a,[.43,.31,.66,.9])}
   for(const e of g.fx){if(e.life<=0)continue;if(Math.abs(e.x*SCALE-currentX)>23||Math.abs(e.y*SCALE-currentZ)>23)continue;let q=Math.max(.1,e.life/(e.max||.35)),r=Math.max(.3,(e.r||22)*SCALE*(1+(1-q)*.7));add('disk',e.x*SCALE,-.025,e.y*SCALE,r,1,r,0,[.66,.85,1,q*.31]);}
@@ -756,7 +769,7 @@ function bossPhaseForHealth(b){
 function bossSyncPhase(b){
  const next=bossPhaseForHealth(b),old=b.phaseIndex||0;b.phaseCount=b.bossId==='sol'?1:3;
  if(next<=old)return false;
- b.phaseIndex=next;b.phaseTransitionTimer=1.15;b.attackInstance=null;b.attackCooldown=1.25;
+ b.phaseIndex=next;b.phaseTransitionTimer=1.15;bossCancelAttack(b);b.attackCooldown=1.25;
  if(b.bossId==='krog'&&next>=1&&!b.fieldActive){
   b.fieldActive=true;b.fieldCenter={x:game.player.x,y:game.player.y};b.fieldRadius=600;
   b.fieldHazard={x:b.fieldCenter.x,y:b.fieldCenter.y,r:b.fieldRadius,timer:99999,life:99999,dmg:0,kind:'warning',color:'#80e2e6',boss:true};
@@ -790,31 +803,38 @@ function bossAttackGeometry(b,def,p){
   return{kind:'grid',points:offsets.slice(0,count).map(([x,y])=>({x:p.x+x,y:p.y+y,r:def.radius+phase*5}))};
  }
  if(def.shape==='radial')return{kind:'radial',x:b.x,y:b.y,r:def.radius+phase*14};
- return{kind:'target',x:p.x,y:p.y,r:def.radius||58};
+ return{kind:'target',x:p.x,y:p.y,r:def.radius||58,originX:b.x,originY:b.y};
 }
 function bossEmitTelegraph(instance){
- const g=game,geo=instance.geometry,def=instance.def;
- if(geo.kind==='line'){
-  const dx=geo.tx-geo.x,dy=geo.ty-geo.y,len=Math.hypot(dx,dy),steps=Math.max(2,Math.ceil(len/78));
-  for(let i=0;i<=steps;i++){const q=i/steps;g.hazards.push({x:geo.x+dx*q,y:geo.y+dy*q,r:geo.width*.48,timer:def.telegraph,life:def.telegraph+.08,dmg:0,kind:'warning',color:def.color,boss:true})}
- }else if(geo.kind==='grid'){
-  for(const q of geo.points)g.hazards.push({x:q.x,y:q.y,r:q.r,timer:def.telegraph,life:def.telegraph+.08,dmg:0,kind:'warning',color:def.color,boss:true});
- }else g.hazards.push({x:geo.x,y:geo.y,r:geo.r||58,timer:def.telegraph,life:def.telegraph+.08,dmg:0,kind:'warning',color:def.color,boss:true});
+ const geo=instance.geometry,def=instance.def,first=geo.points?.[0]||{};
+ game.hazards.push({x:geo.x??first.x??0,y:geo.y??first.y??0,r:geo.r??first.r??(geo.width||116)*.5,
+  timer:def.telegraph,life:def.telegraph+.08,dmg:0,kind:'warning',color:def.color,boss:true,
+  bossAttackToken:instance.token,bossAttackId:instance.id,bossShape:geo.kind,bossGeometry:geo,
+  bossAttackCount:def.count+(def.phaseCount||0)*instance.phaseIndex});
 }
 function bossBeginAttack(b,def){
- const a={id:def.id,def,geometry:bossAttackGeometry(b,def,game.player),stage:'telegraph',timer:def.telegraph,phaseIndex:b.phaseIndex||0,resolved:false,hitOnce:false};
+ const token=(b.attackToken||0)+1;b.attackToken=token;
+ const a={id:def.id,token,def,geometry:bossAttackGeometry(b,def,game.player),stage:'telegraph',timer:def.telegraph,phaseIndex:b.phaseIndex||0,resolved:false,hitOnce:false};
  b.attackInstance=a;bossEmitTelegraph(a);return a;
 }
+function bossCancelAttack(b,cooldown=0){
+ const a=b?.attackInstance;if(!a)return false;
+ game.hazards=game.hazards.filter(h=>h.bossAttackToken!==a.token);
+ b.attackInstance=null;
+ if(cooldown>0)b.attackCooldown=Math.max(b.attackCooldown||0,cooldown);
+ return true;
+}
 function bossFireProjectiles(b,a){
- const def=a.def,geo=a.geometry,phase=b.phaseIndex||0,count=def.count+(def.phaseCount||0)*phase;
- const base=Math.atan2((geo.y??game.player.y)-b.y,(geo.x??game.player.x)-b.x);
+ const def=a.def,geo=a.geometry,phase=a.phaseIndex??b.phaseIndex??0,count=def.count+(def.phaseCount||0)*phase;
+ const originX=geo.kind==='radial'?geo.x:(geo.originX??b.x),originY=geo.kind==='radial'?geo.y:(geo.originY??b.y);
+ const targetX=geo.x??game.player.x,targetY=geo.y??game.player.y,base=Math.atan2(targetY-originY,targetX-originX);
  for(let i=0;i<count;i++){
   const angle=geo.kind==='radial'?i*TAU/count:base+(i-(count-1)/2)*.17,speed=def.speed||190;
-  game.shots.push({x:b.x+Math.cos(angle)*(b.r+8),y:b.y+Math.sin(angle)*(b.r+8),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:4.8,dmg:def.damage,r:9,kind:def.effect==='homing'?'enemyHoming':'enemy',speed,turnRate:def.turnRate||1.6,color:def.color,owner:'boss'});
+  game.shots.push({x:originX+Math.cos(angle)*(b.r+8),y:originY+Math.sin(angle)*(b.r+8),vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:4.8,dmg:def.damage,r:9,kind:def.effect==='homing'?'enemyHoming':'enemy',speed,turnRate:def.turnRate||1.6,color:def.color,owner:'boss'});
  }
 }
 function bossApplyPull(b,a,dt){
- const geo=a.geometry,p=game.player,dx=b.x-p.x,dy=b.y-p.y,dist=Math.hypot(dx,dy)||1,def=a.def;
+ const geo=a.geometry,p=game.player,dx=geo.x-p.x,dy=geo.y-p.y,dist=Math.hypot(dx,dy)||1,def=a.def;
  if(dist<geo.r){const strength=.35+.65*(1-dist/geo.r),step=def.pullSpeed*strength*dt;p.x+=dx/dist*step;p.y+=dy/dist*step;if(dist<118&&!a.hitOnce){a.hitOnce=true;damagePlayer(def.damage,'bossInhale')}}
 }
 function bossResolveAttack(b,a,dt){
@@ -826,19 +846,16 @@ function bossResolveAttack(b,a,dt){
  a.resolved=true;
 }
 function bossUpdateAttack(b,dt){
- if(b.phaseTransitionTimer>0||b.vulnerable>0||b.freeze>0)return;
+ if(b.phaseTransitionTimer>0||b.vulnerable>0||b.freeze>0){if(b.attackInstance?.stage==='telegraph')bossCancelAttack(b,.65);return}
  if(!b.attackInstance){
   b.attackCooldown=Math.max(0,(b.attackCooldown||0)-dt);
   if(b.attackCooldown<=0){const defs=BOSS_ATTACK_DEFS[b.bossId]||BOSS_ATTACK_DEFS.sol,def=defs[(b.attackSequence||0)%defs.length];b.attackSequence=(b.attackSequence||0)+1;bossBeginAttack(b,def)}
-  return;
+  return
  }
  const a=b.attackInstance;
  if(a.stage==='telegraph'){a.timer-=dt;if(a.timer<=0){a.stage='active';a.timer=a.def.active;bossResolveAttack(b,a,dt)}}
- else if(a.stage==='active'){
-  if(a.def.effect==='pull')bossResolveAttack(b,a,dt);
-  a.timer-=dt;
-  if(a.timer<=0){a.stage='recovery';a.timer=a.def.recovery;game.fx.push({x:b.x,y:b.y,r:b.r*2.1,life:.3,max:.3,color:a.def.color,type:'burst'})}
- }else if(a.stage==='recovery'){a.timer-=dt;if(a.timer<=0){b.attackCooldown=a.def.cooldown;b.attackInstance=null}}
+ else if(a.stage==='active'){if(a.def.effect==='pull')bossResolveAttack(b,a,dt);a.timer-=dt;if(a.timer<=0){a.stage='recovery';a.timer=a.def.recovery;game.fx.push({x:b.x,y:b.y,r:b.r*2.1,life:.3,max:.3,color:a.def.color,type:'burst'})}}
+ else if(a.stage==='recovery'){a.timer-=dt;if(a.timer<=0){b.attackCooldown=a.def.cooldown;b.attackInstance=null}}
 }
 function bossUpdateHomingProjectile(s,dt,p){
  const dx=p.x-s.x,dy=p.y-s.y,dist=Math.hypot(dx,dy)||1,speed=s.speed||180,blend=Math.min(1,dt*(s.turnRate||1.6));
@@ -883,10 +900,10 @@ function updateBossEncounter(dt){
  if(b.burn>0){b.burnTick=(b.burnTick||0)-dt;if(b.burnTick<=0){b.burnTick=.5;damageEnemy(b,b.burnDmg||4,'burn',null,false)}}
  if(b.dead)return;
  bossSyncPhase(b);
- if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;b.attackInstance=null;b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
+ if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;bossCancelAttack(b);b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
  b.phaseTransitionTimer=Math.max(0,(b.phaseTransitionTimer||0)-dt);
  const dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx);
- if(b.vulnerable<=0&&b.freeze<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);b.x+=Math.cos(a)*speed*(1-b.slow)*dt;b.y+=Math.sin(a)*speed*(1-b.slow)*dt}
+ const committedAttack=!!b.attackInstance&&(b.attackInstance.stage==='telegraph'||b.attackInstance.stage==='active');if(b.vulnerable<=0&&b.freeze<=0&&!committedAttack&&b.phaseTransitionTimer<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);b.x+=Math.cos(a)*speed*(1-b.slow)*dt;b.y+=Math.sin(a)*speed*(1-b.slow)*dt}
  bossApplyMagneticField(b,dt);bossUpdateMulMinions(b,dt);if(b.dead)return;bossUpdateAttack(b,dt);
  const phaseText=b.phaseCount>1?' · 阶段 '+((b.phaseIndex||0)+1)+'/'+b.phaseCount:'';
  const headText=b.bossId==='mul'?' · '+(b.headCount||1)+'首':'';
@@ -1018,6 +1035,31 @@ function v2sprite(id,x,y,w,h,alpha=1){if(!V2_ATLAS.complete||!V2_ATLAS.naturalWi
 function v2hero(p){let a=V2.age,walk=p.lastMove>0?.9:0,bob=Math.sin(a*10)*walk*2;ctx.save();ctx.translate(p.x,p.y+bob);let shadow=ctx.createRadialGradient(0,12,2,0,12,34);shadow.addColorStop(0,'#091d20bb');shadow.addColorStop(1,'#091b1800');ctx.fillStyle=shadow;ctx.beginPath();ctx.ellipse(0,12,31,17,0,0,TAU);ctx.fill();if(p.invuln>0&&Math.floor(a*15)%2===0)ctx.globalAlpha=.58;if(p.ghost){ctx.shadowColor='#8bdfff';ctx.shadowBlur=22;v2sprite(V2_SPRITE.hero,0,-12,92,100,.58)}else{ctx.shadowColor='#80d9f0';ctx.shadowBlur=8+Math.sin(a*4)*3;v2sprite(V2_SPRITE.hero,0,-12,92,100)}ctx.shadowBlur=0;ctx.restore()}
 function v2enemy(e){let t=V2.age,x=e.x,y=e.y,scale=e.r/18,bob=Math.sin(t*4+e.x*.012)*1.5;ctx.save();ctx.translate(x,y+bob);v2ellipse(1,14,24*scale,9*scale,'#09211c80');if(e.state==='burrow'){ctx.globalAlpha=.72;v2ellipse(0,8,24*scale,8*scale,'#2d252e');v2arc(0,5,21*scale,Math.PI,TAU,'#ce80df',3);ctx.restore();return}let id=V2_SPRITE[e.type]??V2_SPRITE.crawler;let size=(e.type==='crabladon'?100: e.type==='gnasher'?92:74)*scale;if(e.hitFlash>0)ctx.globalAlpha=.68;let glow=e.state==='corrupt'||e.freeze>0||e.burn>0;ctx.shadowColor=e.state==='corrupt'?'#c98af0':e.freeze>0?'#8de7ff':'#ff9c55';ctx.shadowBlur=glow?10:0;v2sprite(id,0,-5,size,size*.94);ctx.shadowBlur=0;if(e.elite){ctx.strokeStyle='#e8c87d';ctx.lineWidth=2.5;v2arc(0,-5,size*.43,0,TAU,'#e8c87d',2.5)}if(e.freeze>0){ctx.strokeStyle='#b0effc';ctx.lineWidth=2;v2arc(0,-5,size*.48,0,TAU,'#b0effc',2)}if(e.burn>0){ctx.shadowColor='#ff9d43';ctx.shadowBlur=11;v2poly([[-5,-size*.45],[0,-size*.67],[7,-size*.48]],'#ffb452')}if(e.hp<e.max&&e.max>0){let bw=Math.max(30,size*.72);ctx.fillStyle='#101c18';ctx.fillRect(-bw/2,-size*.57,bw,4);ctx.fillStyle='#dc8771';ctx.fillRect(-bw/2,-size*.57,bw*clamp(e.hp/e.max,0,1),3)}ctx.restore()}
 function v2boss(b){let t=V2.age,id=b.bossId==='krog'?V2_SPRITE.krog:b.bossId==='mul'?V2_SPRITE.mul:V2_SPRITE.sol;ctx.save();ctx.translate(b.x,b.y+Math.sin(t*2.5)*3);v2ellipse(8,54,92,25,'#081923ab');ctx.shadowColor=b.vulnerable>0?'#f7d98b':'#a56fd1';ctx.shadowBlur=b.vulnerable>0?26:15;v2sprite(id,0,-15,190,180);ctx.shadowBlur=0;if(b.vulnerable>0){v2arc(0,-15,94,0,TAU,'#f4d989',4)}ctx.restore()}
+function v2bossTelegraph(z){
+ const g=z.bossGeometry;if(!g)return false;
+ const col=z.color||'#f5d99a',pad=game?.player?.r||0,alpha=z.timer>0?.86:.25;
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=col;ctx.fillStyle=col;
+ const ring=(x,y,r)=>{ctx.globalAlpha=alpha*.12;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();ctx.globalAlpha=alpha;ctx.setLineDash([10,7]);ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();ctx.setLineDash([])};
+ if(z.bossShape==='line'){
+  ctx.globalAlpha=alpha*.17;ctx.lineWidth=g.width+2*pad;ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(g.x,g.y);ctx.lineTo(g.tx,g.ty);ctx.stroke();
+  ctx.globalAlpha=alpha;ctx.lineWidth=3;ctx.setLineDash([14,9]);ctx.beginPath();ctx.moveTo(g.x,g.y);ctx.lineTo(g.tx,g.ty);ctx.stroke();ctx.setLineDash([]);
+  ctx.globalAlpha=alpha*.85;ctx.beginPath();ctx.arc(g.tx,g.ty,g.width*.5+pad,0,TAU);ctx.stroke();
+ }else if(z.bossShape==='grid'){for(const q of g.points){const r=q.r+pad;ring(q.x,q.y,r);ctx.globalAlpha=alpha*.8;ctx.beginPath();ctx.arc(q.x,q.y,4,0,TAU);ctx.fill()}}
+ else if(z.bossShape==='radial'){
+  const count=Math.max(1,z.bossAttackCount||8),len=Math.max(320,Math.min(460,(g.r||160)*2.4));ring(g.x,g.y,Math.max(22,(g.r||160)*.16));
+  ctx.globalAlpha=alpha*.75;ctx.lineWidth=3;ctx.setLineDash([13,10]);for(let i=0;i<count;i++){const a=i*TAU/count;ctx.beginPath();ctx.moveTo(g.x,g.y);ctx.lineTo(g.x+Math.cos(a)*len,g.y+Math.sin(a)*len);ctx.stroke()}
+  ctx.setLineDash([]);ring(g.x,g.y,g.r||160);
+ }else if(z.bossShape==='target'){
+  const r=g.r||58;ring(g.x,g.y,r);ctx.globalAlpha=alpha;ctx.lineWidth=3;
+  for(let i=0;i<4;i++){const a=i*Math.PI/2;ctx.beginPath();ctx.moveTo(g.x+Math.cos(a)*(r+7),g.y+Math.sin(a)*(r+7));ctx.lineTo(g.x+Math.cos(a)*(r+25),g.y+Math.sin(a)*(r+25));ctx.stroke()}
+  ctx.beginPath();ctx.arc(g.x,g.y,5,0,TAU);ctx.fill();
+ }else if(z.bossShape==='pull'){
+  ring(g.x,g.y,g.r);ring(g.x,g.y,g.r*.66);ctx.globalAlpha=alpha;ctx.lineWidth=3;
+  for(let i=0;i<8;i++){const a=i*TAU/8,x1=g.x+Math.cos(a)*g.r*.83,y1=g.y+Math.sin(a)*g.r*.83,x2=g.x+Math.cos(a)*g.r*.62,y2=g.y+Math.sin(a)*g.r*.62;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x2+Math.cos(a+.55)*11,y2+Math.sin(a+.55)*11);ctx.moveTo(x2,y2);ctx.lineTo(x2+Math.cos(a-.55)*11,y2+Math.sin(a-.55)*11);ctx.stroke()}
+ }else ring(g.x,g.y,(g.r||58)+pad);
+ ctx.restore();return true;
+}
+
 function v2shot(s){ctx.save();ctx.translate(s.x,s.y);let rot=Math.atan2(s.vy||0,s.vx||1);ctx.rotate(rot);let col=s.color||'#a8d7ff';ctx.shadowColor=col;ctx.shadowBlur=s.kind==='enemy'?8:20;
  if(['boomerang','blade','sickle'].includes(s.kind)){ctx.lineWidth=5;v2arc(0,0,s.r,Math.PI*.15,Math.PI*1.65,col,4);v2poly([[s.r,-4],[s.r+8,0],[s.r,5]],'#fff5d5')}
  else if(s.kind==='enemy'||s.kind==='enemyHoming'){v2ellipse(0,0,s.r+1,s.r+1,'#db8abd');v2ellipse(-2,-2,2,2,'#fff4eb')}
@@ -1057,7 +1099,7 @@ function drawWorld(){
    if(o.crab?.alive)stuff.push({y:o.crab.y,kind:'crab',o:o.crab});
   }
   if(g.bossPending){ctx.save();ctx.strokeStyle='#e98dbd';ctx.globalAlpha=.65+.3*Math.sin(V2.age*7);ctx.lineWidth=4;ctx.setLineDash([15,8]);v2arc(g.bossPending.x,g.bossPending.y,82,0,TAU,'#fa94c2',5);ctx.setLineDash([]);ctx.restore()}
-  for(let z of g.hazards){ctx.save();let al=z.timer>0?.65:.23;ctx.globalAlpha=al;v2ellipse(z.x,z.y,z.r,z.r*.68,z.kind==='runestone'?'#9e3f82':'#d5b56b');ctx.setLineDash([8,5]);v2arc(z.x,z.y,z.r*.83,0,TAU,z.color||'#f5d99a',3);ctx.setLineDash([]);ctx.restore()}
+  for(let z of g.hazards){if(z.bossGeometry){v2bossTelegraph(z);continue}ctx.save();let al=z.timer>0?.65:.23;ctx.globalAlpha=al;v2ellipse(z.x,z.y,z.r,z.r*.68,z.kind==='runestone'?'#9e3f82':'#d5b56b');ctx.setLineDash([8,5]);v2arc(z.x,z.y,z.r*.83,0,TAU,z.color||'#f5d99a',3);ctx.setLineDash([]);ctx.restore()}
   stuff.sort((a,b)=>a.y-b.y);
   for(let z of stuff){if(z.kind==='decor')v2decor(z.o);else if(z.kind==='hero')v2hero(z.o);else if(z.kind==='enemy')v2enemy(z.o);else if(z.kind==='boss')v2boss(z.o);
    else if(z.kind==='chest'){let c=z.o;ctx.save();ctx.translate(c.x,c.y);v2ellipse(0,12,27,10,'#102b2388');v2poly([[-23,-14],[19,-14],[23,11],[-23,11]],'#7d5635','#2c2420');v2poly([[-23,-14],[-15,-24],[16,-24],[19,-14]],'#b98c56','#473827');v2poly([[-16,-12],[14,-12],[16,8],[-16,8]],'#a17745');ctx.fillStyle='#e9c27b';ctx.fillRect(-3,-18,6,29);ctx.fillRect(-18,-7,36,4);ctx.shadowColor='#ffe7a8';ctx.shadowBlur=19;v2ellipse(0,-35,6,6,'#fff4bc');ctx.restore()}

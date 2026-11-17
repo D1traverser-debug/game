@@ -327,3 +327,12 @@ Artifact unchanged: 729,501 bytes; SHA-256 `41545a842ec17236896fb2edff63e1ac92c1
 The flaky trial assertion was repaired in the test harness only. It now distinguishes a `newSpell` option from a `spellLevel` option for an already-equipped temporary trial spell. No production HTML, boss code, balance values or CAOS assets were changed by that repair.
 
 **Evidence boundary:** this establishes deterministic build and component/regression coverage on the exact artifact. It does not establish human full-run completion, exact source fidelity, readable/avoidable boss attacks, complete pause/invulnerability/phase-cancellation behavior, real file-origin persistence, real-device performance, or final visual/audio acceptance. Product remains **NOT_READY**.
+
+
+## Boss telegraph lifecycle test-first repair — 2026-11-18
+
+Red run: [CI 44128548427](https://github.com/D1traverser-debug/game/actions/runs/44128548427). The original 15 boss component checks passed. Ten new checks were added; seven correctly failed against the old implementation (warning payload/shape, freeze cancellation, phase cancellation, stagger cancellation, pull origin, radial projectile origin, homing projectile origin and boss movement during telegraph). Pause clock, invulnerability and browser/offline integrity passed. There were zero page errors and zero external requests.
+
+The repair centralizes each attack warning as one token-owned payload containing the immutable attack geometry. 2.5D and WebGL2 renderers now draw by geometry kind (circle, line, grid, radial, target and pull). Cancellation removes the matching warning. Pull and projectile launch positions use the snapshot; the boss holds position during telegraph/active. Freeze cancels a pending telegraph rather than allowing an unannounced delayed hit.
+
+This is deterministic component/render-path smoke evidence, not human visual acceptance. Owner playtest, actual dodge/counterplay, exact source timing/damage, full-run victories, hardware performance and final visual/audio acceptance remain open. Product remains **NOT_READY**.

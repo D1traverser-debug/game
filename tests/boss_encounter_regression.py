@@ -9,7 +9,7 @@ assert SOURCE.count(MARKER)==1
 PROBE=r"""
 window.__BOSS_QA={
  spawn:(id)=>{
-  game.boss=null;game.enemies=game.enemies.filter(e=>e.type!=='boss');
+  game.boss=null;game.enemies=game.enemies.filter(e=>e.type!=='boss');game.hazards=game.hazards.filter(h=>!h.bossAttackToken);
   const index=BOSS_ARCHETYPES.findIndex(x=>x.id===id);if(index<0)throw Error('unknown boss '+id);
   const old=Math.random;Math.random=()=>Math.min(.999,(index+.25)/BOSS_ARCHETYPES.length);
   game.bossPending={x:game.player.x+420,y:game.player.y-260};
@@ -47,6 +47,7 @@ window.__BOSS_QA={
  commitment:()=>{const b=window.__BOSS_QA.spawn('krog');bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[1]);const before={x:b.x,y:b.y};game.player.x=b.x+800;game.player.y=b.y;updateBossEncounter(.1);return{stationary:Math.abs(b.x-before.x)<.001&&Math.abs(b.y-before.y)<.001,before,after:{x:b.x,y:b.y}}},
  pauseClock:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[0]),life=game.hazards.find(h=>h.bossAttackToken===a.token)?.life,time=game.time,timer=a.timer;pause();update(.2);const result={timeUnchanged:game.time===time,attackTimerUnchanged:a.timer===timer,warningLifeUnchanged:game.hazards.find(h=>h.bossAttackToken===a.token)?.life===life};resume();return result},
  invulnerability:()=>{const p=game.player;p.hp=100;p.maxHp=100;p.invuln=1;p.dodge=0;const a={def:{effect:'impact',damage:50},geometry:{kind:'circle',x:p.x,y:p.y,r:100},resolved:false};bossResolveAttack(null,a,.1);const afterFirst=p.hp;p.invuln=0;bossResolveAttack(null,a,.1);return{blocked:afterFirst===100,notReplayed:p.hp===100,resolved:a.resolved}}
+  renderAll:()=>{let twoD=0,threeD=0,has3D=!!window.Game3D?.available;for(const [id,defs] of Object.entries(BOSS_ATTACK_DEFS)){for(const def of defs){game.hazards=game.hazards.filter(h=>!h.bossAttackToken);window.__BOSS_QA.spawn(id);bossBeginAttack(game.boss,def);drawWorld();twoD++;if(has3D){window.Game3D.render(game,game.time);threeD++}}}return{twoD,threeD,has3D}}
 };
 """
 TEST_HTML=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
@@ -82,6 +83,7 @@ async def main():
   commitment=await page.evaluate("__BOSS_QA.commitment()");c["boss_commits_position_during_telegraph"]=commitment["stationary"]
   paused=await page.evaluate("__BOSS_QA.pauseClock()");c["pause_freezes_attack_and_warning_clocks"]=paused["timeUnchanged"] and paused["attackTimerUnchanged"] and paused["warningLifeUnchanged"]
   invuln=await page.evaluate("__BOSS_QA.invulnerability()");c["invulnerability_blocks_attack_once"]=invuln["blocked"] and invuln["notReplayed"] and invuln["resolved"]
+  rendered=await page.evaluate("__BOSS_QA.renderAll()");c["all_nine_attack_telegraphs_render"]=rendered["twoD"]==9 and (not rendered["has3D"] or rendered["threeD"]==9)
   c["no_runtime_exceptions"]=not outcome["page_errors"];c["no_external_requests"]=not outcome["requests"]
   await browser.close()
  outcome["pass"]=all(outcome["checks"].values());outcome["count"]=len(outcome["checks"]);outcome["limitations"]=["Deterministic component probes only; not a human full-run or final-balance acceptance."]

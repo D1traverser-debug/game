@@ -238,3 +238,14 @@
 - The corrected kind-aware trial assertion passed.
 - The exact artifact checkpoint and all nine browser regression jobs passed; boss encounter probes passed 15/15.
 - No production game or balance change was required. D-028 is resolved at the test-harness level.
+
+
+## D-029 — Boss telegraph geometry and lifecycle are authoritative (2026-11-18)
+
+**Decision:** A boss attack instance owns one immutable geometry snapshot and a unique token. The warning renderer consumes that same geometry; attack effects must use its snapshotted origin. A boss commits its position during telegraph and active stages. Freeze, phase transition and stagger cancel a pending telegraph and remove only the warning owned by that attack. Pause freezes the whole simulation clock; invulnerability consumes a resolved hit without replaying it.
+
+**Reason:** The test-first run #44128548427 passed the prior 15 checks but failed seven new probes. The defects were not balance issues: warning hazards had independent lifetimes, phase/stagger cleared only the attack pointer, pull/projectiles used a moving boss origin, and the boss continued chasing during a snapshotted wind-up.
+
+**Trade-off:** The boss pauses movement briefly while committing to an attack. This is an adaptation-level readability rule, not a claim about exact original-game animation timing. Numeric timings, radii and damage remain provisional.
+
+**Falsifiers:** Any warning visible after its attack is canceled; an attack resolving after its warning has expired; a pull/projectile origin differing from the warning snapshot; an attack that cannot be avoided with plausible movement; or renderer disagreement between 2.5D and available WebGL2.
