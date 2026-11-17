@@ -317,3 +317,11 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Root cause in the test harness: no RNG seed, first-option-only upgrades, XP-only movement, no health pickup priority, no enemy/projectile/hazard avoidance, and no damage-source trace.
 - Revision 025 makes the smoke deterministic with seed 20261117, adds a basic threat-aware controller and defensive/sustain upgrade ranking, and captures damage events. The 90-second survival gate remains intact.
 - No production balance changes are authorized by this test-harness finding alone.
+
+
+## BOSS PILOT 026 — CI #135 survival failure analysis (2026-11-17)
+- CI #135: https://github.com/D1traverser-debug/game/actions/runs/44017267943. Checkpoint, deterministic 90-second smoke, XP/objective/upgrade/browser regressions PASS; natural-run matrix FAIL 0/3.
+- Seed 1 died at 132.2s after five projectile hits; first four arrived from 111.7s to 119.6s. The supposed 1.8s trigger was nested inside an outer `t<1.35` condition, so the extended horizon did not work.
+- Seed 2 died at 588.8s after two Gnasher hits (317.6 and 318.7 raw) near the left edge. Distances from landing points were 59 and 26.2. The controller assumed 0.55s movement even when less leap time remained.
+- Seed 3 died at 823.2s from contact while the Crab objective was active; HP was 36.5% at 822.5s, but critical retreat only began below 30%.
+- Revision 026 corrects the outer projectile guard, models actual remaining Gnasher stateT, uses away-from-landing and boundary-aware scoring, and raises critical retreat to 55% HP. Product HTML unchanged.

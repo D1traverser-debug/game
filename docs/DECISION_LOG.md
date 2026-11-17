@@ -122,3 +122,10 @@
 - It should prioritize health when injured, avoid visible threats and select defensive/sustain upgrades when offered.
 - Keep the 90-second survival assertion; do not turn a failed smoke into a pass by removing the survival requirement.
 - If the competent seeded pilot still dies, use recorded damage evidence to investigate source fidelity and production balance separately.
+
+
+## D-019 — Use remaining attack time and retreat before critical HP (ACCEPTED)
+- Projectile lookahead conditions must be checked at the outermost guard; an inner 1.8s threshold nested under a 1.35s guard is not an effective 1.8s predictor.
+- For Gnasher leap, predict player displacement over the attack's remaining `stateT`, not a fixed full 0.55s window.
+- At low HP, suspend objective/loot pursuit and prioritize survival before the player reaches 30% HP; use 55% as the pilot retreat threshold under nearby threat.
+- Keep all changes in the QA agent until human/source evidence justifies production balance changes.

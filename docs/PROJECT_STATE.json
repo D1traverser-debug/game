@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "NORMAL_PLAY_SMOKE_SEEDED_THREAT_AWARE_025",
+  "checkpoint": "MULTI_BOSS_PILOT_ACTUAL_LEAP_TIME_PROJECTILE_HORIZON_026",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -135,7 +135,12 @@
     "Seed 3 naturally defeated Krog'wa at 1390.7s: level 20, 1485 kills, 482.1/700 HP, 129 armor, 8 regen.",
     "Seed 1 Gnasher traces show late-game burrow/leap threats near map edges; the prior dynamic planner scored landing separation but did not explicitly reward actual post-clamp displacement or combine all simultaneous leap targets. Seed 2 and seed 3 confirm the 1.8s projectile horizon did not regress their natural wins.",
     "Boss coverage in CI #133 was krog and sol; Mul'gath remains independently verified by CI #131 seed 1.",
-    "CI #134 / commit 13ed1c2: checkpoint PASS; normal-play 90-second smoke failed at 82.8s (77 kills, level 8, 0 HP) without page/console/network errors. Inspection found the smoke harness used unseeded Math.random, always selected the first offered upgrade, chased XP without enemy/projectile/hazard avoidance, and recorded no damage-source trace. The natural-run matrix and later release gates did not execute."
+    "CI #134 / commit 13ed1c2: checkpoint PASS; normal-play 90-second smoke failed at 82.8s (77 kills, level 8, 0 HP) without page/console/network errors. Inspection found the smoke harness used unseeded Math.random, always selected the first offered upgrade, chased XP without enemy/projectile/hazard avoidance, and recorded no damage-source trace. The natural-run matrix and later release gates did not execute.",
+    "CI #135 / commit eee611f: deterministic 90-second normal-play smoke PASS; XP, objective collection, upgrade and browser progression regressions PASS.",
+    "Natural-run matrix failed 0/3. Seed 1 died at 132.2s to five projectile hits; the first four arrived between 111.7s and 119.6s. The code had an outer `t<1.35` guard, so the inner 1.8s lookahead was unreachable for projectiles with t=1.35..1.8.",
+    "Seed 2 died at 588.8s after two Gnasher hits (317.6 and 318.7 raw) near the left edge; first hit left 59 units from landing point, second left 26.2 units. The planner modeled a fixed 0.55s escape even when the attack timer had less time remaining.",
+    "Seed 3 died at 823.2s from contact while completing the Crab objective. HP was 36.5 at 822.5s; the critical-escape threshold was only 30%, so the agent kept objective-oriented movement while under pressure.",
+    "No page, console or external-network errors. The 90-second smoke is now deterministic and uses defensive upgrades, health pickups, enemy/projectile/hazard avoidance."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -197,9 +202,10 @@
     "BOSS_PILOT_022 pending CI: preserve Gnasher escape while blending separate projectile and hazard avoidance vectors. Seed 1/Mul and seed 3/Sol win; seed 2 must survive projectile pressure and naturally reach Krog'wa.",
     "BOSS_PILOT_023 pending CI: revert the Gnasher per-attack direction lock to the previously successful dynamic controller; expand projectile prediction/evasion horizon to 1.8s and miss radius to 110. Need all three natural wins and exact sol/krog/mul coverage in one run.",
     "BOSS_PILOT_024 pending CI: keep dynamic per-frame scoring but add actual post-clamp travel and minimum separation from all active Gnasher landing points. Seed 1 must survive Sol'phish; seed 2/3 must retain Krog'wa wins. A Mul'gath seed is still needed for same-run coverage.",
-    "QA_SMOKE_025 pending CI: make the 90-second smoke deterministic, choose legal defensive/sustain upgrades when offered, prioritize health orbs at low HP, evade nearby enemies/projectiles/hazards, and record damage events. This is a harness-quality correction; do not weaken the 90-second survival gate."
+    "QA_SMOKE_025 pending CI: make the 90-second smoke deterministic, choose legal defensive/sustain upgrades when offered, prioritize health orbs at low HP, evade nearby enemies/projectiles/hazards, and record damage events. This is a harness-quality correction; do not weaken the 90-second survival gate.",
+    "BOSS_PILOT_026 pending CI: fix the outer projectile horizon guard to 1.8s; score Gnasher escape over actual remaining stateT; bias leap escape away from landing points and away from edges; raise critical-health escape to 55% HP and strengthen it. Need all three natural wins and exact sol/krog/mul coverage in one run."
   ],
-  "next_action": "Inspect CI after QA_SMOKE_025. First require deterministic 90-second survival, real upgrade flow, and zero runtime/network errors. Then verify the natural-run matrix for all three boss archetypes. If a seeded competent smoke still dies, inspect damage events and determine whether production difficulty is source-faithful before tuning the game.",
+  "next_action": "Inspect CI after BOSS_PILOT_026. Verify seed 1 avoids projectile barrage after the corrected 1.8s guard, seed 2 escapes Gnasher with actual remaining leap time, and seed 3 abandons Crab objective at 55% HP. Require three natural wins and exact sol/krog/mul coverage. Keep production index.html unchanged and NOT_READY.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -225,5 +231,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_QA_SMOKE_025"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_026"
 }

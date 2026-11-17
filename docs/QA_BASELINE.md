@@ -194,3 +194,16 @@ Run: https://github.com/D1traverser-debug/game/actions/runs/44016473737
 Checkpoint: PASS. Normal-play smoke: FAIL at 82.8s (77 kills, level 8, 0 HP). No runtime/console/network errors.
 
 The old smoke agent was unseeded, selected the first upgrade option, chased XP only, ignored health orbs and threat telegraphs, and did not capture damage events. Revision 025 adds deterministic seed 20261117, defensive/sustain upgrade selection, health priority, enemy/projectile/hazard avoidance, and damage telemetry. The survival assertion is retained.
+
+
+## Natural-run pilot #135 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44017267943  
+Checkpoint: PASS. Deterministic 90-second smoke: PASS. XP/objective/upgrade/browser regressions: PASS. Natural-run matrix: FAIL (0/3 wins).
+
+| Seed | Death | Failure |
+|---|---:|---|
+| 1 | 132.2s | Five projectile hits; first four from 111.7–119.6s; 1.8s threshold was blocked by outer 1.35s guard |
+| 2 | 588.8s | Two Gnasher hits near left edge; 59 and 26.2 units from landing points; planner assumed fixed 0.55s |
+| 3 | 823.2s | Contact damage during Crab objective; HP 36.5% one second before death; retreat threshold 30% was too late |
+
+No page, console or external-network errors. Revision 026 corrects these three controller defects while preserving the 90-second survival gate.

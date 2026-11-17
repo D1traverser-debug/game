@@ -20,6 +20,7 @@ PROBE=r"""
 // It records incoming damage without changing the production damage pipeline.
 window.__damageEvents=[];
 window.__gnasherHits=[];
+window.__gnasherLeapSamples=[];
 window.__pilotDodgeStats={projectile:0,gnasher:0,gnasherBurrow:0,gnasherLeap:0,gnasherLeapSafeFrames:0,hazard:0,boundary:0,rift:0,criticalEscape:0};
 const __baseDamagePlayer=damagePlayer;
 damagePlayer=function(n,source='enemy'){
@@ -210,10 +211,16 @@ window.__fullRun = async (maxSeconds) => {
       const e=activeGnasher.e,leaping=e.state==='leap';
       const tx=leaping?(e.leapX??e.x):p.x,ty=leaping?(e.leapY??e.y):p.y;
       const pathX=leaping?tx-e.x:p.x-e.x,pathY=leaping?ty-e.y:p.y-e.y,pathD=Math.hypot(pathX,pathY)||1;
-      const preferredX=-pathY/pathD,preferredY=pathX/pathD;
+      const lateralX=-pathY/pathD,lateralY=pathX/pathD;
+      const awayD=Math.hypot(p.x-tx,p.y-ty)||1;
+      const awayX=leaping?(p.x-tx)/awayD:lateralX,awayY=leaping?(p.y-ty)/awayD:lateralY;
+      const preferredX=leaping?awayX*.78+lateralX*.22:lateralX;
+      const preferredY=leaping?awayY*.78+lateralY*.22:lateralY;
       const moveSpeed=(p.move||220)*(game.carriedCore&&game.carriedCore.alive?.58:1)*
         (p.lowSpeed?1+(1-p.hp/Math.max(1,p.maxHp))*.21:1)*(p.fightT>0?1.3:1);
-      const step=Math.max(80,moveSpeed*.55);
+      const criticalHealth=p.hp/Math.max(1,p.maxHp)<.55;
+      const hitTime=leaping?Math.max(.05,Math.min(.55,e.stateT||.55)):.55;
+      const step=Math.max(20,moveSpeed*hitTime);
       let bestScore=-Infinity;
       for(let k=0;k<24;k++){
         const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);
@@ -241,15 +248,22 @@ window.__fullRun = async (maxSeconds) => {
         }
         const edgeClearance=Math.min(1200-Math.abs(nx),900-Math.abs(ny));
         const lateral=dx*preferredX+dy*preferredY;
-        const score=(leaping?landingDistance*1.8:0)+travel*1.4+
-          Math.min(nearestEnemy,320)*.12+Math.min(edgeClearance,300)*.20+
-          lateral*(leaping?5:18)-hazardPenalty-projectilePenalty;
+        const score=(leaping?landingDistance*2.0:0)+travel*1.8+
+          Math.min(nearestEnemy,420)*(criticalHealth?.38:.16)+Math.min(edgeClearance,350)*(criticalHealth?.42:.24)+
+          lateral*(leaping?4:16)-hazardPenalty-projectilePenalty;
         if(score>bestScore){bestScore=score;gnasherEscapeX=dx;gnasherEscapeY=dy;}
       }
       gnasherThreat=true;gnasherMode=leaping?'leap':'burrow';gnasherStateT=+(e.stateT||0).toFixed(2);
       window.__pilotDodgeStats.gnasher++;
-      if(leaping){window.__pilotDodgeStats.gnasherLeap++;if(activeGnasher.landingD>60)window.__pilotDodgeStats.gnasherLeapSafeFrames++;}
-      else window.__pilotDodgeStats.gnasherBurrow++;
+      if(leaping){
+        window.__pilotDodgeStats.gnasherLeap++;
+        if(activeGnasher.landingD>60)window.__pilotDodgeStats.gnasherLeapSafeFrames++;
+        window.__gnasherLeapSamples.push({t:+game.time.toFixed(1),id:e.id,stateT:+(e.stateT||0).toFixed(2),
+          playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),targetX:+tx.toFixed(1),targetY:+ty.toFixed(1),
+          distance:+activeGnasher.landingD.toFixed(1),escapeX:+gnasherEscapeX.toFixed(2),escapeY:+gnasherEscapeY.toFixed(2),
+          edge:Math.min(1200-Math.abs(p.x),900-Math.abs(p.y))});
+        if(window.__gnasherLeapSamples.length>400)window.__gnasherLeapSamples.shift();
+      }else window.__pilotDodgeStats.gnasherBurrow++;
       target=null;
     }
     let imminentProjectile=false,imminentHazard=false;
@@ -263,7 +277,7 @@ window.__fullRun = async (maxSeconds) => {
         // r = player - projectile; r(t) = r - velocity*t.
         // Positive dot(r, velocity) means the projectile is approaching.
         const t=(dx*vx+dy*vy)/v2;
-        if(t>0&&t<1.35){
+        if(t>0&&t<1.8){
           const cx=dx-vx*t,cy=dy-vy*t,cd=Math.hypot(cx,cy);
           if(t>.05&&t<1.8&&cd<110)imminentProjectile=true;
           if(cd<110){
@@ -312,10 +326,10 @@ window.__fullRun = async (maxSeconds) => {
       goalX=gnasherEscapeX+projectileRx*projectileWeight+hazardRx*hazardWeight;
       goalY=gnasherEscapeY+projectileRy*projectileWeight+hazardRy*hazardWeight;
     }else{
-      if(p.hp/Math.max(1,p.maxHp)<.30&&minThreat<240){
+      if(p.hp/Math.max(1,p.maxHp)<.55&&minThreat<320){
         const threat=nearest(game.enemies.filter(e=>!e.dead&&e.type!=='boss'),p);
         if(threat){goalX=(p.x-threat.o.x)/(threat.d||1);goalY=(p.y-threat.o.y)/(threat.d||1);}
-        evade=Math.max(evade,2.0);window.__pilotDodgeStats.criticalEscape++;
+        evade=Math.max(evade,2.6);window.__pilotDodgeStats.criticalEscape++;
       }
       goalX+=rx*evade;goalY+=ry*evade;
     }
@@ -374,6 +388,7 @@ window.__fullRun = async (maxSeconds) => {
     damageEvents:window.__damageEvents.slice(-80),
     pilotDodgeStats:{...window.__pilotDodgeStats},
     gnasherHits:window.__gnasherHits.slice(-80),
+    gnasherLeapSamples:window.__gnasherLeapSamples.slice(-120),
     trialSpellId:save.trialSpellId||null,
     objective:game.objective?.type||null,
     bossSpawned:!!b,bossId:b?.bossId||null,bossHp:b?.hp??null,bossMax:b?.max??null,
