@@ -148,3 +148,16 @@ Run: https://github.com/D1traverser-debug/game/actions/runs/44013848128
 Checkpoint: PASS. Short browser regressions: PASS. Natural-run matrix: NOT EXECUTED.
 
 Python failed to parse the test file at line 385 because JavaScript instrumentation was inserted outside the Python string that constructs the temporary browser document. This is a test-harness syntax failure, not a gameplay failure. Revision 021 corrects the Python/JavaScript boundary.
+
+
+## Natural-run pilot #131 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44014209474  
+Checkpoint: PASS. Short browser regressions: PASS. Natural-run matrix: FAIL (2/3 wins).
+
+| Seed | Outcome | Boss | Evidence |
+|---|---|---|---|
+| 1 | Natural win at 1274.6s | Mul'gath | Level 21; 1394 kills; 3 objectives; 1227.4/1300 HP |
+| 2 | Death at 506.8s | None | Three projectile hits (56.8/56.8/56.6) plus contact during fungi progress 19; Gnasher nearby but no Gnasher hit; projectile predicted t=1.31s, miss distance 0 |
+| 3 | Natural win at 1229.9s | Sol'phish | Level 22; 1771 kills; 4 objectives; 761.4/1100 HP |
+
+No browser, console or external-network errors. Krog'wa is separately verified by CI #129 seed 2. Revision 022 addresses the vector-override conflict between Gnasher and projectile avoidance.

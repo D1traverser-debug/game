@@ -92,3 +92,10 @@
 - Test-only JavaScript injected into a browser document must be represented as Python string data in the Python harness; raw JavaScript declarations must never appear at Python module scope.
 - Add an exact-one-occurrence anchor assertion before replacing production source in the temporary document.
 - A Python parse failure invalidates the run; do not interpret it as a gameplay result.
+
+
+## D-015 — Merge concurrent emergency steering vectors (ACCEPTED)
+- A Gnasher threat must not erase an independently predicted projectile or active hazard threat.
+- Keep Gnasher escape as the primary route, but add separately tracked projectile and hazard avoidance vectors before final input normalization.
+- The test must preserve evidence that each threat class is detected and that its steering contribution survives the final merge.
+- This is QA-agent behavior only; production damage and attack timing remain unchanged.

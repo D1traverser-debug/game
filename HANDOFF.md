@@ -284,3 +284,12 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - CI #130: https://github.com/D1traverser-debug/game/actions/runs/44013848128. Checkpoint PASS; browser progression/short regressions PASS; natural-run step did not execute.
 - Failure was a Python SyntaxError at line 385: a JavaScript `const GNASHER_HIT` declaration had been inserted outside the Python-generated document string.
 - Revision 021 stores the JavaScript anchor/replacement as Python string variables and injects it into the temporary browser document. This is a harness-only correction; product HTML remains unchanged.
+
+
+## BOSS PILOT 022 — CI #131 concurrent-threat root cause (2026-11-17)
+- CI #131: https://github.com/D1traverser-debug/game/actions/runs/44014209474. Checkpoint PASS; natural-run matrix 2/3 wins.
+- Seed 1 naturally defeated Mul'gath at 1274.6s: level 21, 1394 kills, 3 objectives, 1227.4/1300 HP.
+- Seed 2 died at 506.8s during fungi progress 19 after three projectile hits (56.8, 56.8, 56.6) plus contact. A Gnasher was burrowing 16.3 units away but no Gnasher hit was recorded. At 504.8s a projectile had predicted closest approach t=1.31s and zero miss distance.
+- Seed 3 naturally defeated Sol'phish at 1229.9s: level 22, 1771 kills, 4 objectives, 761.4/1100 HP.
+- Root cause: when Gnasher threat was active, the pilot replaced its complete steering vector with the Gnasher escape vector, discarding the projectile sidestep already detected by the predictor.
+- Krog'wa remains independently verified by CI #129 seed 2; the current run's seed 2 died before boss. Revision 022 merges separate projectile/hazard vectors with Gnasher escape. Product HTML unchanged.

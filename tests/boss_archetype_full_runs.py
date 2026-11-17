@@ -187,7 +187,7 @@ window.__fullRun = async (maxSeconds) => {
     }
     // Avoid nearby enemies and incoming enemy projectiles instead of blindly
     // walking through the crowd to an XP orb. This changes input only.
-    let rx=0,ry=0,minThreat=9999;
+    let rx=0,ry=0,projectileRx=0,projectileRy=0,hazardRx=0,hazardRy=0,minThreat=9999;
     for(const e of game.enemies){
       if(e.dead||e.type==='boss'||(e.bossHealer&&game.boss?.bossId==='mul'))continue;
       const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;
@@ -265,7 +265,7 @@ window.__fullRun = async (maxSeconds) => {
     for(const shot of game.shots){
       if(shot.kind!=='enemy')continue;
       const dx=p.x-shot.x,dy=p.y-shot.y,d=Math.hypot(dx,dy)||1;
-      if(d<190){const w=(190-d)/190*1.7;rx+=dx/d*w;ry+=dy/d*w;}
+      if(d<190){const w=(190-d)/190*1.7;rx+=dx/d*w;ry+=dy/d*w;projectileRx+=dx/d*w;projectileRy+=dy/d*w;}
       // Predict the closest approach of a live projectile and sidestep its path.
       const vx=shot.vx||0,vy=shot.vy||0,v2=vx*vx+vy*vy;
       if(v2>1){
@@ -284,7 +284,9 @@ window.__fullRun = async (maxSeconds) => {
             },0);
             const side=danger(p.x+px*90,p.y+py*90)<=danger(p.x-px*90,p.y-py*90)?1:-1;
             const w=(92-cd)/92*2.5;
-            rx+=px*side*w;ry+=py*side*w;window.__pilotDodgeStats.projectile++;
+            rx+=px*side*w;ry+=py*side*w;
+            projectileRx+=px*side*w;projectileRy+=py*side*w;
+            window.__pilotDodgeStats.projectile++;
           }
         }
       }
@@ -292,7 +294,7 @@ window.__fullRun = async (maxSeconds) => {
     for(const h of game.hazards){
       if(h.hit||!['warning','runestone','krogLeap','krogAcid','meteor','bell','bomb','slam','dice','explosiveSprout','explosiveMushroom'].includes(h.kind))continue;
       const dx=p.x-h.x,dy=p.y-h.y,d=Math.hypot(dx,dy)||1,range=(h.r||0)+95;
-      if(d<range){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;window.__pilotDodgeStats.hazard++;}
+      if(d<range){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;hazardRx+=dx/d*w;hazardRy+=dy/d*w;window.__pilotDodgeStats.hazard++;}
       if(Number.isFinite(h.timer)&&h.timer<.9&&d<range+85)imminentHazard=true;
     }
     const riftDist=target?Math.hypot(p.x-target.x,p.y-target.y):Infinity;
@@ -311,7 +313,13 @@ window.__fullRun = async (maxSeconds) => {
     if(gnasherThreat){
       // A Gnasher leap is a fixed landing-point attack; use the scored escape
       // heading directly instead of blending it back toward the objective.
-      goalX=gnasherEscapeX;goalY=gnasherEscapeY;
+      // Gnasher avoidance must not suppress an independent projectile/hazard
+      // dodge. Blend both emergency vectors; a close predicted projectile can
+      // temporarily dominate the heading instead of being ignored.
+      const projectileWeight=imminentProjectile?2.8:1.6;
+      const hazardWeight=imminentHazard?1.8:1.0;
+      goalX=gnasherEscapeX+projectileRx*projectileWeight+hazardRx*hazardWeight;
+      goalY=gnasherEscapeY+projectileRy*projectileWeight+hazardRy*hazardWeight;
     }else{
       if(p.hp/Math.max(1,p.maxHp)<.30&&minThreat<240){
         const threat=nearest(game.enemies.filter(e=>!e.dead&&e.type!=='boss'),p);
@@ -350,6 +358,8 @@ window.__fullRun = async (maxSeconds) => {
         edgeDistance:Math.min(1200-Math.abs(q.x),900-Math.abs(q.y)),
         imminentProjectile,imminentHazard,gnasherThreat,gnasherMode,gnasherStateT,
         gnasherEscape:{x:+gnasherEscapeX.toFixed(2),y:+gnasherEscapeY.toFixed(2)},
+        projectileAvoidance:{x:+projectileRx.toFixed(2),y:+projectileRy.toFixed(2)},
+        hazardAvoidance:{x:+hazardRx.toFixed(2),y:+hazardRy.toFixed(2)},
         activeGnasher:activeGnasher?{state:activeGnasher.e.state,stateT:+(activeGnasher.e.stateT||0).toFixed(2),distance:+activeGnasher.d.toFixed(1),landingX:Number.isFinite(activeGnasher.e.leapX)?+activeGnasher.e.leapX.toFixed(1):null,landingY:Number.isFinite(activeGnasher.e.leapY)?+activeGnasher.e.leapY.toFixed(1):null}:null,
         healthOrbs:game.orbs.filter(x=>x.type==='health').length,magnetOrbs:game.orbs.filter(x=>x.type==='magnet').length,objective:game.objective?.type||null,
         objectiveProgress:game.objective?.progress||0,objectiveTarget:game.objective?.target||0,
