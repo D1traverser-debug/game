@@ -19,6 +19,7 @@ PROBE=r"""
 // Diagnostic instrumentation exists only in this temporary browser document.
 // It records incoming damage without changing the production damage pipeline.
 window.__damageEvents=[];
+window.__contactSource=null;
 window.__gnasherHits=[];
 window.__gnasherLeapSamples=[];
 window.__pilotDodgeStats={projectile:0,gnasher:0,gnasherBurrow:0,gnasherLeap:0,gnasherLeapSafeFrames:0,hazard:0,boundary:0,rift:0,criticalEscape:0};
@@ -43,7 +44,7 @@ damagePlayer=function(n,source='enemy'){
     const dx=(p?.x||0)-s.x,dy=(p?.y||0)-s.y,vx=s.vx||0,vy=s.vy||0,v2=vx*vx+vy*vy;
     const t=v2>1?(dx*vx+dy*vy)/v2:0;
     const miss=v2>1&&t>0?Math.hypot(dx-vx*t,dy-vy*t):Math.hypot(dx,dy);
-    return {t:+t.toFixed(2),miss:+miss.toFixed(1),distance:+Math.hypot(dx,dy).toFixed(1),vx:+vx.toFixed(1),vy:+vy.toFixed(1),damage:s.dmg};
+    return {t:+t.toFixed(2),miss:+miss.toFixed(1),distance:+Math.hypot(dx,dy).toFixed(1),vx:+vx.toFixed(1),vy:+vy.toFixed(1),damage:s.dmg,sourceType:s.sourceType||null,sourceId:s.sourceId||null,sourceDamage:s.sourceDamage??null};
   }).sort((a,b)=>a.miss-b.miss)[0];
   window.__damageEvents.push({
     t:+(game?.time||0).toFixed(1),source,amount:+Number(n).toFixed(1),
@@ -53,12 +54,13 @@ damagePlayer=function(n,source='enemy'){
     facing:p?+p.facing.toFixed(2):null,invuln:p?+p.invuln.toFixed(2):null,carriedCore:!!game?.carriedCore?.alive,moveSpeed:p?+p.move.toFixed(1):null,
     nearestGnasher:gnasher?{state:gnasher.e.state,stateT:+(gnasher.e.stateT||0).toFixed(2),distance:+gnasher.d.toFixed(1),x:+gnasher.e.x.toFixed(1),y:+gnasher.e.y.toFixed(1),leapX:Number.isFinite(gnasher.e.leapX)?+gnasher.e.leapX.toFixed(1):null,leapY:Number.isFinite(gnasher.e.leapY)?+gnasher.e.leapY.toFixed(1):null,dmg:+gnasher.e.dmg.toFixed(1)}:null,
     nearbyGnashers:nearGnashers.slice(0,6).map(x=>({state:x.e.state,stateT:+(x.e.stateT||0).toFixed(2),distance:+x.d.toFixed(1),x:+x.e.x.toFixed(1),y:+x.e.y.toFixed(1),leapX:Number.isFinite(x.e.leapX)?+x.e.leapX.toFixed(1):null,leapY:Number.isFinite(x.e.leapY)?+x.e.leapY.toFixed(1):null,dmg:+x.e.dmg.toFixed(1)})),
-    nearestProjectile:nearestProjectile||null
+    nearestProjectile:nearestProjectile||null,contactSource:source==='contact'?window.__contactSource:null
   });
+  if(source==='contact')window.__contactSource=null;
   return __baseDamagePlayer(n,source);
 };
 window.__setRunSeed=(seed)=>{
-  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};window.__manualTick=false;window.__renderPhase=false;window.__pilotHeading={x:0,y:0};
+  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};window.__manualTick=false;window.__renderPhase=false;window.__pilotHeading={x:0,y:0};window.__contactSource=null;
   let state=seed>>>0;
   Math.random=()=>{
     if(window.__renderPhase)window.__simulationHarness.renderRandomCalls++;
@@ -245,8 +247,8 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       const hitTime=leaping?Math.max(.05,Math.min(.55,e.stateT||.55)):.55;
       const step=Math.max(20,moveSpeed*hitTime);
       let bestScore=-Infinity;
-      for(let k=0;k<24;k++){
-        const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);
+      for(let k=0;k<8;k++){
+        const a=k*Math.PI/4,dx=Math.cos(a),dy=Math.sin(a);
         const nx=clamp(p.x+dx*step,-1200,1200),ny=clamp(p.y+dy*step,-900,900);
         const travel=Math.hypot(nx-p.x,ny-p.y);
         const landingDistance=leaping&&leapThreats.length
@@ -363,8 +365,8 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       const desiredX=goalX/desiredD,desiredY=goalY/desiredD;
       const previous=window.__pilotHeading||{x:desiredX,y:desiredY};
       let bestScore=-Infinity,bestX=desiredX,bestY=desiredY;
-      for(let k=0;k<24;k++){
-        const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);
+      for(let k=0;k<8;k++){
+        const a=k*Math.PI/4,dx=Math.cos(a),dy=Math.sin(a);
         const nx=clamp(p.x+dx*moveSpeed*horizon,-1200,1200);
         const ny=clamp(p.y+dy*moveSpeed*horizon,-900,900);
         let score=(dx*desiredX+dy*desiredY)*28+
@@ -520,6 +522,12 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
 """
 GNASHER_HIT="if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');"
 assert SOURCE.count(GNASHER_HIT)==1,"Gnasher hit instrumentation anchor must occur exactly once"
+assert SOURCE.count(CONTACT_HIT)==1,"Contact source instrumentation anchor must occur exactly once"
+assert SOURCE.count(RANGED_SHOT)==1,"Ranged projectile source instrumentation anchor must occur exactly once"
+CONTACT_HIT="if(d<e.r+p.r+3&&e.state!=='corrupt'){e.touch=(e.touch||0)-dt;if(e.touch<=0){damagePlayer(e.dmg*.14*(e.weakness>0?.65:1),'contact');e.touch=.65}}"
+CONTACT_INSTRUMENTED="if(d<e.r+p.r+3&&e.state!=='corrupt'){e.touch=(e.touch||0)-dt;if(e.touch<=0){window.__contactSource={type:e.type,state:e.state,id:e.id,hp:+e.hp.toFixed(1),dmg:+e.dmg.toFixed(1),distance:+d.toFixed(1),damage:+(e.dmg*.14*(e.weakness>0?.65:1)).toFixed(1)};damagePlayer(e.dmg*.14*(e.weakness>0?.65:1),'contact');e.touch=.65}}"
+RANGED_SHOT="g.shots.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,life:3,dmg:e.dmg*.65,r:6,kind:'enemy',color:'#d28fcb'})"
+TAGGED_RANGED_SHOT="g.shots.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,life:3,dmg:e.dmg*.65,r:6,kind:'enemy',sourceType:e.type,sourceId:e.id,sourceDamage:e.dmg,color:'#d28fcb'})"
 DRAW_SHAKE="let sx=g?.shake?rand(-g.shake,g.shake):0,sy=g?.shake?rand(-g.shake,g.shake):0;"
 DRAW_SHAKE_25D="ctx.translate(-cx+(g?.shake?rand(-g.shake,g.shake):0),-cy+(g?.shake?rand(-g.shake,g.shake):0));"
 FRAME_RENDER="if(save.renderMode==='3d'&&window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}\n else drawWorld();"
@@ -531,13 +539,15 @@ DETERMINISTIC_SHAKE_25D="ctx.translate(-cx+(g?.shake?Math.sin(g.time*37)*g.shake
 TRACKED_RENDER="window.__renderPhase=true;try{if(save.renderMode==='3d'&&window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}else drawWorld();}finally{window.__renderPhase=false;}"
 DOCUMENT=(SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
   .replace(GNASHER_HIT,"if(Math.hypot(p.x-e.x,p.y-e.y)<60){window.__gnasherHits.push({t:+g.time.toFixed(1),id:e.id,state:e.state,stateT:+e.stateT.toFixed(2),x:+e.x.toFixed(1),y:+e.y.toFixed(1),leapX:+e.leapX.toFixed(1),leapY:+e.leapY.toFixed(1),playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),distance:+Math.hypot(p.x-e.x,p.y-e.y).toFixed(1),dmg:+e.dmg.toFixed(1)});damagePlayer(e.dmg*1.7,'gnasher');}")
+  .replace(CONTACT_HIT,CONTACT_INSTRUMENTED)
+  .replace(RANGED_SHOT,TAGGED_RANGED_SHOT)
   .replace(DRAW_SHAKE,DETERMINISTIC_SHAKE)
   .replace(DRAW_SHAKE_25D,DETERMINISTIC_SHAKE_25D)
   .replace(FRAME_RENDER,TRACKED_RENDER))
 assert "rand(-g.shake,g.shake)" not in DOCUMENT,"render RNG source remains in test document"
 
 async def main():
-  seeds=[int(x) for x in sys.argv[1:]] or list(range(1,13))
+  seeds=[int(x) for x in sys.argv[1:]] or list(range(1,25))
   required_baseline={1,2,3}
   valid_bosses={"sol","krog","mul"}
   report={"runs":[],"checks":{},"required_baseline_seeds":sorted(required_baseline),"seed_budget":seeds}
