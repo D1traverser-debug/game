@@ -90,3 +90,10 @@ Sol'phish:
 ## Numerical tuning policy
 
 Current HP/damage scale remains unchanged during architecture and attack implementation. Windup, recovery, radius, speed and damage values are provisional adaptation parameters. They must be calibrated only after attack cards pass and representative play sessions are reviewed.
+
+
+## Implementation checkpoint — 2026-11-17
+
+The first implementation is committed in `src/game/boss_encounters.js` and bundled reproducibly into the offline root HTML. CI run 44062145086 passed 15/15 deterministic boss component checks. The probes validate attack-card presence, phase changes, geometry snapshot, telegraph-before-damage, active/recovery/cooldown progression, selected hit/collision paths, Krog'wa field behavior, Mul'gath minion healing/corruption, and homing steering.
+
+This is **PARTIAL_COMPONENT_TESTED**, not complete acceptance. In particular, the current regression does not establish that every attack's rendered warning matches the active collision shape in both render paths, that players can reliably read and evade every attack, or that pause/invulnerability/phase-transition cancellation is correct. Numerical timings and damage remain provisional. Human playtest and natural boss victory on the exact current artifact remain open.

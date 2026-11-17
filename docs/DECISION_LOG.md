@@ -196,3 +196,22 @@
 - The Python test driver must call the injected probe, not call a private production function from the page's global scope.
 - Keep probes in the in-memory test document only. Verify the release HTML still has no production debug surface.
 - A ReferenceError caused by a test calling an inaccessible private symbol is a test-harness defect until a separate runtime failure is demonstrated.
+
+
+## D-027 — Boss attack cards share one snapshotted lifecycle; component pass is not product acceptance (ACCEPTED)
+
+**Evidence**
+- The development candidate now defines three attack cards for each of Sol'phish, Krog'wa and Mul'gath in `src/game/boss_encounters.js`.
+- Each attack instance snapshots its geometry at telegraph creation and advances through telegraph, active, recovery and cooldown.
+- Krog'wa's three health segments and magnetic boundary, Mul'gath's three segments/head growth/healing servants/corruption collision, and homing projectile steering are covered by deterministic browser probes.
+- CI 44062145086 passed all 15 boss component checks and all nine browser regression jobs. The build is reproducible. Its only failed job was the checkpoint guard, which compared the new HTML against stale SHA/byte values in PROJECT_STATE.json.
+
+**Decision**
+- Keep the boss implementation as a partial, source-informed adaptation; do not mark boss requirements complete.
+- Preserve current HP/damage scaling. Windup, active duration, recovery, radius, speed and damage remain provisional because authoritative current-version numerical evidence is incomplete.
+- Next acceptance is visual: compare every warning against the actual active collision shape at normal game speed in the active renderer. Then test player counterplay, pause/invulnerability/phase transitions and conduct an owner-controlled boss encounter.
+- Keep natural full-run automation exploratory; never infer human playability from synthetic component probes or a scripted pilot.
+
+**Falsifiers / review**
+- If rendered telegraphs and hitboxes diverge, change the shared attack-instance/render contract rather than adding independent visual offsets.
+- If source-version evidence establishes different mechanics or timing, update the attack definitions and tests with the evidence recorded.

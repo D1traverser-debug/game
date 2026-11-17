@@ -388,3 +388,22 @@ Research now supports a source-informed boss redesign:
 - Exact timing, radius and damage values are not authoritatively pinned. Treat them as adaptation tuning values, not canonical source facts. Do not add the video-reported rock wall/orb absorption/spin attacks to the acceptance baseline until corroborated against the current source version.
 
 Next: implement one shared boss attack state machine with explicit telegraph, active and recovery stages; keep attack geometry, damage resolution and rendering synchronized; add deterministic attack-card tests. Preserve current HP/damage scaling until the attack patterns are playable and independently reviewed. Product status remains NOT_READY.
+
+
+## BOSS ENCOUNTER IMPLEMENTATION — RECOVERY UPDATE (2026-11-17)
+
+This section supersedes the earlier "NEXT PRODUCT VERTICAL SLICE — BOSS ENCOUNTERS" statement: the first shared attack-state-machine implementation is now committed; the next work is acceptance and refinement, not initial implementation.
+
+- Development HEAD at recovery: `35b4aa2170428f70421470b10c91d2a13c8850a4` (`fix: render homing boss projectiles as hostile`).
+- Main baseline remains preserved at `eace4cb66f282d35c663f3a13d6e39ff8a15e0b8`.
+- Exact root `index.html`: 729,501 bytes; SHA-256 `41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee`.
+- Reproducible build: `python scripts/build_game.py --check` — PASS.
+- Boss module: `src/game/boss_encounters.js`; source-fragment builder: `scripts/build_game.py`; deterministic browser regression: `tests/boss_encounter_regression.py`.
+- Attack cards: Sol'phish (obelisk, radial burst, homing volley); Krog'wa (inhale/pull, tongue-smash lane, tracking spit); Mul'gath (head whip, spike grid, radial head volley).
+- Common lifecycle: immutable/snapshotted target geometry → telegraph → active resolution → recovery → cooldown. Krog'wa and Mul'gath use three health segments; Krog'wa gains a magnetic arena boundary after segment one; Mul'gath grows heads and summons healing servants that can be corrupted to damage it.
+- CI run 44062145086: all nine browser regression jobs passed; boss suite 15/15. No browser page errors or external requests.
+- The checkpoint job alone failed because PROJECT_STATE.json had stale candidate metadata. The exact artifact SHA/byte values have now been updated in this recovery commit; rerun CI before treating the checkpoint as verified.
+
+**Still NOT_TESTED / PARTIAL:** exact current-source timing and damage; every attack's rendered telegraph-to-hitbox parity and readability at normal speed; actual player dodge/counterplay; pause/invulnerability/phase-transition cancellation edge cases; natural full-run wins for all three bosses on this exact artifact; owner playtest; real file-origin save/reload; real hardware performance; final visual/audio acceptance.
+
+Next action: verify the metadata-rebaseline CI run. If the checkpoint passes, inspect each boss attack visually at normal speed and run a human boss playtest before changing provisional numeric tuning. Product status remains **NOT_READY**. CAOS remains strictly read-only.

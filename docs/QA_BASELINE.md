@@ -273,3 +273,24 @@ Development commit: 0ce3072ce697956d8c15ef322783ad8a060c7541
 - Atlas renderer and Reginald spell-scope checks were skipped because the content/visual group was still sequential in this run.
 - Correction: call the private transition through the temporary probe injected inside the same IIFE, and execute independent browser regressions as a fail-fast-disabled matrix.
 - No production game code or artifact hash changed in this correction.
+
+
+## Boss encounter implementation checkpoint — CI 44062145086 (2026-11-17)
+
+Development commit: `35b4aa2170428f70421470b10c91d2a13c8850a4`  
+Exact player artifact: `index.html`, 729,501 bytes  
+SHA-256: `41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee`  
+Build command: `python scripts/build_game.py --check` — **PASS_REPRODUCIBLE**.
+
+The boss implementation now uses data-driven attack definitions and a shared attack instance with snapshotted geometry and explicit telegraph, active, recovery and cooldown stages:
+- Sol'phish: obelisk strike, radial projectile burst, homing volley.
+- Krog'wa: inhale/pull, tongue-smash lane, tracking spit; three health segments and magnetic boundary after segment one.
+- Mul'gath: head whip, spike grid, radial head volley; three health segments, phase-driven head count, healing servants and corrupted-servant collision damage.
+
+CI boss regression: **15/15 PASS**. The probes cover attack-card presence/contracts, Krog'wa and Mul'gath phase transitions, telegraph geometry snapshot, telegraph-before-damage, active/recovery/cooldown progression, obelisk hit resolution, magnetic-field boundary correction, minion approach/healing/corruption damage, circle/line/grid collision, homing projectile steering, zero page errors and zero external requests.
+
+All nine browser regression jobs in CI run 44062145086 passed, including normal-play smoke, progression, objective collection, character upgrades, trial unlock, 3D integration, atlas renderer, Reginald spell scope and boss encounters.
+
+**Checkpoint outcome:** the CI checkpoint job failed only because `docs/PROJECT_STATE.json` still contained the previous artifact's SHA-256 and byte count (`90840f...`, 729,453 bytes). The build reproducibility check passed and reported the exact current artifact values above. This documentation commit rebases those values; a fresh CI run is required to verify the checkpoint.
+
+**Evidence boundary:** these are deterministic component probes, not a complete human run. They do not prove every rendered warning matches its active collision shape, that every attack is readable/avoidable at normal speed, that pause/invulnerability/phase cancellation is correct, or that the numerical tuning matches the source game. Human owner playtest, real-device performance, real file-origin persistence and final visual/audio acceptance remain NOT_TESTED or PARTIAL. Product remains **NOT_READY**.

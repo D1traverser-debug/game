@@ -167,7 +167,11 @@
     "Blocking CI now runs deterministic and bounded browser tests in fail-fast-disabled parallel matrices; long-run heuristic play runs separately on nightly schedule/manual dispatch and preserves a JSON report.",
     "CI workflow changes did not modify production index.html. Current development artifact remains 721829 bytes with SHA-256 632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29; checkpoint verification passed on the latest commit.",
     "Boss source research now records Krog'wa's three health segments, magnetic field, inhale, tongue charge and tracking spit; Mul'gath's three segments, additional heads, head whip, spike grid and linked minions. Official 1.1 notes corroborate Mul'gath minion corruption and phase-transition resistance behavior.",
-    "Boss combat first implementation is now in src/game/boss_encounters.js and bundled into index.html: Sol'phish obelisk/radial/homing cards; Krog'wa inhale/tongue-smash/tracking spit and phase-one magnetic boundary; Mul'gath head-whip/spike-grid/volley, three health segments, head-count growth, healing minion approach and corruption collision. All attacks use snapshotted telegraph geometry followed by active and recovery stages."
+    "Boss combat first implementation is now in src/game/boss_encounters.js and bundled into index.html: Sol'phish obelisk/radial/homing cards; Krog'wa inhale/tongue-smash/tracking spit and phase-one magnetic boundary; Mul'gath head-whip/spike-grid/volley, three health segments, head-count growth, healing minion approach and corruption collision. All attacks use snapshotted telegraph geometry followed by active and recovery stages.",
+    "Development commit 35b4aa2170428f70421470b10c91d2a13c8850a4 adds the homing-projectile hostile rendering branch and idempotent source-fragment build integration; root index.html remains a self-contained offline artifact.",
+    "Exact current development/index.html artifact read back at 729501 bytes, SHA-256 41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee; scripts/build_game.py --check reported PASS_REPRODUCIBLE.",
+    "CI run 44062145086: all nine independent browser regression jobs passed, including boss_encounter_regression 15/15, trial unlock, normal-play smoke, progression, objective collection, character upgrades, 3D integration, atlas renderer and Reginald spell scope; zero browser page errors and zero external requests.",
+    "CI run 44062145086 checkpoint guard alone failed because PROJECT_STATE.json still recorded the prior artifact SHA/byte count; exact current candidate metadata is now rebaselined. Product remains NOT_READY."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -219,19 +223,19 @@
     "Seeded full-mission natural run seed 1 died at 167.8 seconds before boss; root cause investigation and pilot strategy refinement underway; not a boss-mechanics failure",
     "Seeded natural full mission seed 1 failed at gameTime 121.17s before boss spawn; player HP 0/100 after taking 131.0 damage, only 2 spells equipped, 0 armor/regen, 0 objectives completed. Trace shows HP 100 at 90.2s then 13 at 120.3s during sludge objective. No JS/console/network errors.",
     "After moving defensive stat cards ahead of spell-level/augment picks, seed 1 survived longer to 167.87s with 400 max HP and 2 regen, but died at the Rift objective; progress only 35.7%, objectives completed 0, HP 0, damageTaken 402.88, no boss spawned. Trace confirms the pilot's threat-evasion vector repeatedly leaves the required capture radius.",
-    "BOSS_PILOT_031 pending CI: replace screen-shake RNG in both the legacy 2D and atlas-backed 2.5D renderer in the temporary QA document; require zero render-phase Math.random calls, production 1/30 fixed steps, manual tick/simulation tick equality, blocked RAF evidence, identical seed-1 replay, natural baseline wins 1/2/3, and same-run natural Sol/Krog/Mul victories. No production index.html or balance changes.",
     "Natural-play exploratory pilot remains unresolved: CI #141 seeds 1/2/3 died before boss spawn and recorded zero natural wins. It is no longer a blocking CI gate; obtain additional telemetry and an owner-controlled run before production balance changes.",
-    "Boss encounters remain P0 incomplete: Krog'wa and Mul'gath still use simplified approximations. Implement source-informed phase and attack state machines with explicit telegraphs and attack-by-attack regression; keep undocumented timings and damage provisional.",
     "Performance remains below the 60 FPS desktop target in the software-rendered stress baseline; real hardware benchmarking and draw-cost profiling remain open.",
     "Real file-origin save/reload, corrupted-save recovery, visual/audio review, human full-run acceptance and source-fidelity review remain NOT_TESTED or PARTIAL.",
-    "Boss feature acceptance is not complete: current CI run 44061028666 exposed a stale artifact checkpoint after the gameplay change; boss regression itself passed, while checkpoint metadata is being rebased. Human full-run play, exact source timing, visual readability and balance remain unaccepted."
+    "Boss attack state machines and 15/15 deterministic component probes are implemented, but attack-by-attack visual readability, rendered-telegraph/hitbox parity, counterplay, pause/invulnerability/phase-cancellation behavior and human play acceptance remain open.",
+    "Boss attack timings, radii, projectile speeds and damage values remain provisional adaptations; source evidence does not pin exact current-version numerical values.",
+    "Natural full-run victories for Sol'phish, Krog'wa and Mul'gath are not demonstrated on the exact 729501-byte candidate; prior wins across separate historical runs do not satisfy same-run coverage."
   ],
-  "next_action": "Rebase the exact index.html SHA/byte checkpoint, rerun deterministic CI, then perform visual and human play review of all boss attack cards before numerical balance tuning.",
+  "next_action": "Rerun deterministic CI against the rebaselined artifact checkpoint. If the checkpoint passes, review every boss telegraph/hitbox in normal-speed 2.5D gameplay and perform an owner-controlled boss playtest before tuning provisional timings or damage.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "development_candidate_sha256": "90840f1c40684d959449c4c6cc42caffbfb7c3cc38d7363cb88d5011d0aa1550",
-  "development_candidate_bytes": 729453,
+  "development_candidate_sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
+  "development_candidate_bytes": 729501,
   "last_successful_candidate_ci": {
     "run_id": 44053362404,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/44053362404",
@@ -245,20 +249,24 @@
   "latest_local_candidate": {
     "artifact": "development/index.html",
     "delivery_filename": "咒语旅团-当前开发版-单人网页版.html",
-    "bytes": 729453,
-    "sha256": "90840f1c40684d959449c4c6cc42caffbfb7c3cc38d7363cb88d5011d0aa1550",
-    "source_base": "single-file 2.5D art-forward candidate with embedded 4x4 sprite atlas, 24 static decor cache tiles and recent progression/objective/balance fixes",
+    "bytes": 729501,
+    "sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
+    "source_base": "2.5D art-forward single-file candidate with embedded 4x4 sprite atlas, 24 static decor cache tiles, progression/objective fixes and source-informed boss attack state machines",
     "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
     "scope": "Reginald only / Verdant Meadow only / single-player / offline single HTML",
-    "tested": "CI 44061028666: normal-play smoke, objective collection, progression, renderer, 3D integration and boss encounter regression passed where completed; checkpoint and remaining browser jobs pending state rebaseline.",
-    "not_tested": "Natural Sol'phish/Krog'wa/Mul'gath full-run victories on this exact candidate, human owner acceptance, real file-origin persistence, real hardware performance, complete source fidelity and final visual/audio acceptance."
+    "tested": "CI run 44062145086 on commit 35b4aa2170428f70421470b10c91d2a13c8850a4: reproducible build PASS; all nine browser regression jobs PASS; boss encounter regression 15/15 PASS; zero browser errors and external requests. Checkpoint alone failed because PROJECT_STATE.json still contained the previous artifact SHA/byte count; this metadata is now rebaselined.",
+    "not_tested": "Human owner playtest; source-accurate timing/damage; attack-by-attack visual parity and player counterplay in both render paths; natural full-run wins for all three bosses on this exact artifact; pause/invulnerability/phase-cancellation edge cases; real file-origin persistence; real hardware performance; final visual/audio acceptance."
   },
-  "latest_candidate_ci_status": "PENDING_PROJECT_STATE_ARTIFACT_REBASELINE",
-  "last_verified_development_commit": "ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd",
+  "latest_candidate_ci_status": "CHECKPOINT_METADATA_REBASELINED_PENDING_CI_RERUN",
+  "last_verified_development_commit": "35b4aa2170428f70421470b10c91d2a13c8850a4",
   "last_verified_ci_run": {
-    "run_id": 44053362404,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44053362404",
-    "commit": "ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd",
-    "conclusion": "success"
+    "run_id": 44062145086,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44062145086",
+    "commit": "35b4aa2170428f70421470b10c91d2a13c8850a4",
+    "conclusion": "failure_checkpoint_metadata_only",
+    "browser_component": "PASS",
+    "browser_content_visual": "PASS",
+    "artifact_sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
+    "artifact_bytes": 729501
   }
 }

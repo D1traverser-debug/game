@@ -49,3 +49,6 @@ The existing prototype has some menus, combat and progression code. Its previous
 | RUN-ACCEPT-02 | 90 seconds of normal combat with real movement and offered upgrade selection, no forced XP/damage/result | P1 | Playwright normal-play smoke; 83 kills, level 8, 8 real upgrades, 100/100 HP, no errors/network | PASS_AUTOMATED_SMOKE_ONLY |
 | SPELL-1.2-ADAPT-01 | Three new 1.2 starter spells have four distinct, functioning augmentations each | P0 | Individual effect probes per augment, not only catalogue counts | PARTIAL_MECHANIC_EXISTS |
 | SOURCE-TRUTH-01 | Officially undocumented new-spell augmentation names/effects must be identified as independent adaptations | P0 | UI copy and source matrix clearly separate source facts from original designs | PASS_DOCUMENTED / UI_POLISH |
+
+
+Boss component evidence (2026-11-17): CI 44062145086 passed 15/15 deterministic boss probes on development commit 35b4aa2. This upgrades the implementation status from missing/simplified mechanics to partial component coverage only. It does not satisfy the source-accurate natural-combat, visual readability, counterplay, pause/invulnerability, human-play or balance acceptance criteria in the BOSS rows.
