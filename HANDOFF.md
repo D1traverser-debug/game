@@ -216,3 +216,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Added upgrade offer/selection logging to `tests/boss_archetype_full_runs.py`.
 - Adjusted test-only steering: while inside Rift capture radius, threat-evasion vector is damped to 18% so player remains in the legitimate capture area. No direct objective progress or player stats are changed.
 - Latest CI should be checked after commit `104bad238bf461cacd98304f9260a5fa3deca606`. Continue investigating until a natural complete run reaches and defeats the boss; never weaken the pass condition.
+
+
+## MULTI-BOSS PILOT GOVERNANCE 015 — 2026-11-17
+- Verified development HEAD before this revision: `48f7132abcdaaab89dd9fb97d4688ed40a21036a`; latest CI #124: https://github.com/D1traverser-debug/game/actions/runs/44003040650.
+- CI #124 checkpoint passed. Browser-component failed at the seeded natural-run step: seed 1 ended at 155.5s, level 10, 141 kills, HP 0/100, damageTaken 134.18, two level-1 spells, 0 armor, 0 regen, one objective, no browser/console/network errors.
+- Structural test-gate defect: `.github/workflows/qa.yml` passed only seed 1, while `tests/boss_archetype_full_runs.py` required exact coverage of all three boss IDs. A one-seed workflow invocation cannot satisfy that condition, even if its single boss is naturally defeated.
+- Pilot-policy defects: scroll ranking compared English internal IDs with Chinese `name` display strings; generic stats were selected ahead of available spell-level cards; the full-run test selected a temporary Solar Pulse trial instead of the default baseline loadout. These findings do not prove a production balance defect.
+- Revision 015 changes only the QA harness and project evidence: default no-trial loadout, Chinese display-name scroll ranking, spell/defense-aware choices, reroll only when critically low and no useful legal option exists, 15-second trace, test-only damage-source logging, and CI seeds 1/2/3.
+- Product `index.html` is unchanged in this revision. The exact product candidate remains `NOT_READY`; no changes to `main` or CAOS.
+- Next: inspect the three-seed CI run. Require natural wins for all seeds and exact `sol`, `krog`, `mul` coverage. If any seed fails, use recorded damage events and 15-second traces to distinguish pilot navigation/card selection from production combat balance. Human owner acceptance, file-origin persistence, real-device performance, audio/visual polish and full source fidelity remain open.

@@ -48,3 +48,17 @@ These are useful component/integration probes, not full product acceptance.
 - Full-run acceptance must be completed by a human or an independently controlled player agent without debug APIs.
 - Save acceptance must close and reopen the actual file in at least two supported browsers.
 - Benchmark at fixed device/browser/resolution and repeat at least five times; report average and p95 frame time.
+
+
+## Seeded multi-boss pilot audit — 2026-11-17
+
+Latest inspected CI: [run 44003040650](https://github.com/D1traverser-debug/game/actions/runs/44003040650), development HEAD `48f7132abcdaaab89dd9fb97d4688ed40a21036a`.
+
+- Checkpoint job: PASS.
+- Browser-component job: FAIL at `tests/boss_archetype_full_runs.py 1`.
+- Seed 1 ended at 155.5 in-game seconds before the boss window: 141 kills, level 10, HP 0/100, damageTaken 134.18, two level-1 spells, zero armor/regen, one objective. Browser, console and external-network error lists were empty.
+- The CI configuration supplied one seed, but the test predicate required all three boss IDs (`sol`, `krog`, `mul`). This made the configured gate impossible to satisfy even if the one run won.
+- The pilot's scroll comparator used English internal IDs against Chinese display names; the run selected `灵药恒存` despite `健康成长` and `魔力汲取` being offered. It also chose generic stat cards over available spell-level cards. The test selected a temporary Solar Pulse trial, so it was not a default-loadout baseline run.
+- These are verified QA-harness defects. The run is insufficient evidence to change production balance.
+- Revision 015 removes the trial from this acceptance path, ranks actual displayed scrolls and meaningful spell/defense cards, logs damage sources and objective state, and changes CI to seeds 1/2/3. Result remains PENDING until GitHub Actions readback.
+- This is automated pilot evidence only. It does not establish human fun/UX acceptance, source fidelity, real-device performance, or release readiness.

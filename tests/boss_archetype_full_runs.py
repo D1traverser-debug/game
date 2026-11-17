@@ -16,6 +16,19 @@ MARKER="// Production build: internal debug mutations are test-only and not ship
 assert SOURCE.count(MARKER)==1
 
 PROBE=r"""
+// Diagnostic instrumentation exists only in this temporary browser document.
+// It records incoming damage without changing the production damage pipeline.
+window.__damageEvents=[];
+const __baseDamagePlayer=damagePlayer;
+damagePlayer=function(n,source='enemy'){
+  const p=game?.player,o=game?.objective;
+  window.__damageEvents.push({
+    t:+(game?.time||0).toFixed(1),source,amount:+Number(n).toFixed(1),
+    hpBefore:p?+p.hp.toFixed(1):null,x:p?+p.x.toFixed(1):null,y:p?+p.y.toFixed(1):null,
+    objective:o?.type||null,objectiveProgress:o?.progress||0
+  });
+  return __baseDamagePlayer(n,source);
+};
 window.__setRunSeed=(seed)=>{
   let state=seed>>>0;
   Math.random=()=>{
@@ -55,37 +68,60 @@ window.__fullRun = async (maxSeconds) => {
     if(o.objects?.length)return nearest(o.objects,p)?.o||o;
     return o;
   };
-  const choose=(opts)=>{
-    const scrollPriority=['growth','thick','bulwark','evasion','fight','blood','go','mana','vital','elixir','hard','attune','siphon'];
+  const choose=(opts,p)=>{
     const newSpell=opts.find(x=>x.kind==='newSpell');
     if(newSpell)return newSpell;
-    const scroll=opts.filter(x=>x.kind==='scroll').sort((a,b)=>scrollPriority.indexOf(a.name)-scrollPriority.indexOf(b.name))[0];
+    // Scroll options expose Chinese display names, not the internal IDs.
+    // Rank the actual displayed cards so a mislabeled comparison cannot silently
+    // turn every scroll into an arbitrary first-card choice.
+    const scrollPriority={
+      '健康成长':0,'壁垒':1,'厚皮':2,'闪避疗愈':3,'致命回响':4,
+      '魔力虹吸':5,'魔力汲取':6,'目标馈赠':7,'炼金过载':8,
+      '战或逃':9,'血速':10,'严酷教训':11,'延迟命运':12,
+      '静心调谐':13,'灵药恒存':14
+    };
+    const scroll=opts.filter(x=>x.kind==='scroll')
+      .sort((a,b)=>(scrollPriority[a.name]??99)-(scrollPriority[b.name]??99))[0];
     if(scroll)return scroll;
-    // A competent solo build secures sustain first, then layers spell damage.
-    const statPriority=['regen','armor','dodge','maxHp','speed','damage','cast','crit','critDmg','spellSize','manaPull','manaGain','luck'];
-    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
-    if(stat)return stat;
+    const defensivePriority={maxHp:0,regen:1,armor:2,dodge:3};
+    const defensive=opts.filter(x=>x.kind==='stat'&&Object.prototype.hasOwnProperty.call(defensivePriority,x.k))
+      .sort((a,b)=>defensivePriority[a.k]-defensivePriority[b.k]);
+    const hpRatio=p.hp/Math.max(1,p.maxHp);
+    if(hpRatio<.72&&defensive.length)return defensive[0];
     const augPriority=['healingSprout','quakeBurst','diceTwin','diceEcho','sawTwin','sawReturn','orbSplit','orbBurst','quakeAfter','quakePull','sawMagnet','seeking','surge','tempo','reach'];
-    const aug=opts.filter(x=>x.kind==='spellAugment').sort((a,b)=>augPriority.indexOf(a.aug)-augPriority.indexOf(b.aug))[0];
+    const aug=opts.filter(x=>x.kind==='spellAugment')
+      .sort((a,b)=>{const ai=augPriority.indexOf(a.aug),bi=augPriority.indexOf(b.aug);return (ai<0?999:ai)-(bi<0?999:bi)})[0];
     if(aug)return aug;
-    const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
-    if(level)return level;
     const bonus=opts.find(x=>x.kind==='spellLevelBonus'&&x.mode==='damage')||opts.find(x=>x.kind==='spellLevelBonus');
     if(bonus)return bonus;
     const infusion=opts.find(x=>x.kind==='infuse');
     if(infusion)return infusion;
+    const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
+    if(level)return level;
+    if(defensive.length)return defensive[0];
+    // Spell levels and augmentations outrank marginal economy/mobility stats.
+    const statPriority={damage:0,cast:1,crit:2,critDmg:3,spellSize:4,speed:5,manaGain:6,manaPull:7,luck:8};
+    const stat=opts.filter(x=>x.kind==='stat')
+      .sort((a,b)=>(statPriority[a.k]??99)-(statPriority[b.k]??99))[0];
+    if(stat)return stat;
     return opts[0];
   };
   while(elapsed<maxSeconds&&!game.ended&&(screen==='playing'||screen==='upgrade')){
     if(screen==='upgrade'){
       const opts=game.pending?.opts||[];
       if(!opts.length)break;
-      // Spend only real in-game rerolls to seek a defensive option; never pay HP for rerolls.
+      // Spend only a real free reroll when health is critical and the current
+      // offers contain neither sustain nor a meaningful spell upgrade. Never pay HP.
+      const hpRatio=game.player.hp/Math.max(1,game.player.maxHp);
       const hasDefensive=opts.some(x=>x.kind==='stat'&&['regen','armor','dodge','maxHp'].includes(x.k));
-      const hasNewSpell=opts.some(x=>x.kind==='newSpell');
-      if(!hasDefensive&&!hasNewSpell&&game.player.rerolls>0){$('reroll').click();continue;}
+      const hasStrongUpgrade=opts.some(x=>['newSpell','spellAugment','spellLevelBonus','spellLevel','infuse'].includes(x.kind));
+      const hasSustainScroll=opts.some(x=>x.kind==='scroll'&&['健康成长','壁垒','厚皮','闪避疗愈','致命回响','魔力虹吸','魔力汲取','目标馈赠'].includes(x.name));
+      if(hpRatio<.62&&!hasDefensive&&!hasStrongUpgrade&&!hasSustainScroll&&game.player.rerolls>0){$('reroll').click();continue;}
       // Only choose from real cards currently offered by the production game.
-      const choice=choose(opts);upgradeLog.push({t:+game.time.toFixed(1),offered:opts.map(x=>({kind:x.kind,k:x.k,name:x.name,aug:x.aug,spell:x.spell?.id})),selected:{kind:choice.kind,k:choice.k,name:choice.name,aug:choice.aug,spell:choice.spell?.id}});applyUpgrade(choice);upgrades++;continue;
+      const rerollsBefore=game.player.rerolls||0;
+      const choice=choose(opts,game.player);
+      upgradeLog.push({t:+game.time.toFixed(1),rerollsBefore,offered:opts.map(x=>({kind:x.kind,k:x.k,name:x.name,aug:x.aug,spell:x.spell?.id,title:x.title,rarity:x.rarity})),selected:{kind:choice.kind,k:choice.k,name:choice.name,aug:choice.aug,spell:choice.spell?.id},rerollsAfter:game.player.rerolls||0});
+      applyUpgrade(choice);upgrades++;continue;
     }
     const p=game.player;
     let target=null,goalX=0,goalY=0,activeObjective=null;
@@ -191,14 +227,18 @@ window.__fullRun = async (maxSeconds) => {
     }
     if(chestNear||itemNear){interact();interactions++;}
     update(dt);elapsed+=dt;ticks++;
-    if(game.time-lastTrace>=30){
+    if(game.time-lastTrace>=15){
       const q=game.player,near=nearest(game.enemies.filter(e=>!e.dead),q);
       trace.push({t:+game.time.toFixed(1),hp:+q.hp.toFixed(1),maxHp:q.maxHp,level:q.level,
         kills:q.kills,damageTaken:+q.damageTaken.toFixed(1),armor:+q.armor.toFixed(1),
         regen:+q.regen.toFixed(1),damage:+q.damage.toFixed(2),cast:+q.cast.toFixed(2),crit:+q.crit.toFixed(2),
         spellCount:q.spells.length,enemyCount:game.enemies.filter(e=>!e.dead).length,
         nearestEnemy:near?+near.d.toFixed(1):null,healthOrbs:game.orbs.filter(x=>x.type==='health').length,magnetOrbs:game.orbs.filter(x=>x.type==='magnet').length,objective:game.objective?.type||null,
-        objectiveProgress:game.objective?.progress||0,spells:q.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()}))});
+        objectiveProgress:game.objective?.progress||0,objectiveTarget:game.objective?.target||0,
+        objectiveDone:!!game.objective?.done,objectiveVariant:game.objective?.variant||null,
+        objectiveTime:game.objective?+game.objective.time.toFixed(1):null,
+        rerolls:q.rerolls,scrolls:q.scrolls.slice(),invuln:+q.invuln.toFixed(2),
+        spells:q.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()}))});
       lastTrace=game.time;
     }
     if(ticks%100===0)await new Promise(r=>setTimeout(r,0));
@@ -210,6 +250,10 @@ window.__fullRun = async (maxSeconds) => {
     hp:p.hp,maxHp:p.maxHp,damageTaken:p.damageTaken,armor:p.armor,regen:p.regen,
     objectives:p.objectives,upgrades,interactions,upgradeLog,
     spells:p.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()})),
+    scrolls:p.scrolls.slice(),rerolls:p.rerolls,
+    position:{x:+p.x.toFixed(1),y:+p.y.toFixed(1)},
+    damageEvents:window.__damageEvents.slice(-80),
+    trialSpellId:save.trialSpellId||null,
     objective:game.objective?.type||null,
     bossSpawned:!!b,bossId:b?.bossId||null,bossHp:b?.hp??null,bossMax:b?.max??null,
     bossDead:!!b?.dead,wins:save.wins||0,losses:save.runs-(save.wins||0),
@@ -221,7 +265,7 @@ window.__fullRun = async (maxSeconds) => {
 DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
 
 async def main():
-  seeds=[int(x) for x in sys.argv[1:]] or [1]
+  seeds=[int(x) for x in sys.argv[1:]] or [1,2,3]
   report={"runs":[],"checks":{}}
   async with async_playwright() as p:
     browser=await p.chromium.launch(headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
@@ -235,10 +279,7 @@ async def main():
       page.set_default_timeout(180000)
       await page.set_content(DOCUMENT,wait_until="load")
       await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
-# Normal menu flow: choose the one-run Solar Pulse trial, then start.
-      await page.locator('#camp').click()
-      await page.locator('[data-trial="solar"]').click()
-      await page.locator('#campBack').click()
+# Baseline natural mission: use the default Reginald loadout, without a temporary trial.
       await page.locator("#start").click()
       state=await asyncio.wait_for(page.evaluate("window.__fullRun(1500)"),timeout=180)
       item={"seed":seed,"boss":state["bossId"],"natural_win":bool(state["bossDead"] and state["ended"] and state["screen"]=="result" and state["wins"]>=1),"state":state,"page_errors":errors,"console_errors":console,"external_requests":requests}
@@ -249,10 +290,12 @@ async def main():
   report["checks"]={
     "all_seeded_runs_natural_wins":bool(report["runs"]) and all(x["natural_win"] for x in report["runs"]),
     "boss_ids_recorded":bool(bosses) and all(x in {"sol","krog","mul"} for x in bosses),
-    "all_three_boss_archetypes_covered":len(seeds)>1 and set(bosses)=={"sol","krog","mul"},
+    "seed_count_at_least_three":len(seeds)>=3,
+    "all_three_boss_archetypes_covered":len(seeds)>=3 and set(bosses)=={"sol","krog","mul"},
     "no_browser_errors":all(not x["page_errors"] and not x["console_errors"] for x in report["runs"]),
     "offline_no_external_requests":all(not x["external_requests"] for x in report["runs"])
   }
+  report["boss_ids"]=sorted(set(x for x in bosses if x))
   report["pass"]=all(report["checks"].values())
   print(json.dumps(report,ensure_ascii=False,indent=2))
   if not report["pass"]:raise SystemExit(1)

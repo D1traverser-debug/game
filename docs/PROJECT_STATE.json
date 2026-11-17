@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "MULTI_BOSS_NATURAL_RUN_QA_FIX_014",
+  "checkpoint": "MULTI_BOSS_PILOT_GOVERNANCE_015",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -84,7 +84,10 @@
     "Corrected seeded full-run test Python comment syntax and synchronized PROJECT_STATE artifact hash/bytes to exact CI-reported values; checkpoint job passed in run 44002043276.",
     "Updated test-only natural-play build policy to select defensive stat cards whenever actually offered before spell augments/levels; does not mutate player stats or alter production game code.",
     "Seeded full-run test now logs each real upgrade offer/selection for evidence-based pilot tuning.",
-    "Adjusted test-only movement policy to damp threat evasion while inside the Rift capture radius (multi-node radius tighter); no game state, player stats or objective progress is forced."
+    "Adjusted test-only movement policy to damp threat evasion while inside the Rift capture radius (multi-node radius tighter); no game state, player stats or objective progress is forced.",
+    "GitHub Actions run 44003040650 at development commit 48f7132: checkpoint PASS; browser-component failed in seeded full-run step. Seed 1 died at 155.5s, level 10, 141 kills, 0/100 HP, 134.18 damage taken, two level-1 spells, zero armor/regen, one objective, and no JS/console/network errors.",
+    "Root-cause audit found the multi-boss test gate was structurally mismatched: qa.yml supplied only seed 1 while boss_archetype_full_runs.py required all three boss IDs, so the coverage check could never pass from that workflow invocation.",
+    "Root-cause audit found the test-only pilot compared English scroll IDs with Chinese display names, ranked spell-level cards below generic stats, and selected a temporary Solar Pulse trial instead of the default baseline loadout."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -135,9 +138,10 @@
     "Full-run test is a scripted movement/upgrade policy; repeat with alternate builds and all three boss archetypes",
     "Seeded full-mission natural run seed 1 died at 167.8 seconds before boss; root cause investigation and pilot strategy refinement underway; not a boss-mechanics failure",
     "Seeded natural full mission seed 1 failed at gameTime 121.17s before boss spawn; player HP 0/100 after taking 131.0 damage, only 2 spells equipped, 0 armor/regen, 0 objectives completed. Trace shows HP 100 at 90.2s then 13 at 120.3s during sludge objective. No JS/console/network errors.",
-    "After moving defensive stat cards ahead of spell-level/augment picks, seed 1 survived longer to 167.87s with 400 max HP and 2 regen, but died at the Rift objective; progress only 35.7%, objectives completed 0, HP 0, damageTaken 402.88, no boss spawned. Trace confirms the pilot's threat-evasion vector repeatedly leaves the required capture radius."
+    "After moving defensive stat cards ahead of spell-level/augment picks, seed 1 survived longer to 167.87s with 400 max HP and 2 regen, but died at the Rift objective; progress only 35.7%, objectives completed 0, HP 0, damageTaken 402.88, no boss spawned. Trace confirms the pilot's threat-evasion vector repeatedly leaves the required capture radius.",
+    "BOSS_PILOT_015 changes are pending CI validation: corrected no-trial loadout, evidence-based card ranking, incoming-damage diagnostics, and a three-seed natural-run matrix. Product balance must not be changed solely from the previous weak-pilot failure."
   ],
-  "next_action": "Inspect the next CI seeded run. If it reaches the Rift completion and survives, continue to boss. If not, analyze the upgrade offer log and objective trace, then tune only normal movement/selection inputs. After stable seed 1, expand to all three bosses and repeat varied builds. Keep product NOT_READY pending player acceptance.",
+  "next_action": "Inspect the first three-seed CI run after BOSS_PILOT_015. Require three natural wins and exact coverage of sol/krog/mul. If a seed dies, inspect the 15-second trace, actual incoming-damage sources, selected upgrade cards, objective progress and route before deciding whether the cause is pilot behavior or production balance. Keep product NOT_READY and do not modify main or CAOS.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -163,5 +167,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_RIFT_HOLD_PILOT_014B"
+  "latest_candidate_ci_status": "PENDING_MULTI_SEED_PILOT_015"
 }

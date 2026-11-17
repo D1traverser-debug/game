@@ -39,3 +39,11 @@
 - Other wizard Ascension signature spells are excluded from Reginald's research, temporary trials, persistent unlocks and level-up offer pool.
 - The trial slot is a single-player adaptation for otherwise impossible unlock prerequisites, not an original-game feature; the underlying quest conditions remain source-derived and must be labeled as adaptation where needed.
 - Evidence: official 1.2 patch notes, Reginald and Spells wiki pages, and Ascension signature discussion. Sources are listed in MECHANIC_REFERENCE_MATRIX.md.
+
+
+## D-008 — Natural-run pilot and multi-boss coverage gate (ACCEPTED)
+- The full-mission baseline uses the default Reginald loadout. The temporary one-run spell trial is tested by its dedicated regression and must not be silently injected into the boss-coverage baseline.
+- Multi-boss automated coverage requires at least three deterministic seeds, each completing a natural run, with the observed boss-ID set exactly equal to `sol`, `krog`, and `mul`.
+- The pilot may only supply normal movement, ordinary interaction, and selections from cards actually offered by production. It may not set time, HP, XP, objective progress, enemy/boss state, or victory.
+- Card ranking must use actual option identifiers or exact displayed labels. If the pilot fails, incoming damage, build choices, objective progress and movement must be inspected before attributing the result to production balance.
+- Automated pilot success is not human owner acceptance and does not waive source-fidelity, performance, persistence, visual/audio or release gates.
