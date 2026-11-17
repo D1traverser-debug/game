@@ -95,3 +95,5 @@
 | GAME-053 | P0 | Browser prototype test success can be mistaken for full-game acceptance | CI #44131377996 validates only the legacy single-player HTML candidate | OPEN | Keep CI evidence scoped to legacy prototype; create independent Unity edit/play/network/build/performance gates |
 
 | QA-005 | P1 | Full-game scope-guard negative control retained the old single-player assumption | CI #44141591159 exposed stale test fixture; CI #44141825172 passed 10/10 after changing the mutation to multiplayer=false and adding branch-drift control | RESOLVED_IN_CI_44141825172 | Keep the negative control aligned to the full-game contract |
+
+| GAME-054 | P0 | Full-game branch has no engine-independent deterministic simulation core | The browser prototype's simulation, rendering and input are coupled in one HTML file; the new full-game branch requires host-authoritative co-op and deterministic tests | IN_PROGRESS | Build and test fixed-step clock, seeded gameplay RNG and centralized friendly-fire/invulnerability damage gate before adding spell and enemy content |

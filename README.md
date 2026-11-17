@@ -38,6 +38,10 @@ This repository is the durable source of truth for product scope, source-version
 9. `docs/REFERENCE_RESEARCH.md` and `docs/MECHANIC_REFERENCE_MATRIX.md` — source facts, assumptions, and version pins.
 10. `docs/DECISION_LOG.md` and `docs/ISSUE_REGISTER.md` — decisions, risks, and root causes.
 
+## Engine-independent simulation core
+
+`src/core` contains the deterministic C# simulation kernel, targeted at .NET Standard 2.1 for Unity integration. It is built and tested separately from Unity presentation and network providers. See `src/core/README.md`.
+
 ## Production rule
 
 Build a complete, polished vertical slice before mass-producing content. The first slice must prove the actual camera, one finished hero, one finished realm, representative enemy AI, spell/element interactions, objective loop, boss encounter, audio, performance, and 1–4 player networking. Do not build fifteen placeholder characters or four empty maps and call that progress.

@@ -70,5 +70,17 @@ jobs:
       - name: Run ${{ matrix.test }}
         run: python tests/${{ matrix.test }}.py
 
+  core-simulation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build engine-independent simulation core
+        run: dotnet build src/core/Game.Core.csproj --configuration Release
+      - name: Run deterministic core contracts
+        run: dotnet run --project tests/core/Game.Core.Tests.csproj --configuration Release
+
 # Blocking CI is limited to deterministic contracts and bounded browser regressions.
 # Long-horizon heuristic play is exploratory telemetry, not a human acceptance test.

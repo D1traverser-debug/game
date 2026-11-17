@@ -61,3 +61,13 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 - Scope guard now validates the expanded full-game contract and checks the exact legacy browser artifact as a preserved reference.
 - All nine legacy browser regression jobs passed on the full-game branch.
 - This is repository/legacy-prototype integrity only. No Unity project, native build, multiplayer, production art/audio or full-game player acceptance exists yet.
+
+
+## Simulation core foundation — 2026-11-18 (CI pending)
+
+- Added `src/core/Game.Core.csproj` targeting .NET Standard 2.1, with no UnityEngine or third-party package dependency.
+- Added fixed-step `SimulationClock`: explicit pause behavior, bounded per-frame steps, preserved backlog.
+- Added PCG seeded `DeterministicRng`; rendering/UI/audio must never consume gameplay RNG.
+- Added central `DamagePipeline` with independently configurable friendly-fire/self-damage policy and invulnerability gate. Exact armor and damage formulas remain unfrozen pending source research.
+- Added standalone .NET 8 contract runner with 12 deterministic tests.
+- GitHub Actions now builds the core and runs the contract runner. Await CI before marking the foundation PASS.

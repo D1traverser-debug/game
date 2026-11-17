@@ -272,3 +272,16 @@
 **Rationale:** The new scope needs authored 3D models/rigs/animation, layered VFX, audio tooling, native PC builds, controller support and 1–4 player networking. Unity 6.3 LTS is the current LTS with support through December 2027. Unity documents URP/Shader Graph/VFX Graph improvements and integrated multiplayer services. Godot remains a viable lower-cost alternative with ENet high-level networking, but would require more bespoke lobby/relay/service integration for internet co-op.
 
 **Falsifiers:** Reject or revise the engine decision if a bounded 4-client slice cannot meet the agreed performance/network targets, if the asset pipeline is not usable by the project owner, or if the required license/service cost is unacceptable. Do not build the full roster before the spike passes.
+
+
+## D-032 — Keep the simulation kernel engine-independent (2026-11-18)
+
+**Status:** ACCEPTED for the full-game branch.
+
+**Decision:** Implement deterministic simulation primitives in a pure C# .NET Standard 2.1 library that Unity can reference. The first contracts are fixed-step time, pause semantics, seeded gameplay RNG, and a centralized damage gate with configurable friendly fire/self-damage and invulnerability.
+
+**Reason:** The project needs host-authoritative simulation and deterministic tests. Putting rules inside MonoBehaviours, render loops, or network callbacks would reintroduce the prototype's coupling and make server/client consistency difficult to test.
+
+**Boundary:** This kernel intentionally does not freeze armor formulas, damage multipliers, spell timings, element interactions or progression values without source-version evidence. It is not a playable game.
+
+**Falsifiers:** If the library cannot be referenced cleanly by the pinned Unity editor or if profiling shows a material integration/performance problem, revisit the boundary with a measured alternative.

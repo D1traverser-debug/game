@@ -198,7 +198,8 @@
     "Community inventory identifies 15 wizards, four realms, seven elements and ten dual-element combinations; counts remain provisional pending version reconciliation.",
     "Selected Unity 6.3 LTS + URP for a controlled native PC vertical slice; not yet implemented or validated.",
     "Current 734011-byte browser candidate and 10/10 CI remain legacy prototype evidence only.",
-    "Full-game branch CI #44141825172 passed 10/10 jobs after correcting the negative-control fixture; checkpoint guard confirms the expanded scope and exact legacy artifact, and all nine legacy browser regression jobs pass."
+    "Full-game branch CI #44141825172 passed 10/10 jobs after correcting the negative-control fixture; checkpoint guard confirms the expanded scope and exact legacy artifact, and all nine legacy browser regression jobs pass.",
+    "Added engine-independent .NET Standard 2.1 simulation core foundation: fixed-step clock, deterministic PCG RNG and configurable damage/friendly-fire/invulnerability pipeline; CI verification pending."
   ],
   "failed_or_open": [
     "Unity 6.3 LTS editor project, URP configuration, package manifest and native Windows build have not yet been created or validated.",
@@ -207,7 +208,7 @@
     "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
     "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested."
   ],
-  "next_action": "Build the Unity 6.3 LTS URP project skeleton and a polished 1–4 player vertical slice: one original hero, one realm, three distinct spells, one elemental interaction, three enemy archetypes, one objective, one boss, original animation/VFX/SFX/music, and host-authoritative networking. Run a 4-client technical spike before expanding the content roster. Keep the browser prototype isolated.",
+  "next_action": "Run the new .NET core contract suite in GitHub Actions. After green, extend the simulation core with typed gameplay events, elemental status contracts and host-authoritative session commands; then bootstrap Unity 6.3 LTS and connect the core to the first vertical slice.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
