@@ -407,3 +407,14 @@ This section supersedes the earlier "NEXT PRODUCT VERTICAL SLICE — BOSS ENCOUN
 **Still NOT_TESTED / PARTIAL:** exact current-source timing and damage; every attack's rendered telegraph-to-hitbox parity and readability at normal speed; actual player dodge/counterplay; pause/invulnerability/phase-transition cancellation edge cases; natural full-run wins for all three bosses on this exact artifact; owner playtest; real file-origin save/reload; real hardware performance; final visual/audio acceptance.
 
 Next action: verify the metadata-rebaseline CI run. If the checkpoint passes, inspect each boss attack visually at normal speed and run a human boss playtest before changing provisional numeric tuning. Product status remains **NOT_READY**. CAOS remains strictly read-only.
+
+
+## RECOVERY UPDATE — TRIAL TEST ASSERTION ROOT CAUSE (2026-11-17)
+
+- Artifact checkpoint rebaseline succeeded in CI run 44064015142.
+- Boss encounter regression remained 15/15 PASS; eight of nine browser jobs passed.
+- The only failure was the trial unlock test's `trial_offered_at_slot_two` assertion.
+- Root cause: the probe flattened options to spell IDs. Since the trial spell is already equipped at run start, a legitimate spell-level upgrade card for that spell could be mistaken for a duplicate new-spell offer. Random option selection made the assertion flaky.
+- The test now preserves `kind` and `spell` and checks that the trial spell is not offered as a duplicate `newSpell`, while remaining equipped exactly once after accepting a level-up card.
+- No production HTML or balance changes were made for this test defect. Corrected full CI is pending.
+- Recovery boundary remains unchanged: CAOS is read-only; main baseline preserved; product status NOT_READY.

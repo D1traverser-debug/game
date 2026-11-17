@@ -38,3 +38,8 @@ The 15 checks cover: three attack cards per boss; valid lifecycle durations and 
 These are synthetic deterministic component probes. They do not prove complete player combat, full-run survival, natural victory, readable visuals, source-exact timing, or human acceptance. The current suite does not yet prove every rendered telegraph uses the exact active hitbox geometry in both render paths, nor does it cover pause, invulnerability, phase-transition cancellation or duplicate damage on every attack. Numerical durations, radii, speeds and damage are provisional adaptations.
 
 Next: verify the metadata-rebaseline CI run; then capture every boss attack at normal speed and compare warning geometry/lifetime with its active hitbox, test actual dodge/counterplay, add the missing lifecycle edge regressions, and obtain an owner-controlled boss playtest. Do not tune global HP/damage or claim source fidelity based only on this component pass.
+
+
+## Follow-up CI evidence
+
+CI run 44064015142 verified the exact artifact checkpoint and again passed the 15/15 boss regression. Eight of nine browser jobs passed. The sole failure was an unrelated flaky trial-unlock test assertion that conflated `spellLevel` and `newSpell` option kinds; it did not indicate a boss or production-artifact regression. The test harness correction and full rerun are pending.

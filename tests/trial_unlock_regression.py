@@ -17,7 +17,7 @@ assert SOURCE.count(MARKER) == 1
 PROBE = """
 window.__trialProbe={
  snapshot:()=>({trial:save.trialSpellId,unlocks:save.unlocks.slice(),flags:(save.questFlags||[]).slice(),level:game?.player.level,spells:game?.player.spells.map(s=>s.id),screen}),
- offer:(n)=>{game.player.level=n;screen='playing';offerUpgrade('level');return{offers:game.pending?.opts.map(o=>o.spell?.id||'NONE'),screen}},
+ offer:(n)=>{game.player.level=n;screen='playing';offerUpgrade('level');return{offers:game.pending?.opts.map(o=>({kind:o.kind,spell:o.spell?.id||null})),screen}},
  acceptFirst:()=>{applyUpgrade(game.pending.opts[0]);return{spells:game.player.spells.map(s=>s.id),screen}},
  grant:(id)=>({newlyGranted:grantSpellQuest(id),isFlagged:save.questFlags.includes(id),isUnlocked:save.unlocks.includes(id)}),
  starEvent:()=>{let s={...spells.find(x=>x.id==='stars'),level:14,infusions:[],augments:[],cdNow:0};
@@ -54,9 +54,9 @@ async def main():
     c['trial_consumed_on_start']=before['trial'] is None
     c['trial_spell_equipped_at_start']='solar' in before['spells']
     offer=await page.evaluate('__trialProbe.offer(2)')
-    c['trial_offered_at_slot_two']='solar' in offer['offers']
+    c['trial_not_duplicated_as_new_spell_at_slot_two']=not any(o['kind']=='newSpell' and o['spell']=='solar' for o in offer['offers'])
     accepted=await page.evaluate('__trialProbe.acceptFirst()')
-    c['trial_equipped']='solar' in accepted['spells']
+    c['trial_remains_equipped_once_after_upgrade']=accepted['spells'].count('solar')==1
     granted=await page.evaluate('__trialProbe.grant("solar")')
     c['quest_permanent_unlock']=granted['newlyGranted'] and granted['isFlagged'] and granted['isUnlocked']
     second=await page.evaluate('__trialProbe.grant("solar")')

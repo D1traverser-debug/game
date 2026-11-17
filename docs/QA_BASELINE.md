@@ -294,3 +294,19 @@ All nine browser regression jobs in CI run 44062145086 passed, including normal-
 **Checkpoint outcome:** the CI checkpoint job failed only because `docs/PROJECT_STATE.json` still contained the previous artifact's SHA-256 and byte count (`90840f...`, 729,453 bytes). The build reproducibility check passed and reported the exact current artifact values above. This documentation commit rebases those values; a fresh CI run is required to verify the checkpoint.
 
 **Evidence boundary:** these are deterministic component probes, not a complete human run. They do not prove every rendered warning matches its active collision shape, that every attack is readable/avoidable at normal speed, that pause/invulnerability/phase cancellation is correct, or that the numerical tuning matches the source game. Human owner playtest, real-device performance, real file-origin persistence and final visual/audio acceptance remain NOT_TESTED or PARTIAL. Product remains **NOT_READY**.
+
+
+## CI 44064015142 — checkpoint rebaseline passed; trial assertion flake isolated (2026-11-17)
+
+Run: https://github.com/D1traverser-debug/game/actions/runs/44064015142  
+Commit: `75eb495d585dd36f713abd6304dcf463e4f1a1a0`  
+Artifact unchanged: 729,501 bytes; SHA-256 `41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee`.
+
+- Checkpoint: PASS.
+- Boss encounter regression: 15/15 PASS.
+- Eight of nine browser regression jobs passed; the only failure was `trial_unlock_regression`.
+- Root cause: its probe reduced every option to a spell ID, then asserted that `solar` appeared at slot two. The trial spell was already equipped at run start; a random `spellLevel` option for Solar could be mistaken for a `newSpell` offer. This made the assertion dependent on random card selection.
+- Production code behavior is consistent with the intended temporary trial: the selected spell is equipped at run start, the trial flag is consumed, and it is not permanently unlocked until the quest grant.
+- Test correction: retain both option `kind` and spell ID; assert Solar is not re-offered as a `newSpell` duplicate and remains equipped exactly once after accepting a level-up choice. No production HTML or balance change.
+
+The corrected full CI run is pending. Product remains **NOT_READY**; boss visual parity, real counterplay, source-exact tuning and human acceptance remain open.

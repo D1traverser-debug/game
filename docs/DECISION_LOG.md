@@ -215,3 +215,20 @@
 **Falsifiers / review**
 - If rendered telegraphs and hitboxes diverge, change the shared attack-instance/render contract rather than adding independent visual offsets.
 - If source-version evidence establishes different mechanics or timing, update the attack definitions and tests with the evidence recorded.
+
+
+## D-028 — Trial regression must distinguish new-spell offers from spell-level cards (ACCEPTED)
+
+**Evidence**
+- CI 44064015142 passed the artifact checkpoint and eight of nine browser regression jobs. The only failure was `trial_unlock_regression`.
+- The production flow equips the selected temporary trial spell at run start and consumes the trial selection. At level two, that same spell may appear as a `spellLevel` card, but must not be offered again as a `newSpell` duplicate.
+- The test probe previously returned only `spell.id`, discarding the option kind. It therefore could not distinguish a legitimate level-up card from an invalid duplicate new-spell offer; random card selection made the assertion flaky.
+
+**Decision**
+- Keep the production behavior unchanged.
+- Return `{kind, spell}` from the temporary test probe.
+- Assert no `kind === 'newSpell'` offer for the already-equipped trial spell, and assert it remains equipped exactly once after an upgrade is accepted.
+- Keep the probe inside the temporary in-memory document; do not export private production functions or add a debug API.
+
+**Falsifiers / review**
+- If the corrected test fails, inspect actual option kinds and player spell state before changing production code.
