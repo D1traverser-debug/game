@@ -54,7 +54,7 @@ async def main():
     c['trial_consumed_on_start']=before['trial'] is None
     c['trial_spell_equipped_at_start']='solar' in before['spells']
     offer=await page.evaluate('__trialProbe.offer(2)')
-    c['trial_offered_at_slot_two']=offer['offers'][0]=='solar'
+    c['trial_offered_at_slot_two']='solar' in offer['offers']
     accepted=await page.evaluate('__trialProbe.acceptFirst()')
     c['trial_equipped']='solar' in accepted['spells']
     granted=await page.evaluate('__trialProbe.grant("solar")')

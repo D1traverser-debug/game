@@ -860,6 +860,7 @@ function spawnBossHealer(b){
  spawnEnemy(false,'buffer');const e=game.enemies[game.enemies.length-1];
  e.x=b.x+rand(-210,210);e.y=b.y+rand(-190,190);e.hp=e.max=400;e.speed=52;e.dmg=22;e.bossHealer=true;e.bossOwnerId=b.id;e.heal=999999;e.elite=false;e.type='buffer';e.state='chase';
  game.fx.push({x:e.x,y:e.y,r:55,life:.4,max:.4,color:'#c0e6a0',type:'ring'});
+ return e;
 }
 function bossUpdateMulMinions(b,dt){
  if(b.bossId!=='mul')return;
@@ -875,7 +876,7 @@ function bossUpdateMulMinions(b,dt){
  }
 }
 function updateBossEncounter(dt){
- const g=game,b=g?.boss,p=g?.player;if(!b||b.dead)return;
+ const g=game,b=g?.boss,p=g?.player;if(!b)return;if(b.dead){if(b.fieldHazard)b.fieldHazard.life=0;return}
  const spec=BOSS_ARCHETYPES.find(x=>x.id===b.bossId)||BOSS_ARCHETYPES[0];
  b.age=(b.age||0)+dt;b.hitFlash=Math.max(0,(b.hitFlash||0)-dt);b.burn=Math.max(0,(b.burn||0)-dt);b.acid=Math.max(0,(b.acid||0)-dt);
  b.slow=Math.max(0,(b.slow||0)-dt*.025);b.freeze=Math.max(0,(b.freeze||0)-dt);b.vulnerable=Math.max(0,(b.vulnerable||0)-dt);
@@ -895,7 +896,6 @@ function updateBossEncounter(dt){
  if(d<b.r+p.r+8&&b.vulnerable<=0){b.touch=(b.touch||0)-dt;if(b.touch<=0){damagePlayer(b.bossId==='krog'?41:32,'boss');b.touch=.9}}
  if(b.hp<=0&&!b.dead)killEnemy(b);
 }
-
 function pause(){if(screen!=='playing')return;let p=game.player;$('pauseStats').innerHTML=[['等级',p.level],['击杀',p.kills],['伤害',Math.floor(p.damageDone)],['目标',p.objectives]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');show('pause')}
 function resume(){document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now()}
 function finish(win,abandon=false){if(!game||game.ended)return;game.ended=true;let p=game.player;let secs=Math.floor(game.time),gold=Math.floor((p.kills*.12+p.objectives*90+secs*.12)*(1+(save.enchant.bounty||0)*.05));if(win)gold+=600;gold+=(game.bonusGold||0);if(abandon)gold=Math.floor(gold*.35);save.gold+=gold;save.runs++;if(win){save.wins++;const id=game.boss?.bossId||'sol';save.bossKills=save.bossKills||{};save.bossKills[id]=(save.bossKills[id]||0)+1;}save.best=Math.max(save.best||0,secs);persist();$('resultEyebrow').textContent=win?'MISSION COMPLETE':'MISSION FAILED';$('resultIcon').textContent=win?'✦':'☽';$('resultTitle').textContent=win?'秘境已净化':'巫师倒下了';$('resultDesc').textContent=win?'你击败了 '+(game.boss?.name||'深渊首领')+'，翠绿草甸暂时恢复了宁静。':abandon?'你放弃了本次远征。':'魔潮吞没了最后的防线。';$('resultStats').innerHTML=[['生存时间',fmt(secs)],['击败敌人',p.kills],['最高等级',p.level],['完成目标',p.objectives],['造成伤害',Math.floor(p.damageDone)],['拾取卷轴',p.scrollCount],['暴击次数',p.critHits],['施法次数',p.casts]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');$('reward').textContent=gold;$('totalDamage').textContent=Math.floor(p.damageDone);$('hud').classList.remove('active');show('result');sound(win?880:90,.5,win?'triangle':'sawtooth')}

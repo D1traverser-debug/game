@@ -133,6 +133,7 @@ function spawnBossHealer(b){
  spawnEnemy(false,'buffer');const e=game.enemies[game.enemies.length-1];
  e.x=b.x+rand(-210,210);e.y=b.y+rand(-190,190);e.hp=e.max=400;e.speed=52;e.dmg=22;e.bossHealer=true;e.bossOwnerId=b.id;e.heal=999999;e.elite=false;e.type='buffer';e.state='chase';
  game.fx.push({x:e.x,y:e.y,r:55,life:.4,max:.4,color:'#c0e6a0',type:'ring'});
+ return e;
 }
 function bossUpdateMulMinions(b,dt){
  if(b.bossId!=='mul')return;
@@ -148,7 +149,7 @@ function bossUpdateMulMinions(b,dt){
  }
 }
 function updateBossEncounter(dt){
- const g=game,b=g?.boss,p=g?.player;if(!b||b.dead)return;
+ const g=game,b=g?.boss,p=g?.player;if(!b)return;if(b.dead){if(b.fieldHazard)b.fieldHazard.life=0;return}
  const spec=BOSS_ARCHETYPES.find(x=>x.id===b.bossId)||BOSS_ARCHETYPES[0];
  b.age=(b.age||0)+dt;b.hitFlash=Math.max(0,(b.hitFlash||0)-dt);b.burn=Math.max(0,(b.burn||0)-dt);b.acid=Math.max(0,(b.acid||0)-dt);
  b.slow=Math.max(0,(b.slow||0)-dt*.025);b.freeze=Math.max(0,(b.freeze||0)-dt);b.vulnerable=Math.max(0,(b.vulnerable||0)-dt);
@@ -168,4 +169,3 @@ function updateBossEncounter(dt){
  if(d<b.r+p.r+8&&b.vulnerable<=0){b.touch=(b.touch||0)-dt;if(b.touch<=0){damagePlayer(b.bossId==='krog'?41:32,'boss');b.touch=.9}}
  if(b.hp<=0&&!b.dead)killEnemy(b);
 }
-

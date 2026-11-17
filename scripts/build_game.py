@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 INDEX=ROOT/"index.html"
 BOSS_MODULE=ROOT/"src"/"game"/"boss_encounters.js"
-START="/* Boss pool and combat patterns."
+START="/* Shared, data-driven boss attack lifecycle."
 END="\nfunction pause("
 SHOT_OLD="}else if(s.kind==='imp'){"
 SHOT_NEW="}else if(s.kind==='enemyHoming'){bossUpdateHomingProjectile(s,dt,p)}else if(s.kind==='imp'){"
@@ -22,7 +22,10 @@ def replace_once(text,old,new):
 def build_html():
  text=INDEX.read_text(encoding="utf-8")
  text=replace_range(text,START,END,BOSS_MODULE.read_text(encoding="utf-8"))
- return replace_once(text,SHOT_OLD,SHOT_NEW)
+ if SHOT_NEW not in text:
+  text=replace_once(text,SHOT_OLD,SHOT_NEW)
+ elif text.count(SHOT_NEW)!=1:raise ValueError('DUPLICATE_ENEMY_HOMING_BRANCH')
+ return text
 def main():
  parser=argparse.ArgumentParser(description=__doc__);parser.add_argument("--check",action="store_true");args=parser.parse_args()
  current=INDEX.read_text(encoding="utf-8");generated=build_html()
