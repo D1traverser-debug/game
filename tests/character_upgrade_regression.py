@@ -33,6 +33,11 @@ window.__characterUpgradeRegression = () => {
     ['manaPull',.08,108],['manaGain',.07,1.07],['luck',2,4]
   ];
   const effects={};
+  startRun();
+  game.player.hp=20;
+  applyUpgrade({kind:'stat',k:'maxHp',amount:100,title:'Vitality Forge'});
+  const vitalityHealing={hp:game.player.hp,maxHp:game.player.maxHp,pass:game.player.hp===45&&game.player.maxHp===200};
+
   for(const [key,amount,expected] of cases){
     startRun();
     const p=game.player;
@@ -45,7 +50,7 @@ window.__characterUpgradeRegression = () => {
       critDmg:p.critDmg,manaPull:p.manaPull,manaGain:p.manaGain,luck:p.luck})[key];
     effects[key]={before,after,expected,pass:Math.abs(after-expected)<.0001};
   }
-  return {offers,offerChecks,effects};
+  return {offers,offerChecks,effects,vitalityHealing};
 };
 """
 DOCUMENT = SOURCE.replace(MARKER, PROBE + "\n" + MARKER)
@@ -64,6 +69,7 @@ async def main():
         report["result"]=result
         report["checks"].update(result["offerChecks"])
         report["checks"]["all_13_upgrade_effects"]=all(x["pass"] for x in result["effects"].values())
+        report["checks"]["vitality_upgrade_heals_25_percent"]=result["vitalityHealing"]["pass"]
         report["checks"]["no_runtime_or_console_errors"]=not report["page_errors"] and not report["console_errors"]
         report["checks"]["offline_no_external_requests"]=not report["external_requests"]
         report["pass"]=all(report["checks"].values())
