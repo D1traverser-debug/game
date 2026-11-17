@@ -54,6 +54,7 @@ jobs:
           - trial_unlock_regression
           - art_renderer_regression
           - reginald_spell_scope_regression
+          - boss_encounter_regression
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
