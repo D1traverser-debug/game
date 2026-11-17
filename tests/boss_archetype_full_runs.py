@@ -197,26 +197,31 @@ window.__fullRun = async (maxSeconds) => {
         rx-=dx/d*w;ry-=dy/d*w;
       }
     }
-    // Gnasher's leap lands at the captured leapX/leapY point, not at its
-    // current interpolated position. Choose a safe escape heading for the full
-    // 0.55s leap window and make it override objective/loot steering.
+    // Score a fresh heading each frame against all active leap landing points.
+    // A locked heading can become unusable when the player reaches a world edge.
     let gnasherThreat=false,gnasherEscapeX=0,gnasherEscapeY=0,gnasherMode=null,gnasherStateT=null;
     const activeGnashers=game.enemies.filter(e=>!e.dead&&e.type==='gnasher'&&(e.state==='burrow'||e.state==='leap'))
       .map(e=>({e,d:Math.hypot(e.x-p.x,e.y-p.y),landingD:e.state==='leap'?Math.hypot(p.x-(e.leapX??e.x),p.y-(e.leapY??e.y)):Infinity}))
-      .sort((a,b)=>(a.e.state==='leap'?0:1)-(b.e.state==='leap'?0:1)||Math.min(a.d,a.landingD)-Math.min(b.d,b.landingD));
-    const activeGnasher=activeGnashers[0];
-    if(activeGnasher&&((activeGnasher.e.state==='leap'&&Math.min(activeGnasher.d,activeGnasher.landingD)<430)||(activeGnasher.e.state==='burrow'&&activeGnasher.d<560))){
+      .sort((a,b)=>(a.e.state==='leap'?0:1)-(b.e.state==='leap'?0:1)||(a.e.stateT||0)-(b.e.stateT||0)||Math.min(a.d,a.landingD)-Math.min(b.d,b.landingD));
+    const leapThreats=activeGnashers.filter(x=>x.e.state==='leap'&&Math.min(x.d,x.landingD)<500);
+    const burrowThreats=activeGnashers.filter(x=>x.e.state==='burrow'&&x.d<600);
+    const activeGnasher=leapThreats[0]||burrowThreats[0];
+    if(activeGnasher){
       const e=activeGnasher.e,leaping=e.state==='leap';
       const tx=leaping?(e.leapX??e.x):p.x,ty=leaping?(e.leapY??e.y):p.y;
       const pathX=leaping?tx-e.x:p.x-e.x,pathY=leaping?ty-e.y:p.y-e.y,pathD=Math.hypot(pathX,pathY)||1;
       const preferredX=-pathY/pathD,preferredY=pathX/pathD;
-      const step=Math.max(80,(p.move||220)*.55);
+      const moveSpeed=(p.move||220)*(game.carriedCore&&game.carriedCore.alive?.58:1)*
+        (p.lowSpeed?1+(1-p.hp/Math.max(1,p.maxHp))*.21:1)*(p.fightT>0?1.3:1);
+      const step=Math.max(80,moveSpeed*.55);
       let bestScore=-Infinity;
-      for(let k=0;k<16;k++){
-        const a=k*Math.PI/8,dx=Math.cos(a),dy=Math.sin(a);
-        const nx=clamp(p.x+dx*step,-1180,1180),ny=clamp(p.y+dy*step,-880,880);
-        const landingDistance=leaping?Math.hypot(nx-tx,ny-ty):0;
-        let nearestEnemy=360;
+      for(let k=0;k<24;k++){
+        const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);
+        const nx=clamp(p.x+dx*step,-1200,1200),ny=clamp(p.y+dy*step,-900,900);
+        const travel=Math.hypot(nx-p.x,ny-p.y);
+        const landingDistance=leaping&&leapThreats.length
+          ?Math.min(...leapThreats.map(x=>Math.hypot(nx-(x.e.leapX??x.e.x),ny-(x.e.leapY??x.e.y)))):0;
+        let nearestEnemy=420;
         for(const other of game.enemies){
           if(other===e||other.dead||other.type==='boss')continue;
           nearestEnemy=Math.min(nearestEnemy,Math.hypot(other.x-nx,other.y-ny));
@@ -225,20 +230,20 @@ window.__fullRun = async (maxSeconds) => {
         for(const h of game.hazards){
           if(h.hit||!Number.isFinite(h.timer)||h.timer>1.4)continue;
           const hd=Math.hypot(nx-h.x,ny-h.y),hr=(h.r||0)+p.r+35;
-          if(hd<hr)hazardPenalty+=(hr-hd)*.65;
+          if(hd<hr)hazardPenalty+=(hr-hd)*.75;
         }
         let projectilePenalty=0;
         for(const shot of game.shots){
           if(shot.kind!=='enemy')continue;
           const sx=shot.x+(shot.vx||0)*.55,sy=shot.y+(shot.vy||0)*.55;
           const sd=Math.hypot(nx-sx,ny-sy),sr=(shot.r||6)+p.r+28;
-          if(sd<sr)projectilePenalty+=(sr-sd)*.8;
+          if(sd<sr)projectilePenalty+=(sr-sd)*.9;
         }
         const edgeClearance=Math.min(1200-Math.abs(nx),900-Math.abs(ny));
         const lateral=dx*preferredX+dy*preferredY;
-        const score=(leaping?landingDistance*1.25:0)+lateral*42+
-          Math.min(nearestEnemy,300)*.12+Math.min(edgeClearance,260)*.12-
-          hazardPenalty-projectilePenalty;
+        const score=(leaping?landingDistance*1.8:0)+travel*1.4+
+          Math.min(nearestEnemy,320)*.12+Math.min(edgeClearance,300)*.20+
+          lateral*(leaping?5:18)-hazardPenalty-projectilePenalty;
         if(score>bestScore){bestScore=score;gnasherEscapeX=dx;gnasherEscapeY=dy;}
       }
       gnasherThreat=true;gnasherMode=leaping?'leap':'burrow';gnasherStateT=+(e.stateT||0).toFixed(2);

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "MULTI_BOSS_PILOT_DYNAMIC_GNASHER_PROJECTILE_HORIZON_023",
+  "checkpoint": "MULTI_BOSS_PILOT_DYNAMIC_MULTI_LANDING_024",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -128,7 +128,13 @@
     "Seed 2 died at 187.3s during Rift progress 62.12 after repeated projectile hits (44.5-46.2 damage). No Gnasher was active. The first recorded hit had a predicted closest-approach time of 1.47s and miss distance 2.7, just outside the 1.35s pilot trigger.",
     "Seed 3 died at 661.0s to a 329.4 raw Gnasher hit at (-515.2,868.1), 48.1 units from the attacker's landing point (-467.1,868.1). It had 200 max HP, 52 armor and 10 regen.",
     "The lock-based multi-Gnasher planner is rejected: seed 1's Gnasher leap-safe frames fell from 327 in CI #131 to 20 in CI #132. Dynamic per-frame scoring in CI #131 allowed seed 1 and seed 3 to win.",
-    "Projectile trigger horizon 1.35s was too short: seed 2's first projectile was already predicted to intersect at t=1.47s."
+    "Projectile trigger horizon 1.35s was too short: seed 2's first projectile was already predicted to intersect at t=1.47s.",
+    "CI #133 / commit 50e2d55: checkpoint PASS; two of three natural runs won, exact bosses recorded were krog and sol.",
+    "Seed 1 reached Sol'phish but died at 1237.7s after six Gnasher hits; final raw hit 255.3*1.7=434.0 landed 31.8 units from target (-1138,384.6). Player had 107.6/500 HP, 119 armor, 3 regen and was near the left map edge. Only 164 leap-safe frames across 626 were recorded.",
+    "Seed 2 naturally defeated Krog'wa at 1217.1s: level 22, 1992 kills, 254.6/300 HP, 114 armor, 8 regen.",
+    "Seed 3 naturally defeated Krog'wa at 1390.7s: level 20, 1485 kills, 482.1/700 HP, 129 armor, 8 regen.",
+    "Seed 1 Gnasher traces show late-game burrow/leap threats near map edges; the prior dynamic planner scored landing separation but did not explicitly reward actual post-clamp displacement or combine all simultaneous leap targets. Seed 2 and seed 3 confirm the 1.8s projectile horizon did not regress their natural wins.",
+    "Boss coverage in CI #133 was krog and sol; Mul'gath remains independently verified by CI #131 seed 1."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -188,9 +194,10 @@
     "BOSS_PILOT_020 pending CI: combine all active Gnasher leap landing points, lock one escape direction per Gnasher attack phase, score actual displacement after world-boundary clamping, and record the exact Gnasher attacker on every hit. Two boss archetypes now have natural wins; Sol'phish remains unverified.",
     "BOSS_PILOT_021 pending CI: correct the Python-to-JavaScript instrumentation boundary, then rerun the multi-Gnasher escape controller. CI #130 is a harness syntax failure, not a gameplay result.",
     "BOSS_PILOT_022 pending CI: preserve Gnasher escape while blending separate projectile and hazard avoidance vectors. Seed 1/Mul and seed 3/Sol win; seed 2 must survive projectile pressure and naturally reach Krog'wa.",
-    "BOSS_PILOT_023 pending CI: revert the Gnasher per-attack direction lock to the previously successful dynamic controller; expand projectile prediction/evasion horizon to 1.8s and miss radius to 110. Need all three natural wins and exact sol/krog/mul coverage in one run."
+    "BOSS_PILOT_023 pending CI: revert the Gnasher per-attack direction lock to the previously successful dynamic controller; expand projectile prediction/evasion horizon to 1.8s and miss radius to 110. Need all three natural wins and exact sol/krog/mul coverage in one run.",
+    "BOSS_PILOT_024 pending CI: keep dynamic per-frame scoring but add actual post-clamp travel and minimum separation from all active Gnasher landing points. Seed 1 must survive Sol'phish; seed 2/3 must retain Krog'wa wins. A Mul'gath seed is still needed for same-run coverage."
   ],
-  "next_action": "Inspect CI after BOSS_PILOT_023. Expect dynamic Gnasher evasion to restore seed 1 and seed 3 survival, and the 1.8s projectile horizon to prevent seed 2's early Rift death. Verify exact hit telemetry and all three boss IDs. Keep product index.html unchanged and NOT_READY.",
+  "next_action": "Inspect CI after BOSS_PILOT_024. Require three natural wins and exact sol/krog/mul coverage in one run. Validate that seed 1 no longer takes repeated Gnasher hits at the left edge, and that projectile horizon 1.8s remains effective. Keep index.html unchanged and product NOT_READY.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -216,5 +223,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_023"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_024"
 }

@@ -106,3 +106,11 @@
 - Restore the empirically successful dynamic controller; do not retain a lock solely because it appears more stable.
 - Expand projectile lookahead to at least 1.8s when the predicted miss distance is within the collision envelope.
 - This remains QA-agent tuning; do not change production attack timing or damage to compensate.
+
+
+## D-017 — Dynamic all-landing scoring with actual movement distance (ACCEPTED)
+- Keep Gnasher escape dynamic per frame; a direction lock regressed observed survival.
+- Score candidate movement by actual displacement after clamping, not only by nominal heading or landing-point distance.
+- When multiple Gnashers are in leap state, maximize minimum separation from all their fixed landing points.
+- Preserve the 1.8-second projectile lookahead validated in CI #133 seeds 2 and 3.
+- QA-agent change only; no production damage adjustment without source and human-play evidence.

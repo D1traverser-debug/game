@@ -174,3 +174,16 @@ Checkpoint: PASS. Short browser regressions: PASS. Natural-run matrix: FAIL (0/3
 | 3 | 661.0s | Gnasher hit 329.4 raw at 48.1 units from landing point |
 
 No browser, console or external-network errors. Revision 023 reverts the harmful Gnasher lock and extends projectile detection horizon.
+
+
+## Natural-run pilot #133 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44015470700  
+Checkpoint: PASS. Natural-run matrix: FAIL (2/3 wins).
+
+| Seed | Outcome | Boss | Evidence |
+|---|---|---|---|
+| 1 | Death at 1237.7s | Sol'phish | Reached boss; six Gnasher hits; final raw hit 434 at 31.8 units from landing target near left edge |
+| 2 | Natural win at 1217.1s | Krog'wa | Level 22; 1992 kills; 254.6/300 HP |
+| 3 | Natural win at 1390.7s | Krog'wa | Level 20; 1485 kills; 482.1/700 HP |
+
+No browser, console or external-network errors. Mul'gath is independently verified in CI #131 seed 1. Revision 024 adds dynamic all-landing scoring and actual post-clamp travel.

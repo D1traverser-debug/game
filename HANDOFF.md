@@ -301,3 +301,12 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Seed 2 died at 187.3s during Rift after repeated projectile hits. The first projectile hit was predicted at t=1.47s, just outside the 1.35s trigger.
 - Seed 3 died at 661.0s to a Gnasher hit 48.1 units from its fixed landing point.
 - Revision 023 rejects the per-attack direction lock and restores the dynamic Gnasher controller that passed seeds 1 and 3 in CI #131. Projectile detection expands to 1.8s/110 units. Production HTML unchanged.
+
+
+## BOSS PILOT 024 — CI #133 late-boss Gnasher analysis (2026-11-17)
+- CI #133: https://github.com/D1traverser-debug/game/actions/runs/44015470700. Checkpoint PASS; two of three natural runs win.
+- Seed 1 reached Sol'phish but died at 1237.7s after six Gnasher hits. Final raw hit 255.3*1.7=434.0 landed 31.8 units from target (-1138,384.6); player was at (-1165,367.6), with 107.6/500 HP, 119 armor and 3 regen. It was near the left world edge; only 164 leap-safe frames across 626 were recorded.
+- Seed 2 naturally defeated Krog'wa at 1217.1s: level 22, 1992 kills, 254.6/300 HP.
+- Seed 3 naturally defeated Krog'wa at 1390.7s: level 20, 1485 kills, 482.1/700 HP.
+- Boss IDs in this run: `sol`, `krog`. Mul'gath remains independently verified in CI #131 seed 1.
+- Revision 024 keeps dynamic per-frame steering but adds actual post-clamp travel and minimum separation from all active leap landing points. The 1.8s projectile horizon is retained. Product HTML unchanged.
