@@ -229,7 +229,7 @@ async def main():
       page.set_default_timeout(180000)
       await page.set_content(DOCUMENT,wait_until="load")
       await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
-      // Normal menu flow: choose the one-run Solar Pulse trial, then start.
+# Normal menu flow: choose the one-run Solar Pulse trial, then start.
       await page.locator('#camp').click()
       await page.locator('[data-trial="solar"]').click()
       await page.locator('#campBack').click()
