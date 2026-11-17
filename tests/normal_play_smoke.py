@@ -16,42 +16,106 @@ MARKER = "// Production build: internal debug mutations are test-only and not sh
 assert SOURCE.count(MARKER) == 1
 
 PROBE = r"""
+window.__setRunSeed=(seed)=>{
+  let state=seed>>>0;
+  Math.random=()=>{
+    state=(Math.imul(1664525,state)+1013904223)>>>0;
+    return state/4294967296;
+  };
+};
+window.__normalDamageEvents=[];
+const __normalBaseDamage=damagePlayer;
+damagePlayer=(n,source)=>{
+  const p=game?.player;
+  window.__normalDamageEvents.push({
+    t:+(game?.time||0).toFixed(1),source,amount:+Number(n).toFixed(1),
+    hp:p?+p.hp.toFixed(1):null,x:p?+p.x.toFixed(1):null,y:p?+p.y.toFixed(1):null
+  });
+  return __normalBaseDamage(n,source);
+};
 window.__normalPlay = async (seconds) => {
-  const dt = 0.1;
-  let elapsed = 0, ticks = 0, upgrades = 0;
-  while (elapsed < seconds && (screen === 'playing' || screen === 'upgrade') && !game.ended) {
-    if (screen === 'upgrade') {
-      const opts = game.pending?.opts || [];
-      if (!opts.length) break;
-      // Real player action: choose the first option actually offered by the game.
-      applyUpgrade(opts[0]);
+  const dt = 0.1, seed=20261117;
+  let elapsed=0,ticks=0,upgrades=0,interactions=0;
+  const nearest=(items,p)=>items.map(o=>({o,d:Math.hypot(o.x-p.x,o.y-p.y)})).sort((a,b)=>a.d-b.d)[0];
+  const chooseUpgrade=(opts,p)=>{
+    const priority={maxHp:0,regen:1,armor:2,dodge:3};
+    const defense=opts.filter(x=>x.kind==='stat'&&Object.prototype.hasOwnProperty.call(priority,x.k))
+      .sort((a,b)=>priority[a.k]-priority[b.k])[0];
+    const sustain=new Set(['健康成长','壁垒','厚皮','闪避疗愈','致命回响','魔力虹吸','魔力汲取','目标馈赠']);
+    const scroll=opts.find(x=>x.kind==='scroll'&&sustain.has(x.name));
+    if(p.hp/Math.max(1,p.maxHp)<.8&&scroll)return scroll;
+    if(defense)return defense;
+    if(scroll)return scroll;
+    return opts.find(x=>x.kind==='newSpell')||opts.find(x=>x.kind==='spellAugment')||opts[0];
+  };
+  while(elapsed<seconds&&(screen==='playing'||screen==='upgrade')&&!game.ended){
+    if(screen==='upgrade'){
+      const opts=game.pending?.opts||[];
+      if(!opts.length)break;
+      applyUpgrade(chooseUpgrade(opts,game.player));
       upgrades++;
       continue;
     }
-    const p = game.player;
-    const orb = game.orbs.filter(o => o.type === 'xp')
-      .map(o => ({o,d:Math.hypot(o.x-p.x,o.y-p.y)}))
-      .filter(x => x.d < 650)
-      .sort((a,b) => a.d-b.d)[0];
-    let dx,dy;
-    if (orb && orb.d > 24) {
-      dx=(orb.o.x-p.x)/orb.d; dy=(orb.o.y-p.y)/orb.d;
-    } else {
-      const a=Math.floor(elapsed/7)%4*Math.PI/2;
-      dx=Math.cos(a); dy=Math.sin(a);
+    const p=game.player,hpRatio=p.hp/Math.max(1,p.maxHp);
+    const health=nearest(game.orbs.filter(o=>o.type==='health'),p);
+    const xp=nearest(game.orbs.filter(o=>o.type==='xp'),p);
+    const target=hpRatio<.76&&health&&health.d<900?health:(xp&&xp.d<650?xp:null);
+    let gx=target&&target.d>24?(target.o.x-p.x)/target.d:Math.cos(Math.floor(elapsed/7)%4*Math.PI/2);
+    let gy=target&&target.d>24?(target.o.y-p.y)/target.d:Math.sin(Math.floor(elapsed/7)%4*Math.PI/2);
+    let rx=0,ry=0;
+    for(const e of game.enemies){
+      if(e.dead||e.state==='burrow')continue;
+      const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;
+      const range=e.type==='gnasher'?420:e.type==='ranged'?300:220;
+      if(d<range){const w=(range-d)/range*2.2;rx+=dx/d*w;ry+=dy/d*w;}
     }
-    keys={KeyD:dx>.25,KeyA:dx<-.25,KeyS:dy>.25,KeyW:dy<-.25};
+    for(const shot of game.shots){
+      if(shot.kind!=='enemy')continue;
+      const dx=p.x-shot.x,dy=p.y-shot.y,d=Math.hypot(dx,dy)||1;
+      if(d<190){const w=(190-d)/190*1.8;rx+=dx/d*w;ry+=dy/d*w;}
+      const vx=shot.vx||0,vy=shot.vy||0,v2=vx*vx+vy*vy;
+      if(v2>1){
+        const tm=(dx*vx+dy*vy)/v2;
+        if(tm>.05&&tm<1.8){
+          const cx=dx-vx*tm,cy=dy-vy*tm,miss=Math.hypot(cx,cy);
+          if(miss<110){
+            const speed=Math.sqrt(v2),px=-vy/speed,py=vx/speed;
+            const danger=(x,y)=>game.enemies.reduce((sum,e)=>{
+              if(e.dead||e.type==='boss')return sum;
+              const q=Math.hypot(e.x-x,e.y-y);
+              return sum+(q<230?(230-q)/230:0);
+            },0);
+            const side=danger(p.x+px*90,p.y+py*90)<=danger(p.x-px*90,p.y-py*90)?1:-1;
+            const w=(110-miss)/110*2.8;
+            rx+=px*side*w;ry+=py*side*w;
+          }
+        }
+      }
+    }
+    for(const h of game.hazards){
+      if(h.hit||!Number.isFinite(h.timer))continue;
+      const dx=p.x-h.x,dy=p.y-h.y,d=Math.hypot(dx,dy)||1,range=(h.r||0)+p.r+110;
+      if(d<range&&h.timer<1.2){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;}
+    }
+    if(hpRatio<.30){rx*=1.55;ry*=1.55;}
+    let mx=gx+rx*1.45,my=gy+ry*1.45;
+    if(p.x>1150)mx-=1.5;if(p.x< -1150)mx+=1.5;
+    if(p.y>850)my-=1.5;if(p.y< -850)my+=1.5;
+    const mag=Math.hypot(mx,my)||1;mx/=mag;my/=mag;
+    keys={KeyD:mx>.22,KeyA:mx<-.22,KeyS:my>.22,KeyW:my<-.22};
     const chest=game.chests.find(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<70);
-    if(chest) interact();
+    if(chest){interact();interactions++;}
     update(dt);
     elapsed+=dt;ticks++;
-    if(ticks%100===0) await new Promise(r=>setTimeout(r,0));
+    if(ticks%100===0)await new Promise(r=>setTimeout(r,0));
   }
   keys={};
   return {
-    screen,ended:game.ended,time:game.time,kills:game.player.kills,level:game.player.level,
+    seed,screen,ended:game.ended,time:game.time,kills:game.player.kills,level:game.player.level,
     hp:game.player.hp,maxHp:game.player.maxHp,xp:game.player.xp,nextXp:game.player.nextXp,upgrades,
-    objectiveCount:game.player.objectives,enemyCount:game.enemies.filter(e=>!e.dead).length
+    objectives:game.player.objectives,enemyCount:game.enemies.filter(e=>!e.dead).length,
+    dodgeStats:{projectiles:game.shots.length,damageEvents:window.__normalDamageEvents.length},
+    damageEvents:window.__normalDamageEvents.slice(-25)
   };
 };
 """
@@ -66,8 +130,10 @@ async def main():
         page.on("console",lambda m:report["console_errors"].append(m.text) if m.type=="error" else None)
         page.on("request",lambda r:report["external_requests"].append(r.url) if r.url.startswith(("http://","https://")) else None)
         await page.set_content(DOCUMENT,wait_until="load")
+        await page.evaluate("window.__setRunSeed(20261117)")
         await page.locator("#start").click()
         state=await page.evaluate("window.__normalPlay(90)")
+        report["seed"]=20261117
         report["state"]=state
         report["checks"]["natural_time_advanced"]=state["time"]>=89
         report["checks"]["normal_combat_kills"]=state["kills"]>0

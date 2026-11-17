@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "MULTI_BOSS_PILOT_DYNAMIC_MULTI_LANDING_024",
+  "checkpoint": "NORMAL_PLAY_SMOKE_SEEDED_THREAT_AWARE_025",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -134,7 +134,8 @@
     "Seed 2 naturally defeated Krog'wa at 1217.1s: level 22, 1992 kills, 254.6/300 HP, 114 armor, 8 regen.",
     "Seed 3 naturally defeated Krog'wa at 1390.7s: level 20, 1485 kills, 482.1/700 HP, 129 armor, 8 regen.",
     "Seed 1 Gnasher traces show late-game burrow/leap threats near map edges; the prior dynamic planner scored landing separation but did not explicitly reward actual post-clamp displacement or combine all simultaneous leap targets. Seed 2 and seed 3 confirm the 1.8s projectile horizon did not regress their natural wins.",
-    "Boss coverage in CI #133 was krog and sol; Mul'gath remains independently verified by CI #131 seed 1."
+    "Boss coverage in CI #133 was krog and sol; Mul'gath remains independently verified by CI #131 seed 1.",
+    "CI #134 / commit 13ed1c2: checkpoint PASS; normal-play 90-second smoke failed at 82.8s (77 kills, level 8, 0 HP) without page/console/network errors. Inspection found the smoke harness used unseeded Math.random, always selected the first offered upgrade, chased XP without enemy/projectile/hazard avoidance, and recorded no damage-source trace. The natural-run matrix and later release gates did not execute."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -195,9 +196,10 @@
     "BOSS_PILOT_021 pending CI: correct the Python-to-JavaScript instrumentation boundary, then rerun the multi-Gnasher escape controller. CI #130 is a harness syntax failure, not a gameplay result.",
     "BOSS_PILOT_022 pending CI: preserve Gnasher escape while blending separate projectile and hazard avoidance vectors. Seed 1/Mul and seed 3/Sol win; seed 2 must survive projectile pressure and naturally reach Krog'wa.",
     "BOSS_PILOT_023 pending CI: revert the Gnasher per-attack direction lock to the previously successful dynamic controller; expand projectile prediction/evasion horizon to 1.8s and miss radius to 110. Need all three natural wins and exact sol/krog/mul coverage in one run.",
-    "BOSS_PILOT_024 pending CI: keep dynamic per-frame scoring but add actual post-clamp travel and minimum separation from all active Gnasher landing points. Seed 1 must survive Sol'phish; seed 2/3 must retain Krog'wa wins. A Mul'gath seed is still needed for same-run coverage."
+    "BOSS_PILOT_024 pending CI: keep dynamic per-frame scoring but add actual post-clamp travel and minimum separation from all active Gnasher landing points. Seed 1 must survive Sol'phish; seed 2/3 must retain Krog'wa wins. A Mul'gath seed is still needed for same-run coverage.",
+    "QA_SMOKE_025 pending CI: make the 90-second smoke deterministic, choose legal defensive/sustain upgrades when offered, prioritize health orbs at low HP, evade nearby enemies/projectiles/hazards, and record damage events. This is a harness-quality correction; do not weaken the 90-second survival gate."
   ],
-  "next_action": "Inspect CI after BOSS_PILOT_024. Require three natural wins and exact sol/krog/mul coverage in one run. Validate that seed 1 no longer takes repeated Gnasher hits at the left edge, and that projectile horizon 1.8s remains effective. Keep index.html unchanged and product NOT_READY.",
+  "next_action": "Inspect CI after QA_SMOKE_025. First require deterministic 90-second survival, real upgrade flow, and zero runtime/network errors. Then verify the natural-run matrix for all three boss archetypes. If a seeded competent smoke still dies, inspect damage events and determine whether production difficulty is source-faithful before tuning the game.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -223,5 +225,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_024"
+  "latest_candidate_ci_status": "PENDING_QA_SMOKE_025"
 }

@@ -310,3 +310,10 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Seed 3 naturally defeated Krog'wa at 1390.7s: level 20, 1485 kills, 482.1/700 HP.
 - Boss IDs in this run: `sol`, `krog`. Mul'gath remains independently verified in CI #131 seed 1.
 - Revision 024 keeps dynamic per-frame steering but adds actual post-clamp travel and minimum separation from all active leap landing points. The 1.8s projectile horizon is retained. Product HTML unchanged.
+
+
+## QA SMOKE 025 — deterministic 90-second baseline (2026-11-17)
+- CI #134: https://github.com/D1traverser-debug/game/actions/runs/44016473737. Checkpoint PASS; 90-second smoke died at 82.8s (77 kills, level 8, 0 HP); no page, console or external-network errors.
+- Root cause in the test harness: no RNG seed, first-option-only upgrades, XP-only movement, no health pickup priority, no enemy/projectile/hazard avoidance, and no damage-source trace.
+- Revision 025 makes the smoke deterministic with seed 20261117, adds a basic threat-aware controller and defensive/sustain upgrade ranking, and captures damage events. The 90-second survival gate remains intact.
+- No production balance changes are authorized by this test-harness finding alone.

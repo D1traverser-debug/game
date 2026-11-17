@@ -187,3 +187,10 @@ Checkpoint: PASS. Natural-run matrix: FAIL (2/3 wins).
 | 3 | Natural win at 1390.7s | Krog'wa | Level 20; 1485 kills; 482.1/700 HP |
 
 No browser, console or external-network errors. Mul'gath is independently verified in CI #131 seed 1. Revision 024 adds dynamic all-landing scoring and actual post-clamp travel.
+
+
+## Normal-play smoke #134 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44016473737  
+Checkpoint: PASS. Normal-play smoke: FAIL at 82.8s (77 kills, level 8, 0 HP). No runtime/console/network errors.
+
+The old smoke agent was unseeded, selected the first upgrade option, chased XP only, ignored health orbs and threat telegraphs, and did not capture damage events. Revision 025 adds deterministic seed 20261117, defensive/sustain upgrade selection, health priority, enemy/projectile/hazard avoidance, and damage telemetry. The survival assertion is retained.

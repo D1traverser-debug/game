@@ -114,3 +114,11 @@
 - When multiple Gnashers are in leap state, maximize minimum separation from all their fixed landing points.
 - Preserve the 1.8-second projectile lookahead validated in CI #133 seeds 2 and 3.
 - QA-agent change only; no production damage adjustment without source and human-play evidence.
+
+
+## D-018 — A survival smoke must use a deterministic, minimally competent pilot (ACCEPTED)
+- Fix the RNG seed so a regression is reproducible.
+- The smoke pilot may use only legal movement, pickup and upgrade actions; it must not mutate combat state, grant resources, skip time or force a result.
+- It should prioritize health when injured, avoid visible threats and select defensive/sustain upgrades when offered.
+- Keep the 90-second survival assertion; do not turn a failed smoke into a pass by removing the survival requirement.
+- If the competent seeded pilot still dies, use recorded damage evidence to investigate source fidelity and production balance separately.
