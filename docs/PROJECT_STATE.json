@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "MULTI_BOSS_PILOT_THREAT_PRIORITY_018",
+  "checkpoint": "MULTI_BOSS_PILOT_GNASHER_LEAP_ESCAPE_019",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -102,7 +102,14 @@
     "CI #127: checkpoint and short browser regressions PASS; three-seed natural-run matrix FAIL.",
     "Seed 1 died at 376.4s near fungi objective (-968,709), HP 0/500; the x=980/y=720 hard-boundary margin blocked a valid objective at y=810.",
     "Seed 2 died at 168.9s during Rift with progress 70.32; repeated projectiles landed because the .32 evasion multiplier and radial suppression over-constrained dodging.",
-    "Seed 3 died at 515.2s during Soul Sludge after repeated Gnasher hits; objective/resource pursuit continued during burrow/leap."
+    "Seed 3 died at 515.2s during Soul Sludge after repeated Gnasher hits; objective/resource pursuit continued during burrow/leap.",
+    "CI #128 / commit bf6bf43: checkpoint PASS; browser progression, 90-second combat smoke, objective collection and character upgrade regressions PASS; three-seed natural-run matrix FAIL.",
+    "Seed 1 died at 397.3s with HP 0, level 15, 386 kills, 300 max HP, 41 armor, 1 regen. Final Gnasher hits were 282.4 and 284.6 raw at 389.3s and 397.3s; a friendlyFire hit also landed at 388.2s.",
+    "Seed 2 died at 372.6s with HP 0, level 14, 381 kills, 100 max HP, 28 armor, 9 regen. Projectile hits clustered at 334.4s, 340.2s, 342.1s, 343.4s, 350.2s and 350.7s; final Gnasher hit was 279.9 raw.",
+    "Seed 3 died at 373.9s with HP 0, level 16, 450 kills, 300 max HP, 32 armor, 1 regen. Gnasher hits of 280.1 and 280.4 raw landed at 372.3s and 373.9s.",
+    "Source inspection confirms Gnasher's burrow tracks the player at 3x speed for 1.25s, then stores leapX/leapY and moves to that fixed landing point for 0.55s; damage is dealt if the player is within 60 units. Prior pilot incorrectly steered from the Gnasher's interpolated current position rather than scoring escape from its fixed landing point.",
+    "Upgrade audit found choose() returned a newSpell before checking defensive stats; seed 3 selected wickedBuzzsaw at 220s even though Dodge was offered. This contradicted the intended defense-first policy.",
+    "Projectile emergency detection only covered t<0.85 and miss distance<72, despite the predictor considering shots up to 1.35s; it also scaled projectile avoidance by nearby-enemy pressure."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -157,9 +164,10 @@
     "BOSS_PILOT_015 changes are pending CI validation: corrected no-trial loadout, evidence-based card ranking, incoming-damage diagnostics, and a three-seed natural-run matrix. Product balance must not be changed solely from the previous weak-pilot failure.",
     "BOSS_PILOT_016 pending CI: correct projectile approach-time sign, choose defense whenever offered, steer away from Gnasher burrow/leap and friendly-fire hazards, and record dodge counters. No production balance changes made.",
     "BOSS_PILOT_017 pending CI: hard inward boundary steering, safe loot targeting, Rift tangential evasion, critical-health escape, and lateral Gnasher sidesteps. Two of three seeds remain unvalidated; boss coverage is incomplete.",
-    "BOSS_PILOT_018 pending CI: imminent projectile/Gnasher threats suspend objective/loot pursuit, emergency Rift dodges are permitted, hard boundary correction is restricted to the actual clamp, and Gnasher escape uses stronger lateral movement."
+    "BOSS_PILOT_018 pending CI: imminent projectile/Gnasher threats suspend objective/loot pursuit, emergency Rift dodges are permitted, hard boundary correction is restricted to the actual clamp, and Gnasher escape uses stronger lateral movement.",
+    "BOSS_PILOT_019 pending CI: choose a scored safe heading away from Gnasher leapX/leapY, suspend interactions during Gnasher attacks, make defensive/sustain cards outrank new spells, and let predicted projectile/hazard threats activate evasion independently of enemy proximity."
   ],
-  "next_action": "Inspect CI after BOSS_PILOT_018. Verify seed 1 completes perimeter objectives, seed 2 survives Rift projectile pressure, and seed 3 escapes Gnasher burrow/leap. Require three natural wins and exact sol/krog/mul coverage. Keep production unchanged until pilot threat priorities are demonstrated. Then address GAME-042 boss attack fidelity.",
+  "next_action": "Inspect CI after BOSS_PILOT_019. Require three natural wins and exact sol/krog/mul coverage. Read damage-time Gnasher leap target/stateT and nearest projectile telemetry to validate the escape controller. If still failing, isolate projectile, hazard and Gnasher control in separate deterministic encounter tests before any production tuning. Keep index.html unchanged and product NOT_READY.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -185,5 +193,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_018"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_019"
 }

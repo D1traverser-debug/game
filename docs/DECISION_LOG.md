@@ -70,3 +70,11 @@
 - Hard inward boundary steering activates only near the actual world clamp. Perimeter objectives remain reachable.
 - When Gnasher is in a burrow/leap sequence, suspend objective and loot pursuit and use a lateral escape vector.
 - These are automated QA-agent rules only. Do not change production objective radius, map bounds or enemy damage without separate source/player evidence.
+
+
+## D-012 — Treat Gnasher leap as a fixed landing-point attack (ACCEPTED)
+- Gnasher burrow follows the player for 1.25 seconds at 3x movement speed, then captures `leapX/leapY` and completes a 0.55-second leap.
+- The landing hit checks a 60-unit radius around the fixed target point. The QA pilot must score its escape path against that point, not against the enemy's interpolated current position.
+- Defensive stats and sustain scrolls must not be silently outranked by a new-spell offer when survival is the active gate.
+- Projectile/hazard avoidance activation must not depend solely on nearby-enemy distance.
+- This decision governs the QA pilot only. Production enemy damage and behavior remain unchanged pending source fidelity and human playtest evidence.

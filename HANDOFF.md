@@ -257,3 +257,14 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Revision 018 prioritizes imminent projectiles and Gnasher over objectives, permits emergency Rift dodges, applies hard boundary correction only near actual clamp, and suspends loot/objective pursuit during Gnasher threat.
 - Product HTML remains unchanged. Boss content fidelity GAME-042 remains separate and unresolved.
 - Next: inspect CI #128; do not relax tests or alter production damage to force green.
+
+
+## BOSS PILOT 019 — CI #128 root-cause update (2026-11-17)
+- CI #128: https://github.com/D1traverser-debug/game/actions/runs/44009463457. Checkpoint and short browser regressions PASS; three-seed natural-run matrix FAIL.
+- Seed 1 died at 397.3s (level 15, 386 kills, 300 max HP, 41 armor, 1 regen). Two Gnasher hits dealt 282.4 and 284.6 raw at 389.3s and 397.3s; friendlyFire also landed at 388.2s.
+- Seed 2 died at 372.6s (level 14, 381 kills, 100 max HP, 28 armor, 9 regen). Six projectile hits clustered between 334.4s and 350.7s, followed by a 279.9 raw Gnasher hit.
+- Seed 3 died at 373.9s (level 16, 450 kills, 300 max HP, 32 armor, 1 regen). Gnasher hits of 280.1 and 280.4 raw landed at 372.3s and 373.9s.
+- Source inspection: Gnasher burrows toward the player at 3x speed for 1.25s, captures fixed `leapX/leapY`, then moves to that point over 0.55s and damages the player within 60 units. Prior pilot used the interpolated enemy position rather than the fixed landing point.
+- Upgrade chooser bug: `newSpell` returned before defensive options were checked; seed 3 selected a new spell despite Dodge being offered.
+- Projectile predictor checked up to 1.35s, but emergency activation was restricted to 0.85s/72 units and avoidance was scaled by nearby-enemy pressure.
+- Revision 019 changes test harness only: landing-point escape scoring, defensive/sustain card precedence, independent projectile/hazard emergency activation, and damage-time telemetry. Product HTML unchanged.

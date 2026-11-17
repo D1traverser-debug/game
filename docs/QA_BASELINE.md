@@ -115,3 +115,16 @@ Checkpoint: PASS. Short browser regressions: PASS. Three-seed natural-run matrix
 | 3 | 515.2s | Soul Sludge | Repeated Gnasher burrow/leap hits while the pilot continued objective/resource pursuit |
 
 All runs had no page errors, console errors or external requests. Revision 018 changes only test-agent priority and diagnostics; product HTML remains unchanged.
+
+
+## Natural-run pilot #128 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44009463457  
+Checkpoint: PASS. Short browser regressions: PASS. Three-seed natural-run matrix: FAIL.
+
+| Seed | End time | Main failure evidence |
+|---|---:|---|
+| 1 | 397.3s | Two Gnasher hits (282.4/284.6 raw); friendlyFire hit at 388.2s |
+| 2 | 372.6s | Six projectile hits from 334.4s to 350.7s, then Gnasher hit (279.9 raw) |
+| 3 | 373.9s | Two Gnasher hits (280.1/280.4 raw) |
+
+No browser, console or external-network errors. Source review identified fixed Gnasher landing-point mechanics and a defensive-card precedence bug in the test pilot. Revision 019 corrects the pilot and adds telemetry; product HTML remains unchanged.
