@@ -37,9 +37,13 @@ class GuardTests(unittest.TestCase):
         (self.root/'index.html').write_bytes(self.source+b'mutation')
         self.assertIn('ARTIFACT_SHA_MISMATCH',module.verify(self.root)['errors'])
     def test_scope_drift_detected(self):
-        self.state['scope']['multiplayer']=True
+        self.state['scope']['multiplayer']=False
         self.save_state()
         self.assertIn('SCOPE_DRIFT:multiplayer',module.verify(self.root)['errors'])
+    def test_active_branch_drift_detected(self):
+        self.state['active_production_branch']='development'
+        self.save_state()
+        self.assertIn('ACTIVE_BRANCH_DRIFT',module.verify(self.root)['errors'])
     def test_fake_ready_detected(self):
         self.state['status']='READY'
         self.save_state()

@@ -353,3 +353,8 @@ Green run: [CI 44131377996](https://github.com/D1traverser-debug/game/actions/ru
 ## Scope rebaseline — full-game branch (2026-11-18)
 
 The legacy browser candidate's green CI (10/10 jobs, Boss Encounter 26/26) is retained as prototype evidence. It does not satisfy the expanded full-game target. Native Unity build, original art/audio, full content breadth, 1–4 player networking, controller hardware, real full runs, real save/load, performance and independent acceptance are all NOT_TESTED. Do not reuse the legacy green status as a full-game release signal.
+
+
+## Full-game scope-guard first CI run — 2026-11-18
+
+The first full-game branch run verified the new scope metadata and the exact legacy artifact successfully. One negative-control test failed because it still changed `multiplayer` from false to true, which was the old prototype assumption and is now the correct full-game scope. This was a stale test fixture, not a product or scope-guard failure. The fixture now mutates multiplayer from true to false and adds an active-branch drift negative control. Awaiting the rerun.

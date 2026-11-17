@@ -45,3 +45,10 @@ Create the Unity 6.3 LTS URP project skeleton. Then build one polished vertical 
 6. Stable performance under representative enemy/projectile load.
 
 Do not mass-produce placeholder heroes, spells or maps before this slice passes. Keep the browser prototype isolated. Update state, decisions, issues and evidence after each meaningful change.
+
+
+## Scope-guard CI correction — 2026-11-18
+
+- First full-game CI: `44141591159`. Reproducible legacy artifact check PASS; new full-game scope guard PASS; browser objective and art renderer/boss jobs passed; checkpoint job failed only because the negative-control fixture still set `multiplayer=True` (the new required value), so it did not create drift.
+- Corrected the fixture to set `multiplayer=False` and added an active-branch drift negative control. No production game code or content changed.
+- Rerun required. Full-game product remains NOT_READY.
