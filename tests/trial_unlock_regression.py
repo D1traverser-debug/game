@@ -24,7 +24,8 @@ window.__trialProbe={
    const already=save.questFlags?.includes('stars')||false;
    game.player.spells.push(s);fireSpell(s);
    return {unlocked:save.unlocks.includes('stars'),preexisting:already};
- }
+ },
+ restart:()=>{startRun();return{trial:save.trialSpellId,spells:game.player.spells.map(s=>s.id),screen}}
 };
 """
 TEST_HTML = SOURCE.replace(MARKER, PROBE + '\n' + MARKER)
@@ -62,7 +63,7 @@ async def main():
     c['grant_is_idempotent']=not second['newlyGranted']
     star=await page.evaluate('screen="playing";__trialProbe.starEvent()')
     c['star_cast_event_unlock']=star['unlocked'] and not star['preexisting']
-    await page.evaluate('startRun()')
+    await page.evaluate('__trialProbe.restart()')
     restarted=await page.evaluate('__trialProbe.snapshot()')
     c['trial_does_not_repeat_next_run']='solar' not in restarted['spells']
     c['no_runtime_exceptions']=not outcome['page_errors']

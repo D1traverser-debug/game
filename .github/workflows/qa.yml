@@ -20,6 +20,14 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_*.py' -v
 
   browser-component:
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - progression_regression
+          - normal_play_smoke
+          - objective_collection_regression
+          - character_upgrade_regression
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -32,16 +40,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Browser progression integration regression
-        run: python tests/progression_regression.py
-      - name: Browser normal-play 90-second combat smoke
-        run: python tests/normal_play_smoke.py
-      - name: Browser objective collection regression
-        run: python tests/objective_collection_regression.py
-      - name: Browser character upgrade regression
-        run: python tests/character_upgrade_regression.py
+      - name: Run ${{ matrix.test }}
+        run: python tests/${{ matrix.test }}.py
 
   browser-content-visual:
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - game3d_integration
+          - trial_unlock_regression
+          - art_renderer_regression
+          - reginald_spell_scope_regression
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -54,14 +64,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Browser 3D combat, boss and objectives integration
-        run: python tests/game3d_integration.py
-      - name: Browser solo spell trials and quest persistence regression
-        run: python tests/trial_unlock_regression.py
-      - name: Browser atlas-backed 2.5D renderer regression
-        run: python tests/art_renderer_regression.py
-      - name: Browser Reginald-only spell pool and migration regression
-        run: python tests/reginald_spell_scope_regression.py
+      - name: Run ${{ matrix.test }}
+        run: python tests/${{ matrix.test }}.py
 
 # Blocking CI is limited to deterministic contracts and bounded browser regressions.
 # Long-horizon heuristic play is exploratory telemetry, not a human acceptance test.

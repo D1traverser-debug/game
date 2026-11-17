@@ -187,3 +187,12 @@
 **Falsifiers / review**
 - If the exploratory agent becomes a validated representative player model with documented skill envelope and independent correlation to human outcomes, its role may be reconsidered.
 - Any future change to the pilot must retain legal inputs, no state mutation, deterministic replay and complete per-seed evidence.
+
+
+## D-026 — Test closure-private game functions through in-scope probes (ACCEPTED)
+
+- Production game functions remain private inside the runtime IIFE; do not export internal mutation APIs solely to satisfy tests.
+- Browser component tests may inject a temporary probe at the approved in-IIFE marker, where it can call private functions through lexical scope.
+- The Python test driver must call the injected probe, not call a private production function from the page's global scope.
+- Keep probes in the in-memory test document only. Verify the release HTML still has no production debug surface.
+- A ReferenceError caused by a test calling an inaccessible private symbol is a test-harness defect until a separate runtime failure is demonstrated.

@@ -259,3 +259,17 @@ Development commit: 698fa9150eba673f33419aec3de1467273e2caeb
 - Five independent tests after the pilot were skipped because the long-run pilot was placed in the same sequential blocking job.
 - Interpretation: this is a reproducible failure of the current scripted pilot/game interaction, not proof of human impossibility and not evidence that a specific production damage or health value should be changed.
 - Decision: split deterministic blocking regressions from long-horizon heuristic exploration. The latter runs nightly or manually and preserves per-seed JSON telemetry. Human play acceptance remains a separate release gate.
+
+
+## CI #142 — trial test harness scope defect exposed after pipeline split (2026-11-17)
+
+Run: https://github.com/D1traverser-debug/game/actions/runs/44052717364  
+Development commit: 0ce3072ce697956d8c15ef322783ad8a060c7541
+
+- Checkpoint: PASS.
+- The four core browser regressions all passed.
+- 3D integration: 22/22 PASS, including all three boss constructors, nine objective constructors, Gnasher underground immunity, pause/resume, WebGL2 availability, offline requests and no runtime errors.
+- Trial unlock regression failed before its assertions because the Python driver evaluated startRun() from the page's global context. Production startRun is private to the main runtime IIFE; the failure is a test-harness scope error, not evidence of a broken game start path.
+- Atlas renderer and Reginald spell-scope checks were skipped because the content/visual group was still sequential in this run.
+- Correction: call the private transition through the temporary probe injected inside the same IIFE, and execute independent browser regressions as a fail-fast-disabled matrix.
+- No production game code or artifact hash changed in this correction.

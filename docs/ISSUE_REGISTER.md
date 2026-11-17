@@ -77,3 +77,6 @@
 
 
 | QA-002 | P1 | A heuristic full-run pilot blocks unrelated deterministic regression jobs | CI #141: checkpoint and four bounded browser checks passed; the pilot failed seeds 1/2/3 before boss time and caused five later independent checks to be skipped. The run still passed fixed-step, single-clock, render-RNG, replay, browser-error and offline assertions. | RESOLVED_IN_PIPELINE | Long-run agent moved to nightly/manual exploratory workflow; deterministic renderer/content tests run in parallel. Continue treating pilot deaths as diagnostic signals, not human acceptance or automatic balance defects. |
+
+
+| QA-003 | P1 | Solo spell-trial regression calls a closure-private startRun function from the global page context | CI #142: 3D integration passed 22/22; trial test failed at page.evaluate('startRun()') with ReferenceError because startRun is intentionally scoped inside the production IIFE. No production runtime exception occurred. | RESOLVED_IN_TEST_HARNESS_PENDING_CI | Invoke the next-run transition through the injected in-IIFE trial probe; keep production internals private and re-run the independent matrix. |
