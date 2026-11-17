@@ -13,7 +13,7 @@ This repository is the durable source of truth for product scope, source-version
 ## Current product target
 
 - Solo play and 1–4 player online co-op.
-- Full content target based on the current reference snapshot: the complete wizard roster, all four documented realms, spell catalogue, seven elements and ten dual-element combinations, objectives/variants, enemies/bosses, progression, quests, scrolls, trials/covenants, and meta systems. Counts and mechanics remain version-pinned research items, not assumed facts.
+- Full content target based on the current reference snapshot: the complete wizard roster, all four documented realms, spell catalogue, the full source-reconciled primary-element and advanced-infusion catalogue, objectives/variants, enemies/bosses, progression, quests, scrolls, trials/covenants, and meta systems. Counts and mechanics remain version-pinned research items, not assumed facts.
 - Windows PC first; keyboard/mouse and controller. Steam distribution is a target, not a claim of an existing release. Console/cross-play are later platform gates.
 - Production engine decision for the vertical slice: Unity 6.3 LTS + URP. See `docs/ENGINE_EVALUATION.md`.
 - Original game title, characters, names, art, animation, UI expression, writing, music, and sound recordings are not shipped. Gameplay mechanics are independently implemented from observable research. The shipped game must have its own IP and brand.

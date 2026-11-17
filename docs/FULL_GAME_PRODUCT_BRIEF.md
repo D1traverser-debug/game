@@ -31,7 +31,7 @@ This is a draft positioning line, not final marketing copy.
 The working research target is:
 - 15 wizards (community inventory; verify current version).
 - Four realms: Verdant Meadows, Frozen Ancients, Pyrestorm Pit and Astral Riftlands.
-- Seven elements and ten dual-element combinations (community inventory; verify current version).
+- An evidence-reconciled primary-element and advanced-infusion catalogue. Current sources conflict: the detailed matrix lists five primary elements plus fifteen advanced infusion candidates, while another community guide summarizes seven identities and ten combinations. Resolve against the pinned current in-game version before locking counts.
 - Full spell catalogue and augmentations, including official 1.2 additions.
 - Enemy/boss rosters, objective catalogue and variants, scrolls, chests, quests, trials/covenants, enchantments/masteries, wizard rank, cosmetics and achievements.
 - Solo and 1–4 player online co-op, including friendly fire and revive rules.

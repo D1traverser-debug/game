@@ -15,7 +15,7 @@ The repository—not chat summaries—is the canonical source of truth. The acti
 
 - Complete independent game, not a one-hero/one-map prototype.
 - Solo and 1–4 player online co-op are production targets.
-- Full current-version content target: complete wizard roster, all documented realms, spells, elements and combinations, augmentations, scrolls, quests, objectives/variants, enemies/bosses, trials/covenants and meta progression.
+- Full current-version content target: complete wizard roster, all documented realms, spells, primary elements and advanced infusions, augmentations, scrolls, quests, objectives/variants, enemies/bosses, trials/covenants and meta progression. Element counts are disputed in current research; resolve them before freezing content.
 - Windows PC first; keyboard/mouse and controller. Console/cross-play is a later gate.
 - Production engine direction: Unity 6.3 LTS + URP. Minimum pinned security-patched Editor: `6000.3.27f2`; update only to a later patched 6000.3 LTS version after release-note review and CI.
 - Original IP and assets: do not copy proprietary source, extracted game data, character designs, original art, animation, fonts, UI expression, writing, music, voice, or recordings. Independently implement gameplay systems and create original content.

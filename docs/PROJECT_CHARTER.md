@@ -13,7 +13,7 @@ The previous one-wizard / one-realm / single-player / single-HTML restrictions a
 - Modes: solo and 1–4 player online co-op.
 - Platform: Windows PC first; keyboard/mouse and controller. Steam is a distribution target. Additional platforms and cross-play are post-PC gates.
 - Content: complete current-version roster and systems, with the exact count/version pinned before each content batch.
-- Gameplay reference inventory (provisional): 15 wizards, four realms, seven elements, ten dual-element combinations, spells/augmentations, scrolls, objectives/variants, enemies/bosses, quests, trials/covenants, enchantments/masteries, achievements and meta progression. These figures are research targets, not source-verified acceptance facts.
+- Gameplay reference inventory (provisional): 15 wizards, four realms, five primary elements plus fifteen advanced infusion candidates (disputed against a seven-identity/ten-combo community summary), spells/augmentations, scrolls, objectives/variants, enemies/bosses, quests, trials/covenants, enchantments/masteries, achievements and meta progression. These figures are research targets, not source-verified acceptance facts.
 - Engine direction: Unity 6.3 LTS + URP, subject to vertical-slice validation.
 
 ## Gameplay fidelity

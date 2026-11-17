@@ -257,7 +257,7 @@
 
 **Decision:** The former constraints of one wizard, one realm, single-player only, and one offline HTML file apply only to the legacy browser prototype. The active product target is a complete original-IP 3D roguelite with solo and 1–4 player online co-op, full current-version content breadth, Windows PC first, keyboard/mouse and controller.
 
-**Evidence:** The owner explicitly requested a complete game substitute and authorized copying gameplay mechanics. The official Steam page describes 1–4 player online co-op and team objectives. Current community inventory reports 15 wizards, four realms, seven elements and ten dual-element combinations; those counts remain provisional until reconciled against a pinned source version.
+**Evidence:** The owner explicitly requested a complete game substitute and authorized copying gameplay mechanics. The official Steam page describes 1–4 player online co-op and team objectives. Current community inventory reports 15 wizards and four realms. Element research conflicts: detailed matrix lists five primary elements plus fifteen advanced infusion candidates, while another guide reports seven identities and ten combinations. All counts remain provisional until reconciled against a pinned source version.
 
 **Trade-off:** This invalidates the old single-file/offline architecture as the final delivery architecture. The old prototype remains useful as a mechanics reference and regression artifact. No code or assets are copied wholesale into the new runtime.
 

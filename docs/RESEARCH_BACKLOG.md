@@ -38,7 +38,7 @@ Research must produce observable mechanics and testable rules, not just descript
 - Reconcile the full wizard roster (community guide reports 15) and every wizard's passive, stats, signature spell, unlock quest and co-op-specific interactions.
 - Reconcile all four realms and their layout variants, hazards, destructible props, enemy rosters, objectives and boss eligibility.
 - Build complete spell/augmentation catalogues; include the three 1.2 spells and distinguish official effects from undocumented adaptations.
-- Build the seven-element and ten-pair interaction matrix; confirm stacking, status, crit, friendly-fire and co-op rules.
+- Resolve the element/infusion inventory discrepancy (five primary plus fifteen advanced candidates vs seven identities plus ten combinations); confirm every effect, stacking, status, crit, friendly-fire and co-op rule.
 - Map co-op rules: friendly fire, revive, team objectives, individual/shared level-up timing, disconnect/reconnect and player death/return.
 - Research current scroll, trial, covenant, mastery, enchantment, rank, quest, outfit and achievement progression.
 - Record gameplay timing and damage only when supported by current-version observation; do not inherit provisional prototype numbers.

@@ -19,7 +19,7 @@ The previous Reginald-only / Verdant Meadows-only / solo-only / single offline H
 ## Full-game target
 
 - Solo and 1–4 player online co-op.
-- Full current-version content breadth: complete wizard roster, all four documented realms, spells, seven elements and ten dual-element combinations, augmentations, scrolls, objectives/variants, enemy/boss roster, quests, trials/covenants and meta progression.
+- Full current-version content breadth: complete wizard roster, all four documented realms, spells, the complete primary-element and advanced-infusion catalogue (element counts remain disputed), augmentations, scrolls, objectives/variants, enemy/boss roster, quests, trials/covenants and meta progression.
 - Provisional community inventory: 15 wizards, four realms, seven elements, ten dual combinations, 78 achievements. Counts require source-version reconciliation.
 - Windows PC first; keyboard/mouse and controller. Steam distribution target; other platforms/cross-play are later gates.
 - Engine direction: Unity 6.3 LTS + URP for a bounded vertical slice. Engine choice remains conditional on measured performance, 4-client networking and owner workflow.
@@ -115,3 +115,8 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 - First run #44144743422 verified 13/17 checks. Only four ignore-rule checks failed because the script expected literal names while the .gitignore correctly uses case-insensitive patterns.
 - Updated the validator to match the exact patterns already committed. No Unity project files or production code changed.
 - Rerun pending; Editor package resolution remains NOT_TESTED.
+
+
+## Element inventory research correction — 2026-11-18
+
+The previous brief's "seven elements + ten combinations" wording was too definitive. The detailed reference matrix records five primary elements and fifteen advanced infusion candidates (five self-pairs plus ten mixed pairs), while another community guide summarizes seven identities and ten combinations. Official 1.2 notes confirm some advanced infusions but not the complete matrix. The current product scope now marks this as a source discrepancy, not a frozen count. Reconcile the in-game infusion UI before implementing the full catalogue.

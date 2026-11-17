@@ -1,20 +1,20 @@
 # Mechanic Reference Matrix — Current Evidence Snapshot
 
-This matrix distinguishes verified source facts, community-reported facts, and implementation assumptions. A mechanic is not accepted until it has a version pin and an observable test.
+This matrix distinguishes verified source facts, community-reported facts, and implementation assumptions. A mechanic is not accepted until it has a version pin and an observable test. The full-game branch supersedes the old one-hero/one-realm/single-player contract; Reginald-only rows below are retained as legacy prototype evidence, not the full-game content boundary.
 
 | System | Current evidence | Confidence | Required implementation/test |
 |---|---|---|---|
-| Product format | Steam page describes Survivors-like, top-down, single-player plus online co-op | Official product page | We intentionally implement single-player only |
+| Product format | Survivors-like top-down action; solo and 1–4 player online co-op | Official Steam product page | Full-game branch targets solo + 1–4 online co-op; `development` remains the historical single-player browser prototype |
 | Reginald | Signature Astral Orbs; +2 Luck; +10% health potion/magnet find chance; +25% spell size and -12% cooldown (community reference) | Medium | Verify values in current game; model passive and signature modifier separately |
 | Initial spells | 1.2.0.20127 adds Loaded Dice, Tiny Tremors, Wicked Buzzsaw as unlocked from start | Official patch notes | Add all three; ensure only source-defined initial set is unlocked |
 | Spell slots | Update 1.1: 3rd spell at player level 13; 4th at level 20; new spell gets immediate upgrade; 3rd/4th spells start at levels 3/4 | Official patch notes | Deterministic boundary tests at levels 12/13/19/20; verify 2nd-slot milestone |
 | Spell unlocks | Many spells unlocked by spell-specific quests; wiki lists 21 spell quests | Community reference | Implement individual quest predicates; never use arbitrary kill-count substitute |
 | Infusions | Community guide reports spell infusion at levels 7 and 14 for normal wizard; another wizard may differ | Community reference | Verify Reginald milestones; test 6/7/13/14 boundaries and all available element pairs |
-| Elements | Fire, Lightning, Acid, Ice, Dark | Community reference and current code | Per-element damage/status/tick/stack/crit tests |
+| Elements / infusions | Inventory is disputed: detailed matrix identifies 5 primary elements and 15 advanced infusion candidates (5 self-pairs + 10 mixed); another community guide summarizes 7 element identities and 10 dual combos | Community references conflict; official 1.2 notes confirm Plasma/Flux/Glint/Shadowbolt interactions and crit fixes | Do not freeze element counts from a summary guide. Reconcile current in-game infusion cards and official patch history; model each primary element and advanced infusion separately |
 | Augmentations | Official 1.2.0.20127 adds 13 augmentations including 4 for each new spell and 13 for older spells | Official patch notes | Capture all current augmentation names/effects; do not substitute generic stats |
 | Verdant Meadow | First realm; Gnasher unique; no environmental hazards listed on wiki | Community reference | Verify terrain, layout variants, destructible props, roads and boundaries |
 | Gnasher | Roar → burrow → fast underground approach (invulnerable) → leap; nearby enemies can be damaged on landing | Community reference | State-machine tests, hitbox/timing tests, damage and drop tests |
-| Objectives | Update 1.1 introduced objective variants; map-specific changes | Official patch notes | Recreate only Verdant Meadow objective types and their unlocked variants |
+| Objectives | Update 1.1 introduced variants across the objective catalogue and map-specific variants | Official patch notes | Recreate the full current-version objective catalogue and eligible realm variants; retain source/version and solo/co-op rules per objective |
 | Sol'phish | Historical official patch records intro/outro, burst attack and stagger; community wiki describes runestones and +200% damage during stagger | Official historical patch + community | Confirm current attack timing, telegraphs, stagger, vulnerability, damage and death |
 | Performance | Official Oct 22 patch specifically addressed stability/performance in Endless | Official patch feed | Treat peak-entity performance as a release gate |
 | Visual target | Official Steam screenshots show modeled 3D characters, 3D environment, top-down camera, dense spell VFX and HUD | Official Steam screenshots | Compare our independent art/animation readability to these references |
@@ -69,12 +69,12 @@ Advanced mixed pairs: Plasma (Fire+Lightning), Flux (Acid+Lightning), Shadowbolt
 The exact status/chain/crit behavior must be modeled separately per pair. Do not implement a generic pair damage multiplier.
 Official 1.2 fixes Plasma burn damage to account for initial crit, and fixes Flux/Glint/Shadowbolt lightning damage to scale with crit from the initial hit. Acid duration resets on each hit instead of stacking duration. These are mandatory regression cases.
 
-### Solo-only content boundary
-- Official 1.2 explicitly removed Healing Slam from the augmentation pool in solo play because it is co-op-only. The single-player pool must filter co-op-only upgrades and quests, not merely omit networking.
-- Some quest achievements require teammates (revives, ally healing, friendly-fire against teammate, etc.). They must be marked unavailable/inapplicable in the solo product, or replaced only if the original has a true solo equivalent. Do not silently invent a substitute.
+### Mode-specific content boundary
+- Official 1.2 explicitly removed Healing Slam from the augmentation pool in solo play because it is co-op-only. The solo pool must filter co-op-only upgrades and quests; the co-op pool must expose them only under the correct eligibility rules.
+- Some quest achievements require teammates (revives, ally healing, friendly-fire against teammate, etc.). They must be modeled as co-op-only and remain unavailable in solo. Do not silently invent solo substitutes.
 
-### Reginald solo spell allowlist — source audit 2026-11-17
-The current Reginald-only build exposes 18 spells:
+### Legacy Reginald-only spell allowlist — source audit 2026-11-17 (prototype only)
+The historical Reginald-only prototype exposed 18 spells:
 - Signature: Astral Orbs.
 - 1.2 starters (officially unlocked from the start): Loaded Dice, Tiny Tremors, Wicked Buzzsaw.
 - 14 general spell-quest unlocks: Magic Missile, Solar Pulse, Moonerang, Arcane Broadsword, Aether Beam, Falling Stars, Phantom Blades, Cardinal Runes, Rocky Road, Aurora Wings, Bell March, Vengeful Sprout, Talon Slash, Impish Havoc.
@@ -88,12 +88,12 @@ Sources:
 - Reginald signature and traits: https://thespellbrigade.wiki.gg/wiki/Reginald
 - Ascension signature mapping discussion (secondary corroboration): https://steamcommunity.com/app/2904000/discussions/0/838375062933398814/
 
-The wiki and community discussion are secondary sources. Reconfirm against the target game build where possible. The 1.2 starter status is grounded in the official patch announcement. Do not claim the complete source game contains only 18 spells; this allowlist is specific to the one-hero Reginald product.
+The wiki and community discussion are secondary sources. Reconfirm against the target game build where possible. The 1.2 starter status is grounded in the official patch announcement. Do not claim the complete source game contains only 18 spells; this allowlist is specific to the legacy one-hero Reginald prototype.
 
 ## Official 1.2 spell-content reconciliation (2026-11-17)
 - The developer's 1.2.0.20127 notes explicitly confirm three new start-unlocked spells and four augmentations for each: Loaded Dice, Tiny Tremors and Wicked Buzzsaw. The public notes describe the core spell behavior and augmentation count, but do **not** publish the names or detailed effects of those twelve new augmentations.
 - The same notes list thirteen augmentations for older spells: Aura Beam (Aether Beam), Baby Sprout (Vengeful Sprout), Chthonic Pull (Chthonic Charge), Counter Talon (Talon Slash), Massive Missile (Magic Missile), Piercing Blades (Phantom Blades), Pulling Whirl (Necro Whirl), Scepter Link (Scepter Mesh), Solar Zenith (Solar Pulse), Super Star (Falling Stars), Unrung Bells (Bell March), Waxing Moon (Moonerang), Wing Split (Aurora Wings).
-- Only the Reginald-eligible subset belongs in this one-hero product. Non-Reginald signature spells and their augmentations remain excluded.
+- This allowlist applies only to the legacy Reginald prototype. The full-game branch must include the complete current-version wizard roster and each wizard's eligible spell catalogue; non-Reginald signatures are not excluded from the full game.
 - The four augmentations for each 1.2 starter are our own named, original gameplay adaptations because official notes provide only the count, not their source names/effects. Do not label those twelve as source-faithful. Their actual mechanics must be tested individually.
 - Official source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026, patch 1.2.0.20127); the same feed's 22 Oct 2026 performance patch makes high-entity stability a first-class quality requirement.
 
@@ -102,4 +102,13 @@ The wiki and community discussion are secondary sources. Reconfirm against the t
 | Mechanic | Current baseline | Evidence | Implementation rule |
 |---|---|---|---|
 | Caster self-damage | Default friendly fire can damage the caster with their own spell hazards | Official Harmony Pact patch notes say the covenant prevents damage to self and teammates; developer response confirms default self/team damage is intentional | Preserve self-damage in the default baseline; pilot must evade; do not misclassify `friendlyFire` damage as a bug |
-| Harmony Pact | Optional covenant disables friendly fire | https://steamdb.info/patchnotes/16553491/ | Track as a separate source-fidelity feature; add only if run modifiers are in the single-player scope |
+| Harmony Pact | Optional covenant disables friendly fire | https://steamdb.info/patchnotes/16553491/ | Include as a full-game run modifier; verify how it affects self-damage, teammate damage, status transfer and achievements |
+
+
+## Full-game content boundary and element-count discrepancy (2026-11-18)
+
+- Product format is solo plus 1–4 online co-op. The old "Reginald only" spell allowlist is a historical prototype constraint and must not restrict the full-game roster.
+- Four realms are the current target: Verdant Meadows, Frozen Ancients, Pyrestorm Pit and Astral Riftlands. Each has map variants and realm-specific hazards/props from official 1.1 notes.
+- **Element inventory is not yet resolved.** The detailed infusion reference lists five primary elements (Fire, Lightning, Acid, Ice, Dark), five self-pair advanced effects (Wildfire, Thunder, Corrosion, Frost, Void), and ten mixed-pair effects (Plasma, Flux, Shadowbolt, Glint, Brimstone, Hellfire, Frostbite, Miasma, Blight, Wither). A separate community guide describes seven element identities and ten dual-element combinations. The official 1.2 patch confirms Plasma, Flux, Glint and Shadowbolt behavior/fixes, but does not publish a complete authoritative matrix.
+- Treat "5 primary + 15 advanced effects" as the current detailed research candidate and "7 identities + 10 combos" as a conflicting community summary. Do not choose a count by convenience. Capture every infusion card from the pinned in-game version and reconcile all effects before content implementation.
+- The core must represent element identity, infusion identity, effect stacking, status duration, initial-hit crit propagation, chain/area behavior and teammate/self-damage independently. Never collapse all combinations into a generic damage multiplier.

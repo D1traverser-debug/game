@@ -21,11 +21,13 @@
     "target_content": {
       "wizards": 15,
       "realms": 4,
-      "elements": 7,
-      "dual_element_combinations": 10,
+      "primary_elements": 5,
+      "advanced_infusion_candidates": 15,
+      "community_guide_element_identities": 7,
+      "community_guide_dual_element_combinations": 10,
       "achievements": 78
     },
-    "content_count_confidence": "provisional community inventory; reconcile against pinned current source version",
+    "content_count_confidence": "provisional community inventory; element/infusion classification is disputed and must be reconciled against pinned current source version",
     "engine": "Unity 6.3 LTS + URP (selected for vertical-slice validation)",
     "final_delivery": "native Windows PC build; Steam distribution target",
     "original_ip_required": true
@@ -211,7 +213,7 @@
   "failed_or_open": [
     "Unity project skeleton is committed at unity/ with Editor 6000.3.27f2 and URP 17.3.0 dependency; opening the project, package resolution, URP asset assignment and native Windows build remain NOT_TESTED.",
     "1–4 player online co-op transport/session, host snapshots, lobby/relay, reconnect, friendly-fire replication, revive and four-client stress are not implemented; only the pure input-envelope validation contract exists.",
-    "Full wizard/realm/spell/element/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented.",
+    "Full wizard/realm/spell/element/advanced-infusion/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented; element counts conflict across community references.",
     "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
     "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested."
   ],

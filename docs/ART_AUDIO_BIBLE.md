@@ -10,7 +10,7 @@ Create a distinctive, premium stylized 3D fantasy world with the readability and
 
 1. **Hand-authored silhouettes:** every hero and enemy reads at gameplay camera distance; signature props and spell poses distinguish characters instantly.
 2. **Material richness without visual noise:** stylized PBR surfaces, hand-painted detail, controlled roughness/metalness, selective emissive materials and clear focal hierarchy.
-3. **Elemental spectacle with rules:** every element has a unique shape language, motion, color family and sound signature; pair combinations blend both identities rather than merely recoloring a projectile.
+3. **Elemental spectacle with rules:** every primary element and advanced infusion has a unique shape language, motion, color family and sound signature; pair combinations blend both identities rather than merely recoloring a projectile.
 4. **Battlefield legibility:** telegraphs, damage zones, ally spells, enemy attacks and pickups remain distinguishable under peak density.
 5. **A coherent world:** realm architecture, vegetation, props, lighting, sky, ambient particles and music tell one story.
 

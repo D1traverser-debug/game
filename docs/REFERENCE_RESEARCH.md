@@ -95,3 +95,12 @@ Source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026 entry, lines
 
 **Version policy**
 The working source snapshot is the latest official material located by 2026-11-18: Update 1.1 (2026-09-02), spell patch 1.2.0.20127 (2026-10-06), and performance patch (2026-10-22). The Oct 6 announcement says a larger update was planned for later in 2026; check the official feed before each content freeze for a later release. Do not rely on the 1.0 wiki alone.
+
+
+## Element / infusion catalogue discrepancy — 2026-11-18
+
+The current research cannot yet support a single authoritative count:
+- The detailed `MECHANIC_REFERENCE_MATRIX.md` records five primary elements (Fire, Lightning, Acid, Ice, Dark), five advanced self-pair effects (Wildfire, Thunder, Corrosion, Frost, Void), and ten mixed-pair effects (Plasma, Flux, Shadowbolt, Glint, Brimstone, Hellfire, Frostbite, Miasma, Blight, Wither).
+- A separate community elements guide summarizes seven element identities and ten dual-element combinations.
+- Official 1.2.0.20127 patch notes confirm Plasma infusion burn behavior and crit scaling for Flux, Glint and Shadowbolt, but do not publish the complete current infusion matrix.
+- Therefore the product brief must not claim a verified "7 + 10" catalogue. Current working hypothesis is five primary elements plus fifteen advanced infusion candidates; this remains unverified. Capture the full current in-game infusion UI and reconcile every pair/effect before implementation.

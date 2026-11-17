@@ -34,7 +34,7 @@ Exit gate: owner and independent reviewers accept feel, readability, visual/audi
 
 - Complete simulation and damage pipeline.
 - Spell/augmentation framework with individual behaviors.
-- Seven-element and pair-combination framework, verified interaction matrix.
+- Source-reconciled primary-element and advanced-infusion framework, with a verified interaction matrix and separate effect logic for every infusion.
 - XP, levels, spell slots, infusion, reroll/ban/lock, scrolls and chest economy.
 - Enemy director, elites, boss framework, objective scheduler and realm hazards.
 - Co-op friendly fire, revive, team objectives, individual progression and reconnect rules.
