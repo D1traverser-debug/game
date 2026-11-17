@@ -60,7 +60,7 @@ damagePlayer=function(n,source='enemy'){
   return __baseDamagePlayer(n,source);
 };
 window.__setRunSeed=(seed)=>{
-  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};window.__manualTick=false;window.__renderPhase=false;window.__pilotHeading={x:0,y:0};window.__contactSource=null;
+  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};window.__manualTick=false;window.__renderPhase=false;window.__pilotHeading={x:0,y:0};window.__contactSource=null;joy.x=0;joy.y=0;joy.active=true;
   let state=seed>>>0;
   Math.random=()=>{
     if(window.__renderPhase)window.__simulationHarness.renderRandomCalls++;
@@ -105,14 +105,15 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     const hpRatio=p.hp/Math.max(1,p.maxHp);
     // Preserve the level-13/20 spell-slot milestones, but do not build a glass cannon.
     // Defense targets are modest and are selected only while the corresponding stat is deficient.
-    const defensivePriority={maxHp:0,armor:1,regen:2,dodge:3};
+    const defensivePriority={maxHp:0,armor:1,regen:2,dodge:3,speed:4};
     const defensive=opts.filter(x=>x.kind==='stat'&&Object.prototype.hasOwnProperty.call(defensivePriority,x.k))
       .sort((a,b)=>defensivePriority[a.k]-defensivePriority[b.k]);
     const defensiveNeed=defensive.filter(x=>
       (x.k==='maxHp'&&p.maxHp<300)||
       (x.k==='armor'&&p.armor<36)||
       (x.k==='regen'&&p.regen<2)||
-      (x.k==='dodge'&&p.dodge<.12));
+      (x.k==='dodge'&&p.dodge<.12)||
+      (x.k==='speed'&&p.move<205));
     const sustainNames=new Set(['健康成长','壁垒','厚皮','闪避疗愈','致命回响','魔力虹吸','魔力汲取','目标馈赠']);
     const scrollPriority={
       '健康成长':0,'壁垒':1,'厚皮':2,'闪避疗愈':3,'致命回响':4,
@@ -247,8 +248,8 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       const hitTime=leaping?Math.max(.05,Math.min(.55,e.stateT||.55)):.55;
       const step=Math.max(20,moveSpeed*hitTime);
       let bestScore=-Infinity;
-      for(let k=0;k<8;k++){
-        const a=k*Math.PI/4,dx=Math.cos(a),dy=Math.sin(a);
+      for(let k=0;k<24;k++){
+        const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);
         const nx=clamp(p.x+dx*step,-1200,1200),ny=clamp(p.y+dy*step,-900,900);
         const travel=Math.hypot(nx-p.x,ny-p.y);
         const landingDistance=leaping&&leapThreats.length
@@ -360,13 +361,13 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     if(emergency){
       const moveSpeed=(p.move||220)*(game.carriedCore&&game.carriedCore.alive?.58:1)*
         (p.lowSpeed?1+(1-p.hp/Math.max(1,p.maxHp))*.21:1)*(p.fightT>0?1.3:1);
-      const horizon=.7;
+      const horizon=1.5;
       const desiredD=Math.hypot(goalX,goalY)||1;
       const desiredX=goalX/desiredD,desiredY=goalY/desiredD;
       const previous=window.__pilotHeading||{x:desiredX,y:desiredY};
       let bestScore=-Infinity,bestX=desiredX,bestY=desiredY;
-      for(let k=0;k<8;k++){
-        const a=k*Math.PI/4,dx=Math.cos(a),dy=Math.sin(a);
+      for(let k=0;k<24;k++){
+        const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);
         const nx=clamp(p.x+dx*moveSpeed*horizon,-1200,1200);
         const ny=clamp(p.y+dy*moveSpeed*horizon,-900,900);
         let score=(dx*desiredX+dy*desiredY)*28+
@@ -409,8 +410,11 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
           if(rv2<1)continue;
           const t=Math.max(0,Math.min(horizon,-(rx0*rvx+ry0*rvy)/rv2));
           const miss=Math.hypot(rx0+rvx*t,ry0+rvy*t);
-          const safe=(shot.r||6)+p.r+34;
-          if(miss<safe+24)score-=(safe+24-miss)*4.4;
+          const armorValue=p.armor+(p.thick?(1-p.hp/Math.max(1,p.maxHp))*90:0);
+          const expected=(shot.dmg||0)*100/(100+armorValue)*(1-(p.dodge||0));
+          const risk=expected/Math.max(1,p.hp);
+          const safe=(shot.r||6)+p.r+28+Math.min(110,risk*70);
+          if(miss<safe+24)score-=(safe+24-miss)*(4.4+Math.min(3,risk*1.5));
           else score+=Math.min(miss-safe,120)*.018;
         }
         // Timed hazards are evaluated at their trigger time.
@@ -424,14 +428,18 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
           if(hd<safe)score-=(safe-hd)*2.8;
         }
         // Predict enemy approach over the same horizon.
+        const armorValue=p.armor+(p.thick?(1-p.hp/Math.max(1,p.maxHp))*90:0);
         for(const e of game.enemies){
           if(e.dead||e.type==='boss'||e.state==='burrow'||e.state==='leap')continue;
           const ex0=p.x-e.x,ey0=p.y-e.y,ed=Math.hypot(ex0,ey0)||1;
           const es=(e.speed||0)*Math.max(0,1-(e.slow||0));
           const ex=e.x+ex0/ed*es*horizon,ey=e.y+ey0/ed*es*horizon;
-          const contactD=Math.hypot(nx-ex,ny-ey),safe=e.r+p.r+30;
-          if(contactD<safe)score-=(safe-contactD)*1.5;
-          else if(contactD<safe+55)score-=(safe+55-contactD)*.18;
+          const contactD=Math.hypot(nx-ex,ny-ey);
+          const expected=(e.dmg||0)*.14*(e.weakness>0?.65:1)*100/(100+armorValue)*(1-(p.dodge||0));
+          const risk=expected/Math.max(1,p.hp);
+          const safe=e.r+p.r+28+Math.min(130,risk*95);
+          if(contactD<safe)score-=(safe-contactD)*(2.0+Math.min(3,risk*2.2));
+          else if(contactD<safe+55)score-=(safe+55-contactD)*.12;
         }
         // Reward moving inward; do not hard-steer toward an edge while dodging.
         const edgeAfter=Math.min(1200-Math.abs(nx),900-Math.abs(ny));
@@ -452,7 +460,7 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       window.__pilotHeading={x:goalX,y:goalY};
     }
     const mag=Math.hypot(goalX,goalY)||1;goalX/=mag;goalY/=mag;
-    keys={KeyD:goalX>.22,KeyA:goalX<-.22,KeyS:goalY>.22,KeyW:goalY<-.22};
+    keys={};joy.x=goalX;joy.y=goalY;joy.active=true;
     const chestNear=game.chests.some(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);
     const o=game.objective&&!game.objective.done?game.objective:null;
     let itemNear=false;
