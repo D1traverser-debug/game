@@ -63,13 +63,13 @@ window.__fullRun = async (maxSeconds) => {
     if(scroll)return scroll;
     // A competent solo build secures sustain first, then layers spell damage.
     const statPriority=['regen','armor','dodge','maxHp','speed','damage','cast','crit','critDmg','spellSize','manaPull','manaGain','luck'];
+    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
+    if(stat)return stat;
     const augPriority=['healingSprout','quakeBurst','diceTwin','diceEcho','sawTwin','sawReturn','orbSplit','orbBurst','quakeAfter','quakePull','sawMagnet','seeking','surge','tempo','reach'];
     const aug=opts.filter(x=>x.kind==='spellAugment').sort((a,b)=>augPriority.indexOf(a.aug)-augPriority.indexOf(b.aug))[0];
     if(aug)return aug;
     const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
     if(level)return level;
-    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
-    if(stat)return stat;
     const bonus=opts.find(x=>x.kind==='spellLevelBonus'&&x.mode==='damage')||opts.find(x=>x.kind==='spellLevelBonus');
     if(bonus)return bonus;
     const infusion=opts.find(x=>x.kind==='infuse');
