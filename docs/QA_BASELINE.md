@@ -372,3 +372,10 @@ Evidence boundary: this verifies foundational domain code only. It does not veri
 CI [44143534101](https://github.com/D1traverser-debug/game/actions/runs/44143534101) passed 11/11 jobs. The engine-independent core passed 20/20 contracts: fixed-step time, pause/backlog, PCG RNG, damage/friendly fire/invulnerability, monotonic event sequencing, and player input envelope validation. The checkpoint and all nine legacy browser regressions passed.
 
 Unity project skeleton is committed with Editor 6000.3.27f2 and URP 17.3.0 dependency, but Editor package resolution and native build have not been tested. The core event/command extension is still pending CI.
+
+
+## Unity project skeleton and core package organization — green legacy/core CI (2026-11-18)
+
+CI [44144343912](https://github.com/D1traverser-debug/game/actions/runs/44144343912) passed 11/11 jobs. Game.Core now lives under `src/core/Runtime` as a local UPM package; .NET Standard 2.1 build passed and 22/22 contracts passed. The Unity project pins Editor 6000.3.27f2 and URP 17.3.0.
+
+The Editor has not been launched. Package resolution, URP pipeline asset assignment, scene creation, native Windows build, controller input and runtime are NOT_TESTED. A project-structure guard is being added separately.

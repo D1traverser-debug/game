@@ -70,6 +70,14 @@ jobs:
       - name: Run ${{ matrix.test }}
         run: python tests/${{ matrix.test }}.py
 
+
+  unity-project-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Unity project and local package structure
+        run: python3 scripts/verify_unity_project.py
+
   core-simulation:
     runs-on: ubuntu-latest
     steps:

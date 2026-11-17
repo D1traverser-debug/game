@@ -99,3 +99,12 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 - `unity/ProjectSettings/ProjectVersion.txt` and `unity/Packages/manifest.json` committed.
 - Editor has not been launched in this environment. Package resolution, URP asset assignment, scene import and Windows build are NOT_TESTED.
 - The core command validator now rejects negative sequence and client tick values. Expanded test suite: 22 contracts expected; CI pending.
+
+
+## Unity skeleton / core package validation — CI green (2026-11-18)
+
+- CI [44144343912](https://github.com/D1traverser-debug/game/actions/runs/44144343912): 11/11 jobs PASS.
+- Core sources moved under `src/core/Runtime` and packaged as `com.d1traverser.game-core`; .NET Standard 2.1 build PASS, 22/22 contracts PASS.
+- Unity Editor pinned to `6000.3.27f2`, URP 17.3.0 dependency declared, local package path `file:../src/core`.
+- Editor has not been launched. URP asset assignment, scene, Windows build, controller, networking, production art/audio and playtest remain NOT_TESTED.
+- Next: validate Unity project/package structure in CI, then open with the pinned Editor.
