@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "DYNAMIC_ENEMY_PRESSURE_DIRECTOR_010",
+  "checkpoint": "VITALITY_HEAL_AND_POPULATION_DIRECTOR_011",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -73,7 +73,9 @@
     "Natural-run trace exposed survival failure at 154.3 in-game seconds during a Seal the Rift objective: HP 10.7/100, damage taken 89.3, level 9, 135 kills; no JS errors or external requests",
     "Full mission pilot now considers real health and magnet orb pickups as player actions; the next CI run will determine whether the rift survival failure is resolved",
     "Replaced uncapped time-multiplied wave stacking with a time-scaled population director targeting 18+floor(time/34) living enemies, capped at 64; hard spawn guard now enforces the same cap",
-    "Fixed a systemic spawn-pressure defect: active-enemy population now follows a time-scaled target of 18 + floor(gameTime/34), capped at 64; spawn batches adapt to the remaining population deficit and spawnEnemy enforces the hard cap"
+    "Fixed a systemic spawn-pressure defect: active-enemy population now follows a time-scaled target of 18 + floor(gameTime/34), capped at 64; spawn batches adapt to the remaining population deficit and spawnEnemy enforces the hard cap",
+    "Enemy pressure director limits living population to 64 and scales target density from 18 to 64 over mission duration; 2.5D enemy accumulation no longer reaches 241 by 7 minutes",
+    "Vitality Forge max-health upgrades now restore 25 percent of the added maximum HP immediately, with matching UI description and a dedicated regression assertion"
   ],
   "failed_or_open": [
     "Real unassisted full-run completion not tested",
@@ -119,14 +121,15 @@
     "Full natural-run pilot still died at 154.3 seconds before the 19-minute boss window during a Rift objective; health pickup routing was added to the test pilot, but real-player balance and survival remain unverified",
     "Character upgrade pool still does not yet reproduce the source game's broad global stat choices at each level-up; verify source-backed upgrade offer distribution and implementation",
     "Latest non-cheating full-run simulation still died at 440.2 seconds with 241 enemies; population director change has just been committed and must be revalidated",
-    "Previous non-cheating full-run simulation died at 440.2 seconds with 241 active enemies and 400 max HP; dynamic population director is now committed but has not yet been revalidated"
+    "Previous non-cheating full-run simulation died at 440.2 seconds with 241 active enemies and 400 max HP; dynamic population director is now committed but has not yet been revalidated",
+    "First population-director full-run attempt still died at 470.5 seconds with 29 enemies, 900 max HP and 0 regen; evidence indicates build survivability and objective navigation also need balancing, not only enemy count"
   ],
-  "next_action": "Run the full non-cheating 25-minute mission simulation with the new enemy population director. Inspect survival, objective completion, spell build strength and natural boss behavior. Do not force time, HP, XP, boss damage or victory. After normal-combat acceptance, continue real browser persistence, real-device performance, source-fidelity content and owner playtest.",
+  "next_action": "Validate vitality healing and re-run the non-cheating full mission. If survival improves, inspect rift/sludge objective completion and build diversity; if it still fails, use trace to identify the next production root cause. Continue until natural boss win and independent player acceptance.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "development_candidate_sha256": "7341e21f2a94b05460113c1138cb7cf6d29d13f5e8357d85844e2a8d2b1bf47f",
-  "development_candidate_bytes": 721469,
+  "development_candidate_sha256": "2d9c2cf2e406e68d098a2ade01b3c7bd7805b9b5942f4e5f588b798222b6493a",
+  "development_candidate_bytes": 721554,
   "last_successful_candidate_ci": {
     "run_id": 43848382432,
     "url": "https://github.com/D1traverser-debug/game/actions/runs/43848382432",
@@ -141,13 +144,13 @@
   "latest_local_candidate": {
     "artifact": "development/index.html",
     "delivery_filename": "咒语旅团-当前开发版-单人网页版.html",
-    "bytes": 721469,
-    "sha256": "7341e21f2a94b05460113c1138cb7cf6d29d13f5e8357d85844e2a8d2b1bf47f",
+    "bytes": 721554,
+    "sha256": "2d9c2cf2e406e68d098a2ade01b3c7bd7805b9b5942f4e5f588b798222b6493a",
     "source_base": "single-file 2.5D art-forward candidate with embedded 4x4 sprite atlas",
     "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
     "scope": "Reginald only / Verdant Meadow only / single-player / offline single HTML",
-    "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration filtering, 90-second normal play, objective collection component tests; new population director pending full mission run",
+    "tested": "Enemy population director hard cap 64 and adaptive target; max-health upgrades restore 25 percent of the increase; browser regression added; full natural run pending",
     "not_tested": "19-minute full mission and natural boss win after population director, real file-origin persistence, real hardware performance, complete source fidelity, owner acceptance"
   },
-  "latest_candidate_ci_status": "PENDING_DYNAMIC_ENEMY_PRESSURE_REVALIDATION"
+  "latest_candidate_ci_status": "PENDING_VITALITY_AND_FULL_RUN_REVALIDATION"
 }
