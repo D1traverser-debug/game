@@ -120,3 +120,13 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 ## Element inventory research correction — 2026-11-18
 
 The previous brief's "seven elements + ten combinations" wording was too definitive. The detailed reference matrix records five primary elements and fifteen advanced infusion candidates (five self-pairs plus ten mixed pairs), while another community guide summarizes seven identities and ten combinations. Official 1.2 notes confirm some advanced infusions but not the complete matrix. The current product scope now marks this as a source discrepancy, not a frozen count. Reconcile the in-game infusion UI before implementing the full catalogue.
+
+
+## Unity project structure guard — GREEN CI (2026-11-18)
+
+- CI [44144872368](https://github.com/D1traverser-debug/game/actions/runs/44144872368): **12/12 jobs PASS**.
+- Unity project structure: **17/17 PASS**.
+- Game.Core: **22/22 PASS**.
+- Legacy browser regression: **9/9 PASS**.
+- The run validates the project files and local package path, not an actual Unity Editor launch. Package resolution, URP asset assignment, scene, native build, online co-op and production assets remain NOT_TESTED.
+- The element/infusion source discrepancy has been recorded: detailed matrix says 5 primary + 15 advanced candidates; another community guide says 7 identities + 10 combinations. Do not freeze the count until in-game verification.

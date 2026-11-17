@@ -384,3 +384,10 @@ The Editor has not been launched. Package resolution, URP pipeline asset assignm
 ## Unity project structure guard — first run (2026-11-18)
 
 The first Unity structure job (#44144743422) passed 13/17 checks. The four failures were false negatives in the checker: the repository uses Unity's standard case-insensitive .gitignore globs `[Ll]ibrary/`, `[Tt]emp/`, `[Oo]bj/`, and `[Bb]uilds/`, while the script searched for literal directory names. The validator now checks the actual glob patterns. Project version, URP dependency, local package path, asmdef, .NET target, source layout and engine-independence all passed. Rerun pending.
+
+
+## Unity project structure guard — green CI (2026-11-18)
+
+CI [44144872368](https://github.com/D1traverser-debug/game/actions/runs/44144872368) passed 12/12 jobs. The Unity project structure guard passed 17/17 checks: security-patched Editor version/revision, URP package dependency, local Game.Core UPM path, package metadata, engine-independent asmdef, .NET Standard 2.1 target, runtime source layout, Unity ignore rules and Assets root. Game.Core passed 22/22 contracts; all nine legacy browser regression jobs passed.
+
+This still does not launch Unity Editor. Package resolution, URP pipeline asset creation/assignment, scene import, native Windows build, 4-player runtime, art/audio and human full-game acceptance remain NOT_TESTED.
