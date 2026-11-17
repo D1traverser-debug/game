@@ -52,20 +52,20 @@ window.__fullRun = async (maxSeconds) => {
     const scrollPriority=['growth','thick','bulwark','evasion','fight','blood','go','mana','vital','elixir','hard','attune','siphon'];
     const scroll=opts.filter(x=>x.kind==='scroll').sort((a,b)=>scrollPriority.indexOf(a.name)-scrollPriority.indexOf(b.name))[0];
     if(scroll)return scroll;
+    const newSpell=opts.find(x=>x.kind==='newSpell');
+    if(newSpell)return newSpell;
     const augPriority=['healingSprout','quakeBurst','diceTwin','diceEcho','sawTwin','sawReturn','orbSplit','orbBurst','quakeAfter','quakePull','sawMagnet','seeking','surge','tempo','reach'];
     const aug=opts.filter(x=>x.kind==='spellAugment').sort((a,b)=>augPriority.indexOf(a.aug)-augPriority.indexOf(b.aug))[0];
     if(aug)return aug;
-    const newSpell=opts.find(x=>x.kind==='newSpell');
-    if(newSpell)return newSpell;
-    const statPriority=['regen','maxHp','armor','dodge','speed','damage','cast','crit','critDmg','manaPull','manaGain','luck','spellSize'];
-    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
-    if(stat)return stat;
     const bonus=opts.find(x=>x.kind==='spellLevelBonus'&&x.mode==='damage')||opts.find(x=>x.kind==='spellLevelBonus');
     if(bonus)return bonus;
     const infusion=opts.find(x=>x.kind==='infuse');
     if(infusion)return infusion;
     const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
-    return level||opts[0];
+    if(level)return level;
+    const statPriority=['damage','cast','crit','critDmg','spellSize','regen','armor','dodge','speed','maxHp','manaPull','manaGain','luck'];
+    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
+    return stat||opts[0];
   };
   while(elapsed<maxSeconds&&!game.ended&&(screen==='playing'||screen==='upgrade')){
     if(screen==='upgrade'){
@@ -171,7 +171,8 @@ window.__fullRun = async (maxSeconds) => {
       const q=game.player,near=nearest(game.enemies.filter(e=>!e.dead),q);
       trace.push({t:+game.time.toFixed(1),hp:+q.hp.toFixed(1),maxHp:q.maxHp,level:q.level,
         kills:q.kills,damageTaken:+q.damageTaken.toFixed(1),armor:+q.armor.toFixed(1),
-        regen:+q.regen.toFixed(1),enemyCount:game.enemies.filter(e=>!e.dead).length,
+        regen:+q.regen.toFixed(1),damage:+q.damage.toFixed(2),cast:+q.cast.toFixed(2),crit:+q.crit.toFixed(2),
+        spellCount:q.spells.length,enemyCount:game.enemies.filter(e=>!e.dead).length,
         nearestEnemy:near?+near.d.toFixed(1):null,healthOrbs:game.orbs.filter(x=>x.type==='health').length,magnetOrbs:game.orbs.filter(x=>x.type==='magnet').length,objective:game.objective?.type||null,
         objectiveProgress:game.objective?.progress||0,spells:q.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()}))});
       lastTrace=game.time;
