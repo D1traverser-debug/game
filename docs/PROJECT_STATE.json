@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "VITALITY_HEAL_AND_POPULATION_DIRECTOR_011",
+  "checkpoint": "NATURAL_MULGATH_BOSS_WIN_012",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -75,17 +75,18 @@
     "Replaced uncapped time-multiplied wave stacking with a time-scaled population director targeting 18+floor(time/34) living enemies, capped at 64; hard spawn guard now enforces the same cap",
     "Fixed a systemic spawn-pressure defect: active-enemy population now follows a time-scaled target of 18 + floor(gameTime/34), capped at 64; spawn batches adapt to the remaining population deficit and spawnEnemy enforces the hard cap",
     "Enemy pressure director limits living population to 64 and scales target density from 18 to 64 over mission duration; 2.5D enemy accumulation no longer reaches 241 by 7 minutes",
-    "Vitality Forge max-health upgrades now restore 25 percent of the added maximum HP immediately, with matching UI description and a dedicated regression assertion"
+    "Vitality Forge max-health upgrades now restore 25 percent of the added maximum HP immediately, with matching UI description and a dedicated regression assertion",
+    "Non-cheating full mission Playwright pilot reached the 19-minute boss window and naturally defeated Mul'gath at gameTime 1463.17 seconds; no HP/time/XP/enemy/boss/objective/victory mutation",
+    "Natural run result: 732 kills, level 19, 4 objectives completed, 3 spells equipped, 26 upgrades selected from actual offers, 462.25/540 HP remaining, 52 armor, 6 regen, 1 recorded win and 0 losses",
+    "Full mission run completed with zero JavaScript page errors, zero console errors and zero external network requests",
+    "GitHub Actions run 43989883310 passed both checkpoint and all browser-component steps, including the new natural full mission boss win"
   ],
   "failed_or_open": [
-    "Real unassisted full-run completion not tested",
-    "Boss defeat was forced by test hook; genuine combat victory not tested",
     "Real file:// open and localStorage close/reopen not tested",
     "Original-game source version and detailed mechanic data not fully pinned",
     "Spell/enemy/objective/boss fidelity incomplete",
     "Visual/audio quality and balance not independently accepted",
     "Human owner playtest not performed",
-    "Current QA oracle is nondeterministic and includes forced state mutation",
     "WebGL 3D slice is a rough prototype, not accepted visual quality",
     "200-enemy SwiftShader synthetic profile reports approximately 20 FPS; hardware GPU benchmark is not tested",
     "Renderer engine choice (raw WebGL2 vs bundled Three.js) remains open",
@@ -122,24 +123,26 @@
     "Character upgrade pool still does not yet reproduce the source game's broad global stat choices at each level-up; verify source-backed upgrade offer distribution and implementation",
     "Latest non-cheating full-run simulation still died at 440.2 seconds with 241 enemies; population director change has just been committed and must be revalidated",
     "Previous non-cheating full-run simulation died at 440.2 seconds with 241 active enemies and 400 max HP; dynamic population director is now committed but has not yet been revalidated",
-    "First population-director full-run attempt still died at 470.5 seconds with 29 enemies, 900 max HP and 0 regen; evidence indicates build survivability and objective navigation also need balancing, not only enemy count"
+    "First population-director full-run attempt still died at 470.5 seconds with 29 enemies, 900 max HP and 0 regen; evidence indicates build survivability and objective navigation also need balancing, not only enemy count",
+    "Natural boss victory verified only for Mul'gath in one automated pilot; Sol'phish and Krog'wa natural full-run wins still need verification",
+    "Automated pilot is not a human player; owner-controlled full run, subjective combat feel, readability and fun remain unaccepted",
+    "Mul'gath boss phase took roughly 323 seconds after the 19-minute spawn; compare boss duration and healing-servant pressure against source evidence before tuning",
+    "Full-run test is a scripted movement/upgrade policy; repeat with alternate builds and all three boss archetypes"
   ],
-  "next_action": "Validate vitality healing and re-run the non-cheating full mission. If survival improves, inspect rift/sludge objective completion and build diversity; if it still fails, use trace to identify the next production root cause. Continue until natural boss win and independent player acceptance.",
+  "next_action": "Run additional non-cheating full missions with reproducible seeds to naturally defeat Sol'phish and Krog'wa; inspect Mul'gath's 323-second fight duration against official references; then test human-facing input, visual clarity, save/reload, performance on real devices and owner acceptance. Keep status NOT_READY until these gates pass.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
   "development_candidate_sha256": "2d9c2cf2e406e68d098a2ade01b3c7bd7805b9b5942f4e5f588b798222b6493a",
   "development_candidate_bytes": 721554,
   "last_successful_candidate_ci": {
-    "run_id": 43848382432,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/43848382432",
-    "commit": "0b513f19a67393fcfdff64fd37c444571aa31f7b",
+    "run_id": 43989883310,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/43989883310",
+    "commit": "6507d65277e1abaac10047e1721990751f8dfe84",
     "checkpoint": "PASS",
-    "positive_negative_controls": "PASS",
     "browser_component": "PASS",
-    "covered_product_artifact_sha256": "0c8d9de43c8fe30f3cad8bd47d657056e1d84bf4a54869229b585b944c281a6a",
-    "meaning": "Exact artifact integrity, repo governance controls, 17 progression tests, 3-boss/9-objective synthetic component suite and 11 solo trial/quest component checks. NOT a full-run/player acceptance.",
-    "historical_only": true
+    "covered_product_artifact_sha256": "2d9c2cf2e406e68d098a2ade01b3c7bd7805b9b5942f4e5f588b798222b6493a",
+    "meaning": "17 progression, 90-second normal play, objective collection, 13 character upgrade effects + vitality healing, full 25-minute natural-combat mission with a naturally defeated Mul'gath, 3D/2.5D renderer, solo spell quest, and Reginald scope regressions. Automated pilot only; no human UX acceptance."
   },
   "latest_local_candidate": {
     "artifact": "development/index.html",
@@ -149,8 +152,8 @@
     "source_base": "single-file 2.5D art-forward candidate with embedded 4x4 sprite atlas",
     "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
     "scope": "Reginald only / Verdant Meadow only / single-player / offline single HTML",
-    "tested": "Enemy population director hard cap 64 and adaptive target; max-health upgrades restore 25 percent of the increase; browser regression added; full natural run pending",
-    "not_tested": "19-minute full mission and natural boss win after population director, real file-origin persistence, real hardware performance, complete source fidelity, owner acceptance"
+    "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
+    "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_VITALITY_AND_FULL_RUN_REVALIDATION"
+  "latest_candidate_ci_status": "PASS_MECHANICAL_AND_AUTOMATED_MULGATH_FULL_RUN; HUMAN_ACCEPTANCE_PENDING"
 }
