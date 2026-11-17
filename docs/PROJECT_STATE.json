@@ -213,7 +213,8 @@
     "Full-game branch CI #44144872368 passed 12/12 jobs; Game.Core passed 22/22 contracts; all nine legacy browser regression jobs passed.",
     "Added data-driven SpellDefinition/SpellRuntimeState and automatic target selection/projectile spawn kernel; CI pending.",
     "Added data-driven spell execution kernel with nearest, lowest-health-ratio and seeded-random targeting; range filtering; cooldown ticks; single/spread/radial projectile spawn patterns. CI #44145957567 passed 32/32 core contracts.",
-    "Full-game branch CI #44145957567 passed 12/12 jobs, including Unity project structure 17/17 and nine legacy browser regressions."
+    "Full-game branch CI #44145957567 passed 12/12 jobs, including Unity project structure 17/17 and nine legacy browser regressions.",
+    "Added fixed-tick projectile simulation with swept-circle collision, stable hit ordering, pierce/lifetime, hit-once and DamagePipeline integration; CI pending."
   ],
   "failed_or_open": [
     "Unity project skeleton is committed at unity/ with Editor 6000.3.27f2 and URP 17.3.0 dependency; opening the project, package resolution, URP asset assignment and native Windows build remain NOT_TESTED.",
@@ -221,9 +222,10 @@
     "Full wizard/realm/spell/element/advanced-infusion/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented; element counts conflict across community references.",
     "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
     "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested.",
-    "Spell kernel does not yet implement projectile simulation/collision, status/element effects, augmentations, non-projectile spell behaviors or source-complete content catalogue."
+    "Spell kernel does not yet implement projectile simulation/collision, status/element effects, augmentations, non-projectile spell behaviors or source-complete content catalogue.",
+    "Projectile simulation has not yet been integrated into a complete run loop, Unity presentation, networking, element/status effects, or human gameplay."
   ],
-  "next_action": "Implement fixed-tick projectile travel, swept collision, pierce/lifetime and DamagePipeline integration. Keep spell-specific effects and element/infusion behavior separate and source-qualified. Then wire the first spell trio into the Unity vertical slice with original VFX/SFX.",
+  "next_action": "Run projectile contracts and verify collision/friendly-fire behavior. Then implement source-qualified elemental/status effects and a small playable simulation loop before Unity scene integration.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",

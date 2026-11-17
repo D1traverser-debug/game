@@ -149,3 +149,13 @@ The previous brief's "seven elements + ten combinations" wording was too definit
 - Unity project structure: **17/17 PASS**.
 - Spell core now supports nearest/lowest-health-ratio/seeded-random target selection, range filtering, tick cooldowns, single/spread/radial projectile spawn data.
 - This is a deterministic domain kernel, not a complete spell system. Projectile movement/collision, lifetime/pierce, element/status effects, augmentations, Unity scene/VFX/SFX and network integration remain open.
+
+
+## Projectile simulation — CI pending
+
+- Added `ProjectileState`, `ProjectileTarget`, `ProjectileHit` and `ProjectileSystem`.
+- Fixed-tick movement; swept-circle collision prevents fast-projectile tunneling.
+- Multiple hits are ordered by earliest impact then stable target ID.
+- Per-target hit tracking, pierce count and lifetime are explicit.
+- Collision routes through the central DamagePipeline; friendly-fire and self-damage policies are respected.
+- 11 new deterministic tests added; CI pending.

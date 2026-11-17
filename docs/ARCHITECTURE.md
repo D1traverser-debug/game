@@ -32,6 +32,10 @@ The full-game branch targets a native Windows PC game built with Unity 6.3 LTS a
 
 The domain simulation lives in `src/core` as a .NET Standard 2.1 library. It owns fixed-step time, gameplay RNG and combat rules. Unity presentation, audio, UI and network transports consume core state/events; they do not own or mutate the rules. The core is tested with a standalone .NET 8 contract runner so it can be verified before the Unity Editor project is available.
 
+## Projectile simulation
+
+Projectile movement runs on fixed simulation ticks, uses swept-circle collision to avoid tunneling, sorts simultaneous hits by impact time and stable target ID, tracks one hit per target, supports pierce/lifetime, and resolves contact through the central damage pipeline. Friendly-fire and self-damage policies determine whether an ally/self collision is ignored or applied. The projectile system emits hit outcomes for event/UI/audio adapters.
+
 ## Spell execution
 
 The core provides a data-driven automatic targeting/cast kernel: nearest, lowest-health-ratio and seeded-random target selection; range filtering; cooldown ticks; single, spread and radial projectile spawn patterns. It emits deterministic projectile spawn commands only. Projectile movement, collision, damage, element/status effects and VFX remain separate systems.

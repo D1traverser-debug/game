@@ -38,6 +38,17 @@ var tests = new List<(string Name, Action Run)>
     ("invalid_targeting_pattern_is_rejected", InvalidTargetingPatternIsRejected),
     ("same_seed_produces_same_projectile_spawns", SameSeedProducesSameProjectileSpawns),
     ("single_pattern_emits_exactly_one_projectile", SinglePatternEmitsOneProjectile),
+    ("projectile_moves_and_lifetime_ticks", ProjectileMovesAndLifetimeTicks),
+    ("swept_collision_hits_fast_projectile", SweptCollisionHitsFastProjectile),
+    ("projectile_hit_applies_damage_and_destroys", ProjectileHitAppliesDamageAndDestroys),
+    ("piercing_projectile_hits_in_path_order", PiercingProjectileHitsInPathOrder),
+    ("projectile_does_not_hit_same_target_twice", ProjectileDoesNotHitSameTargetTwice),
+    ("friendly_fire_disabled_projectile_passes_through_ally", FriendlyFireDisabledProjectilePassesThroughAlly),
+    ("friendly_fire_enabled_projectile_hits_ally_first", FriendlyFireEnabledProjectileHitsAllyFirst),
+    ("invulnerability_blocks_projectile_damage", InvulnerabilityBlocksProjectileDamage),
+    ("projectile_expires_at_lifetime", ProjectileExpiresAtLifetime),
+    ("simultaneous_collision_tie_breaks_by_target_id", SimultaneousCollisionTieBreaksByTargetId),
+    ("self_damage_policy_applies_to_projectiles", SelfDamagePolicyAppliesToProjectiles),
 };
 
 var failures = 0;
@@ -415,6 +426,182 @@ static void SinglePatternEmitsOneProjectile()
     var result = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
         1, 1, 0, 0, targets);
     Assert.Equal(1, result.Projectiles.Length);
+}
+
+static void ProjectileMovesAndLifetimeTicks()
+{
+    var source = new CombatantState(1, 1, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, -1, 0, 0, 0, 2, 0, 5, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.1f, 3);
+    var combatants = new Dictionary<int, CombatantState> { [1] = source };
+    Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile },
+        Array.Empty<Game.Core.Projectiles.ProjectileTarget>(), combatants, 0.5, new DamagePolicy());
+    Assert.Equal(1.0f, projectile.X, 1e-5f);
+    Assert.Equal(2, projectile.LifetimeTicksRemaining);
+    Assert.True(projectile.IsAlive);
+}
+
+static void SweptCollisionHitsFastProjectile()
+{
+    var source = new CombatantState(1, 1, 100);
+    var target = new CombatantState(2, 2, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, 2, 0, 0, 0, 100, 0, 10, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.1f, 5);
+    var targets = new[] { new Game.Core.Projectiles.ProjectileTarget(target, 5, 0, 0.4f) };
+    var combatants = new Dictionary<int, CombatantState> { [1] = source, [2] = target };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 0.1, new DamagePolicy());
+    Assert.Equal(1, result.Hits.Length);
+    Assert.Equal(90.0f, target.Health, 1e-5f);
+}
+
+static void ProjectileHitAppliesDamageAndDestroys()
+{
+    var source = new CombatantState(1, 1, 100);
+    var target = new CombatantState(2, 2, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, 2, 0, 0, 0, 10, 0, 15, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.2f, 10);
+    var targets = new[] { new Game.Core.Projectiles.ProjectileTarget(target, 5, 0, 0.5f) };
+    var combatants = new Dictionary<int, CombatantState> { [1] = source, [2] = target };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 1.0, new DamagePolicy());
+    Assert.Equal(1, result.Hits.Length);
+    Assert.Equal(85.0f, target.Health, 1e-5f);
+    Assert.True(!projectile.IsAlive);
+}
+
+static void PiercingProjectileHitsInPathOrder()
+{
+    var source = new CombatantState(1, 1, 100);
+    var far = new CombatantState(2, 2, 100);
+    var near = new CombatantState(10, 2, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, -1, 0, 0, 0, 10, 0, 10, 1);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.1f, 5);
+    var targets = new[]
+    {
+        new Game.Core.Projectiles.ProjectileTarget(far, 6, 0, 0.4f),
+        new Game.Core.Projectiles.ProjectileTarget(near, 3, 0, 0.4f)
+    };
+    var combatants = new Dictionary<int, CombatantState> { [1] = source, [2] = far, [10] = near };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 1.0, new DamagePolicy());
+    Assert.Equal(2, result.Hits.Length);
+    Assert.Equal(10, result.Hits[0].TargetId);
+    Assert.Equal(2, result.Hits[1].TargetId);
+    Assert.Equal(90.0f, near.Health, 1e-5f);
+    Assert.Equal(90.0f, far.Health, 1e-5f);
+    Assert.True(!projectile.IsAlive);
+}
+
+static void ProjectileDoesNotHitSameTargetTwice()
+{
+    var source = new CombatantState(1, 1, 100);
+    var target = new CombatantState(2, 2, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, 2, 0, 0, 0, 1, 0, 10, 2);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 1.0f, 5);
+    var targets = new[] { new Game.Core.Projectiles.ProjectileTarget(target, 1, 0, 1.0f) };
+    var combatants = new Dictionary<int, CombatantState> { [1] = source, [2] = target };
+    var first = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 0.1, new DamagePolicy());
+    var second = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 0.1, new DamagePolicy());
+    Assert.Equal(1, first.Hits.Length);
+    Assert.Equal(0, second.Hits.Length);
+    Assert.Equal(90.0f, target.Health, 1e-5f);
+}
+
+static void FriendlyFireDisabledProjectilePassesThroughAlly()
+{
+    var source = new CombatantState(1, 1, 100);
+    var ally = new CombatantState(2, 1, 100);
+    var enemy = new CombatantState(3, 2, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, -1, 0, 0, 0, 10, 0, 12, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.1f, 5);
+    var targets = new[]
+    {
+        new Game.Core.Projectiles.ProjectileTarget(ally, 3, 0, 0.4f),
+        new Game.Core.Projectiles.ProjectileTarget(enemy, 6, 0, 0.4f)
+    };
+    var combatants = new Dictionary<int, CombatantState> { [1] = source, [2] = ally, [3] = enemy };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 1.0,
+        new DamagePolicy { FriendlyFireEnabled = false });
+    Assert.Equal(1, result.Hits.Length);
+    Assert.Equal(3, result.Hits[0].TargetId);
+    Assert.Equal(100.0f, ally.Health, 1e-5f);
+    Assert.Equal(88.0f, enemy.Health, 1e-5f);
+}
+
+static void FriendlyFireEnabledProjectileHitsAllyFirst()
+{
+    var source = new CombatantState(1, 1, 100);
+    var ally = new CombatantState(2, 1, 100);
+    var enemy = new CombatantState(3, 2, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, -1, 0, 0, 0, 10, 0, 12, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.1f, 5);
+    var targets = new[]
+    {
+        new Game.Core.Projectiles.ProjectileTarget(enemy, 6, 0, 0.4f),
+        new Game.Core.Projectiles.ProjectileTarget(ally, 3, 0, 0.4f)
+    };
+    var combatants = new Dictionary<int, CombatantState> { [1] = source, [2] = ally, [3] = enemy };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 1.0, new DamagePolicy());
+    Assert.Equal(1, result.Hits.Length);
+    Assert.Equal(2, result.Hits[0].TargetId);
+    Assert.Equal(88.0f, ally.Health, 1e-5f);
+    Assert.Equal(100.0f, enemy.Health, 1e-5f);
+}
+
+static void InvulnerabilityBlocksProjectileDamage()
+{
+    var source = new CombatantState(1, 1, 100);
+    var target = new CombatantState(2, 2, 100);
+    target.GrantInvulnerability(2);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, 2, 0, 0, 0, 10, 0, 12, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.1f, 5);
+    var targets = new[] { new Game.Core.Projectiles.ProjectileTarget(target, 3, 0, 0.4f) };
+    var combatants = new Dictionary<int, CombatantState> { [1] = source, [2] = target };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 0.5, new DamagePolicy());
+    Assert.Equal(1, result.Hits.Length);
+    Assert.Equal(DamageOutcome.BlockedInvulnerability, result.Hits[0].Outcome);
+    Assert.Equal(100.0f, target.Health, 1e-5f);
+    Assert.True(!projectile.IsAlive);
+}
+
+static void ProjectileExpiresAtLifetime()
+{
+    var source = new CombatantState(1, 1, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, -1, 0, 0, 0, 1, 0, 5, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.1f, 1);
+    var combatants = new Dictionary<int, CombatantState> { [1] = source };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile },
+        Array.Empty<Game.Core.Projectiles.ProjectileTarget>(), combatants, 0.1, new DamagePolicy());
+    Assert.Equal(1, result.DestroyedCount);
+    Assert.True(!projectile.IsAlive);
+}
+
+static void SimultaneousCollisionTieBreaksByTargetId()
+{
+    var source = new CombatantState(1, 1, 100);
+    var higher = new CombatantState(9, 2, 100);
+    var lower = new CombatantState(2, 2, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, -1, 0, 0, 0, 10, 0, 10, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.2f, 5);
+    var targets = new[]
+    {
+        new Game.Core.Projectiles.ProjectileTarget(higher, 5, 0, 0.5f),
+        new Game.Core.Projectiles.ProjectileTarget(lower, 5, 0, 0.5f)
+    };
+    var combatants = new Dictionary<int, CombatantState> { [1] = source, [9] = higher, [2] = lower };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 1.0, new DamagePolicy());
+    Assert.Equal(1, result.Hits.Length);
+    Assert.Equal(2, result.Hits[0].TargetId);
+}
+
+static void SelfDamagePolicyAppliesToProjectiles()
+{
+    var player = new CombatantState(1, 1, 100);
+    var spawn = new Game.Core.Spells.ProjectileSpawn(1, 1, 0, 0, 0, 1, 0, 15, 0);
+    var projectile = new Game.Core.Projectiles.ProjectileState(1, spawn, 0.1f, 5);
+    var targets = new[] { new Game.Core.Projectiles.ProjectileTarget(player, 0, 0, 0.5f) };
+    var combatants = new Dictionary<int, CombatantState> { [1] = player };
+    var result = Game.Core.Projectiles.ProjectileSystem.Step(new[] { projectile }, targets, combatants, 0.1, new DamagePolicy());
+    Assert.Equal(1, result.Hits.Length);
+    Assert.Equal(85.0f, player.Health, 1e-5f);
 }
 
 static class Assert
