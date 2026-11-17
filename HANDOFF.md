@@ -365,3 +365,26 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Root cause: revision 030 replaced the legacy 2D renderer's two screen-shake RNG calls but missed the second, atlas-backed 2.5D renderer, which also used two `rand()` calls in its camera translation.
 - Revision 031 adds an exact source anchor for the 2.5D renderer and replaces its X/Y shake with deterministic time-based offsets in the temporary QA document. It retains the source assertion, render-phase RNG counter, fixed 1/30 simulation step, single-clock counters and same-seed replay.
 - Product `index.html`, game balance and CAOS remain unchanged. CI #141 pending. Product remains **NOT_READY**.
+
+
+## CI GOVERNANCE REBASELINE — 2026-11-17
+
+- Current verified development HEAD: ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd
+- Pipeline separation commit: 0ce3072ce697956d8c15ef322783ad8a060c7541
+- Parallel matrix + trial probe scope fix commit: ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd
+- CI run: https://github.com/D1traverser-debug/game/actions/runs/44053362404 — SUCCESS.
+- Checkpoint: PASS. All eight independent browser regression jobs: PASS (progression, normal-play smoke, objective collection, character upgrades, 3D integration, trial unlock, atlas renderer, Reginald spell scope).
+- The previous natural-play pilot was removed from blocking CI and moved to a separate nightly/manual workflow. Its last observed 24-seed run (CI #141) failed seeds 1/2/3 before boss spawn; this remains exploratory evidence, not proof of human impossibility and not a reason to change production balance.
+- The trial regression failure in CI #142 was a test-driver scope bug: it called the private startRun function outside the production IIFE. CI #143 verifies the in-IIFE probe correction.
+- Production index.html was not modified by these pipeline commits. The exact current artifact remains 721829 bytes, SHA-256 632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29; the checkpoint guard passed.
+- Main remains the preserved baseline. CAOS remains read-only.
+
+## NEXT PRODUCT VERTICAL SLICE — BOSS ENCOUNTERS
+
+Research now supports a source-informed boss redesign:
+- Sol'phish: targeted obelisk/runestone strikes, radial projectiles, homing projectiles and stagger/vulnerability.
+- Krog'wa: three health segments; a magnetic-field arena change after the first segment; inhale/pull, tongue-smash charge and tracking spit.
+- Mul'gath: three health segments; head count increases by phase; head whip, ground spike grid and linked healing minions that can be corrupted to damage the boss.
+- Exact timing, radius and damage values are not authoritatively pinned. Treat them as adaptation tuning values, not canonical source facts. Do not add the video-reported rock wall/orb absorption/spin attacks to the acceptance baseline until corroborated against the current source version.
+
+Next: implement one shared boss attack state machine with explicit telegraph, active and recovery stages; keep attack geometry, damage resolution and rendering synchronized; add deterministic attack-card tests. Preserve current HP/damage scaling until the attack patterns are playable and independently reviewed. Product status remains NOT_READY.

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "ALL_RENDER_PATH_RNG_ISOLATED_FIXED_STEP_PILOT_031",
+  "checkpoint": "DETERMINISTIC_CI_SPLIT_AND_PARALLEL_MATRIX_PASS_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -159,7 +159,14 @@
     "Revision 030 changes only the temporary QA document: screen shake uses deterministic time-based offsets, render-phase Math.random calls are counted and required to be zero, and the pilot now advances three production-sized 1/30-second fixed updates per 0.1-second input decision. Production index.html remains unchanged.",
     "CI #140 / commit f49f7a6: checkpoint, progression, 90-second normal-play, objective collection and character-upgrade jobs PASS. Natural-run pilot stopped at its pre-browser source assertion; no natural-run seed was executed in this run.",
     "CI #140 assertion failure was accurate: the test document replaced the legacy 2D renderer's two screen-shake rand() calls but left two more in the atlas-backed 2.5D renderer. The remaining `ctx.translate(-cx+rand(...),-cy+rand(...))` calls still shared the seeded gameplay RNG.",
-    "Source preflight confirmed exactly one 2D and one atlas-backed 2.5D screen-shake anchor. A local deterministic-document construction check confirms both are replaced and no `rand(-g.shake,g.shake)` token remains."
+    "Source preflight confirmed exactly one 2D and one atlas-backed 2.5D screen-shake anchor. A local deterministic-document construction check confirms both are replaced and no `rand(-g.shake,g.shake)` token remains.",
+    "CI #141 showed the 24-seed heuristic natural-play pilot was not a valid blocking PR gate: seeds 1/2/3 died before the 19-minute boss window while harness integrity checks passed. The pilot is now separate nightly/manual exploratory telemetry.",
+    "CI #142 exposed a test-driver scope defect: trial_unlock_regression called the IIFE-private startRun from the global page context. No production game defect was established.",
+    "CI #143 / commit ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd passed checkpoint plus all eight independent browser regression jobs: progression, normal-play smoke, objective collection, character upgrades, 3D integration, trial unlock, atlas renderer and Reginald spell scope.",
+    "Trial unlock test now invokes the private restart transition through its temporary in-IIFE probe; production runtime internals remain private and no debug API was added.",
+    "Blocking CI now runs deterministic and bounded browser tests in fail-fast-disabled parallel matrices; long-run heuristic play runs separately on nightly schedule/manual dispatch and preserves a JSON report.",
+    "CI workflow changes did not modify production index.html. Current development artifact remains 721829 bytes with SHA-256 632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29; checkpoint verification passed on the latest commit.",
+    "Boss source research now records Krog'wa's three health segments, magnetic field, inhale, tongue charge and tracking spit; Mul'gath's three segments, additional heads, head whip, spike grid and linked minions. Official 1.1 notes corroborate Mul'gath minion corruption and phase-transition resistance behavior."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -211,33 +218,45 @@
     "Seeded full-mission natural run seed 1 died at 167.8 seconds before boss; root cause investigation and pilot strategy refinement underway; not a boss-mechanics failure",
     "Seeded natural full mission seed 1 failed at gameTime 121.17s before boss spawn; player HP 0/100 after taking 131.0 damage, only 2 spells equipped, 0 armor/regen, 0 objectives completed. Trace shows HP 100 at 90.2s then 13 at 120.3s during sludge objective. No JS/console/network errors.",
     "After moving defensive stat cards ahead of spell-level/augment picks, seed 1 survived longer to 167.87s with 400 max HP and 2 regen, but died at the Rift objective; progress only 35.7%, objectives completed 0, HP 0, damageTaken 402.88, no boss spawned. Trace confirms the pilot's threat-evasion vector repeatedly leaves the required capture radius.",
-    "BOSS_PILOT_031 pending CI: replace screen-shake RNG in both the legacy 2D and atlas-backed 2.5D renderer in the temporary QA document; require zero render-phase Math.random calls, production 1/30 fixed steps, manual tick/simulation tick equality, blocked RAF evidence, identical seed-1 replay, natural baseline wins 1/2/3, and same-run natural Sol/Krog/Mul victories. No production index.html or balance changes."
+    "BOSS_PILOT_031 pending CI: replace screen-shake RNG in both the legacy 2D and atlas-backed 2.5D renderer in the temporary QA document; require zero render-phase Math.random calls, production 1/30 fixed steps, manual tick/simulation tick equality, blocked RAF evidence, identical seed-1 replay, natural baseline wins 1/2/3, and same-run natural Sol/Krog/Mul victories. No production index.html or balance changes.",
+    "Natural-play exploratory pilot remains unresolved: CI #141 seeds 1/2/3 died before boss spawn and recorded zero natural wins. It is no longer a blocking CI gate; obtain additional telemetry and an owner-controlled run before production balance changes.",
+    "Boss encounters remain P0 incomplete: Krog'wa and Mul'gath still use simplified approximations. Implement source-informed phase and attack state machines with explicit telegraphs and attack-by-attack regression; keep undocumented timings and damage provisional.",
+    "Performance remains below the 60 FPS desktop target in the software-rendered stress baseline; real hardware benchmarking and draw-cost profiling remain open.",
+    "Real file-origin save/reload, corrupted-save recovery, visual/audio review, human full-run acceptance and source-fidelity review remain NOT_TESTED or PARTIAL."
   ],
-  "next_action": "Inspect CI #141. Confirm the 2D and atlas-backed 2.5D renderer both use deterministic time-based shake in the temporary QA document; source assertion must find no rand(-g.shake,g.shake). Then require renderRandomCalls=0, manualTicks=tickCount, blockedFrameUpdates>0, 1/30 fixed steps and identical seed-1 replay. Only after harness checks pass, inspect natural survival and boss coverage. Do not change production balance based on a QA-harness failure.",
+  "next_action": "Implement ADR-002 boss encounter architecture: typed attack lifecycle (telegraph/active/recovery), three-segment phase transitions for Krog'wa and Mul'gath, Krog inhale/tongue-smash/tracking spit, Mul'gath head-whip/spike-grid/linked healing minions, and source-backed Sol'phish obelisk/radial/homing attacks. Add deterministic attack-card tests before tuning HP/damage. Do not use the heuristic pilot as a balance oracle; do not modify CAOS.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
   "development_candidate_sha256": "632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29",
   "development_candidate_bytes": 721829,
   "last_successful_candidate_ci": {
-    "run_id": 43989883310,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/43989883310",
-    "commit": "6507d65277e1abaac10047e1721990751f8dfe84",
+    "run_id": 44053362404,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44053362404",
+    "commit": "ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd",
     "checkpoint": "PASS",
     "browser_component": "PASS",
-    "covered_product_artifact_sha256": "2d9c2cf2e406e68d098a2ade01b3c7bd7805b9b5942f4e5f588b798222b6493a",
-    "meaning": "17 progression, 90-second normal play, objective collection, 13 character upgrade effects + vitality healing, full 25-minute natural-combat mission with a naturally defeated Mul'gath, 3D/2.5D renderer, solo spell quest, and Reginald scope regressions. Automated pilot only; no human UX acceptance."
+    "browser_content_visual": "PASS",
+    "covered_product_artifact_sha256": "632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29",
+    "meaning": "Checkpoint and all eight independent browser regression jobs passed: progression, 90-second normal-play smoke, objective collection, character upgrades, 3D integration, solo trial unlock, atlas renderer and Reginald spell scope. Component/regression evidence only; no full human run or product acceptance."
   },
   "latest_local_candidate": {
     "artifact": "development/index.html",
     "delivery_filename": "咒语旅团-当前开发版-单人网页版.html",
-    "bytes": 721554,
-    "sha256": "2d9c2cf2e406e68d098a2ade01b3c7bd7805b9b5942f4e5f588b798222b6493a",
-    "source_base": "single-file 2.5D art-forward candidate with embedded 4x4 sprite atlas",
+    "bytes": 721829,
+    "sha256": "632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29",
+    "source_base": "single-file 2.5D art-forward candidate with embedded 4x4 sprite atlas, 24 static decor cache tiles and recent progression/objective/balance fixes",
     "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
     "scope": "Reginald only / Verdant Meadow only / single-player / offline single HTML",
-    "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
-    "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
+    "tested": "CI 44053362404 exact artifact checkpoint; eight browser regression jobs passed: progression, 90-second normal combat, objective collection, 13 character upgrade effects, 3D integration, solo trial unlock, atlas renderer and Reginald-only spell scope.",
+    "not_tested": "Natural Sol'phish/Krog'wa/Mul'gath full-run victories on this exact candidate, human owner acceptance, real file-origin persistence, real hardware performance, complete source fidelity and final visual/audio acceptance."
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_031"
+  "latest_candidate_ci_status": "PASS_DETERMINISTIC_CI; EXPLORATORY_NATURAL_PLAY_ADVISORY_NOT_RUN",
+  "last_verified_development_commit": "ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd",
+  "last_verified_ci_run": {
+    "run_id": 44053362404,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44053362404",
+    "commit": "ab28767a741aff82bbfaeb0571fd7ab7deb3e0cd",
+    "conclusion": "success"
+  }
 }
