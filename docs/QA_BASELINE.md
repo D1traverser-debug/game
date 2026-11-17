@@ -209,9 +209,17 @@ Checkpoint: PASS. Deterministic 90-second smoke: PASS. XP/objective/upgrade/brow
 No page, console or external-network errors. Revision 026 corrects these three controller defects while preserving the 90-second survival gate.
 
 
-## D-020 — Separate baseline survival from adaptive boss-archetype discovery (ACCEPTED)
-- Keep seeds 1, 2 and 3 as mandatory full natural-run regressions; all three must win.
-- Boss archetype selection remains entirely natural and RNG-driven. Do not patch `spawnBoss`, force a boss ID, alter boss HP, or mutate game state.
-- Candidate seeds 4-12 may stop after the naturally selected boss spawns. If that boss archetype is not yet represented by a natural victory in the current CI run, continue the same run to a natural boss death; otherwise record the scout without claiming a victory.
-- Count archetype coverage only from runs that naturally defeat the boss. Require exactly the three expected winning IDs: `sol`, `krog`, `mul`.
-- Preserve browser/console and offline/no-external-request checks for every attempted run. This is a test-harness strategy only; production balance remains untouched.
+## Natural-run pilot #137 — nondeterministic double-clock failure (2026-11-17)
+Run: https://github.com/D1traverser-debug/game/actions/runs/44030442251  
+Checkpoint, progression, 90-second normal-play, objective and upgrade regressions: PASS. Natural-run matrix: FAIL. No page, console or external-network errors.
+
+| Seed | Result | Evidence |
+|---|---|---|
+| 1 | Death at 492.97s | Level 16, 508 kills, 1 objective; no boss |
+| 2 | Natural Krog'wa win at 1196.4s | Level 22, 2062 kills, 3 objectives |
+| 3 | Death at 123.87s | Level 8, 107 kills, 0 objectives; no boss |
+| 9 | Krog'wa spawned; scout only | 1142.9s, 651.6/900 HP; no victory claimed |
+| 10–11 | Death during Mul'gath attempt | Boss spawned; neither run won |
+| 12 | Natural Mul'gath win at 1206.33s | Level 23, 2242 kills, 3 objectives |
+
+The same seed 1 had naturally defeated Krog'wa in CI #136 at 1259.5s, but died at 492.97s in CI #137. Root cause was confirmed in the test architecture: the manual agent called `update(0.1)` while the production `requestAnimationFrame` loop also called `update(SIM_STEP)`. The two clocks advanced one game concurrently and consumed seeded randomness in different orders. Revision 028 gates production-frame updates during manual simulation, adds a one-clock assertion and same-seed replay, and compacts logs. This is a test-harness correction, not a production gameplay change.

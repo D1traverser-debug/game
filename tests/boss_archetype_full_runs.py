@@ -22,6 +22,15 @@ window.__damageEvents=[];
 window.__gnasherHits=[];
 window.__gnasherLeapSamples=[];
 window.__pilotDodgeStats={projectile:0,gnasher:0,gnasherBurrow:0,gnasherLeap:0,gnasherLeapSafeFrames:0,hazard:0,boundary:0,rift:0,criticalEscape:0};
+// The production RAF loop must render but must not advance simulation during a manual QA run.
+// Otherwise frame-driven update(SIM_STEP) races this harness's update(dt), consuming seeded RNG twice.
+window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0};
+window.__manualTick=false;
+const __uncontrolledUpdate=update;
+update=function(dt){
+  if(window.__manualTick){window.__simulationHarness.manualTicks++;return __uncontrolledUpdate(dt);}
+  window.__simulationHarness.blockedFrameUpdates++;
+};
 const __baseDamagePlayer=damagePlayer;
 damagePlayer=function(n,source='enemy'){
   const p=game?.player,o=game?.objective;
@@ -47,6 +56,7 @@ damagePlayer=function(n,source='enemy'){
   return __baseDamagePlayer(n,source);
 };
 window.__setRunSeed=(seed)=>{
+  window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0};window.__manualTick=false;
   let state=seed>>>0;
   Math.random=()=>{
     state=(Math.imul(1664525,state)+1013904223)>>>0;
@@ -56,6 +66,7 @@ window.__setRunSeed=(seed)=>{
 
 window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
   const dt=0.1;
+  const manualStart=window.__simulationHarness.manualTicks,blockedStart=window.__simulationHarness.blockedFrameUpdates;
   let elapsed=0,ticks=0,upgrades=0,interactions=0,lastTrace=0,upgradeLog=[];
   const trace=[];
   const nearest=(items,p)=>items.filter(x=>x&&x.alive!==false)
@@ -350,7 +361,9 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
       itemNear=(o.objects||[]).some(x=>x.alive&&(wanted===null||wanted===undefined||x.index===wanted)&&Math.hypot(x.x-p.x,x.y-p.y)<80);
     }
     if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}
-    update(dt);elapsed+=dt;ticks++;
+    window.__manualTick=true;
+    try{update(dt);}finally{window.__manualTick=false;}
+    elapsed+=dt;ticks++;
     if(game.time-lastTrace>=15){
       const q=game.player,near=nearest(game.enemies.filter(e=>!e.dead),q);
       trace.push({t:+game.time.toFixed(1),hp:+q.hp.toFixed(1),maxHp:q.maxHp,level:q.level,
@@ -379,7 +392,9 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
   keys={};
   const p=game.player,b=game.boss;
   return {
-    screen,ended:game.ended,elapsed,gameTime:game.time,kills:p.kills,level:p.level,
+    screen,ended:game.ended,elapsed,gameTime:game.time,tickCount:ticks,
+    simulationHarness:{manualTicks:window.__simulationHarness.manualTicks-manualStart,blockedFrameUpdates:window.__simulationHarness.blockedFrameUpdates-blockedStart},
+    kills:p.kills,level:p.level,
     hp:p.hp,maxHp:p.maxHp,damageTaken:p.damageTaken,armor:p.armor,regen:p.regen,
     objectives:p.objectives,upgrades,interactions,upgradeLog,
     spells:p.spells.map(x=>({id:x.id,level:x.level,augments:x.augments.slice(),infusions:x.infusions.slice()})),
@@ -436,7 +451,22 @@ async def main():
           state=scout
           phase="candidate_boss_scout_only"
       natural_win=bool(state["bossDead"] and state["ended"] and state["screen"]=="result" and state["wins"]>=1)
-      item={"seed":seed,"phase":phase,"boss":state["bossId"],"natural_win":natural_win,"state":state,
+      compact_state={
+        "screen":state["screen"],"ended":state["ended"],"elapsed":round(state["elapsed"],1),
+        "gameTime":round(state["gameTime"],1),"tickCount":state["tickCount"],
+        "simulationHarness":state["simulationHarness"],"kills":state["kills"],"level":state["level"],
+        "hp":round(state["hp"],1),"maxHp":state["maxHp"],"damageTaken":round(state["damageTaken"],1),
+        "armor":state["armor"],"regen":state["regen"],"objectives":state["objectives"],
+        "upgrades":state["upgrades"],"interactions":state["interactions"],"spells":state["spells"],
+        "scrolls":state["scrolls"],"rerolls":state["rerolls"],"position":state["position"],
+        "bossSpawned":state["bossSpawned"],"bossId":state["bossId"],"bossHp":state["bossHp"],
+        "bossMax":state["bossMax"],"bossDead":state["bossDead"],"wins":state["wins"],
+        "losses":state["losses"],"enemyCount":state["enemyCount"],"errors":state["errors"],
+        "pilotDodgeStats":state["pilotDodgeStats"],
+        "recentDamageEvents":state["damageEvents"][-10:],"recentGnasherHits":state["gnasherHits"][-10:],
+        "recentTrace":state["trace"][-10:],"recentUpgrades":state["upgradeLog"][-10:]
+      }
+      item={"seed":seed,"phase":phase,"boss":state["bossId"],"natural_win":natural_win,"state":compact_state,
             "page_errors":errors,"console_errors":console,"external_requests":requests}
       report["runs"].append(item)
       await context.close()
@@ -445,6 +475,30 @@ async def main():
       winning_bosses={x["boss"] for x in report["runs"] if x["natural_win"]}
       if baseline_ok and winning_bosses==valid_bosses:
         break
+    # Repeat seed 1 in a fresh context. A seeded result must not depend on RAF scheduling.
+    replay_context=await browser.new_context(viewport={"width":1280,"height":800})
+    replay_page=await replay_context.new_page()
+    replay_errors=[];replay_console=[];replay_requests=[]
+    replay_page.on("pageerror",lambda e:replay_errors.append(str(e)))
+    replay_page.on("console",lambda m:replay_console.append(m.text) if m.type=="error" else None)
+    replay_page.on("request",lambda r:replay_requests.append(r.url) if r.url.startswith(("http://","https://")) else None)
+    await replay_page.set_content(DOCUMENT,wait_until="load")
+    await replay_page.evaluate("(seed)=>window.__setRunSeed(seed)",1)
+    await replay_page.locator("#start").click()
+    replay_state=await asyncio.wait_for(replay_page.evaluate("window.__fullRun(1500,false)"),timeout=180)
+    replay_fields=["screen","ended","elapsed","gameTime","tickCount","kills","level","hp","maxHp","damageTaken","armor","regen","objectives","bossId","bossDead","wins","enemyCount","spells","scrolls"]
+    first_seed_one=next(x["state"] for x in report["runs"] if x["seed"]==1)
+    replay_signature={k:replay_state[k] for k in replay_fields}
+    for k in ("elapsed","gameTime","hp","damageTaken"):
+      replay_signature[k]=round(replay_signature[k],1)
+    first_signature={k:first_seed_one[k] for k in replay_fields}
+    report["same_seed_replay"]={
+      "seed":1,"matches":first_signature==replay_signature,
+      "first":first_signature,"repeat":replay_signature,
+      "simulationHarness":replay_state["simulationHarness"],"tickCount":replay_state["tickCount"],
+      "page_errors":replay_errors,"console_errors":replay_console,"external_requests":replay_requests
+    }
+    await replay_context.close()
     await browser.close()
   baseline_runs=[x for x in report["runs"] if x["seed"] in required_baseline]
   baseline_ok=len(baseline_runs)==len(required_baseline) and {x["seed"] for x in baseline_runs}==required_baseline and all(x["natural_win"] for x in baseline_runs)
@@ -456,6 +510,9 @@ async def main():
     "at_least_three_natural_wins":len(winning_runs)>=3,
     "boss_ids_recorded_and_valid":all(x in valid_bosses for x in all_boss_ids),
     "all_three_boss_archetypes_naturally_defeated":winning_bosses==valid_bosses,
+    "manual_simulation_is_single_clock":all(x["state"]["simulationHarness"]["manualTicks"]==x["state"]["tickCount"] and x["state"]["simulationHarness"]["blockedFrameUpdates"]>0 for x in report["runs"]) and report["same_seed_replay"]["simulationHarness"]["manualTicks"]==report["same_seed_replay"]["tickCount"] and report["same_seed_replay"]["simulationHarness"]["blockedFrameUpdates"]>0,
+    "same_seed_replay_is_identical":report["same_seed_replay"]["matches"],
+    "replay_has_no_browser_errors_or_external_requests":not report["same_seed_replay"]["page_errors"] and not report["same_seed_replay"]["console_errors"] and not report["same_seed_replay"]["external_requests"],
     "all_attempted_runs_no_browser_errors":all(not x["page_errors"] and not x["console_errors"] for x in report["runs"]),
     "offline_no_external_requests":all(not x["external_requests"] for x in report["runs"])
   }

@@ -129,3 +129,19 @@
 - For Gnasher leap, predict player displacement over the attack's remaining `stateT`, not a fixed full 0.55s window.
 - At low HP, suspend objective/loot pursuit and prioritize survival before the player reaches 30% HP; use 55% as the pilot retreat threshold under nearby threat.
 - Keep all changes in the QA agent until human/source evidence justifies production balance changes.
+
+
+## D-020 — Separate baseline survival from adaptive boss-archetype discovery (ACCEPTED)
+- Keep seeds 1, 2 and 3 as mandatory full natural-run regressions; all three must win.
+- Boss archetype selection remains entirely natural and RNG-driven. Do not patch `spawnBoss`, force a boss ID, alter boss HP, or mutate game state.
+- Candidate seeds may stop after the naturally selected boss spawns. If that archetype is not yet represented by a natural victory in the current CI run, continue the same run to a natural boss defeat; otherwise record the scout without claiming a victory.
+- Count archetype coverage only from runs that naturally defeat the boss. Require winning IDs exactly `sol`, `krog`, and `mul`.
+- Preserve browser/console and offline/no-external-request checks for every attempted run.
+
+## D-021 — A deterministic browser pilot must own the only simulation clock (ACCEPTED)
+- The test agent may advance game state manually only when the production RAF loop is prevented from advancing it.
+- Keep rendering active, but gate the production `update(SIM_STEP)` call in the temporary test document while the manual pilot owns simulation.
+- Count manual ticks and require one manual update for every harness tick. Record blocked RAF update attempts as evidence that the gate is active.
+- Repeat at least one seeded run in a fresh browser context and require identical outcome signatures.
+- Keep deterministic RNG seeding and compact per-run diagnostics. Do not change production balance or game code to compensate for a test-harness race.
+- A same-seed result that changes between CI runs invalidates natural-run evidence until the clock ownership is fixed and replayed.

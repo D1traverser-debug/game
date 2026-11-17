@@ -335,3 +335,11 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - All three natural runs won; no browser, console or external-network errors. The current run covered only `krog` and `mul`, so CI correctly failed the exact `sol`/`krog`/`mul` coverage gate.
 - Sol'phish was naturally defeated in CI #131 seed 3, and Krog'wa in CI #129 seed 2; historical cross-run evidence does not satisfy same-run coverage.
 - Revision 027 changes only the QA harness and workflow: seeds 1-3 remain mandatory full natural runs; seeds 4-12 scout the naturally selected boss, and only a currently missing archetype is continued through a full natural boss victory. No boss is forced or selected, and no production combat state is mutated.
+
+
+## BOSS PILOT 028 — single-clock harness correction (2026-11-17)
+- CI #137: https://github.com/D1traverser-debug/game/actions/runs/44030442251. Checkpoint, progression, 90-second smoke, objective and upgrade regressions PASS; natural-run matrix FAIL.
+- Seed 1 died at 492.97s in CI #137 despite naturally defeating Krog'wa at 1259.5s in CI #136. Seed 2 naturally defeated Krog'wa at 1196.4s; seed 3 died at 123.87s; seed 12 naturally defeated Mul'gath at 1206.33s. Seed 9 spawned Krog'wa but was a scout only; seeds 10/11 died during Mul'gath attempts.
+- Confirmed root cause: `__fullRun` manually called `update(0.1)` while the live production RAF loop continued calling `update(SIM_STEP)`. This double-advanced game state and consumed Math.random from two clocks.
+- Revision 028 gates RAF-driven update calls in the temporary QA document, counts manual ticks and blocked RAF calls, asserts single-clock operation and identical seed-1 replay, and limits output to compact state plus recent evidence.
+- No production `index.html` or balance change. CI #138 is pending. Product remains NOT_READY; same-run Sol/Krog/Mul wins, source fidelity, real-origin save/reload, real-device performance and owner playtest remain open.
