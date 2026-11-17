@@ -1,5 +1,7 @@
 # Issue Register
 
+> Scope note (2026-11-18): GAME-001 through GAME-048 are historical/legacy-browser findings. They remain useful evidence about the prototype but are not the active full-game acceptance plan. GAME-049 onward tracks the full-game production branch. Do not treat legacy browser CI as native-game acceptance.
+
 | ID | Severity | Finding | Evidence | Status | Next action |
 |---|---|---|---|---|---|
 | GAME-001 | P0 | Boss victory test is synthetic: calls forced lethal damage | Previous `studio_release_qa.py` calls `damageBoss(1e7)` | OPEN | Build normal-combat boss acceptance |

@@ -20,10 +20,13 @@ class GuardTests(unittest.TestCase):
         self.source=b'<html><style>x{}</style><script>let x=1</script></html>'
         (self.root/'index.html').write_bytes(self.source)
         import hashlib
+        digest=hashlib.sha256(self.source).hexdigest()
         self.state={'repository':'D1traverser-debug/game','scope':dict(module.OWNER_SCOPE),
+                    'active_production_branch':'full-game','branch':'full-game',
+                    'legacy_browser_prototype':{'branch':'development','sha256':digest,'bytes':len(self.source)},
                     'caos_boundary':'CAOS parent is read-only and unchanged.',
                     'status':'NOT_READY','checkpoint':'TEST',
-                    'development_candidate_sha256':hashlib.sha256(self.source).hexdigest(),
+                    'development_candidate_sha256':digest,
                     'development_candidate_bytes':len(self.source)}
         self.save_state()
     def save_state(self):
@@ -45,7 +48,10 @@ class GuardTests(unittest.TestCase):
         new=b'<html><style>x{}</style><script>window.__QA={}</script></html>'
         (self.root/'index.html').write_bytes(new)
         import hashlib
-        self.state['development_candidate_sha256']=hashlib.sha256(new).hexdigest()
+        digest=hashlib.sha256(new).hexdigest()
+        self.state['legacy_browser_prototype']['sha256']=digest
+        self.state['legacy_browser_prototype']['bytes']=len(new)
+        self.state['development_candidate_sha256']=digest
         self.state['development_candidate_bytes']=len(new)
         self.save_state()
         self.assertIn('PRODUCTION_DEBUG_MUTATION_SURFACE',module.verify(self.root)['errors'])

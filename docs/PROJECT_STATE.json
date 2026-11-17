@@ -200,6 +200,69 @@
     "Current 734011-byte browser candidate and 10/10 CI remain legacy prototype evidence only."
   ],
   "failed_or_open": [
+    "Unity 6.3 LTS editor project, URP configuration, package manifest and native Windows build have not yet been created or validated.",
+    "1–4 player online co-op, host authority, lobby/relay, reconnect, friendly-fire replication, revive and four-client stress are not implemented.",
+    "Full wizard/realm/spell/element/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented.",
+    "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
+    "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested."
+  ],
+  "next_action": "Build the Unity 6.3 LTS URP project skeleton and a polished 1–4 player vertical slice: one original hero, one realm, three distinct spells, one elemental interaction, three enemy archetypes, one objective, one boss, original animation/VFX/SFX/music, and host-authoritative networking. Run a 4-client technical spike before expanding the content roster. Keep the browser prototype isolated.",
+  "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
+  "branch": "full-game",
+  "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
+  "development_candidate_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
+  "development_candidate_bytes": 734011,
+  "last_successful_candidate_ci": {
+    "run_id": 44131377996,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44131377996",
+    "commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
+    "checkpoint": "PASS",
+    "browser_jobs_passed": 10,
+    "browser_jobs_total": 10,
+    "covered_product_artifact_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
+    "meaning": "Legacy browser prototype only: exact 734011-byte artifact passed checkpoint and 10/10 browser regression jobs; boss regression 26/26. Not full-game acceptance."
+  },
+  "latest_local_candidate": {
+    "artifact": "development/index.html",
+    "delivery_filename": "咒语旅团-当前开发版-单人网页版.html",
+    "bytes": 734011,
+    "sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
+    "source_base": "2.5D art-forward single-file candidate with shape-aware boss telegraphs, snapshotted attack origins, committed telegraph positions and synchronized cancellation",
+    "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
+    "scope": "single-player Reginald / Verdant Meadows / offline HTML",
+    "tested": "Legacy CI #44131377996: 10/10 jobs PASS; boss regression 26/26; this is not full-game acceptance.",
+    "not_tested": "All full-game scope, Unity native build, 1–4 online co-op, full content, original production art/audio, real hardware performance, owner playtest and release acceptance.",
+    "branch": "development",
+    "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
+  },
+  "latest_candidate_ci_status": "PASS_LEGACY_PROTOTYPE_CI_ONLY",
+  "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
+  "last_verified_ci_run": {
+    "run_id": 44131377996,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44131377996",
+    "commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
+    "conclusion": "success",
+    "checkpoint": "PASS",
+    "browser_jobs_passed": 10,
+    "browser_jobs_total": 10,
+    "boss_regression": "26/26 PASS",
+    "artifact_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
+    "artifact_bytes": 734011,
+    "scope": "legacy single-player browser prototype only; not full-game acceptance"
+  },
+  "active_production_branch": "full-game",
+  "legacy_prototype_branch": "development",
+  "legacy_browser_prototype": {
+    "branch": "development",
+    "artifact": "index.html",
+    "bytes": 734011,
+    "sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
+    "ci_run": 44131377996,
+    "ci_jobs": "10/10 PASS",
+    "boss_regression": "26/26 PASS",
+    "status": "LEGACY_MECHANICS_REFERENCE_ONLY_NOT_FULL_GAME_RELEASE"
+  },
+  "legacy_prototype_open": [
     "Real file:// open and localStorage close/reopen not tested",
     "Original-game source version and detailed mechanic data not fully pinned",
     "Spell/enemy/objective/boss fidelity incomplete",
@@ -260,61 +323,5 @@
     "Complete wizard/realm/spell/element/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented.",
     "Original IP, 3D art pipeline, character rigs/animation, environment kits, spell VFX, UI, original music and SFX production have not started.",
     "Windows native build, controller hardware, real save/load, performance, network reliability and independent human acceptance are NOT_TESTED."
-  ],
-  "next_action": "Build the Unity 6.3 LTS URP project skeleton and a polished 1–4 player vertical slice: one original hero, one realm, three distinct spells, one elemental interaction, three enemy archetypes, one objective, one boss, original animation/VFX/SFX/music, and host-authoritative networking. Run a 4-client technical spike before expanding the content roster. Keep the browser prototype isolated.",
-  "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
-  "branch": "full-game",
-  "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "development_candidate_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
-  "development_candidate_bytes": 734011,
-  "last_successful_candidate_ci": {
-    "run_id": 44064686910,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44064686910",
-    "commit": "26726036397b71a0b77fbdb837d54ee59509b89f",
-    "checkpoint": "PASS",
-    "browser_component": "PASS",
-    "browser_content_visual": "PASS",
-    "covered_product_artifact_sha256": "41545a842ec17236896fb2edff63e1ac92c1423eee76cfa4ed2f340a94cac5ee",
-    "meaning": "Exact 729501-byte candidate passed checkpoint and all nine independent browser regression jobs: progression, 90-second normal-play smoke, objective collection, character upgrades, 3D integration, trial unlock, atlas renderer, Reginald spell scope and boss encounter. Boss regression 15/15. Component/regression evidence only; not human full-run or product acceptance."
-  },
-  "latest_local_candidate": {
-    "artifact": "development/index.html",
-    "delivery_filename": "咒语旅团-当前开发版-单人网页版.html",
-    "bytes": 734011,
-    "sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
-    "source_base": "2.5D art-forward single-file candidate with shape-aware boss telegraphs, snapshotted attack origins, committed telegraph positions and synchronized cancellation",
-    "repository_sync": "SYNCED_TO_GITHUB_DEVELOPMENT_EXACT_BYTES",
-    "scope": "single-player Reginald / Verdant Meadows / offline HTML",
-    "tested": "Legacy CI #44131377996: 10/10 jobs PASS; boss regression 26/26; this is not full-game acceptance.",
-    "not_tested": "All full-game scope, Unity native build, 1–4 online co-op, full content, original production art/audio, real hardware performance, owner playtest and release acceptance.",
-    "branch": "development",
-    "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
-  },
-  "latest_candidate_ci_status": "PASS_LEGACY_PROTOTYPE_CI_ONLY",
-  "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
-  "last_verified_ci_run": {
-    "run_id": 44131377996,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44131377996",
-    "commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
-    "conclusion": "success",
-    "checkpoint": "PASS",
-    "browser_jobs_passed": 10,
-    "browser_jobs_total": 10,
-    "boss_regression": "26/26 PASS",
-    "artifact_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
-    "artifact_bytes": 734011,
-    "scope": "legacy single-player browser prototype only; not full-game acceptance"
-  },
-  "active_production_branch": "full-game",
-  "legacy_prototype_branch": "development",
-  "legacy_browser_prototype": {
-    "branch": "development",
-    "artifact": "index.html",
-    "bytes": 734011,
-    "sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
-    "ci_run": 44131377996,
-    "ci_jobs": "10/10 PASS",
-    "boss_regression": "26/26 PASS",
-    "status": "LEGACY_MECHANICS_REFERENCE_ONLY_NOT_FULL_GAME_RELEASE"
-  }
+  ]
 }

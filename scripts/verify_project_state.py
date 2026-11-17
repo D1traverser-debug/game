@@ -8,14 +8,15 @@ from pathlib import Path
 import sys
 
 OWNER_SCOPE={
-    'hero':'Reginald',
-    'map':'Verdant Meadow',
-    'players':1,
-    'multiplayer':False,
-    'ai_teammates':False,
-    'additional_heroes':False,
-    'additional_maps':False,
-    'final_delivery':'single self-contained offline HTML',
+    'product':'original-IP full-game 3D co-op roguelite inspired by The Spell Brigade gameplay',
+    'modes':['solo','online_coop_1_to_4'],
+    'players':'1-4',
+    'multiplayer':True,
+    'target_platform':'Windows PC first',
+    'input':['keyboard_mouse','controller'],
+    'engine':'Unity 6.3 LTS + URP (selected for vertical-slice validation)',
+    'final_delivery':'native Windows PC build; Steam distribution target',
+    'original_ip_required':True,
 }
 
 def verify(root:Path)->dict:
@@ -29,6 +30,11 @@ def verify(root:Path)->dict:
         return {'status':'FAIL','errors':[f'STATE_MISSING_OR_INVALID:{exc}']}
     if state.get('repository')!='D1traverser-debug/game':
         findings.append('WRONG_REPOSITORY')
+    if state.get('active_production_branch')!='full-game' or state.get('branch')!='full-game':
+        findings.append('ACTIVE_BRANCH_DRIFT')
+    legacy=state.get('legacy_browser_prototype',{})
+    if legacy.get('branch')!='development':
+        findings.append('LEGACY_PROTOTYPE_BRANCH_DRIFT')
     for key,want in OWNER_SCOPE.items():
         if state.get('scope',{}).get(key)!=want:
             findings.append(f'SCOPE_DRIFT:{key}')
@@ -41,13 +47,14 @@ def verify(root:Path)->dict:
     except OSError as exc:
         return {'status':'FAIL','errors':[f'SOURCE_MISSING:{exc}']+findings}
     digest=hashlib.sha256(contents).hexdigest()
-    expected=state.get('development_candidate_sha256')
+    expected=legacy.get('sha256') or state.get('development_candidate_sha256')
     if not expected:
-        findings.append('CANDIDATE_SHA_MISSING')
+        findings.append('LEGACY_ARTIFACT_SHA_MISSING')
     elif digest!=expected:
         findings.append('ARTIFACT_SHA_MISMATCH')
-    if state.get('development_candidate_bytes')!=len(contents):
-        findings.append('ARTIFACT_SIZE_MISMATCH')
+    expected_bytes=legacy.get('bytes') or state.get('development_candidate_bytes')
+    if expected_bytes!=len(contents):
+        findings.append('LEGACY_ARTIFACT_SIZE_MISMATCH')
     text=contents.decode('utf-8','replace')
     if '<script>' not in text or '</script>' not in text or '<style>' not in text:
         findings.append('NOT_SINGLE_FILE_HTML')
@@ -62,9 +69,11 @@ def verify(root:Path)->dict:
         'sha256':digest,
         'bytes':len(contents),
         'checkpoint':state.get('checkpoint'),
+        'active_branch':state.get('active_production_branch'),
         'product_status':state.get('status'),
+        'legacy_artifact_sha256':digest,
         'errors':findings,
-        'warning':'Mechanical consistency does not prove gameplay, fidelity, performance, persistence or player acceptance.'
+        'warning':'This verifies full-game scope metadata and legacy HTML artifact integrity only. It does not verify a Unity project/build, gameplay, networking, art/audio, performance, persistence or player acceptance.'
     }
 
 def main()->int:

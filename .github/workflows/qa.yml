@@ -1,7 +1,7 @@
 name: Game repository integrity and regression
 on:
   push:
-    branches: [development, main]
+    branches: [development, main, full-game]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
           python-version: '3.12'
       - name: Verify single-file build reproducibility
         run: python scripts/build_game.py --check
-      - name: Verify owner scope and exact artifact checkpoint
+      - name: Verify full-game scope and legacy artifact checkpoint
         run: python scripts/verify_project_state.py
       - name: Run positive and negative checkpoint controls
         run: python -m unittest discover -s tests -p 'test_*.py' -v
