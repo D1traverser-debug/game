@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "SPELL_TRIAL_ACTUAL_LOADOUT_FIX_013",
+  "checkpoint": "MULTI_BOSS_NATURAL_RUN_QA_FIX_014",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -135,7 +135,7 @@
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
-  "development_candidate_sha256": "6f10aba4ad7ce3303e13db29cff50169f91771b395cabff9ee484231d00c2c8e",
+  "development_candidate_sha256": "632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29",
   "development_candidate_bytes": 721829,
   "last_successful_candidate_ci": {
     "run_id": 43989883310,
@@ -157,5 +157,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_FULL_MISSION_AND_TRIAL_LOADOUT_REGRESSION"
+  "latest_candidate_ci_status": "PENDING_SEEDED_NATURAL_BOSS_RUNS"
 }
