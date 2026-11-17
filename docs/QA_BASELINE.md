@@ -398,3 +398,10 @@ This still does not launch Unity Editor. Package resolution, URP pipeline asset 
 CI [44145957567](https://github.com/D1traverser-debug/game/actions/runs/44145957567) passed 12/12 jobs. Game.Core passed 32/32 contracts. Ten new spell tests verify nearest-target selection, ally/dead/out-of-range filtering, lowest-health-ratio targeting, seeded-random targeting, cooldown gating, symmetric spread, targetless radial patterns, no-target cooldown behavior, invalid pattern rejection and deterministic projectile spawn output. Unity project structure remains 17/17; all nine legacy browser regressions pass.
 
 Evidence boundary: projectile movement/collision, piercing/lifetime, elemental/status effects, augmentations, Unity scene integration, original art/audio and network runtime remain NOT_TESTED.
+
+
+## Projectile simulation and damage integration — green CI (2026-11-18)
+
+CI [44146841718](https://github.com/D1traverser-debug/game/actions/runs/44146841718) passed 12/12 jobs. Game.Core passed 43/43 contracts. Eleven new projectile tests verify fixed-tick motion/lifetime, swept collision for fast projectiles, damage application, pierce ordering by impact time, hit-once protection, friendly-fire pass-through/allow behavior, invulnerability, expiry, deterministic target-ID tie-breaks and self-damage. Unity project structure passed 17/17; all nine legacy browser regression jobs passed.
+
+Evidence boundary: this is a combat simulation foundation, not a complete run loop. Enemy AI, player movement, status/element interactions, objectives, boss logic, Unity presentation, network runtime, art/audio and full-run acceptance remain NOT_TESTED.

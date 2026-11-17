@@ -159,3 +159,13 @@ The previous brief's "seven elements + ten combinations" wording was too definit
 - Per-target hit tracking, pierce count and lifetime are explicit.
 - Collision routes through the central DamagePipeline; friendly-fire and self-damage policies are respected.
 - 11 new deterministic tests added; CI pending.
+
+
+## Projectile simulation and damage integration — GREEN CI (2026-11-18)
+
+- CI [44146841718](https://github.com/D1traverser-debug/game/actions/runs/44146841718): **12/12 jobs PASS**.
+- Game.Core: **43/43 contracts PASS**.
+- Unity project structure: **17/17 PASS**.
+- Legacy browser regression: **9/9 PASS**.
+- Projectile simulation includes fixed-tick movement, swept-circle collision, stable impact ordering, pierce/lifetime, hit-once tracking and DamagePipeline integration.
+- Still not a playable game: no integrated run loop, Unity Editor validation, multiplayer runtime, production assets/audio, full content, or human acceptance.

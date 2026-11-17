@@ -214,7 +214,9 @@
     "Added data-driven SpellDefinition/SpellRuntimeState and automatic target selection/projectile spawn kernel; CI pending.",
     "Added data-driven spell execution kernel with nearest, lowest-health-ratio and seeded-random targeting; range filtering; cooldown ticks; single/spread/radial projectile spawn patterns. CI #44145957567 passed 32/32 core contracts.",
     "Full-game branch CI #44145957567 passed 12/12 jobs, including Unity project structure 17/17 and nine legacy browser regressions.",
-    "Added fixed-tick projectile simulation with swept-circle collision, stable hit ordering, pierce/lifetime, hit-once and DamagePipeline integration; CI pending."
+    "Added fixed-tick projectile simulation with swept-circle collision, stable hit ordering, pierce/lifetime, hit-once and DamagePipeline integration; CI pending.",
+    "Added fixed-tick projectile movement, swept-circle collision, deterministic impact ordering, per-target hit tracking, pierce/lifetime and central damage integration; CI #44146841718 passed 43/43 core contracts.",
+    "Full-game branch CI #44146841718 passed 12/12 jobs, including Unity project structure 17/17 and all nine legacy browser regressions."
   ],
   "failed_or_open": [
     "Unity project skeleton is committed at unity/ with Editor 6000.3.27f2 and URP 17.3.0 dependency; opening the project, package resolution, URP asset assignment and native Windows build remain NOT_TESTED.",
@@ -225,7 +227,7 @@
     "Spell kernel does not yet implement projectile simulation/collision, status/element effects, augmentations, non-projectile spell behaviors or source-complete content catalogue.",
     "Projectile simulation has not yet been integrated into a complete run loop, Unity presentation, networking, element/status effects, or human gameplay."
   ],
-  "next_action": "Run projectile contracts and verify collision/friendly-fire behavior. Then implement source-qualified elemental/status effects and a small playable simulation loop before Unity scene integration.",
+  "next_action": "Implement generic status-effect lifecycle and a minimal deterministic run loop tying player input, movement, auto-cast, projectile simulation, damage, enemy movement, XP and objective progress together. Keep elemental/infusion behavior source-qualified and mark all provisional values. Then integrate the loop into Unity and create a polished first vertical slice.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -254,7 +256,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PASS_SPELL_CORE_32_OF_32_UNITY_STRUCTURE_17_OF_17_44145957567",
+  "latest_candidate_ci_status": "PASS_PROJECTILE_CORE_43_OF_43_UNITY_STRUCTURE_17_OF_17_44146841718",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -355,25 +357,25 @@
     "meaning": "Full-game scope metadata and legacy prototype integrity were checked; legacy browser regression jobs passed. No Unity project/build, multiplayer, art/audio or full-game acceptance is implied."
   },
   "last_full_game_ci": {
-    "run_id": 44145957567,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44145957567",
-    "commit": "fc8377eec2ce2621980e49715bf2b446ceaf9a56",
+    "run_id": 44146841718,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44146841718",
+    "commit": "d5d354c3bf8daa18e3e186324c7a140f9f97de2f",
     "conclusion": "success",
     "jobs_passed": 12,
     "jobs_total": 12,
-    "core_simulation_contracts": "32/32 PASS",
+    "core_simulation_contracts": "43/43 PASS",
     "unity_project_structure": "17/17 PASS",
     "checkpoint": "PASS",
     "legacy_browser_regressions": "9/9 PASS",
-    "meaning": "Core spell targeting/cooldown/projectile pattern contracts compile and pass; Unity project file structure passes; legacy browser regression passes. No Unity Editor/native build or human full-game acceptance."
+    "meaning": "Fixed-tick projectile simulation and damage integration pass deterministic contracts; Unity project file structure passes; legacy browser prototype regressions pass. No Unity Editor launch/native build or full-game player acceptance."
   },
   "core_simulation": {
     "project": "src/core/Game.Core.csproj",
     "target_framework": "netstandard2.1",
     "test_project": "tests/core/Game.Core.Tests.csproj",
     "test_runner": "dotnet 8 console contracts; no external NuGet packages",
-    "contracts": "32/32 PASS in CI #44145957567",
-    "status": "FOUNDATION_AND_INPUT_EVENT_CONTRACTS_VERIFIED_NOT_FULL_SIMULATION"
+    "contracts": "43/43 PASS in CI #44146841718",
+    "status": "DETERMINISTIC_COMBAT_FOUNDATION_VERIFIED_NOT_FULL_RUN_LOOP"
   },
   "unity_project": {
     "path": "unity/",
