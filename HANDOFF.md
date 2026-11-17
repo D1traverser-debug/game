@@ -325,3 +325,13 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Seed 2 died at 588.8s after two Gnasher hits (317.6 and 318.7 raw) near the left edge. Distances from landing points were 59 and 26.2. The controller assumed 0.55s movement even when less leap time remained.
 - Seed 3 died at 823.2s from contact while the Crab objective was active; HP was 36.5% at 822.5s, but critical retreat only began below 30%.
 - Revision 026 corrects the outer projectile guard, models actual remaining Gnasher stateT, uses away-from-landing and boundary-aware scoring, and raises critical retreat to 55% HP. Product HTML unchanged.
+
+
+## BOSS PILOT 027 — CI #136 results and adaptive archetype coverage (2026-11-17)
+- CI #136: https://github.com/D1traverser-debug/game/actions/runs/44018248222. Checkpoint PASS; deterministic 90-second smoke, XP/objective/upgrade/browser regressions PASS.
+- Seed 1 naturally defeated Krog'wa at 1259.5s: level 20, 1245 kills, 700/700 HP, 3 objectives.
+- Seed 2 naturally defeated Krog'wa at 1286.7s: level 21, 1742 kills, 300/300 HP, 3 objectives.
+- Seed 3 naturally defeated Mul'gath at 1291.7s: level 22, 1642 kills, 160.9/400 HP, 3 objectives.
+- All three natural runs won; no browser, console or external-network errors. The current run covered only `krog` and `mul`, so CI correctly failed the exact `sol`/`krog`/`mul` coverage gate.
+- Sol'phish was naturally defeated in CI #131 seed 3, and Krog'wa in CI #129 seed 2; historical cross-run evidence does not satisfy same-run coverage.
+- Revision 027 changes only the QA harness and workflow: seeds 1-3 remain mandatory full natural runs; seeds 4-12 scout the naturally selected boss, and only a currently missing archetype is continued through a full natural boss victory. No boss is forced or selected, and no production combat state is mutated.

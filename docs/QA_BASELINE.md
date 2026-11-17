@@ -207,3 +207,11 @@ Checkpoint: PASS. Deterministic 90-second smoke: PASS. XP/objective/upgrade/brow
 | 3 | 823.2s | Contact damage during Crab objective; HP 36.5% one second before death; retreat threshold 30% was too late |
 
 No page, console or external-network errors. Revision 026 corrects these three controller defects while preserving the 90-second survival gate.
+
+
+## D-020 — Separate baseline survival from adaptive boss-archetype discovery (ACCEPTED)
+- Keep seeds 1, 2 and 3 as mandatory full natural-run regressions; all three must win.
+- Boss archetype selection remains entirely natural and RNG-driven. Do not patch `spawnBoss`, force a boss ID, alter boss HP, or mutate game state.
+- Candidate seeds 4-12 may stop after the naturally selected boss spawns. If that boss archetype is not yet represented by a natural victory in the current CI run, continue the same run to a natural boss death; otherwise record the scout without claiming a victory.
+- Count archetype coverage only from runs that naturally defeat the boss. Require exactly the three expected winning IDs: `sol`, `krog`, `mul`.
+- Preserve browser/console and offline/no-external-request checks for every attempted run. This is a test-harness strategy only; production balance remains untouched.

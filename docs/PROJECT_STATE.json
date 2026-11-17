@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "The Spell Brigade — Single-player Browser Recreation",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "MULTI_BOSS_PILOT_ACTUAL_LEAP_TIME_PROJECTILE_HORIZON_026",
+  "checkpoint": "MULTI_BOSS_COVERAGE_ADAPTIVE_SEED_SEARCH_027",
   "status": "NOT_READY",
   "updated_at": "2026-11-17",
   "scope": {
@@ -140,7 +140,11 @@
     "Natural-run matrix failed 0/3. Seed 1 died at 132.2s to five projectile hits; the first four arrived between 111.7s and 119.6s. The code had an outer `t<1.35` guard, so the inner 1.8s lookahead was unreachable for projectiles with t=1.35..1.8.",
     "Seed 2 died at 588.8s after two Gnasher hits (317.6 and 318.7 raw) near the left edge; first hit left 59 units from landing point, second left 26.2 units. The planner modeled a fixed 0.55s escape even when the attack timer had less time remaining.",
     "Seed 3 died at 823.2s from contact while completing the Crab objective. HP was 36.5 at 822.5s; the critical-escape threshold was only 30%, so the agent kept objective-oriented movement while under pressure.",
-    "No page, console or external-network errors. The 90-second smoke is now deterministic and uses defensive upgrades, health pickups, enemy/projectile/hazard avoidance."
+    "No page, console or external-network errors. The 90-second smoke is now deterministic and uses defensive upgrades, health pickups, enemy/projectile/hazard avoidance.",
+    "CI #136 / commit 40b4836: checkpoint PASS; deterministic 90-second smoke, XP/objective/upgrade/browser regressions PASS.",
+    "CI #136 natural runs: seed 1 naturally defeated Krog'wa at 1259.5s (level 20, 1245 kills, 700/700 HP, 3 objectives); seed 2 naturally defeated Krog'wa at 1286.7s (level 21, 1742 kills, 300/300 HP, 3 objectives); seed 3 naturally defeated Mul'gath at 1291.7s (level 22, 1642 kills, 160.9/400 HP, 3 objectives).",
+    "CI #136 recorded boss IDs krog/mul only; all three natural runs won and no browser, console or external-network errors occurred, but same-run Sol'phish coverage remains missing.",
+    "Historical independent natural victories exist for Sol'phish in CI #131 seed 3 and Krog'wa in CI #129 seed 2; these do not substitute for a same-run three-archetype matrix."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -196,16 +200,9 @@
     "BOSS_PILOT_016 pending CI: correct projectile approach-time sign, choose defense whenever offered, steer away from Gnasher burrow/leap and friendly-fire hazards, and record dodge counters. No production balance changes made.",
     "BOSS_PILOT_017 pending CI: hard inward boundary steering, safe loot targeting, Rift tangential evasion, critical-health escape, and lateral Gnasher sidesteps. Two of three seeds remain unvalidated; boss coverage is incomplete.",
     "BOSS_PILOT_018 pending CI: imminent projectile/Gnasher threats suspend objective/loot pursuit, emergency Rift dodges are permitted, hard boundary correction is restricted to the actual clamp, and Gnasher escape uses stronger lateral movement.",
-    "BOSS_PILOT_019 pending CI: choose a scored safe heading away from Gnasher leapX/leapY, suspend interactions during Gnasher attacks, make defensive/sustain cards outrank new spells, and let predicted projectile/hazard threats activate evasion independently of enemy proximity.",
-    "BOSS_PILOT_020 pending CI: combine all active Gnasher leap landing points, lock one escape direction per Gnasher attack phase, score actual displacement after world-boundary clamping, and record the exact Gnasher attacker on every hit. Two boss archetypes now have natural wins; Sol'phish remains unverified.",
-    "BOSS_PILOT_021 pending CI: correct the Python-to-JavaScript instrumentation boundary, then rerun the multi-Gnasher escape controller. CI #130 is a harness syntax failure, not a gameplay result.",
-    "BOSS_PILOT_022 pending CI: preserve Gnasher escape while blending separate projectile and hazard avoidance vectors. Seed 1/Mul and seed 3/Sol win; seed 2 must survive projectile pressure and naturally reach Krog'wa.",
-    "BOSS_PILOT_023 pending CI: revert the Gnasher per-attack direction lock to the previously successful dynamic controller; expand projectile prediction/evasion horizon to 1.8s and miss radius to 110. Need all three natural wins and exact sol/krog/mul coverage in one run.",
-    "BOSS_PILOT_024 pending CI: keep dynamic per-frame scoring but add actual post-clamp travel and minimum separation from all active Gnasher landing points. Seed 1 must survive Sol'phish; seed 2/3 must retain Krog'wa wins. A Mul'gath seed is still needed for same-run coverage.",
-    "QA_SMOKE_025 pending CI: make the 90-second smoke deterministic, choose legal defensive/sustain upgrades when offered, prioritize health orbs at low HP, evade nearby enemies/projectiles/hazards, and record damage events. This is a harness-quality correction; do not weaken the 90-second survival gate.",
-    "BOSS_PILOT_026 pending CI: fix the outer projectile horizon guard to 1.8s; score Gnasher escape over actual remaining stateT; bias leap escape away from landing points and away from edges; raise critical-health escape to 55% HP and strengthen it. Need all three natural wins and exact sol/krog/mul coverage in one run."
+    "BOSS_PILOT_027 pending CI: preserve natural wins on baseline seeds 1/2/3; scout candidate seeds 4-12 only until a missing boss archetype naturally spawns; continue a full natural boss fight only for an archetype not yet defeated. Require natural wins for sol/krog/mul in one CI run, with no browser/console/network errors. No production HTML or balance changes."
   ],
-  "next_action": "Inspect CI after BOSS_PILOT_026. Verify seed 1 avoids projectile barrage after the corrected 1.8s guard, seed 2 escapes Gnasher with actual remaining leap time, and seed 3 abandons Crab objective at 55% HP. Require three natural wins and exact sol/krog/mul coverage. Keep production index.html unchanged and NOT_READY.",
+  "next_action": "Inspect CI #137. Baseline seeds 1/2/3 must all naturally win. Candidate seeds 4-12 are deterministic archetype scouts; when a missing boss appears, continue that same run through a natural victory. Require natural winning boss IDs exactly sol/krog/mul, no browser/console errors, and zero external requests. Keep index.html unchanged and product NOT_READY.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -231,5 +228,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_026"
+  "latest_candidate_ci_status": "PENDING_BOSS_PILOT_027"
 }
