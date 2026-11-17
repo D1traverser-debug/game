@@ -161,3 +161,10 @@
 - In the temporary QA document only, use deterministic time-based screen-shake offsets and instrument all render calls to `Math.random`; require zero render-phase RNG calls.
 - Advance the manual pilot at the production `SIM_STEP=1/30`, using three simulation steps per 0.1-second input decision. Require manual tick count to equal simulation tick count.
 - Keep production `index.html`, game balance and source behavior unchanged. Re-run identical seed 1 in a fresh browser context and require the outcome signature to match.
+
+
+## D-024 — Isolate RNG from every renderer, not only the legacy 2D path (ACCEPTED)
+- A deterministic game test must audit every rendering implementation that can be active or selected, including the atlas-backed 2.5D camera path.
+- CI #140 showed that replacing the legacy 2D screen-shake calls was insufficient: the second renderer still called `rand()` twice per frame for camera X/Y shake.
+- In the temporary QA document, replace screen-shake randomness in both renderers with deterministic time-based offsets. Keep a source assertion that no `rand(-g.shake,g.shake)` call remains and a runtime counter requiring zero render-phase `Math.random` calls.
+- Do not modify production render behavior merely to make the test pass. Keep production `index.html` and combat balance unchanged until a separate product requirement justifies a production change.

@@ -357,3 +357,11 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Further root cause: revision 028 correctly blocked RAF-driven `update(SIM_STEP)`, but left the renderer active. `drawWorld()` consumed the same seeded `Math.random` twice per rendered frame for screen-shake offsets. The number of rendered frames therefore changed gameplay RNG and boss/upgrade outcomes.
 - Revision 030 changes only `tests/boss_archetype_full_runs.py` and governance records. The temporary browser document gives screen shake deterministic time-based offsets, instruments render-phase random calls and requires zero. Manual simulation now advances three production-sized `1/30` steps per 0.1-second pilot decision.
 - Production `index.html`, combat balance and CAOS remain unchanged. CI #140 pending. Product remains **NOT_READY**.
+
+
+## BOSS PILOT 031 — CI #140 render-RNG preflight correction (2026-11-17)
+- CI #140: https://github.com/D1traverser-debug/game/actions/runs/44035681214. Checkpoint, progression, 90-second normal-play, objective and character-upgrade regressions PASS.
+- Natural-run pilot failed before opening a browser context at the source assertion: `rand(-g.shake,g.shake)` remained in the temporary test document. No natural-run seed was executed; this is not a game-survival result.
+- Root cause: revision 030 replaced the legacy 2D renderer's two screen-shake RNG calls but missed the second, atlas-backed 2.5D renderer, which also used two `rand()` calls in its camera translation.
+- Revision 031 adds an exact source anchor for the 2.5D renderer and replaces its X/Y shake with deterministic time-based offsets in the temporary QA document. It retains the source assertion, render-phase RNG counter, fixed 1/30 simulation step, single-clock counters and same-seed replay.
+- Product `index.html`, game balance and CAOS remain unchanged. CI #141 pending. Product remains **NOT_READY**.

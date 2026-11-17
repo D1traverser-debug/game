@@ -238,3 +238,10 @@ Checkpoint, progression, 90-second normal-play, objective and upgrade regression
 | 9–10 | Scout only | Sol'phish | Boss naturally spawned at 1142.9s; no victory claimed |
 
 The single-clock correction made the run deterministic. Seed 1's upgrade log then exposed a pilot defect: defensive max-HP cards were selected even when health was full, and a healthy offer containing a new Wicked Buzzsaw spell was rejected in favor of dodge. Revision 029 changes only the pilot's choice policy and adds a regression assertion. No production balance changes.
+
+
+## Natural-run pilot #140 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44035681214  
+Checkpoint, progression, 90-second normal-play, objective collection and character-upgrade regressions: PASS. Natural-run pilot: FAIL during source preflight before browser creation. No natural-run seeds executed.
+
+The preflight correctly found that the temporary test document still contained `rand(-g.shake,g.shake)`. Revision 030 replaced the legacy 2D renderer's two screen-shake RNG calls, but missed two equivalent calls in the atlas-backed 2.5D renderer's camera translation. Revision 031 replaces both renderer paths with deterministic time-based offsets in the temporary QA document. No production game failure or balance regression can be inferred from CI #140.

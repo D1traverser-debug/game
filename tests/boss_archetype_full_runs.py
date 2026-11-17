@@ -425,14 +425,18 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
 GNASHER_HIT="if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');"
 assert SOURCE.count(GNASHER_HIT)==1,"Gnasher hit instrumentation anchor must occur exactly once"
 DRAW_SHAKE="let sx=g?.shake?rand(-g.shake,g.shake):0,sy=g?.shake?rand(-g.shake,g.shake):0;"
+DRAW_SHAKE_25D="ctx.translate(-cx+(g?.shake?rand(-g.shake,g.shake):0),-cy+(g?.shake?rand(-g.shake,g.shake):0));"
 FRAME_RENDER="if(save.renderMode==='3d'&&window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}\n else drawWorld();"
-assert SOURCE.count(DRAW_SHAKE)==1,"screen-shake RNG anchor must occur exactly once"
+assert SOURCE.count(DRAW_SHAKE)==1,"2D screen-shake RNG anchor must occur exactly once"
+assert SOURCE.count(DRAW_SHAKE_25D)==1,"atlas-backed 2.5D screen-shake RNG anchor must occur exactly once"
 assert SOURCE.count(FRAME_RENDER)==1,"render path anchor must occur exactly once"
 DETERMINISTIC_SHAKE="let sx=g?.shake?Math.sin(g.time*37)*g.shake:0,sy=g?.shake?Math.cos(g.time*41)*g.shake:0;"
+DETERMINISTIC_SHAKE_25D="ctx.translate(-cx+(g?.shake?Math.sin(g.time*37)*g.shake:0),-cy+(g?.shake?Math.cos(g.time*41)*g.shake:0));"
 TRACKED_RENDER="window.__renderPhase=true;try{if(save.renderMode==='3d'&&window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}else drawWorld();}finally{window.__renderPhase=false;}"
 DOCUMENT=(SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
   .replace(GNASHER_HIT,"if(Math.hypot(p.x-e.x,p.y-e.y)<60){window.__gnasherHits.push({t:+g.time.toFixed(1),id:e.id,state:e.state,stateT:+e.stateT.toFixed(2),x:+e.x.toFixed(1),y:+e.y.toFixed(1),leapX:+e.leapX.toFixed(1),leapY:+e.leapY.toFixed(1),playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),distance:+Math.hypot(p.x-e.x,p.y-e.y).toFixed(1),dmg:+e.dmg.toFixed(1)});damagePlayer(e.dmg*1.7,'gnasher');}")
   .replace(DRAW_SHAKE,DETERMINISTIC_SHAKE)
+  .replace(DRAW_SHAKE_25D,DETERMINISTIC_SHAKE_25D)
   .replace(FRAME_RENDER,TRACKED_RENDER))
 assert "rand(-g.shake,g.shake)" not in DOCUMENT,"render RNG source remains in test document"
 
