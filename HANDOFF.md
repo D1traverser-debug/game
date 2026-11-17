@@ -52,3 +52,12 @@ Do not mass-produce placeholder heroes, spells or maps before this slice passes.
 - First full-game CI: `44141591159`. Reproducible legacy artifact check PASS; new full-game scope guard PASS; browser objective and art renderer/boss jobs passed; checkpoint job failed only because the negative-control fixture still set `multiplayer=True` (the new required value), so it did not create drift.
 - Corrected the fixture to set `multiplayer=False` and added an active-branch drift negative control. No production game code or content changed.
 - Rerun required. Full-game product remains NOT_READY.
+
+
+## Full-game branch mechanical CI — GREEN (2026-11-18)
+
+- Commit: `daead42f4790e5afb8b2343f8271894fac0895b3`.
+- CI: [44141825172](https://github.com/D1traverser-debug/game/actions/runs/44141825172), 10/10 jobs PASS.
+- Scope guard now validates the expanded full-game contract and checks the exact legacy browser artifact as a preserved reference.
+- All nine legacy browser regression jobs passed on the full-game branch.
+- This is repository/legacy-prototype integrity only. No Unity project, native build, multiplayer, production art/audio or full-game player acceptance exists yet.

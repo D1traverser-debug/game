@@ -197,7 +197,8 @@
     "Official update snapshot read: 1.1 Realm Sweep (2026-09-02), 1.2.0.20127 spell patch (2026-10-06), and performance patch (2026-10-22).",
     "Community inventory identifies 15 wizards, four realms, seven elements and ten dual-element combinations; counts remain provisional pending version reconciliation.",
     "Selected Unity 6.3 LTS + URP for a controlled native PC vertical slice; not yet implemented or validated.",
-    "Current 734011-byte browser candidate and 10/10 CI remain legacy prototype evidence only."
+    "Current 734011-byte browser candidate and 10/10 CI remain legacy prototype evidence only.",
+    "Full-game branch CI #44141825172 passed 10/10 jobs after correcting the negative-control fixture; checkpoint guard confirms the expanded scope and exact legacy artifact, and all nine legacy browser regression jobs pass."
   ],
   "failed_or_open": [
     "Unity 6.3 LTS editor project, URP configuration, package manifest and native Windows build have not yet been created or validated.",
@@ -235,7 +236,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PASS_LEGACY_PROTOTYPE_CI_ONLY",
+  "latest_candidate_ci_status": "PASS_FULL_GAME_SCOPE_GUARD_AND_LEGACY_REGRESSIONS_ONLY_44141825172",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -323,5 +324,16 @@
     "Complete wizard/realm/spell/element/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented.",
     "Original IP, 3D art pipeline, character rigs/animation, environment kits, spell VFX, UI, original music and SFX production have not started.",
     "Windows native build, controller hardware, real save/load, performance, network reliability and independent human acceptance are NOT_TESTED."
-  ]
+  ],
+  "last_full_game_scope_ci": {
+    "run_id": 44141825172,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44141825172",
+    "commit": "daead42f4790e5afb8b2343f8271894fac0895b3",
+    "conclusion": "success",
+    "jobs_passed": 10,
+    "jobs_total": 10,
+    "checkpoint": "PASS_MECHANICAL_ONLY",
+    "legacy_browser_regressions": "9/9 PASS",
+    "meaning": "Full-game scope metadata and legacy prototype integrity were checked; legacy browser regression jobs passed. No Unity project/build, multiplayer, art/audio or full-game acceptance is implied."
+  }
 }
