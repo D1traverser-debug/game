@@ -99,3 +99,10 @@
 - Keep Gnasher escape as the primary route, but add separately tracked projectile and hazard avoidance vectors before final input normalization.
 - The test must preserve evidence that each threat class is detected and that its steering contribution survives the final merge.
 - This is QA-agent behavior only; production damage and attack timing remain unchanged.
+
+
+## D-016 — Reject locked Gnasher steering when it reduces observed evasion (ACCEPTED)
+- CI evidence takes precedence over a theoretically cleaner lock: dynamic per-frame Gnasher scoring produced 327 leap-safe frames and a natural win on seed 1, while the locked policy produced 20 and a death.
+- Restore the empirically successful dynamic controller; do not retain a lock solely because it appears more stable.
+- Expand projectile lookahead to at least 1.8s when the predicted miss distance is within the collision envelope.
+- This remains QA-agent tuning; do not change production attack timing or damage to compensate.

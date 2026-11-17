@@ -161,3 +161,16 @@ Checkpoint: PASS. Short browser regressions: PASS. Natural-run matrix: FAIL (2/3
 | 3 | Natural win at 1229.9s | Sol'phish | Level 22; 1771 kills; 4 objectives; 761.4/1100 HP |
 
 No browser, console or external-network errors. Krog'wa is separately verified by CI #129 seed 2. Revision 022 addresses the vector-override conflict between Gnasher and projectile avoidance.
+
+
+## Natural-run pilot #132 — 2026-11-17
+Run: https://github.com/D1traverser-debug/game/actions/runs/44014779710  
+Checkpoint: PASS. Short browser regressions: PASS. Natural-run matrix: FAIL (0/3 wins).
+
+| Seed | End time | Main failure |
+|---|---:|---|
+| 1 | 466.9s | Three Gnasher hits; only 20 leap-safe frames (CI #131 dynamic controller had 327) |
+| 2 | 187.3s | Repeated projectile hits during Rift; first predicted approach t=1.47s exceeded the 1.35s trigger |
+| 3 | 661.0s | Gnasher hit 329.4 raw at 48.1 units from landing point |
+
+No browser, console or external-network errors. Revision 023 reverts the harmful Gnasher lock and extends projectile detection horizon.

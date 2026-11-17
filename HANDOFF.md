@@ -293,3 +293,11 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Seed 3 naturally defeated Sol'phish at 1229.9s: level 22, 1771 kills, 4 objectives, 761.4/1100 HP.
 - Root cause: when Gnasher threat was active, the pilot replaced its complete steering vector with the Gnasher escape vector, discarding the projectile sidestep already detected by the predictor.
 - Krog'wa remains independently verified by CI #129 seed 2; the current run's seed 2 died before boss. Revision 022 merges separate projectile/hazard vectors with Gnasher escape. Product HTML unchanged.
+
+
+## BOSS PILOT 023 — CI #132 regression analysis (2026-11-17)
+- CI #132: https://github.com/D1traverser-debug/game/actions/runs/44014779710. Checkpoint PASS; all three natural runs died before boss.
+- Seed 1 died at 466.9s after Gnasher hits at 368.3s, 456.4s and 466.9s. The locked planner recorded only 20 leap-safe frames versus 327 in CI #131.
+- Seed 2 died at 187.3s during Rift after repeated projectile hits. The first projectile hit was predicted at t=1.47s, just outside the 1.35s trigger.
+- Seed 3 died at 661.0s to a Gnasher hit 48.1 units from its fixed landing point.
+- Revision 023 rejects the per-attack direction lock and restores the dynamic Gnasher controller that passed seeds 1 and 3 in CI #131. Projectile detection expands to 1.8s/110 units. Production HTML unchanged.
