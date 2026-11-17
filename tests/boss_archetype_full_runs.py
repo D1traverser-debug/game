@@ -57,23 +57,24 @@ window.__fullRun = async (maxSeconds) => {
   };
   const choose=(opts)=>{
     const scrollPriority=['growth','thick','bulwark','evasion','fight','blood','go','mana','vital','elixir','hard','attune','siphon'];
-    const scroll=opts.filter(x=>x.kind==='scroll').sort((a,b)=>scrollPriority.indexOf(a.name)-scrollPriority.indexOf(b.name))[0];
-    if(scroll)return scroll;
     const newSpell=opts.find(x=>x.kind==='newSpell');
     if(newSpell)return newSpell;
+    const scroll=opts.filter(x=>x.kind==='scroll').sort((a,b)=>scrollPriority.indexOf(a.name)-scrollPriority.indexOf(b.name))[0];
+    if(scroll)return scroll;
     // A competent solo build secures sustain first, then layers spell damage.
     const statPriority=['regen','armor','dodge','maxHp','speed','damage','cast','crit','critDmg','spellSize','manaPull','manaGain','luck'];
-    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
-    if(stat)return stat;
     const augPriority=['healingSprout','quakeBurst','diceTwin','diceEcho','sawTwin','sawReturn','orbSplit','orbBurst','quakeAfter','quakePull','sawMagnet','seeking','surge','tempo','reach'];
     const aug=opts.filter(x=>x.kind==='spellAugment').sort((a,b)=>augPriority.indexOf(a.aug)-augPriority.indexOf(b.aug))[0];
     if(aug)return aug;
+    const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
+    if(level)return level;
+    const stat=opts.filter(x=>x.kind==='stat').sort((a,b)=>statPriority.indexOf(a.k)-statPriority.indexOf(b.k))[0];
+    if(stat)return stat;
     const bonus=opts.find(x=>x.kind==='spellLevelBonus'&&x.mode==='damage')||opts.find(x=>x.kind==='spellLevelBonus');
     if(bonus)return bonus;
     const infusion=opts.find(x=>x.kind==='infuse');
     if(infusion)return infusion;
-    const level=opts.filter(x=>x.kind==='spellLevel').sort((a,b)=>a.spell.level-b.spell.level)[0];
-    return level||opts[0];
+    return opts[0];
   };
   while(elapsed<maxSeconds&&!game.ended&&(screen==='playing'||screen==='upgrade')){
     if(screen==='upgrade'){
@@ -228,6 +229,10 @@ async def main():
       page.set_default_timeout(180000)
       await page.set_content(DOCUMENT,wait_until="load")
       await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
+      // Normal menu flow: choose the one-run Solar Pulse trial, then start.
+      await page.locator('#camp').click()
+      await page.locator('[data-trial="solar"]').click()
+      await page.locator('#campBack').click()
       await page.locator("#start").click()
       state=await asyncio.wait_for(page.evaluate("window.__fullRun(1500)"),timeout=180)
       item={"seed":seed,"boss":state["bossId"],"natural_win":bool(state["bossDead"] and state["ended"] and state["screen"]=="result" and state["wins"]>=1),"state":state,"page_errors":errors,"console_errors":console,"external_requests":requests}
