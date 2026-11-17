@@ -40,11 +40,6 @@ namespace Game.Core.Combat
             Health = Math.Min(MaxHealth, Health + (restoreAddedCapacity ? added : 0.0f));
         }
 
-        public void ApplyDamageForTest(float amount)
-        {
-            ApplyDamage(amount);
-        }
-
         internal float ApplyDamage(float amount)
         {
             if (!IsFinitePositive(amount) || !IsAlive) return 0.0f;

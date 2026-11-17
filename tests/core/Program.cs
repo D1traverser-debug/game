@@ -147,8 +147,9 @@ static void InvalidDamageIsRejected()
 
 static void MaxHealthUpgradeCanRestoreAddedCapacity()
 {
+    var attacker = new CombatantState(2, 2, 100);
     var player = new CombatantState(1, 1, 100);
-    player.ApplyDamageForTest(40);
+    DamagePipeline.Apply(attacker, player, new DamageRequest(2, 1, 40, DamageKind.Spell), new DamagePolicy());
     player.SetMaxHealth(140, true);
     Assert.Equal(100.0f, player.Health, 1e-5f);
     Assert.Equal(140.0f, player.MaxHealth, 1e-5f);
