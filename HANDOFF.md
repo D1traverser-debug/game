@@ -201,3 +201,11 @@ Perform the full source-grounded audit of the current `index.html` against the r
 - Only Mul'gath has a natural full-run win. Sol'phish and Krog'wa full-run victories, owner playtest, file-origin persistence, real hardware performance and full source fidelity remain OPEN.
 - Product status remains NOT_READY; main branch remains preserved; CAOS remains read-only.
 - Evidence: `docs/experiments/NATURAL_RUN_012.md`.
+
+## MULTI-BOSS natural-run acceptance — 2026-11-17
+- Seeded full-mission test was added and initially failed before boss spawn. CI run `44002043276`: seed 1 died at gameTime 121.17s, HP 0/100, damageTaken 131.04, level 9, kills 131, only Astral + Solar, armor 0, regen 0, objectives 0; active objective was sludge at 120s. No page/console errors or external requests.
+- Trace: HP 100 at 30s, 60s, 90s; dropped to 13 by 120s. This points to the automated build policy not investing in defensive stats soon enough, rather than a JS runtime failure.
+- Fixed Python comment syntax in `tests/boss_archetype_full_runs.py`; checkpoint hash/bytes synchronized to CI-reported SHA `632e86aff74cc139daeea5738eca9f2f261262dc0077083231912a20fffb7d29`, 721829 bytes. Checkpoint job passed.
+- Updated test-only selection policy: when defensive/stat cards are actually offered, choose them before spell augments/levels. No production HP, armor, regen, enemy count, mission time, boss state or win state is mutated.
+- New CI run `44002364988` is pending/running; check its browser-component result and especially the seeded full mission before claiming progress.
+- If seed 1 still fails, record actual upgrade offer sets and objective route trace; do not simply loosen pass criteria. Next objective is repeatable natural wins for all three boss archetypes, then owner-controlled playtest.
