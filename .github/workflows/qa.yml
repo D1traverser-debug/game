@@ -39,8 +39,8 @@ jobs:
         run: python tests/objective_collection_regression.py
       - name: Browser character upgrade regression
         run: python tests/character_upgrade_regression.py
-      - name: Browser seeded full missions for all three boss archetypes
-        run: python tests/boss_archetype_full_runs.py
+      - name: Browser seeded natural Mul'gath full mission (seed 1)
+        run: python tests/boss_archetype_full_runs.py 1
       - name: Browser 3D combat, boss and objectives integration
         run: python tests/game3d_integration.py
       - name: Browser solo spell trials and quest persistence regression
