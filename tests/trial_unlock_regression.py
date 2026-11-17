@@ -50,6 +50,8 @@ async def main():
     await page.locator('#start').click()
     before=await page.evaluate('__trialProbe.snapshot()')
     c['solar_not_early_unlock']='solar' not in before['unlocks']
+    c['trial_consumed_on_start']=before['trial'] is None
+    c['trial_spell_equipped_at_start']='solar' in before['spells']
     offer=await page.evaluate('__trialProbe.offer(2)')
     c['trial_offered_at_slot_two']=offer['offers'][0]=='solar'
     accepted=await page.evaluate('__trialProbe.acceptFirst()')
@@ -60,6 +62,9 @@ async def main():
     c['grant_is_idempotent']=not second['newlyGranted']
     star=await page.evaluate('screen="playing";__trialProbe.starEvent()')
     c['star_cast_event_unlock']=star['unlocked'] and not star['preexisting']
+    await page.evaluate('startRun()')
+    restarted=await page.evaluate('__trialProbe.snapshot()')
+    c['trial_does_not_repeat_next_run']='solar' not in restarted['spells']
     c['no_runtime_exceptions']=not outcome['page_errors']
     c['no_external_requests']=not outcome['requests']
     await browser.close()
