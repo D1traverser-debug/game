@@ -80,6 +80,10 @@ window.__fullRun = async (maxSeconds) => {
     if(screen==='upgrade'){
       const opts=game.pending?.opts||[];
       if(!opts.length)break;
+      // Spend only real in-game rerolls to seek a defensive option; never pay HP for rerolls.
+      const hasDefensive=opts.some(x=>x.kind==='stat'&&['regen','armor','dodge','maxHp'].includes(x.k));
+      const hasNewSpell=opts.some(x=>x.kind==='newSpell');
+      if(!hasDefensive&&!hasNewSpell&&game.player.rerolls>0){$('reroll').click();continue;}
       // Only choose from real cards currently offered by the production game.
       const choice=choose(opts);upgradeLog.push({t:+game.time.toFixed(1),offered:opts.map(x=>({kind:x.kind,k:x.k,name:x.name,aug:x.aug,spell:x.spell?.id})),selected:{kind:choice.kind,k:choice.k,name:choice.name,aug:choice.aug,spell:choice.spell?.id}});applyUpgrade(choice);upgrades++;continue;
     }
