@@ -36,7 +36,17 @@ window.__BOSS_QA={
   return{moved,healed,corruptedDead:corrupted.dead,bossDamaged:b.hp<beforeCorrupt};
  },
  collision:()=>{const p={x:20,y:0,r:5};return{circle:bossAttackContainsPlayer({kind:'circle',x:0,y:0,r:20},p),outside:!bossAttackContainsPlayer({kind:'circle',x:0,y:0,r:10},p),line:bossAttackContainsPlayer({kind:'line',x:0,y:0,tx:100,ty:0,width:20},{x:55,y:8,r:5}),grid:bossAttackContainsPlayer({kind:'grid',points:[{x:0,y:0,r:12}]},{x:15,y:0,r:5})}},
- homing:()=>{const p={x:1000,y:1000,r:16},s={x:0,y:0,vx:180,vy:0,speed:190,turnRate:3,life:3,dmg:1,r:7,kind:'enemyHoming'};bossUpdateHomingProjectile(s,.12,p);return{vy:s.vy,turnsTowardTarget:s.vy>0}}
+ homing:()=>{const p={x:1000,y:1000,r:16},s={x:0,y:0,vx:180,vy:0,speed:190,turnRate:3,life:3,dmg:1,r:7,kind:'enemyHoming'};bossUpdateHomingProjectile(s,.12,p);return{vy:s.vy,turnsTowardTarget:s.vy>0}},
+ warning:(id,attackId)=>{const b=window.__BOSS_QA.spawn(id),def=BOSS_ATTACK_DEFS[id].find(x=>x.id===attackId),a=bossBeginAttack(b,def),h=game.hazards.find(x=>x.bossAttackToken===a.token);return{token:a.token,count:game.hazards.filter(x=>x.bossAttackToken===a.token).length,shape:h?.bossShape,geometryMatches:JSON.stringify(h?.bossGeometry)===JSON.stringify(a.geometry)}},
+ freezeCancel:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[0]);b.freeze=1.5;for(let i=0;i<15;i++){updateBossEncounter(.1);for(const h of game.hazards){h.timer-=.1;h.life-=.1}game.hazards=game.hazards.filter(h=>h.life>0)}return{oldAttackCancelled:b.attackInstance!==a,oldWarnings:game.hazards.filter(h=>h.bossAttackToken===a.token).length,remainingFreeze:b.freeze}},
+ phaseCancel:()=>{const b=window.__BOSS_QA.spawn('krog'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[1]);b.hp=b.max*.6;bossSyncPhase(b);return{oldAttackCancelled:b.attackInstance!==a,oldWarnings:game.hazards.filter(h=>h.bossAttackToken===a.token).length,phase:b.phaseIndex}},
+ staggerCancel:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[0]);b.stagger=100;updateBossEncounter(.05);return{oldAttackCancelled:b.attackInstance!==a,oldWarnings:game.hazards.filter(h=>h.bossAttackToken===a.token).length,vulnerable:b.vulnerable}},
+ pullSnapshot:()=>{const b=window.__BOSS_QA.spawn('krog'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[0]),g=a.geometry,p=game.player;p.x=g.x-100;p.y=g.y;const before=p.x;b.x=g.x-300;bossApplyPull(b,a,.1);return{movedTowardSnapshot:p.x>before,after:p.x,snapshot:g.x,currentBoss:b.x}},
+ radialOrigin:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[1]),g=a.geometry;game.shots=[];b.x+=300;bossFireProjectiles(b,a);return{actual:game.shots[0]?.x,expected:g.x+b.r+8,match:Math.abs(game.shots[0]?.x-(g.x+b.r+8))<.001}},
+ homingOrigin:()=>{const b=window.__BOSS_QA.spawn('sol'),startX=b.x,a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[2]);game.shots=[];b.x+=300;bossFireProjectiles(b,a);return{actual:game.shots[0]?.x,expected:startX+b.r+8,match:Math.abs(game.shots[0]?.x-(startX+b.r+8))<.001}},
+ commitment:()=>{const b=window.__BOSS_QA.spawn('krog');bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[1]);const before={x:b.x,y:b.y};game.player.x=b.x+800;game.player.y=b.y;updateBossEncounter(.1);return{stationary:Math.abs(b.x-before.x)<.001&&Math.abs(b.y-before.y)<.001,before,after:{x:b.x,y:b.y}}},
+ pauseClock:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[0]),life=game.hazards.find(h=>h.bossAttackToken===a.token)?.life,time=game.time,timer=a.timer;pause();update(.2);const result={timeUnchanged:game.time===time,attackTimerUnchanged:a.timer===timer,warningLifeUnchanged:game.hazards.find(h=>h.bossAttackToken===a.token)?.life===life};resume();return result},
+ invulnerability:()=>{const p=game.player;p.hp=100;p.maxHp=100;p.invuln=1;p.dodge=0;const a={def:{effect:'impact',damage:50},geometry:{kind:'circle',x:p.x,y:p.y,r:100},resolved:false};bossResolveAttack(null,a,.1);const afterFirst=p.hp;p.invuln=0;bossResolveAttack(null,a,.1);return{blocked:afterFirst===100,notReplayed:p.hp===100,resolved:a.resolved}}
 };
 """
 TEST_HTML=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
@@ -62,6 +72,16 @@ async def main():
   minions=await page.evaluate("__BOSS_QA.minions()");c["mul_minions_seek_and_heal_boss"]=minions["moved"] and minions["healed"];c["corrupted_minion_damages_boss"]=minions["corruptedDead"] and minions["bossDamaged"]
   collision=await page.evaluate("__BOSS_QA.collision()");c["circle_line_grid_collision_contracts"]=all(collision.values())
   homing=await page.evaluate("__BOSS_QA.homing()");c["homing_projectile_turns_toward_player"]=homing["turnsTowardTarget"]
+  warning=await page.evaluate("__BOSS_QA.warning('mul','spikeGrid')");c["telegraph_payload_preserves_geometry"]=warning["count"]==1 and warning["shape"]=="grid" and warning["geometryMatches"]
+  frozen=await page.evaluate("__BOSS_QA.freezeCancel()");c["freeze_cancels_attack_and_its_warning"]=frozen["oldAttackCancelled"] and frozen["oldWarnings"]==0
+  phase_cancel=await page.evaluate("__BOSS_QA.phaseCancel()");c["phase_transition_cancels_attack_and_warning"]=phase_cancel["oldAttackCancelled"] and phase_cancel["oldWarnings"]==0 and phase_cancel["phase"]==1
+  stagger=await page.evaluate("__BOSS_QA.staggerCancel()");c["stagger_cancels_attack_and_warning"]=stagger["oldAttackCancelled"] and stagger["oldWarnings"]==0 and stagger["vulnerable"]>0
+  pull=await page.evaluate("__BOSS_QA.pullSnapshot()");c["pull_uses_snapshotted_origin"]=pull["movedTowardSnapshot"]
+  radial=await page.evaluate("__BOSS_QA.radialOrigin()");c["radial_projectiles_use_snapshotted_origin"]=radial["match"]
+  homing_origin=await page.evaluate("__BOSS_QA.homingOrigin()");c["homing_projectiles_use_snapshotted_origin"]=homing_origin["match"]
+  commitment=await page.evaluate("__BOSS_QA.commitment()");c["boss_commits_position_during_telegraph"]=commitment["stationary"]
+  paused=await page.evaluate("__BOSS_QA.pauseClock()");c["pause_freezes_attack_and_warning_clocks"]=paused["timeUnchanged"] and paused["attackTimerUnchanged"] and paused["warningLifeUnchanged"]
+  invuln=await page.evaluate("__BOSS_QA.invulnerability()");c["invulnerability_blocks_attack_once"]=invuln["blocked"] and invuln["notReplayed"] and invuln["resolved"]
   c["no_runtime_exceptions"]=not outcome["page_errors"];c["no_external_requests"]=not outcome["requests"]
   await browser.close()
  outcome["pass"]=all(outcome["checks"].values());outcome["count"]=len(outcome["checks"]);outcome["limitations"]=["Deterministic component probes only; not a human full-run or final-balance acceptance."]
