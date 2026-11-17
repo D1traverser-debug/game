@@ -28,6 +28,16 @@ var tests = new List<(string Name, Action Run)>
     ("unknown_button_bits_are_rejected", UnknownButtonBitsAreRejected),
     ("negative_sequence_is_rejected", NegativeSequenceIsRejected),
     ("negative_client_tick_is_rejected", NegativeClientTickIsRejected),
+    ("auto_target_selects_nearest_enemy_not_ally_or_out_of_range", AutoTargetSelectsNearestEnemy),
+    ("lowest_health_ratio_targeting_is_deterministic", LowestHealthRatioTargetingIsDeterministic),
+    ("random_targeting_uses_seeded_rng", RandomTargetingUsesSeededRng),
+    ("spell_cooldown_blocks_recast_until_ticks_elapse", SpellCooldownBlocksRecast),
+    ("spread_pattern_is_symmetric", SpreadPatternIsSymmetric),
+    ("radial_pattern_is_evenly_spaced_without_target", RadialPatternIsEvenlySpaced),
+    ("no_target_does_not_consume_cooldown", NoTargetDoesNotConsumeCooldown),
+    ("invalid_targeting_pattern_is_rejected", InvalidTargetingPatternIsRejected),
+    ("same_seed_produces_same_projectile_spawns", SameSeedProducesSameProjectileSpawns),
+    ("single_pattern_emits_exactly_one_projectile", SinglePatternEmitsOneProjectile),
 };
 
 var failures = 0;
@@ -257,6 +267,154 @@ static void NegativeClientTickIsRejected()
     var players = new HashSet<int> { 1 };
     var command = new Game.Core.Networking.PlayerInputCommand(1, 1, -1, 0, 0, Game.Core.Networking.PlayerButtons.None);
     Assert.Equal(Game.Core.Networking.CommandValidationOutcome.TickOutsideWindow, validator.Validate(command, players, 100).Outcome);
+}
+
+static void AutoTargetSelectsNearestEnemy()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.test_bolt", 5, 10, 12, 8, 1, 0, 0,
+        Game.Core.Spells.SpellTargetingMode.NearestEnemy, Game.Core.Spells.ProjectilePattern.Single);
+    var runtime = new Game.Core.Spells.SpellRuntimeState();
+    var targets = new List<Game.Core.Spells.TargetCandidate>
+    {
+        new(2, 1, 1, 0, 10, 10),
+        new(3, 2, 4, 0, 10, 10),
+        new(4, 2, 2, 0, 10, 10),
+        new(5, 2, 30, 0, 10, 10),
+        new(6, 2, 0.5f, 0, 0, 10)
+    };
+    var result = Game.Core.Spells.SpellSystem.TryCast(def, runtime, 1, 1, 0, 0, targets);
+    Assert.Equal(Game.Core.Spells.SpellCastOutcome.Cast, result.Outcome);
+    Assert.Equal(4, result.TargetId);
+}
+
+static void LowestHealthRatioTargetingIsDeterministic()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.test_seek", 0, 20, 8, 6, 1, 0, 0,
+        Game.Core.Spells.SpellTargetingMode.LowestHealthRatio, Game.Core.Spells.ProjectilePattern.Single);
+    var targets = new List<Game.Core.Spells.TargetCandidate>
+    {
+        new(8, 2, 1, 0, 40, 100),
+        new(4, 2, 4, 0, 10, 100),
+        new(3, 2, 2, 0, 1, 10)
+    };
+    var result = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
+        1, 1, 0, 0, targets);
+    Assert.Equal(3, result.TargetId);
+}
+
+static void RandomTargetingUsesSeededRng()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.test_random", 0, 20, 8, 6, 1, 0, 0,
+        Game.Core.Spells.SpellTargetingMode.RandomEnemy, Game.Core.Spells.ProjectilePattern.Single);
+    var targets = new List<Game.Core.Spells.TargetCandidate>
+    {
+        new(4, 2, 1, 0, 10, 10),
+        new(2, 2, 2, 0, 10, 10),
+        new(3, 2, 3, 0, 10, 10)
+    };
+    var a = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
+        1, 1, 0, 0, targets, new DeterministicRng(42));
+    var b = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
+        1, 1, 0, 0, targets, new DeterministicRng(42));
+    Assert.Equal(a.TargetId, b.TargetId);
+}
+
+static void SpellCooldownBlocksRecast()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.cooldown", 2, 10, 10, 5, 1, 0, 0,
+        Game.Core.Spells.SpellTargetingMode.NearestEnemy, Game.Core.Spells.ProjectilePattern.Single);
+    var runtime = new Game.Core.Spells.SpellRuntimeState();
+    var targets = new List<Game.Core.Spells.TargetCandidate> { new(2, 2, 1, 0, 10, 10) };
+    Assert.Equal(Game.Core.Spells.SpellCastOutcome.Cast,
+        Game.Core.Spells.SpellSystem.TryCast(def, runtime, 1, 1, 0, 0, targets).Outcome);
+    Assert.Equal(2, runtime.CooldownRemainingTicks);
+    Assert.Equal(Game.Core.Spells.SpellCastOutcome.OnCooldown,
+        Game.Core.Spells.SpellSystem.TryCast(def, runtime, 1, 1, 0, 0, targets).Outcome);
+    runtime.AdvanceTick();
+    runtime.AdvanceTick();
+    Assert.Equal(Game.Core.Spells.SpellCastOutcome.Cast,
+        Game.Core.Spells.SpellSystem.TryCast(def, runtime, 1, 1, 0, 0, targets).Outcome);
+}
+
+static void SpreadPatternIsSymmetric()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.fan", 0, 20, 5, 10, 3, 0.4f, 0,
+        Game.Core.Spells.SpellTargetingMode.NearestEnemy, Game.Core.Spells.ProjectilePattern.Spread);
+    var targets = new List<Game.Core.Spells.TargetCandidate> { new(2, 2, 10, 0, 10, 10) };
+    var result = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
+        1, 1, 0, 0, targets);
+    Assert.Equal(3, result.Projectiles.Length);
+    Assert.True(result.Projectiles[0].VelocityY < 0);
+    Assert.True(Math.Abs(result.Projectiles[0].VelocityY + result.Projectiles[2].VelocityY) < 1e-4);
+    Assert.True(Math.Abs(result.Projectiles[1].VelocityY) < 1e-4);
+}
+
+static void RadialPatternIsEvenlySpaced()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.pulse", 0, 20, 7, 10, 4, 0, 0,
+        Game.Core.Spells.SpellTargetingMode.None, Game.Core.Spells.ProjectilePattern.Radial);
+    var result = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
+        1, 1, 2, 3, Array.Empty<Game.Core.Spells.TargetCandidate>());
+    Assert.Equal(Game.Core.Spells.SpellCastOutcome.Cast, result.Outcome);
+    Assert.Equal(-1, result.TargetId);
+    Assert.Equal(4, result.Projectiles.Length);
+    Assert.True(Math.Abs(result.Projectiles[0].VelocityX - 10) < 1e-4);
+    Assert.True(Math.Abs(result.Projectiles[1].VelocityY - 10) < 1e-4);
+    Assert.True(Math.Abs(result.Projectiles[2].VelocityX + 10) < 1e-4);
+    Assert.True(Math.Abs(result.Projectiles[3].VelocityY + 10) < 1e-4);
+}
+
+static void NoTargetDoesNotConsumeCooldown()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.empty", 9, 5, 7, 8, 1, 0, 0,
+        Game.Core.Spells.SpellTargetingMode.NearestEnemy, Game.Core.Spells.ProjectilePattern.Single);
+    var runtime = new Game.Core.Spells.SpellRuntimeState();
+    var result = Game.Core.Spells.SpellSystem.TryCast(def, runtime, 1, 1, 0, 0,
+        new List<Game.Core.Spells.TargetCandidate> { new(2, 2, 8, 0, 10, 10) });
+    Assert.Equal(Game.Core.Spells.SpellCastOutcome.NoTarget, result.Outcome);
+    Assert.Equal(0, runtime.CooldownRemainingTicks);
+}
+
+static void InvalidTargetingPatternIsRejected()
+{
+    var threw = false;
+    try
+    {
+        _ = new Game.Core.Spells.SpellDefinition("spell.invalid", 1, 5, 1, 1, 3, 0, 0,
+            Game.Core.Spells.SpellTargetingMode.None, Game.Core.Spells.ProjectilePattern.Spread);
+    }
+    catch (ArgumentException) { threw = true; }
+    Assert.True(threw, "targetless spread spell was accepted");
+}
+
+static void SameSeedProducesSameProjectileSpawns()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.random", 0, 20, 8, 6, 3, 0.6f, 1,
+        Game.Core.Spells.SpellTargetingMode.RandomEnemy, Game.Core.Spells.ProjectilePattern.Spread);
+    var targets = new List<Game.Core.Spells.TargetCandidate>
+    {
+        new(2, 2, 10, 0, 10, 10), new(3, 2, 0, 10, 10, 10), new(4, 2, -10, 0, 10, 10)
+    };
+    var a = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
+        1, 1, 0, 0, targets, new DeterministicRng(987));
+    var b = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
+        1, 1, 0, 0, targets, new DeterministicRng(987));
+    Assert.Equal(a.TargetId, b.TargetId);
+    for (var i = 0; i < a.Projectiles.Length; i++)
+    {
+        Assert.Equal(a.Projectiles[i].VelocityX, b.Projectiles[i].VelocityX, 1e-5f);
+        Assert.Equal(a.Projectiles[i].VelocityY, b.Projectiles[i].VelocityY, 1e-5f);
+    }
+}
+
+static void SinglePatternEmitsOneProjectile()
+{
+    var def = new Game.Core.Spells.SpellDefinition("spell.single", 0, 10, 5, 4, 7, 1.2f, 0,
+        Game.Core.Spells.SpellTargetingMode.NearestEnemy, Game.Core.Spells.ProjectilePattern.Single);
+    var targets = new List<Game.Core.Spells.TargetCandidate> { new(2, 2, 1, 0, 10, 10) };
+    var result = Game.Core.Spells.SpellSystem.TryCast(def, new Game.Core.Spells.SpellRuntimeState(),
+        1, 1, 0, 0, targets);
+    Assert.Equal(1, result.Projectiles.Length);
 }
 
 static class Assert

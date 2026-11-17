@@ -130,3 +130,13 @@ The previous brief's "seven elements + ten combinations" wording was too definit
 - Legacy browser regression: **9/9 PASS**.
 - The run validates the project files and local package path, not an actual Unity Editor launch. Package resolution, URP asset assignment, scene, native build, online co-op and production assets remain NOT_TESTED.
 - The element/infusion source discrepancy has been recorded: detailed matrix says 5 primary + 15 advanced candidates; another community guide says 7 identities + 10 combinations. Do not freeze the count until in-game verification.
+
+
+## Spell execution kernel — CI pending
+
+- Added `SpellDefinition`, `SpellRuntimeState`, `TargetCandidate`, `ProjectileSpawn` and `SpellSystem`.
+- Target modes: nearest enemy, lowest health ratio and deterministic random enemy; ally/dead/out-of-range targets are filtered.
+- Projectile patterns: single, symmetric spread and targetless radial.
+- Cooldown advances in simulation ticks; no target does not consume cooldown.
+- Output is deterministic projectile spawn data; projectile travel/collision, damage integration, element/status/augmentation logic and non-projectile spell behaviors remain open.
+- Ten new contract tests added; CI pending.

@@ -12,7 +12,7 @@ The full-game scope re-baseline dated 2026-11-18 supersedes the original single-
 | CORE-01 | Full title/menu/lobby/camp/settings/run/pause/upgrade/results/retry loop | P0 | Human-driven flow in solo and online sessions | NOT_TESTED |
 | CORE-02 | Movement, collision, damage, knockback, invulnerability, death and revive | P0 | Deterministic tests plus real combat and network tests | PARTIAL_LEGACY |
 | CORE-03 | Automatic targeting and spell firing behavior | P0 | Per-spell target/trajectory/cadence tests and live combat | PARTIAL_LEGACY |
-| SPELL-01 | Complete source-version spell catalogue with distinct identity, behavior, VFX, SFX, upgrades and augmentations | P0 | Spell cards, behavior tests, live-play and audiovisual review | NOT_TESTED |
+| SPELL-01 | Complete source-version spell catalogue with distinct identity, behavior, VFX, SFX, upgrades and augmentations | P0 | Spell cards, behavior tests, live-play and audiovisual review | PARTIAL_CORE_FRAMEWORK |
 | ELEMENT-01 | Complete source-version primary-element and advanced-infusion catalogue | P0 | Reconcile five-primary/fifteen-advanced detailed matrix against seven-identity/ten-combo community summary; implement each effect and test crit/status/stacking/teammate rules | SOURCE_DISCREPANCY_OPEN |
 | PROG-01 | XP, level-up, spell slots/levels, infusion, reroll/ban/lock and augmentation flow | P0 | Boundary/sequence tests and live run | PARTIAL_LEGACY |
 | PROG-02 | Scrolls, chests, rarity, stack limits, quests, unlocks and meta progression | P0 | Pool eligibility, persistence and progression acceptance | NOT_TESTED |

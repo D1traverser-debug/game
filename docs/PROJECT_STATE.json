@@ -210,16 +210,18 @@
     "Moved Game.Core sources into a local Unity Package Manager package under src/core/Runtime; .NET Standard 2.1 build and 22/22 contracts passed in CI #44144343912.",
     "Committed Unity 6000.3.27f2 project version and URP 17.3.0 package dependency; Editor has not been opened.",
     "Unity project structure guard passed 17/17 checks in CI #44144872368: patched Editor version/revision, URP dependency, local Game.Core UPM path, asmdef, .NET Standard target, engine-independent sources and Unity ignore rules.",
-    "Full-game branch CI #44144872368 passed 12/12 jobs; Game.Core passed 22/22 contracts; all nine legacy browser regression jobs passed."
+    "Full-game branch CI #44144872368 passed 12/12 jobs; Game.Core passed 22/22 contracts; all nine legacy browser regression jobs passed.",
+    "Added data-driven SpellDefinition/SpellRuntimeState and automatic target selection/projectile spawn kernel; CI pending."
   ],
   "failed_or_open": [
     "Unity project skeleton is committed at unity/ with Editor 6000.3.27f2 and URP 17.3.0 dependency; opening the project, package resolution, URP asset assignment and native Windows build remain NOT_TESTED.",
     "1–4 player online co-op transport/session, host snapshots, lobby/relay, reconnect, friendly-fire replication, revive and four-client stress are not implemented; only the pure input-envelope validation contract exists.",
     "Full wizard/realm/spell/element/advanced-infusion/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented; element counts conflict across community references.",
     "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
-    "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested."
+    "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested.",
+    "Spell kernel does not yet implement projectile simulation/collision, status/element effects, augmentations, non-projectile spell behaviors or source-complete content catalogue."
   ],
-  "next_action": "Implement a data-driven automatic spell execution kernel (target selection, cooldown, projectile patterns and deterministic spawn output) with focused tests. In parallel, reconcile the current source-version spell and infusion catalogue; then connect the core to the Unity vertical slice.",
+  "next_action": "Run the expanded core suite. After green, implement projectile simulation/collision and damage/event integration, then build the first original vertical-slice spell trio in Unity with authored VFX/SFX.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
