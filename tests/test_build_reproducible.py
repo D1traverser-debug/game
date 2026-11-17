@@ -8,5 +8,6 @@ class BuildReproducibilityTests(unittest.TestCase):
   html=INDEX.read_text(encoding="utf-8")
   self.assertIn(BOSS_MODULE.read_text(encoding="utf-8").rstrip("\n"),html)
   self.assertIn("bossUpdateHomingProjectile(s,dt,p)",html)
+  self.assertIn("enemyHoming",html)
   self.assertNotIn("window.BOSS_ARCHETYPES",html)
 if __name__=="__main__":unittest.main()
