@@ -82,7 +82,9 @@
     "GitHub Actions run 43989883310 passed both checkpoint and all browser-component steps, including the new natural full mission boss win",
     "Fixed selected one-run spell trial being saved by camp UI but omitted from makePlayer loadout; trial spell is now equipped at run start and selection consumed once",
     "Corrected seeded full-run test Python comment syntax and synchronized PROJECT_STATE artifact hash/bytes to exact CI-reported values; checkpoint job passed in run 44002043276.",
-    "Updated test-only natural-play build policy to select defensive stat cards whenever actually offered before spell augments/levels; does not mutate player stats or alter production game code."
+    "Updated test-only natural-play build policy to select defensive stat cards whenever actually offered before spell augments/levels; does not mutate player stats or alter production game code.",
+    "Seeded full-run test now logs each real upgrade offer/selection for evidence-based pilot tuning.",
+    "Adjusted test-only movement policy to damp threat evasion while inside the Rift capture radius (multi-node radius tighter); no game state, player stats or objective progress is forced."
   ],
   "failed_or_open": [
     "Real file:// open and localStorage close/reopen not tested",
@@ -132,9 +134,10 @@
     "Mul'gath boss phase took roughly 323 seconds after the 19-minute spawn; compare boss duration and healing-servant pressure against source evidence before tuning",
     "Full-run test is a scripted movement/upgrade policy; repeat with alternate builds and all three boss archetypes",
     "Seeded full-mission natural run seed 1 died at 167.8 seconds before boss; root cause investigation and pilot strategy refinement underway; not a boss-mechanics failure",
-    "Seeded natural full mission seed 1 failed at gameTime 121.17s before boss spawn; player HP 0/100 after taking 131.0 damage, only 2 spells equipped, 0 armor/regen, 0 objectives completed. Trace shows HP 100 at 90.2s then 13 at 120.3s during sludge objective. No JS/console/network errors."
+    "Seeded natural full mission seed 1 failed at gameTime 121.17s before boss spawn; player HP 0/100 after taking 131.0 damage, only 2 spells equipped, 0 armor/regen, 0 objectives completed. Trace shows HP 100 at 90.2s then 13 at 120.3s during sludge objective. No JS/console/network errors.",
+    "After moving defensive stat cards ahead of spell-level/augment picks, seed 1 survived longer to 167.87s with 400 max HP and 2 regen, but died at the Rift objective; progress only 35.7%, objectives completed 0, HP 0, damageTaken 402.88, no boss spawned. Trace confirms the pilot's threat-evasion vector repeatedly leaves the required capture radius."
   ],
-  "next_action": "Finish CI run 44002364988. Inspect seed-1 trace after defensive-stat priority change. If still failing, log every real upgrade offer and selection, determine whether defensive cards are actually offered; then adjust pilot movement/objective navigation without granting stats or modifying game state. Once a stable natural win exists, expand seeded runs to Sol'phish/Krog'wa/Mul'gath. Do not call component/synthetic results full-play acceptance.",
+  "next_action": "Inspect the next CI seeded run. If it reaches the Rift completion and survives, continue to boss. If not, analyze the upgrade offer log and objective trace, then tune only normal movement/selection inputs. After stable seed 1, expand to all three bosses and repeat varied builds. Keep product NOT_READY pending player acceptance.",
   "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
   "branch": "development",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -160,5 +163,5 @@
     "tested": "2.5D atlas renderer, 24 static decor cache tiles, Reginald-only 18-spell scope, save migration, 90-second normal combat, all objective collection components, all 13 character stat effects, Vitality Forge 25% healing, and a non-cheating 24m23s automated full mission with a natural Mul'gath win",
     "not_tested": "natural Sol'phish/Krog'wa full-run victories, human owner acceptance, real file-origin persistence, real hardware performance, full source fidelity"
   },
-  "latest_candidate_ci_status": "PENDING_RUN_44002364988"
+  "latest_candidate_ci_status": "PENDING_RIFT_HOLD_PILOT_014B"
 }
