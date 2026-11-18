@@ -83,7 +83,7 @@
 .character-detail h3{font:700 22px Georgia,serif;margin:4px 0 8px;color:#efd49a}
 .character-detail p{font-size:11px;line-height:1.65;color:#c4d0c2;margin:6px 0}
 .character-detail .passive{border-top:1px solid #fff2;margin-top:12px;padding-top:10px}
-.map-preview{display:block;width:100%;height:auto;border:1px solid #d9c28a55;border-radius:9px;background:#18382e}
+.map-preview{display:block;width:100%;height:auto;border:1px solid #d9c28a55;border-radius:9px;background:#18382e;pointer-events:none}
 .map-caption{display:flex;justify-content:space-between;gap:8px;margin:7px 0 12px;color:#b7c8b7;font-size:9px;letter-spacing:.08em}
 .map-legend{display:flex;flex-wrap:wrap;gap:7px;margin:7px 0}
 .map-legend span{font-size:9px;color:#c7d1bf;padding:4px 6px;border:1px solid #ffffff18;border-radius:6px;background:#ffffff08}
@@ -520,7 +520,7 @@ function grantSpellQuest(id){
  checkSpellUnlocks();persist();toast('专属法术试炼完成：'+spells.find(x=>x.id===id).name);return true;
 }
 function renderResearch(){let box=$('questGrid');if(!box)return;
- box.innerHTML='<div class="questline"><b>Reginald</b> · Astral Orbs · 1.2 版本的三种新法术开局解锁。<p style="color:#a4b7a3;font-size:10px">单英雄适配：可选择一项尚未解锁的法术进行临时试炼，达成原作挑战后永久解锁。</p></div>';
+ box.innerHTML='<div class="questline"><b>远征法术档案</b> · 四位巫师共享法术研究进度。<p style="color:#a4b7a3;font-size:10px">单人远征：选择一项尚未解锁的法术作为本局试炼法术；完成对应挑战后永久解锁。</p></div>';
  for(const s of spells){if(!REGINALD_SPELL_IDS.has(s.id)||s.id==='astral')continue;let ok=save.unlocks.includes(s.id);
   let rule=INITIAL_SPELL_IDS.includes(s.id)?'初始解锁':(spellQuestDescriptions[s.id]||'专属挑战：规则尚待核实，不自动发放');
   let canTrial=!ok&&!INITIAL_SPELL_IDS.includes(s.id);
