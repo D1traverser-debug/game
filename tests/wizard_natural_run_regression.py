@@ -22,12 +22,13 @@ PILOT_ABILITY_PATCH="""if(!gnasherThreat&&(chestNear||itemNear)){interact();inte
     );
     if(shouldUseAbility)useCharacterAbility();
     window.__manualTick=true;"""
+PILOT_PROBE_ANCHOR="window.__setRunSeed=(seed)=>{"
+PILOT_PROBE_PATCH="window.__setSelectedWizardForTest=(id)=>{save.selectedCharacterId=id;persist();};window.__getSelectedWizardForTest=()=>game?.player?.characterId||save.selectedCharacterId;\n"+PILOT_PROBE_ANCHOR
 DOCUMENT=(PILOT.DOCUMENT
- .replace(MARKER,"window.__setSelectedWizardForTest=(id)=>{save.selectedCharacterId=id;persist();};window.__getSelectedWizardForTest=()=>game?.player?.characterId||save.selectedCharacterId;\\n"+MARKER)
+ .replace(PILOT_PROBE_ANCHOR,PILOT_PROBE_PATCH)
  .replace(PILOT_ABILITY_ANCHOR,PILOT_ABILITY_PATCH))
 assert DOCUMENT!=PILOT.DOCUMENT and DOCUMENT.count("window.__setSelectedWizardForTest")==1
 assert "if(shouldUseAbility)useCharacterAbility();" in DOCUMENT
-assert DOCUMENT!=PILOT.DOCUMENT and DOCUMENT.count("window.__setSelectedWizardForTest")==1
 
 async def main():
  report={"runs":[],"checks":{}}
