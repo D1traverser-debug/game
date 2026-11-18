@@ -45,3 +45,11 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Updated the artifact byte count to 767208 and moved mute/unmute verification to the unobstructed menu before starting the run.
 - This fixes the identified test/metadata causes only; rerun CI before recording a pass.
 - Product status remains NOT_READY. Remaining product work includes unique in-world wizard silhouettes, solid landmark/prop navigation, all-four-wizard natural full-run coverage, browser/device checks and owner playtest.
+
+
+## Visual identity pass — 2026-11-18
+- Added distinct in-world mantles and signature focus weapons for Aster, Ember, Briar and Nyx. The existing atlas body/headpiece remains the shared base; this improves silhouette/readability without pretending to be four bespoke production rigs.
+- Rebuilt the seven ruin instances as seven landmark-specific silhouettes (Sunspire, Oathgate, Moonfen Temple, Mossfall Altar, Starwell, Eastwatch, West Shrine).
+- Added short-range nameplates when the player approaches a landmark.
+- Added a browser render test that pixel-hashes all four hero renders and all seven landmark renders.
+- Current CI is pending. The game remains NOT_READY pending collision/navigation, natural full-run coverage for every wizard, device testing and owner acceptance.

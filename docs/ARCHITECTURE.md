@@ -21,3 +21,7 @@ Simulation is independent of DOM/render/audio. Fixed ticks are independent of fr
 
 ## Out of scope
 Network authority, rooms, lobbies, reconnect, multiplayer replication, additional realms and Unity/native runtime.
+
+
+## Realm and character presentation
+The 2.5D renderer now uses seven distinct landmark structures and nearby nameplates rather than repeating one ruin wall. Each of the four wizards has a unique mantle silhouette and signature focus/weapon overlay in addition to its palette, headpiece and sigil. The base atlas body is still shared; fully bespoke skeletal rigs and animation clips are not yet implemented.

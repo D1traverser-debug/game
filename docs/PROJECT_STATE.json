@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "FOUR_WIZARD_ONE_REALM_SOLO_RELEASE_002",
+  "checkpoint": "FOUR_WIZARD_DISTINCT_VISUALS_AND_LANDMARKS_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
@@ -246,7 +246,11 @@
     "Procedural audio upgraded from isolated beeps to shaped filtered sound envelopes and a layered ambient score with chord pads, stereo arpeggios, bass and boss-intensity layers; mute control retained.",
     "Added an audio-engine Playwright regression for AudioContext startup, advancing music steps, layered oscillator creation, mute behavior, zero browser errors and offline operation.",
     "Reconciled exact UTF-8 byte count of the current 767208-byte browser artifact with the mechanical checkpoint guard.",
-    "Corrected audio regression sequencing: mute/unmute is verified on the unobstructed menu before starting; gameplay upgrade modal is not clicked through."
+    "Corrected audio regression sequencing: mute/unmute is verified on the unobstructed menu before starting; gameplay upgrade modal is not clicked through.",
+    "Added four character-specific in-world mantle silhouettes and signature held/floating focus weapons, layered around the existing atlas body and headpiece.",
+    "Replaced seven repeated ruin-wall props with seven landmark-specific architectural silhouettes: Sunspire, Oathgate, Moonfen Temple, Mossfall Altar, Starwell, Eastwatch and West Shrine.",
+    "Added proximity-based world nameplates for realm landmarks without consuming gameplay RNG.",
+    "Added browser-rendered pixel-hash regression for four wizard appearances and seven landmark structures."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -261,9 +265,10 @@
     "Map regions and landmarks are authored and navigable, but collision/occlusion, environmental interaction and real player exploration review remain incomplete.",
     "Natural full-run balance and boss victory have not yet been demonstrated for all four selectable wizards on this exact build.",
     "Original music/SFX, bespoke character animation, hit reactions, spell VFX and production-quality visual/audio review remain incomplete.",
-    "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED."
+    "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED.",
+    "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task."
   ],
-  "next_action": "Resolve remaining product-level gaps after clean CI: unique in-world wizard silhouettes, solid landmark/prop navigation, four-character natural full-run coverage, and human visual/gameplay acceptance.",
+  "next_action": "Validate distinct wizard/landmark renders in CI; then add player collision/navigation around landmark footprints, four-wizard natural full-run coverage, and final gameplay/art/audio review.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -409,8 +414,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 767208,
-    "status": "FOUR_WIZARD_ONE_REALM_SOLO_CI_RECHECK",
+    "bytes": 777516,
+    "status": "FOUR_WIZARD_ONE_REALM_VISUAL_POLISH_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -448,7 +453,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contract tests; browser clock/damage integration; roster/map/ability; objective; save; audio; normal-play regressions. CI recheck pending.",
+    "core_tests": "22 Node contract tests; browser clock/damage integration; roster/map/ability; objective; save; audio; normal-play regressions. CI recheck pending. Browser visual identity regression added; CI pending.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
