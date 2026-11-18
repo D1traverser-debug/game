@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Independent Full-Game Co-op Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BROWSER_FIXED_CLOCK_INTEGRATION_001",
+  "checkpoint": "BROWSER_DAMAGE_PIPELINE_INTEGRATION_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
@@ -227,7 +227,11 @@
     "Integrated the modular fixed-step clock into the actual browser game loop at 30 simulation ticks per second, preserving the prior fallback for standalone/file-origin preview.",
     "Reset simulation tick state at run start and discard accumulated simulation debt while menus, pause and upgrade screens are active.",
     "Static browser package now includes all eight runtime ES modules and verifies each packaged module against SHA-256 and byte length.",
-    "Added a Playwright browser integration test that loads the exact clock module and verifies the production game loop advances through it."
+    "Added a Playwright browser integration test that loads the exact clock module and verifies the production game loop advances through it.",
+    "Integrated DamagePipeline into the live damageEnemy and damagePlayer functions after existing crit, elemental, armor and dodge calculations; existing modifiers remain in the legacy combat layer.",
+    "Added per-run WeakMap-backed CombatantState identity and synchronized legacy HP/max-HP state at each damage application.",
+    "Preserved solo ghost-phase attacks by treating the ghost player as an active damage source; friendly/self damage policy remains enabled to preserve current solo semantics.",
+    "Added Playwright integration coverage proving both actual production damage functions invoke the modular DamagePipeline."
   ],
   "failed_or_open": [
     "Current browser game is a single-player, one-hero, one-realm prototype. Full wizard roster, four realms and complete content are not implemented.",
@@ -239,9 +243,9 @@
     "Firefox, WebKit, mobile Safari, Android Chrome, physical GPU performance and 15-minute stability are NOT_TESTED.",
     "Website hosting, TLS, authoritative room service deployment, monitoring and rollback are NOT_CONFIGURED.",
     "Human owner playtest and independent commercial-quality gameplay/art/audio/network acceptance are NOT_DONE.",
-    "Only the fixed-step clock is integrated into the live browser game loop. Damage, RNG, projectile, spell and network modules remain independent contracts and must be integrated incrementally with parity regressions."
+    "Fixed-step clock and central damage pipeline are integrated; seeded RNG, projectile, spell and network modules remain independent contracts awaiting incremental integration."
   ],
-  "next_action": "Verify fixed-step runtime integration and package in CI; then integrate deterministic RNG, damage and projectile systems one at a time with legacy gameplay parity checks.",
+  "next_action": "Verify damage pipeline parity and all legacy regressions in CI; then integrate projectile simulation and deterministic RNG behind behavior-parity tests.",
   "caos_boundary": "CAOS is read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -270,7 +274,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "BROWSER_FIXED_CLOCK_INTEGRATION_CI_PENDING",
+  "latest_candidate_ci_status": "BROWSER_DAMAGE_PIPELINE_INTEGRATION_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -408,7 +412,7 @@
     "hosting": "NOT_CONFIGURED",
     "browser_matrix": "Chromium automation only; Firefox/WebKit/physical devices NOT_TESTED",
     "status": "FOUNDATION_IN_PROGRESS",
-    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_INTEGRATED_IN_BROWSER_GAME_LOOP; OTHER_MODULES_NOT_INTEGRATED",
+    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_AND_DAMAGE_PIPELINE_INTEGRATED; RNG/PROJECTILES/SPELLS/NETWORK_NOT_INTEGRATED",
     "core_modules": [
       "fixed-step-clock",
       "seeded-rng",
@@ -419,7 +423,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "21 node:test contracts pass in prior checkpoint; new browser integration test added; current checkpoint CI pending",
+    "core_tests": "22 node:test contracts passed on prior checkpoint; browser clock and damage integration tests added; current checkpoint CI pending",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",

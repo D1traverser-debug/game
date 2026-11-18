@@ -32,3 +32,8 @@ Static frontend plus separate WSS room service, TLS, versioned assets, monitorin
 ## Runtime integration checkpoint
 
 The live browser loop now uses the modular `FixedStepClock` at 30 Hz. The clock resets on new run and discards fractional debt while outside active play. A legacy fallback remains if the module cannot load in a standalone/file-origin preview. Static packaging copies and hash-verifies all eight ES modules. Other core modules are not yet integrated.
+
+
+## Damage pipeline integration checkpoint
+
+The production `damageEnemy` and `damagePlayer` paths now invoke the modular DamagePipeline after existing game-specific damage modifiers. A per-run WeakMap maps legacy entities to stable CombatantState IDs; HP and max HP are synchronized before each hit. Ghost-phase damage remains supported. A browser integration test proves both paths invoke the pipeline. RNG, projectile, spell and network modules remain unintegrated.

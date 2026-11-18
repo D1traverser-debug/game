@@ -45,3 +45,13 @@ Do not resume Unity work. Do not call READY from packaging or CI. Do not ask the
 - Static packaging copies all eight runtime ES modules into `dist/web/src/core/` and verifies every module's SHA-256 and byte length.
 - Added a Playwright integration test that loads the exact clock module bytes via a data URL and proves the actual game loop advances through the modular clock.
 - Only the clock is integrated. RNG, damage, projectiles, spell execution and network validation remain standalone modules until each can be migrated with behavior-parity tests.
+
+
+## Browser damage pipeline integration — 2026-11-18
+
+- The live `damageEnemy` and `damagePlayer` functions now route final post-modifier damage through the modular `DamagePipeline` when its modules load.
+- Existing critical-hit, elemental, armor, dodge, invulnerability and ghost-phase rules remain in the legacy layer; the core pipeline centralizes health application and lethal clamping.
+- Per-run `WeakMap` state assigns stable integer combatant IDs without changing the legacy object IDs.
+- The previous damage path remains as a fallback if ES modules fail to load.
+- Added Playwright integration coverage for both production damage functions.
+- Seeded RNG, projectile simulation, spell execution and networking remain unintegrated; do not claim those modules are active gameplay yet.
