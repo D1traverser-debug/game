@@ -16,19 +16,19 @@ assert SOURCE.count(MARKER)==1
 def data_url(source):
     return "data:text/javascript;base64,"+base64.b64encode(source.encode("utf-8")).decode("ascii")
 
-combatant_url=data_url(COMBATANT+"\\nglobalThis.__AETHER_COMBATANT_MODULE_LOADED=true;\\n")
+combatant_url=data_url(COMBATANT+"\nglobalThis.__AETHER_COMBATANT_MODULE_LOADED=true;\\n")
 DAMAGE=DAMAGE.replace('from "./combatant.mjs"',f'from "{combatant_url}"')
 apply_marker="static apply(source, target, request, policy = new DamagePolicy()) {"
 assert DAMAGE.count(apply_marker)==1
-DAMAGE=DAMAGE.replace(apply_marker,apply_marker+"\\n    globalThis.__AETHER_DAMAGE_PIPELINE_CALLS=(globalThis.__AETHER_DAMAGE_PIPELINE_CALLS||0)+1;")
-damage_url=data_url(DAMAGE+"\\nglobalThis.__AETHER_DAMAGE_MODULE_LOADED=true;\\n")
+DAMAGE=DAMAGE.replace(apply_marker,apply_marker+"\n    globalThis.__AETHER_DAMAGE_PIPELINE_CALLS=(globalThis.__AETHER_DAMAGE_PIPELINE_CALLS||0)+1;")
+damage_url=data_url(DAMAGE+"\nglobalThis.__AETHER_DAMAGE_MODULE_LOADED=true;\\n")
 document=SOURCE.replace(COMBATANT_IMPORT,f"import('{combatant_url}')").replace(DAMAGE_IMPORT,f"import('{damage_url}')")
 probe="""window.__damageProbe={
  ready:()=>!!coreDamageApi,
  enemyHit:()=>{const e=game.enemies.find(x=>!x.dead);const before=e.hp;damageEnemy(e,1,'integration_test',null,false);return {before,after:e.hp,calls:globalThis.__AETHER_DAMAGE_PIPELINE_CALLS||0};},
  playerHit:()=>{const p=game.player;p.dodge=0;p.invuln=0;const before=p.hp;damagePlayer(10,'integration_test');return {before,after:p.hp,calls:globalThis.__AETHER_DAMAGE_PIPELINE_CALLS||0};}
 };"""
-document=document.replace(MARKER,probe+"\\n"+MARKER)
+document=document.replace(MARKER,probe+"\n"+MARKER)
 
 async def main():
     report={"checks":{},"page_errors":[],"console_errors":[],"external_requests":[]}
