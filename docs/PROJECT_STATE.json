@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "ONE_REALM_FOUR_WIZARD_SOLO_SLICE_001",
+  "checkpoint": "FOUR_WIZARD_ONE_REALM_SOLO_RELEASE_002",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
@@ -244,7 +244,9 @@
     "The Verdant Wilds river and bridges now share a single map-data definition for world rendering, map preview and terrain queries; shallow water slows movement to 72 percent and both bridge crossings preserve normal speed.",
     "Character-upgrade regression corrected to verify the dodge stat increase on top of each character's base dodge chance.",
     "Procedural audio upgraded from isolated beeps to shaped filtered sound envelopes and a layered ambient score with chord pads, stereo arpeggios, bass and boss-intensity layers; mute control retained.",
-    "Added an audio-engine Playwright regression for AudioContext startup, advancing music steps, layered oscillator creation, mute behavior, zero browser errors and offline operation."
+    "Added an audio-engine Playwright regression for AudioContext startup, advancing music steps, layered oscillator creation, mute behavior, zero browser errors and offline operation.",
+    "Reconciled exact UTF-8 byte count of the current 767208-byte browser artifact with the mechanical checkpoint guard.",
+    "Corrected audio regression sequencing: mute/unmute is verified on the unobstructed menu before starting; gameplay upgrade modal is not clicked through."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -261,7 +263,7 @@
     "Original music/SFX, bespoke character animation, hit reactions, spell VFX and production-quality visual/audio review remain incomplete.",
     "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED."
   ],
-  "next_action": "Run the full browser regression matrix including all four character abilities and map UI; fix failures, then execute natural solo runs and visual review for each wizard.",
+  "next_action": "Resolve remaining product-level gaps after clean CI: unique in-world wizard silhouettes, solid landmark/prop navigation, four-character natural full-run coverage, and human visual/gameplay acceptance.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -407,8 +409,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 767207,
-    "status": "FOUR_WIZARD_ONE_REALM_SOLO_BUILD_CI_PENDING",
+    "bytes": 767208,
+    "status": "FOUR_WIZARD_ONE_REALM_SOLO_CI_RECHECK",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -446,7 +448,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contract tests; browser clock and damage integration; single-player roster/map/ability regression added; CI pending",
+    "core_tests": "22 Node contract tests; browser clock/damage integration; roster/map/ability; objective; save; audio; normal-play regressions. CI recheck pending.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",

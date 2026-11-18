@@ -38,3 +38,10 @@ The owner narrowed the product to one complete, offline-capable browser single-p
 5. Complete audio, VFX, save recovery, browser/device performance and owner acceptance.
 
 CAOS is read-only. Do not touch CAOS repositories or configuration.
+
+
+## CI reconciliation — 2026-11-18
+- Latest failed run 44276499906 had two independent causes: PROJECT_STATE byte count lagged the exact UTF-8 HTML by one byte; audio test attempted a pointer click on the top-bar sound button while the upgrade modal correctly intercepted pointer events.
+- Updated the artifact byte count to 767208 and moved mute/unmute verification to the unobstructed menu before starting the run.
+- This fixes the identified test/metadata causes only; rerun CI before recording a pass.
+- Product status remains NOT_READY. Remaining product work includes unique in-world wizard silhouettes, solid landmark/prop navigation, all-four-wizard natural full-run coverage, browser/device checks and owner playtest.

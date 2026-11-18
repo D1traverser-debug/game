@@ -40,6 +40,14 @@ async def main():
         page.on("console", lambda m: report["console_errors"].append(m.text) if m.type == "error" else None)
         page.on("request", lambda r: report["external_requests"].append(r.url) if r.url.startswith(("http://", "https://")) else None)
         await page.set_content(DOCUMENT, wait_until="load")
+        # Verify the real button while the menu is unobstructed. During play an
+        # upgrade modal correctly takes pointer focus, so the top-bar button is
+        # not expected to receive clicks through that modal.
+        await page.locator("#sound").click()
+        muted_on = await page.evaluate("window.__audioProbe.snapshot()")
+        await page.locator("#sound").click()
+        muted_off = await page.evaluate("window.__audioProbe.snapshot()")
+        report["checks"]["mute_toggle_works"] = muted_on["muted"] is True and muted_off["muted"] is False
         await page.locator("#start").click()
         await page.evaluate("window.__audioProbe.resume()")
         await page.wait_for_timeout(1500)
@@ -48,9 +56,6 @@ async def main():
         report["checks"]["audio_context_started"] = state["state"] == "running"
         report["checks"]["procedural_music_advances"] = state["musicStep"] >= 2
         report["checks"]["layered_voices_created"] = state["oscillators"] >= 10
-        await page.locator("#sound").click()
-        muted = await page.evaluate("window.__audioProbe.snapshot()")
-        report["checks"]["mute_toggle_works"] = muted["muted"] is True
         report["checks"]["no_runtime_errors"] = not report["page_errors"] and not report["console_errors"]
         report["checks"]["offline_no_external_requests"] = not report["external_requests"]
         report["pass"] = all(report["checks"].values())
