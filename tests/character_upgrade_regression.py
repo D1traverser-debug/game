@@ -27,7 +27,7 @@ window.__characterUpgradeRegression = () => {
     character_upgrade:offers.some(x=>x.kind==='stat'&&Number.isFinite(x.amount)&&x.amount>0)
   };
   const cases=[
-    ['maxHp',100,200],['regen',1,1],['armor',16,16],['dodge',.04,.04],
+    ['maxHp',100,200],['regen',1,1],['armor',16,16],['dodge',.04,.07],
     ['speed',.08,170*1.08],['damage',.05,1.05],['spellSize',.12,1.25*1.12],
     ['cast',.06,1.06],['crit',.04,.09],['critDmg',.1,1.6],
     ['manaPull',.08,108],['manaGain',.07,1.07],['luck',2,4]
