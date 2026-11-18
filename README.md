@@ -25,3 +25,7 @@ The preview package is emitted to `dist/` with a byte-identical HTML file and SH
 See `docs/PROJECT_STATE.json`, `HANDOFF.md`, `docs/PROJECT_CHARTER.md`, `docs/FULL_GAME_PRODUCT_BRIEF.md`, `docs/FULL_GAME_ROADMAP.md`, `docs/ENGINE_EVALUATION.md`, `docs/ARCHITECTURE.md`, `docs/NETWORK_ARCHITECTURE.md`, `docs/ART_AUDIO_BIBLE.md`, `docs/ISSUE_REGISTER.md` and `docs/RELEASE_GATES.md`.
 
 The old Unity/C# experiment is historical only, not active runtime or CI. A green CI run does not prove full-game readiness.
+
+
+## Browser runtime modules
+The production browser loop imports `web/src/core/fixed-step-clock.mjs` at 30 Hz. The static package copies the complete `web/src/core/*.mjs` runtime directory to `dist/web/src/core/` and verifies each file by byte length and SHA-256. Other core modules remain under incremental integration and are not yet authoritative for gameplay.

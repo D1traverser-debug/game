@@ -124,3 +124,12 @@ test("random targeting is seeded and repeatable",()=>{
  const b=SpellSystem.tryCast(def,new SpellRuntimeState(),caster,targets,new SeededRng(55));
  assert.equal(a.targetId,b.targetId);
 });
+
+test("fixed clock reset and accumulator clear have distinct semantics",()=>{
+ const c=new FixedStepClock({stepSeconds:.1});
+ c.advance(.25,{simulateTick:()=>{}});
+ assert.equal(c.tick,2);assert.ok(c.pendingSeconds>.049);
+ c.clearAccumulator();assert.equal(c.tick,2);assert.equal(c.pendingSeconds,0);
+ c.advance(.1,{simulateTick:()=>{}});assert.equal(c.tick,3);
+ c.reset();assert.equal(c.tick,0);assert.equal(c.pendingSeconds,0);
+});

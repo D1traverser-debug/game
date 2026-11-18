@@ -10,6 +10,8 @@ export class FixedStepClock {
   }
   get pendingSeconds() { return this.accumulator; }
   get interpolationAlpha() { return Math.min(1, this.accumulator / this.stepSeconds); }
+  reset() { this.tick = 0; this.accumulator = 0; }
+  clearAccumulator() { this.accumulator = 0; }
   advance(elapsedSeconds, { paused = false, simulateTick } = {}) {
     if (typeof simulateTick !== "function") throw new TypeError("simulateTick callback is required");
     if (!Number.isFinite(elapsedSeconds) || elapsedSeconds < 0) throw new RangeError("elapsedSeconds must be finite and non-negative");

@@ -254,6 +254,11 @@ try{boot3D()}catch(err){console.warn('3D renderer initialization failed, preserv
 </script>
 <script>
 (()=>{'use strict';
+let coreClock=null;
+import('./web/src/core/fixed-step-clock.mjs').then(({FixedStepClock})=>{
+ coreClock=new FixedStepClock({stepSeconds:1/30,maxStepsPerAdvance:7});
+ simulationDebt=0;
+}).catch(()=>{ /* Standalone/file:// preview keeps the legacy clock fallback. */ });
 const $=id=>document.getElementById(id), canvas=$('world');let ctx=canvas.getContext('2d');
 const W=()=>innerWidth,H=()=>innerHeight,TAU=Math.PI*2,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)],fmt=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 let dpr=1,screen='menu',last=0,toastTimer=0,audio=null,muted=false,keys={},joy={x:0,y:0,active:false},pointer={x:0,y:0};
@@ -378,7 +383,7 @@ function renderResearch(){let box=$('questGrid');if(!box)return;
 }
 
 function makePlayer(){let e=save.enchant;let p={x:0,y:0,r:17,hp:100+(e.maxHp||0)*150/5,maxHp:100+(e.maxHp||0)*150/5,level:1,xp:0,nextXp:18,move:170*(1+(e.speed||0)*.06),damage:1+(e.damage||0)*.05,cast:1+(e.cast||0)*.03,spellSize:1.25+(e.size||0)*.04,crit:.05+(e.crit||0)*.03,critDmg:1.5+(e.critDmg||0)*.064,armor:(e.armor||0)*20/5,regen:(e.regen||0)*3, luck:2+(e.luck||0)*1.0,manaGain:1,rerolls:e.reroll||0,banishes:e.banish||0,locks:e.lock||0,dodge:(e.dodge||0)*.04,manaPull:100+(e.manaPull||0)*20,spells:[{...spells[0],cd:spells[0].cd*.88,level:1,cdNow:0,infusions:[],augments:[]}],scrolls:[],kills:0,damageDone:0,casts:0,critHits:0,objectives:0,scrollCount:0,stand:0,invuln:0,stagger:0,lowSpeed:false,hardLessons:false,attune:false,growth:false,manaSiphon:false,vital:false,thick:false,fight:false,elixir:false,healBonus:0,overload:false,damageTaken:0,heal:0,rerollUsed:0,banished:[],lastMove:0,combo:0,ghost:false,ghostUsed:false,ghostTimer:0};if(save.trialSpellId){const trial=spells.find(x=>x.id===save.trialSpellId);if(trial&&REGINALD_SPELL_IDS.has(trial.id)&&!INITIAL_SPELL_IDS.includes(trial.id)){p.spells.push({...trial,cd:trial.cd*.88,level:1,cdNow:0,infusions:[],augments:[]});save.trialSpellId=null;persist()}}return p}
-function startRun(){game={time:0,world:2600,player:makePlayer(),enemies:[],orbs:[],shots:[],plants:[],ghostImps:[],castSequence:0,ghostDamage:0,ghostTimer:0,fx:[],damageNumbers:[],decor:[],chests:[],hazards:[],boss:null,spawn:0,objective:null,nextObj:0,doneObj:0,nextChest:120,paused:false,ended:false,shake:0,killStreak:0,score:0,randomSeed:1,lockedOption:null,hudTick:0,pendingLevels:0,stats:{}};generateDecor();buildDecorCache(game.decor);for(let i=0;i<12;i++)spawnEnemy(true);document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now();sound(440,.15,'triangle');toast('远征开始：保护自己，收集奥术经验');renderHud()}
+function startRun(){if(coreClock)coreClock.reset();simulationDebt=0;game={time:0,world:2600,player:makePlayer(),enemies:[],orbs:[],shots:[],plants:[],ghostImps:[],castSequence:0,ghostDamage:0,ghostTimer:0,fx:[],damageNumbers:[],decor:[],chests:[],hazards:[],boss:null,spawn:0,objective:null,nextObj:0,doneObj:0,nextChest:120,paused:false,ended:false,shake:0,killStreak:0,score:0,randomSeed:1,lockedOption:null,hudTick:0,pendingLevels:0,stats:{}};generateDecor();buildDecorCache(game.decor);for(let i=0;i<12;i++)spawnEnemy(true);document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now();sound(440,.15,'triangle');toast('远征开始：保护自己，收集奥术经验');renderHud()}
 function generateDecor(){let d=game.decor;for(let i=0;i<480;i++){let x=rand(-1250,1250),y=rand(-1000,1000);let r=Math.random();d.push({x,y,type:r<.52?'grass':r<.72?'flower':r<.85?'stone':r<.95?'bush':'tree',s:rand(.55,1.5),rot:rand(0,TAU),c:Math.floor(rand(0,4))})}}
 function spawnEnemy(initial=false,type){if(!game)return;if(game.enemies.filter(e=>!e.dead).length>=64)return;let p=game.player,ang=rand(0,TAU),dist=initial?rand(300,700):rand(530,780),x=p.x+Math.cos(ang)*dist,y=p.y+Math.sin(ang)*dist;let t=type||enemyType(game.time);let base={crawler:[34,45,48,18],sprout:[45,62,55,16],ranged:[58,52,62,16],buffer:[90,45,72,17],shield:[150,38,95,22],gnasher:[160,70,126,24],crabladon:[420,50,220,33]};let a=base[t]||base.crawler;let threat=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;let scale=(1+game.time/520)*threat;game.enemies.push({id:Math.random(),type:t,x,y,r:a[3],hp:a[0]*scale,max:a[0]*scale,speed:a[1]*(1+game.time/2400),dmg:a[2]*(1+game.time/1200)*threat,attack:rand(.3,2),heal:rand(1,4),state:'chase',stateT:0,slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0,elite:!initial&&Math.random()<.025+game.time/1800,dead:false,stagger:0})}
 function enemyType(t){let r=Math.random();if(t>600&&r<.05)return'crabladon';if(t>360&&r<.13)return'gnasher';if(t>250&&r<.22)return'shield';if(t>170&&r<.28)return'buffer';if(t>90&&r<.43)return'ranged';if(t>35&&r<.65)return'sprout';return'crawler'}
@@ -1170,11 +1175,10 @@ function drawOverlay3D(){let w=W(),h=H();ctx.clearRect(0,0,w,h);if(!game||!game.
 }
 function frame(t){let dt=Math.max(0,Math.min(.22,(t-last)/1000||0));last=t;studioController();
  if(screen==='playing'){
-  simulationDebt+=dt;let steps=0;
-  while(screen==='playing'&&simulationDebt>=SIM_STEP&&steps<7){update(SIM_STEP);simulationDebt-=SIM_STEP;steps++}
-  if(screen!=='playing')simulationDebt=0;
-  else if(steps===7&&simulationDebt>.3)simulationDebt=.3;
- }else simulationDebt=0;
+  if(coreClock)coreClock.advance(dt,{simulateTick:()=>update(SIM_STEP)});
+  else {simulationDebt+=dt;let steps=0;while(screen==='playing'&&simulationDebt>=SIM_STEP&&steps<7){update(SIM_STEP);simulationDebt-=SIM_STEP;steps++}if(screen!=='playing')simulationDebt=0;else if(steps===7&&simulationDebt>.3)simulationDebt=.3;}
+  if(screen!=='playing'){simulationDebt=0;if(coreClock)coreClock.clearAccumulator();}
+ }else {simulationDebt=0;if(coreClock)coreClock.clearAccumulator();}
  studioMusicTick();
  if(save.renderMode==='3d'&&window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}
  else drawWorld();

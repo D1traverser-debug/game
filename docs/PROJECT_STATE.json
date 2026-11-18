@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Independent Full-Game Co-op Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BROWSER_CORE_MODULES_001",
+  "checkpoint": "BROWSER_FIXED_CLOCK_INTEGRATION_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
@@ -223,7 +223,11 @@
     "Prototype menu branding updated to working title Aetherwilds / 以太荒境; gameplay logic was not rewritten by this branding change.",
     "Full-game scope now distinguishes the playable solo prototype from the unimplemented full browser product.",
     "Static web packaging, browser-scope integrity checks and CI artifact publication added in this checkpoint.",
-    "Added browser-native ES modules for fixed-step time, deterministic RNG, damage, events, input validation, projectiles and data-driven spell casting, with Node built-in contract tests."
+    "Added browser-native ES modules for fixed-step time, deterministic RNG, damage, events, input validation, projectiles and data-driven spell casting, with Node built-in contract tests.",
+    "Integrated the modular fixed-step clock into the actual browser game loop at 30 simulation ticks per second, preserving the prior fallback for standalone/file-origin preview.",
+    "Reset simulation tick state at run start and discard accumulated simulation debt while menus, pause and upgrade screens are active.",
+    "Static browser package now includes all eight runtime ES modules and verifies each packaged module against SHA-256 and byte length.",
+    "Added a Playwright browser integration test that loads the exact clock module and verifies the production game loop advances through it."
   ],
   "failed_or_open": [
     "Current browser game is a single-player, one-hero, one-realm prototype. Full wizard roster, four realms and complete content are not implemented.",
@@ -235,9 +239,9 @@
     "Firefox, WebKit, mobile Safari, Android Chrome, physical GPU performance and 15-minute stability are NOT_TESTED.",
     "Website hosting, TLS, authoritative room service deployment, monitoring and rollback are NOT_CONFIGURED.",
     "Human owner playtest and independent commercial-quality gameplay/art/audio/network acceptance are NOT_DONE.",
-    "New modular JavaScript simulation core exists alongside the legacy monolith but is not yet wired into the playable game loop; integration and parity tests remain open."
+    "Only the fixed-step clock is integrated into the live browser game loop. Damage, RNG, projectile, spell and network modules remain independent contracts and must be integrated incrementally with parity regressions."
   ],
-  "next_action": "Run web-core contracts in CI; then connect the modular simulation core to the browser game without breaking the current playable fallback, followed by renderer/device bake-off and authoritative WSS service.",
+  "next_action": "Verify fixed-step runtime integration and package in CI; then integrate deterministic RNG, damage and projectile systems one at a time with legacy gameplay parity checks.",
   "caos_boundary": "CAOS is read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -266,7 +270,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "WEB_CORE_MODULES_CI_PENDING",
+  "latest_candidate_ci_status": "BROWSER_FIXED_CLOCK_INTEGRATION_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -383,7 +387,7 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 733975,
+    "bytes": 734494,
     "status": "PLAYABLE_SINGLE_PLAYER_PROTOTYPE_NOT_FULL_GAME",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
@@ -404,7 +408,7 @@
     "hosting": "NOT_CONFIGURED",
     "browser_matrix": "Chromium automation only; Firefox/WebKit/physical devices NOT_TESTED",
     "status": "FOUNDATION_IN_PROGRESS",
-    "simulation_core": "MODULAR_JS_CORE_ADDED; NOT_YET_INTEGRATED_INTO_LEGACY_GAME_LOOP",
+    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_INTEGRATED_IN_BROWSER_GAME_LOOP; OTHER_MODULES_NOT_INTEGRATED",
     "core_modules": [
       "fixed-step-clock",
       "seeded-rng",
@@ -415,6 +419,12 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "node:test; 20 contracts added; CI pending"
+    "core_tests": "21 node:test contracts pass in prior checkpoint; new browser integration test added; current checkpoint CI pending",
+    "runtime_modules_packaged": true,
+    "package_includes": [
+      "index.html",
+      "web/src/core/*.mjs",
+      "build-manifest.json"
+    ]
   }
 }

@@ -35,3 +35,13 @@ Do not resume Unity work. Do not call READY from packaging or CI. Do not ask the
 - Added a dedicated `web-core` CI job.
 - Important boundary: this is a modular browser-native core foundation alongside the existing playable HTML. It is **not yet integrated** into the current game loop, so it does not replace or prove the legacy game behavior.
 - Next: get module tests green, integrate one system at a time with parity regressions, and keep the old browser prototype as rollback.
+
+
+## Browser fixed-step clock integration — 2026-11-18
+
+- The live browser game loop now imports and uses `web/src/core/fixed-step-clock.mjs` at the existing 30 Hz simulation rate.
+- The clock resets at run start; fractional backlog is discarded while menus, pause and upgrade screens are active.
+- If ES modules cannot load in a standalone/file-origin preview, the previous loop remains as a fallback.
+- Static packaging copies all eight runtime ES modules into `dist/web/src/core/` and verifies every module's SHA-256 and byte length.
+- Added a Playwright integration test that loads the exact clock module bytes via a data URL and proves the actual game loop advances through the modular clock.
+- Only the clock is integrated. RNG, damage, projectiles, spell execution and network validation remain standalone modules until each can be migrated with behavior-parity tests.

@@ -27,3 +27,8 @@ Static frontend plus separate WSS room service, TLS, versioned assets, monitorin
 ## Browser-native simulation module foundation
 
 `web/src/core` now contains ES modules for fixed-step clock, PCG seeded RNG, combatants/damage policy, sequenced events, input validation, swept-circle projectiles and data-driven spell casting. Node built-in tests cover the contracts. These modules are not yet wired into the legacy HTML game loop; integration and behavior parity are an explicit next gate.
+
+
+## Runtime integration checkpoint
+
+The live browser loop now uses the modular `FixedStepClock` at 30 Hz. The clock resets on new run and discards fractional debt while outside active play. A legacy fallback remains if the module cannot load in a standalone/file-origin preview. Static packaging copies and hash-verifies all eight ES modules. Other core modules are not yet integrated.
