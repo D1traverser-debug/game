@@ -9,6 +9,9 @@ SPEC=importlib.util.spec_from_file_location("aetherwilds_boss_pilot",PILOT_PATH)
 PILOT=importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(PILOT)
 CHARACTERS=[("aster",41),("ember",42),("briar",43),("nyx",44)]
+MARKER="// Production build: internal debug mutations are test-only and not shipped."
+DOCUMENT=PILOT.DOCUMENT.replace(MARKER,"window.__setSelectedWizardForTest=(id)=>{save.selectedCharacterId=id;persist();};\n"+MARKER)
+assert DOCUMENT!=PILOT.DOCUMENT and DOCUMENT.count("window.__setSelectedWizardForTest")==1
 
 async def main():
  report={"runs":[],"checks":{}}
@@ -22,8 +25,8 @@ async def main():
    page.on("console",lambda m:console.append(m.text) if m.type=="error" else None)
    page.on("request",lambda r:requests.append(r.url) if r.url.startswith(("http://","https://")) else None)
    page.set_default_timeout(180000)
-   await page.set_content(PILOT.DOCUMENT,wait_until="load")
-   await page.evaluate("(id)=>{save.selectedCharacterId=id;persist();}",character)
+   await page.set_content(DOCUMENT,wait_until="load")
+   await page.evaluate("(id)=>window.__setSelectedWizardForTest(id)",character)
    await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
    await page.locator("#start").click()
    selected=await page.evaluate("game?.player?.characterId||null")

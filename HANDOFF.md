@@ -69,3 +69,9 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - It reuses the existing deterministic, non-cheating full-run pilot and runs Aster, Ember, Briar and Nyx in separate clean browser contexts with fixed seeds 41–44.
 - Each run has up to 1500 in-game seconds and requires a natural boss spawn, natural boss defeat, and a normal result screen.
 - The CI job is intentionally temporary `continue-on-error` while balance telemetry is collected. It must be promoted to a blocking release gate once all four characters pass.
+
+
+## Natural-run harness correction
+- First exploratory run did not reach gameplay: the test tried to access the IIFE-scoped `save` variable from Playwright's page context.
+- Corrected by injecting a test-only setter inside the game's existing test marker. This does not add a production API or mutate game state outside normal character selection.
+- Rerun the four fixed-seed natural runs before drawing any gameplay-balance conclusions.
