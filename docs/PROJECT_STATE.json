@@ -400,7 +400,7 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 760719,
+    "bytes": 760721,
     "status": "FOUR_WIZARD_ONE_REALM_SOLO_BUILD_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
