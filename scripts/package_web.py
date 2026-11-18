@@ -14,7 +14,7 @@ def validate(raw: bytes) -> dict:
     except UnicodeDecodeError as exc:
         raise ValueError(f"HTML_NOT_UTF8:{exc}") from exc
     lower = html.lower()
-    if re.search(r"<script\\b[^>]*\\bsrc\\s*=", html, re.IGNORECASE):
+    if re.search(r"<script\b[^>]*\bsrc\s*=", html, re.IGNORECASE):
         raise ValueError("EXTERNAL_SCRIPT")
     required = {"doctype":"<!doctype html","title":"<title>","inline_style":"<style>","inline_script":"<script>", "world_canvas":'<canvas id="world"'}
     missing = [name for name, marker in required.items() if marker not in lower]
