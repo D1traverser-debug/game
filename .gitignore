@@ -1,4 +1,4 @@
-# Unity generated files
+# Historical Unity / IDE files
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -6,10 +6,6 @@
 [Bb]uilds/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
-[Mm]emoryCaptures/
-Recordings/
-
-# IDE / compiler output
 .vs/
 .idea/
 *.csproj
@@ -17,14 +13,8 @@ Recordings/
 *.suo
 *.user
 *.userprefs
-*.pidb
-*.booproj
-*.svd
-*.pdb
-*.mdb
-*.opendb
-*.VC.db
-
-# OS
 .DS_Store
 Thumbs.db
+
+# Generated browser package
+dist/

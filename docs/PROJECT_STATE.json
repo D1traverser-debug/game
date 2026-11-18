@@ -2,21 +2,22 @@
   "schema_version": 1,
   "project": "Independent Full-Game Co-op Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "FULL_GAME_SCOPE_REBASELINE_001",
+  "checkpoint": "BROWSER_FIRST_REBASELINE_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
-    "product": "original-IP full-game 3D co-op roguelite inspired by The Spell Brigade gameplay",
+    "product": "Original-IP browser-first 3D co-op roguelite inspired by observable spell-survivor gameplay",
     "modes": [
       "solo",
       "online_coop_1_to_4"
     ],
     "players": "1-4",
     "multiplayer": true,
-    "target_platform": "Windows PC first",
+    "target_platform": "Modern desktop browsers first; mobile browser compatibility",
     "input": [
       "keyboard_mouse",
-      "controller"
+      "controller",
+      "touch"
     ],
     "target_content": {
       "wizards": 15,
@@ -28,9 +29,10 @@
       "achievements": 78
     },
     "content_count_confidence": "provisional community inventory; element/infusion classification is disputed and must be reconciled against pinned current source version",
-    "engine": "Unity 6.3 LTS + URP (selected for vertical-slice validation)",
-    "final_delivery": "native Windows PC build; Steam distribution target",
-    "original_ip_required": true
+    "engine": "WebGL2 3D world + DOM UI; raw WebGL2 vs bundled Three.js decision pending measured vertical-slice comparison",
+    "final_delivery": "Deployable static browser frontend plus separate authoritative WebSocket room service",
+    "original_ip_required": true,
+    "browser_first": true
   },
   "baseline": {
     "artifact": "index.html",
@@ -216,19 +218,26 @@
     "Full-game branch CI #44145957567 passed 12/12 jobs, including Unity project structure 17/17 and nine legacy browser regressions.",
     "Added fixed-tick projectile simulation with swept-circle collision, stable hit ordering, pierce/lifetime, hit-once and DamagePipeline integration; CI pending.",
     "Added fixed-tick projectile movement, swept-circle collision, deterministic impact ordering, per-target hit tracking, pierce/lifetime and central damage integration; CI #44146841718 passed 43/43 core contracts.",
-    "Full-game branch CI #44146841718 passed 12/12 jobs, including Unity project structure 17/17 and all nine legacy browser regressions."
+    "Full-game branch CI #44146841718 passed 12/12 jobs, including Unity project structure 17/17 and all nine legacy browser regressions.",
+    "Owner explicitly changed full-game delivery target to a browser-playable website; Unity/native delivery is superseded.",
+    "Prototype menu branding updated to working title Aetherwilds / 以太荒境; gameplay logic was not rewritten by this branding change.",
+    "Full-game scope now distinguishes the playable solo prototype from the unimplemented full browser product.",
+    "Static web packaging, browser-scope integrity checks and CI artifact publication added in this checkpoint."
   ],
   "failed_or_open": [
-    "Unity project skeleton is committed at unity/ with Editor 6000.3.27f2 and URP 17.3.0 dependency; opening the project, package resolution, URP asset assignment and native Windows build remain NOT_TESTED.",
-    "1–4 player online co-op transport/session, host snapshots, lobby/relay, reconnect, friendly-fire replication, revive and four-client stress are not implemented; only the pure input-envelope validation contract exists.",
-    "Full wizard/realm/spell/element/advanced-infusion/augmentation/enemy/objective/boss/quest/scroll/trial/covenant content inventory is not yet source-reconciled or implemented; element counts conflict across community references.",
-    "Original-IP art direction is documented but concept art, production models, rigs, animation, environment kits, spell VFX, UI, soundtrack and SFX have not been produced or reviewed.",
-    "Windows native build, controller hardware, real save/load, peak performance, network reliability and independent human acceptance are not tested.",
-    "Spell kernel does not yet implement projectile simulation/collision, status/element effects, augmentations, non-projectile spell behaviors or source-complete content catalogue.",
-    "Projectile simulation has not yet been integrated into a complete run loop, Unity presentation, networking, element/status effects, or human gameplay."
+    "Current browser game is a single-player, one-hero, one-realm prototype. Full wizard roster, four realms and complete content are not implemented.",
+    "Online 1-4 player co-op has no lobby, authoritative WebSocket room service, reconnect or real multi-client acceptance.",
+    "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
+    "Production-quality original character, enemy, realm, animation, spell VFX, UI, music and SFX assets are not complete.",
+    "Full wizard/spell/element/infusion/augmentation/enemy/objective/boss/quest/trial/meta inventories need source-version reconciliation.",
+    "Browser-origin save/reload, migration, corruption recovery, backup/export and multi-device persistence are NOT_TESTED.",
+    "Firefox, WebKit, mobile Safari, Android Chrome, physical GPU performance and 15-minute stability are NOT_TESTED.",
+    "Static web packaging and browser-scope CI added; first CI run pending.",
+    "Website hosting, TLS, authoritative room service deployment, monitoring and rollback are NOT_CONFIGURED.",
+    "Human owner playtest and independent commercial-quality gameplay/art/audio/network acceptance are NOT_DONE."
   ],
-  "next_action": "Implement generic status-effect lifecycle and a minimal deterministic run loop tying player input, movement, auto-cast, projectile simulation, damage, enemy movement, XP and objective progress together. Keep elemental/infusion behavior source-qualified and mark all provisional values. Then integrate the loop into Unity and create a polished first vertical slice.",
-  "caos_boundary": "CAOS parent assets and repository are read-only; no modifications authorized or performed.",
+  "next_action": "Verify browser package and CI. Then build production browser vertical slice, benchmark raw WebGL2 against bundled Three.js on real devices, and implement authoritative WebSocket co-op.",
+  "caos_boundary": "CAOS is read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
   "development_candidate_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
@@ -256,7 +265,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PASS_PROJECTILE_CORE_43_OF_43_UNITY_STRUCTURE_17_OF_17_44146841718",
+  "latest_candidate_ci_status": "WEB_SCOPE_REBASELINE_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -357,37 +366,42 @@
     "meaning": "Full-game scope metadata and legacy prototype integrity were checked; legacy browser regression jobs passed. No Unity project/build, multiplayer, art/audio or full-game acceptance is implied."
   },
   "last_full_game_ci": {
-    "run_id": 44146841718,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44146841718",
-    "commit": "d5d354c3bf8daa18e3e186324c7a140f9f97de2f",
-    "conclusion": "success",
-    "jobs_passed": 12,
-    "jobs_total": 12,
-    "core_simulation_contracts": "43/43 PASS",
-    "unity_project_structure": "17/17 PASS",
-    "checkpoint": "PASS",
-    "legacy_browser_regressions": "9/9 PASS",
-    "meaning": "Fixed-tick projectile simulation and damage integration pass deterministic contracts; Unity project file structure passes; legacy browser prototype regressions pass. No Unity Editor launch/native build or full-game player acceptance."
+    "status": "HISTORICAL_SUPERSEDED_BY_BROWSER_TARGET",
+    "meaning": "Historical CI covered legacy browser prototype plus Unity/C# scaffolding; it is not full browser product or multiplayer acceptance."
   },
   "core_simulation": {
-    "project": "src/core/Game.Core.csproj",
-    "target_framework": "netstandard2.1",
-    "test_project": "tests/core/Game.Core.Tests.csproj",
-    "test_runner": "dotnet 8 console contracts; no external NuGet packages",
-    "contracts": "43/43 PASS in CI #44146841718",
-    "status": "DETERMINISTIC_COMBAT_FOUNDATION_VERIFIED_NOT_FULL_RUN_LOOP"
+    "status": "HISTORICAL_REFERENCE_ONLY_NOT_BROWSER_RUNTIME",
+    "active_runtime": false,
+    "note": "C# simulation experiment is not loaded by the JavaScript browser game."
   },
   "unity_project": {
-    "path": "unity/",
-    "editor": "6000.3.27f2",
-    "render_pipeline": "URP 17.3.0",
-    "local_core_package": "../src/core",
-    "skeleton": "COMMITTED",
-    "editor_opened": false,
-    "package_resolution": "NOT_TESTED",
-    "urp_assets": "NOT_CREATED",
-    "windows_build": "NOT_TESTED",
-    "status": "SKELETON_COMMITTED_EDITOR_VALIDATION_PENDING",
-    "structure_guard": "17/17 PASS in CI #44144872368"
+    "status": "SUPERSEDED_BY_OWNER_BROWSER_TARGET",
+    "active_runtime": false,
+    "note": "Historical Unity skeleton only; not production target or active CI."
+  },
+  "web_game_artifact": {
+    "branch": "full-game",
+    "path": "index.html",
+    "bytes": 733975,
+    "status": "PLAYABLE_SINGLE_PLAYER_PROTOTYPE_NOT_FULL_GAME",
+    "renderer_default": "2.5D atlas renderer",
+    "renderer_experimental": "raw WebGL2 3D",
+    "runtime_dependencies": "self-contained prototype; no external runtime CDN"
+  },
+  "web_runtime": {
+    "delivery": "static_web_frontend",
+    "target_renderer": "WebGL2 3D world with DOM UI",
+    "current_renderer": "2.5D atlas default; raw WebGL2 experimental",
+    "renderer_decision": "raw WebGL2 versus bundled Three.js; no CDN runtime",
+    "input": [
+      "keyboard_mouse",
+      "controller",
+      "touch"
+    ],
+    "multiplayer": "NOT_IMPLEMENTED",
+    "multiplayer_target": "authoritative secure WebSocket rooms for 1-4 players",
+    "hosting": "NOT_CONFIGURED",
+    "browser_matrix": "Chromium automation only; Firefox/WebKit/physical devices NOT_TESTED",
+    "status": "FOUNDATION_IN_PROGRESS"
   }
 }

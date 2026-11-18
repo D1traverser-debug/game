@@ -1,9 +1,9 @@
-name: Game repository integrity and regression
+name: Browser game integrity and regression
 on:
   push:
     branches: [development, main, full-game]
   pull_request:
-    branches: [main]
+    branches: [main, full-game]
   workflow_dispatch:
 
 jobs:
@@ -14,22 +14,37 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify single-file build reproducibility
-        run: python scripts/build_game.py --check
-      - name: Verify full-game scope and legacy artifact checkpoint
+      - name: Validate browser source
+        run: python scripts/package_web.py --check
+      - name: Verify browser scope and artifact checkpoint
         run: python scripts/verify_project_state.py
-      - name: Run positive and negative checkpoint controls
+      - name: Run positive and negative controls
         run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+  web-package:
+    runs-on: ubuntu-latest
+    needs: checkpoint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Package static browser preview
+        run: python scripts/package_web.py
+      - name: Verify byte-identical package and manifest
+        run: python scripts/package_web.py --verify-output
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aetherwilds-browser-preview
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
 
   browser-component:
     strategy:
       fail-fast: false
       matrix:
-        test:
-          - progression_regression
-          - normal_play_smoke
-          - objective_collection_regression
-          - character_upgrade_regression
+        test: [progression_regression, normal_play_smoke, objective_collection_regression, character_upgrade_regression]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -42,19 +57,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Run ${{ matrix.test }}
+      - name: Run browser regression
         run: python tests/${{ matrix.test }}.py
 
   browser-content-visual:
     strategy:
       fail-fast: false
       matrix:
-        test:
-          - game3d_integration
-          - trial_unlock_regression
-          - art_renderer_regression
-          - reginald_spell_scope_regression
-          - boss_encounter_regression
+        test: [game3d_integration, trial_unlock_regression, art_renderer_regression, reginald_spell_scope_regression, boss_encounter_regression]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -67,28 +77,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Run ${{ matrix.test }}
+      - name: Run browser regression
         run: python tests/${{ matrix.test }}.py
 
-
-  unity-project-structure:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Validate Unity project and local package structure
-        run: python3 scripts/verify_unity_project.py
-
-  core-simulation:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      - name: Build engine-independent simulation core
-        run: dotnet build src/core/Game.Core.csproj --configuration Release
-      - name: Run deterministic core contracts
-        run: dotnet run --project tests/core/Game.Core.Tests.csproj --configuration Release
-
-# Blocking CI is limited to deterministic contracts and bounded browser regressions.
-# Long-horizon heuristic play is exploratory telemetry, not a human acceptance test.
+# CI proves only the listed automated checks. It does not prove full-game completion,
+# online co-op, commercial-quality assets, physical-device performance or player acceptance.
