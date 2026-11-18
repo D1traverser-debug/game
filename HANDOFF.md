@@ -62,3 +62,10 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Enemy/boss spawn points, chests and objective spawn locations are moved to nearby open ground; multi-rift nodes are also checked.
 - The roster/map browser regression now tests landmark blocking, wall sliding and safe spawn relocation.
 - Random meadow trees, bushes and stones remain decorative/non-solid. Natural monster/boss navigation still needs full-run verification.
+
+
+## Four-wizard natural-run acceptance — 2026-11-18
+- Added `tests/wizard_natural_run_regression.py`.
+- It reuses the existing deterministic, non-cheating full-run pilot and runs Aster, Ember, Briar and Nyx in separate clean browser contexts with fixed seeds 41–44.
+- Each run has up to 1500 in-game seconds and requires a natural boss spawn, natural boss defeat, and a normal result screen.
+- The CI job is intentionally temporary `continue-on-error` while balance telemetry is collected. It must be promoted to a blocking release gate once all four characters pass.

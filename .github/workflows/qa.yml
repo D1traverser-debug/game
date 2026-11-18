@@ -124,3 +124,23 @@ jobs:
 
 # CI proves only the listed automated checks. It does not prove full-game completion,
 # online co-op, commercial-quality assets, physical-device performance or player acceptance.
+
+  
+  # Exploratory until every wizard has a repeatable natural win on the same build.
+  # Keep it visible in CI while tuning; promote to a required gate after all four pass.
+  wizard-natural-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Run a full natural solo expedition for all four wizards
+        run: python tests/wizard_natural_run_regression.py

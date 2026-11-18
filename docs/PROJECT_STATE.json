@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "ONE_REALM_LANDMARK_COLLISION_001",
+  "checkpoint": "FOUR_WIZARD_NATURAL_RUN_MATRIX_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
@@ -255,7 +255,10 @@
     "Player movement now resolves against landmark footprints with axis-separated sliding, preserving movement along walls and the existing world boundary.",
     "Nyx dash now uses the same collision-aware movement resolver and cannot teleport through landmark structures.",
     "Enemy and boss spawn points, chests, objective centers, objective pickups and multi-rift nodes are relocated to open ground when their proposed positions overlap landmarks.",
-    "Extended the roster/map browser regression to verify blocking, wall sliding and safe spawn relocation."
+    "Extended the roster/map browser regression to verify blocking, wall sliding and safe spawn relocation.",
+    "Added a four-character deterministic natural-run harness reusing the same non-cheating movement/upgrade pilot and production runtime.",
+    "Each wizard receives a separate clean browser context and seed, runs up to 1500 in-game seconds, and must naturally spawn and defeat its boss; no direct game-state or boss mutation is performed.",
+    "Added a temporary non-blocking CI job to collect all-four-wizard full-run telemetry before promoting it to a required release gate."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -274,7 +277,7 @@
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
     "Landmark collision currently covers authored ruin footprints; random meadow trees/bushes/stones remain non-solid decorative props. Monster pathing and boss movement around structures require natural-run verification."
   ],
-  "next_action": "Verify landmark collision and visual identity in CI; then run full natural solo missions for all four wizards and inspect monster/boss navigation around landmarks.",
+  "next_action": "Use the four-wizard natural-run telemetry to tune progression, enemy pressure and boss balance; repeat until all four characters naturally defeat the boss, then promote the exploratory job to a required CI gate.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -489,7 +492,8 @@
       "landmarks": 7,
       "minimap": true,
       "world_boundary": true
-    }
+    },
+    "natural_run_matrix": "EXPLORATORY: FOUR_WIZARDS, ONE_DETERMINISTIC_SEED_EACH, 1500_GAME_SECONDS, BOSS_DEFEAT_REQUIRED; NOT_YET_ACCEPTED"
   },
   "last_single_player_ci": null
 }
