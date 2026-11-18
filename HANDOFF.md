@@ -12,16 +12,18 @@ The owner narrowed the product to one complete, offline-capable browser single-p
 - Branch: full-game.
 - Root index.html remains the playable runtime.
 - Four wizard selection and persistent selected-character state are implemented.
-- Each wizard has a distinct starter spell, stat profile, passive, active Q ability and palette/sigil treatment.
-- One bounded Verdant Wilds map has six named districts, seven ruins/landmarks, a river, two bridges, a pilgrim road, central rift, visible boundary, map preview and live minimap.
+- Each wizard has a distinct starter spell, stat profile, passive, active Q ability, palette/sigil treatment and an in-world headpiece overlay.
+- One bounded Verdant Wilds map has six named districts, seven ruins/landmarks, a river, two bridge crossings, a pilgrim road, central rift, visible boundary, map preview and live minimap.
+- River/bridge geometry is shared by rendering, map preview and terrain queries; shallow water slows movement to 72%, while bridge corridors preserve normal movement.
 - Q activates the wizard ability; M collapses/opens the minimap; touch has a dedicated ability button.
 - Map movement and enemy/chest/boss spawn coordinates are clamped to the realm bounds.
 - Existing enemy/objective/boss/spell/progression/camp systems are retained.
-- Browser regression for roster/map/abilities added; CI status pending.
+- Browser regression now covers roster, abilities, map districts, river slowdown and bridge passage; CI status pending.
+- A malformed HUD gradient expression that prevented the main runtime from parsing has been fixed; both inline scripts pass syntax parsing.
 
 ## Important limitations
-- The four playable portraits/characters use palette and sigil treatments of the existing atlas hero, not four bespoke production character rigs.
-- One map's environmental interaction and obstacle collision still need playtest review.
+- The four wizards still share the same base atlas body; distinct headpieces, palettes and sigils improve readability but do not replace four bespoke production character rigs.
+- Shallow-water movement and bridge passage are implemented; solid obstacle collision around ruins/props remains unimplemented and needs a deliberate navigation playtest.
 - All four heroes need natural full-run balance/boss acceptance.
 - Original animation, VFX, music/SFX and final visual/audio review are not complete.
 - Firefox/WebKit, physical mobile/controller devices, real-origin save reload and owner playtest remain untested.
