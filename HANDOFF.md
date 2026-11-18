@@ -25,12 +25,13 @@ The owner narrowed the product to one complete, offline-capable browser single-p
 - The four wizards still share the same base atlas body; distinct headpieces, palettes and sigils improve readability but do not replace four bespoke production character rigs.
 - Shallow-water movement and bridge passage are implemented; solid obstacle collision around ruins/props remains unimplemented and needs a deliberate navigation playtest.
 - All four heroes need natural full-run balance/boss acceptance.
-- Original animation, VFX, music/SFX and final visual/audio review are not complete.
+- Procedural ambient music now has layered chord pads, stereo arpeggios, bass and boss-intensity layers; SFX have shaped envelopes and filtering. This is still procedural placeholder sound design, not a final authored soundtrack or professional mix.
+- Original animation/VFX polish, impact variation, spatial mix and final visual/audio review remain incomplete.
 - Firefox/WebKit, physical mobile/controller devices, real-origin save reload and owner playtest remain untested.
 - Status stays NOT_READY until exact-build owner acceptance.
 
 ## Next sequence
-1. Run the roster/map/ability browser regression and the complete CI matrix.
+1. Run roster/map/ability/audio browser regressions and the complete CI matrix.
 2. Fix failures and preserve all existing solo regressions.
 3. Run natural solo missions for each wizard and boss archetype; balance only from recorded evidence.
 4. Finish one-realm navigation/obstacle/collision and character visual readability.
