@@ -10,7 +10,23 @@ PILOT=importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(PILOT)
 CHARACTERS=[("aster",41),("ember",42),("briar",43),("nyx",44)]
 MARKER="// Production build: internal debug mutations are test-only and not shipped."
-DOCUMENT=PILOT.DOCUMENT.replace(MARKER,"window.__setSelectedWizardForTest=(id)=>{save.selectedCharacterId=id;persist();};\n"+MARKER)
+PILOT_ABILITY_ANCHOR="if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}\n    window.__manualTick=true;"
+PILOT_ABILITY_PATCH="""if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}
+    const hpRatio=p.hp/Math.max(1,p.maxHp),closeThreat=game.enemies.some(e=>!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<260);
+    const abilityReady=p.abilityCd<=0;
+    const shouldUseAbility=abilityReady&&(
+      (p.characterId==='aster'&&closeThreat)||
+      (p.characterId==='ember'&&game.enemies.some(e=>!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<700))||
+      (p.characterId==='briar'&&(hpRatio<.92||closeThreat))||
+      (p.characterId==='nyx'&&closeThreat)
+    );
+    if(shouldUseAbility)useCharacterAbility();
+    window.__manualTick=true;"""
+DOCUMENT=(PILOT.DOCUMENT
+ .replace(MARKER,"window.__setSelectedWizardForTest=(id)=>{save.selectedCharacterId=id;persist();};window.__getSelectedWizardForTest=()=>game?.player?.characterId||save.selectedCharacterId;\\n"+MARKER)
+ .replace(PILOT_ABILITY_ANCHOR,PILOT_ABILITY_PATCH))
+assert DOCUMENT!=PILOT.DOCUMENT and DOCUMENT.count("window.__setSelectedWizardForTest")==1
+assert "if(shouldUseAbility)useCharacterAbility();" in DOCUMENT
 assert DOCUMENT!=PILOT.DOCUMENT and DOCUMENT.count("window.__setSelectedWizardForTest")==1
 
 async def main():
@@ -29,7 +45,7 @@ async def main():
    await page.evaluate("(id)=>window.__setSelectedWizardForTest(id)",character)
    await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
    await page.locator("#start").click()
-   selected=await page.evaluate("game?.player?.characterId||null")
+   selected=await page.evaluate("window.__getSelectedWizardForTest()")
    state=await asyncio.wait_for(page.evaluate("window.__fullRun(1500,false)"),timeout=180)
    natural_win=bool(state["bossDead"] and state["ended"] and state["screen"]=="result" and state["wins"]>=1)
    row={

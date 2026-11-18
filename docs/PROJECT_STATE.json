@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "FOUR_WIZARD_NATURAL_RUN_MATRIX_002",
+  "checkpoint": "FOUR_WIZARD_NATURAL_RUN_MATRIX_003",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
@@ -277,7 +277,7 @@
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
     "Landmark collision currently covers authored ruin footprints; random meadow trees/bushes/stones remain non-solid decorative props. Monster pathing and boss movement around structures require natural-run verification."
   ],
-  "next_action": "Rerun the four-wizard natural-run matrix after correcting its test-only closure access; inspect per-character survival and boss outcomes before balance changes.",
+  "next_action": "Rerun all four natural expeditions with the real character ability in use. If any still die before boss spawn, inspect trace and tune enemy pressure/mission rewards from the measured damage source.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -493,7 +493,7 @@
       "minimap": true,
       "world_boundary": true
     },
-    "natural_run_matrix": "EXPLORATORY: four deterministic full runs; initial harness failed before gameplay because the test attempted to access closure-scoped save from page.evaluate; probe now exposes a test-only setter inside the game closure. Rerun pending."
+    "natural_run_matrix": "EXPLORATORY: corrected closure-scoped selection telemetry; pilot now uses each character's actual Q ability on cooldown/appropriate threat. First baseline telemetry showed all four died before boss spawn; those runs did not use Q and are not yet balance evidence."
   },
   "last_single_player_ci": null
 }

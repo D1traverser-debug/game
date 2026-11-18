@@ -75,3 +75,10 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - First exploratory run did not reach gameplay: the test tried to access the IIFE-scoped `save` variable from Playwright's page context.
 - Corrected by injecting a test-only setter inside the game's existing test marker. This does not add a production API or mutate game state outside normal character selection.
 - Rerun the four fixed-seed natural runs before drawing any gameplay-balance conclusions.
+
+
+## Natural-run pilot improvement
+- The first complete telemetry pass revealed the test pilot never used the characters' Q abilities. This is not a valid test of the full character kit.
+- The pilot now uses each character's real ability when ready and when its role makes sense: Aster/Ember on nearby threats, Briar under pressure or when wounded, Nyx when surrounded.
+- Added an in-scope getter for the selected character; the previous `selected: null` value came from trying to read an IIFE-scoped variable outside the game closure, not from a failed selection.
+- The first no-Q runs did die before the boss (Aster 664s, Ember 634s, Briar 106s, Nyx 554s). Do not tune balance from those runs; rerun with Q enabled.
