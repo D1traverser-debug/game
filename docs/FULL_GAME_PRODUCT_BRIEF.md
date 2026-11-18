@@ -1,23 +1,20 @@
-# Full-Game Product Brief — Aetherwilds Browser Edition
+# Product Brief — Aetherwilds Single-Player
 
 ## Player promise
-Enter a living magical frontier alone or with up to three allies. Shape a build from evolving spells and elemental interactions, complete changing objectives, survive escalating threats and defeat realm bosses. Bring discoveries back to camp.
+Choose a wizard, enter one richly authored magical frontier, build a distinct spell loadout, complete changing field objectives, survive escalating enemy waves and defeat the realm boss. Bring rewards back to camp and return with a stronger build.
 
-## Modes/platform
-Browser website; desktop first, mobile compatibility required. Solo and 1–4 player online co-op. Keyboard/mouse, controller and touch. Static frontend plus separate authoritative WebSocket service.
+## Delivery
+Offline-capable static browser game. Desktop browsers are primary; mobile browser support is required. Keyboard/mouse, controller and touch inputs. No CDN runtime.
 
-## Pillars
-1. Readable chaos: large enemy groups and spectacular spells without hiding danger.
-2. Build expression: spell identity, levels, augments, elements and infusions.
-3. Co-op tension: friendly fire, revives, shared objectives and complementary builds.
-4. Run pressure: objectives, hazards, elites and bosses.
-5. Persistent discovery: quests, unlocks, camp upgrades and codex.
+## Fixed scope
+1. One realm: 翠影荒野 / Verdant Wilds, a bounded 2400 × 1800 map with six named districts, seven landmarks, a river, bridges, roads, a central rift and a minimap.
+2. Four playable wizards: Aster (star nova), Ember (fire burst), Briar (healing/root ward), Nyx (shadow dash). Each has unique base stats, starter spell, passive and active Q ability.
+3. Seven enemy archetypes, three boss archetypes, nine objective families, spell catalogue, elemental interactions, augments, scrolls and camp progression already present in the prototype are to be integrated and polished for this one realm.
+4. Full run loop: main menu → character selection → expedition → combat/objectives/upgrades → boss → victory/defeat → result → camp → replay.
+5. Persistence, migration, offline startup, responsive HUD and usable mobile controls.
 
-## Content target
-Full current-version wizard roster, four realms, spells, elements/infusions, augmentations, enemies, bosses, objectives, scrolls, quests, trials/covenants and meta systems. Community counts conflict; reconcile against a pinned in-game version before freezing.
+## Out of scope
+Online co-op, networking, lobbies, additional realms, larger wizard roster, Unity/native build and live service operations.
 
-## Vertical slice
-One original hero and finished realm; three distinct spells; one element interaction; three enemy archetypes; one objective; one authored boss; complete natural run loop; production art/animation/VFX/UI/audio; solo browser stability; then real 2- and 4-client networking.
-
-## Current status
-Existing prototype is one hero, one realm and solo. Its 2.5D and experimental WebGL2 renderers, procedural visuals and synthesized audio have not passed production or device acceptance.
+## Acceptance
+Each wizard must be mechanically and visually distinguishable. The map must be legible, bounded and navigable. A player must be able to finish the run naturally, see a clear result, retain progression and start another run. Browser automation supports but does not replace human playtesting.

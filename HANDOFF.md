@@ -1,57 +1,37 @@
-# HANDOFF — Aetherwilds Browser Game
+# HANDOFF — Aetherwilds Single-Player
 
-## Current checkpoint — 2026-11-18
-- Active branch: `full-game`; working title: Aetherwilds / 以太荒境.
-- Delivery target: browser website, not Unity/native.
-- Modes: solo plus planned 1–4 player online co-op.
-- Status: **NOT_READY**.
-- Current playable artifact: one-hero/one-realm/solo prototype in root `index.html`.
-- 2.5D atlas renderer is default; raw WebGL2 path is experimental.
-- Static preview packaging and browser-scope CI are added in this checkpoint.
-- Unity/C# experiments are historical only. CAOS remains read-only.
+## Owner scope — 2026-11-18
+The owner narrowed the product to one complete, offline-capable browser single-player game:
+- One realm: 翠影荒野 / Verdant Wilds, bounded 2400 × 1800, six districts and seven landmarks.
+- Four playable wizards: Aster, Ember, Briar and Nyx.
+- One complete solo expedition loop: character select, combat, objectives, upgrades, boss, victory/defeat, results, camp and replay.
+- Desktop browser first, mobile touch support, keyboard/mouse and gamepad.
+- No multiplayer, lobby, WSS room server, Unity/native build or additional realms/rosters.
 
-## Existing browser baseline
-Movement, automatic spell casting, XP/upgrades, 25 spell definitions, five primary elements, fifteen candidate infusion effects, nine objective types, three boss archetypes, local progression, DOM UI, synthesized prototype audio, atlas-backed 2.5D rendering and experimental raw WebGL2.
+## Current checkpoint
+- Branch: full-game.
+- Root index.html remains the playable runtime.
+- Four wizard selection and persistent selected-character state are implemented.
+- Each wizard has a distinct starter spell, stat profile, passive, active Q ability and palette/sigil treatment.
+- One bounded Verdant Wilds map has six named districts, seven ruins/landmarks, a river, two bridges, a pilgrim road, central rift, visible boundary, map preview and live minimap.
+- Q activates the wizard ability; M collapses/opens the minimap; touch has a dedicated ability button.
+- Map movement and enemy/chest/boss spawn coordinates are clamped to the realm bounds.
+- Existing enemy/objective/boss/spell/progression/camp systems are retained.
+- Browser regression for roster/map/abilities added; CI status pending.
 
-This is not full content, online co-op or commercial-quality acceptance.
+## Important limitations
+- The four playable portraits/characters use palette and sigil treatments of the existing atlas hero, not four bespoke production character rigs.
+- One map's environmental interaction and obstacle collision still need playtest review.
+- All four heroes need natural full-run balance/boss acceptance.
+- Original animation, VFX, music/SFX and final visual/audio review are not complete.
+- Firefox/WebKit, physical mobile/controller devices, real-origin save reload and owner playtest remain untested.
+- Status stays NOT_READY until exact-build owner acceptance.
 
 ## Next sequence
-1. Verify static package and CI.
-2. Keep current HTML as rollback; migrate production systems into modular TypeScript.
-3. Benchmark raw WebGL2 vs bundled Three.js on one representative scene and real desktop/mobile devices.
-4. Build one complete, polished solo vertical slice.
-5. Implement authoritative WSS rooms, lobby/invites, reconnect and 1/2/3/4-client tests.
-6. Expand the source-reconciled roster, realms and systems.
-7. Deploy the exact website and room service with TLS, monitoring and rollback.
-8. Run owner and independent full-game acceptance on the hosted build.
+1. Run the roster/map/ability browser regression and the complete CI matrix.
+2. Fix failures and preserve all existing solo regressions.
+3. Run natural solo missions for each wizard and boss archetype; balance only from recorded evidence.
+4. Finish one-realm navigation/obstacle/collision and character visual readability.
+5. Complete audio, VFX, save recovery, browser/device performance and owner acceptance.
 
-Do not resume Unity work. Do not call READY from packaging or CI. Do not ask the owner to repeat the browser target.
-
-
-## Browser-native simulation core — added 2026-11-18
-
-- Added `web/src/core` ES modules: fixed-step clock, PCG seeded RNG, combatant/damage policy, sequenced simulation events, client-input validation, swept-circle projectile collision and data-driven spell casting.
-- Added Node built-in contract tests under `web/tests/core.test.mjs`; no external package is required for these tests.
-- Added a dedicated `web-core` CI job.
-- Important boundary: this is a modular browser-native core foundation alongside the existing playable HTML. It is **not yet integrated** into the current game loop, so it does not replace or prove the legacy game behavior.
-- Next: get module tests green, integrate one system at a time with parity regressions, and keep the old browser prototype as rollback.
-
-
-## Browser fixed-step clock integration — 2026-11-18
-
-- The live browser game loop now imports and uses `web/src/core/fixed-step-clock.mjs` at the existing 30 Hz simulation rate.
-- The clock resets at run start; fractional backlog is discarded while menus, pause and upgrade screens are active.
-- If ES modules cannot load in a standalone/file-origin preview, the previous loop remains as a fallback.
-- Static packaging copies all eight runtime ES modules into `dist/web/src/core/` and verifies every module's SHA-256 and byte length.
-- Added a Playwright integration test that loads the exact clock module bytes via a data URL and proves the actual game loop advances through the modular clock.
-- Only the clock is integrated. RNG, damage, projectiles, spell execution and network validation remain standalone modules until each can be migrated with behavior-parity tests.
-
-
-## Browser damage pipeline integration — 2026-11-18
-
-- The live `damageEnemy` and `damagePlayer` functions now route final post-modifier damage through the modular `DamagePipeline` when its modules load.
-- Existing critical-hit, elemental, armor, dodge, invulnerability and ghost-phase rules remain in the legacy layer; the core pipeline centralizes health application and lethal clamping.
-- Per-run `WeakMap` state assigns stable integer combatant IDs without changing the legacy object IDs.
-- The previous damage path remains as a fallback if ES modules fail to load.
-- Added Playwright integration coverage for both production damage functions.
-- Seeded RNG, projectile simulation, spell execution and networking remain unintegrated; do not claim those modules are active gameplay yet.
+CAOS is read-only. Do not touch CAOS repositories or configuration.

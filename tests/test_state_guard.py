@@ -21,7 +21,7 @@ class GuardTests(unittest.TestCase):
   (self.root/"index.html").write_bytes(self.raw+b"changed")
   self.assertIn("WEB_ARTIFACT_SIZE_MISMATCH",M.verify(self.root)["errors"])
  def test_scope_drift_detected(self):
-  self.state["scope"]["multiplayer"]=False; self.save()
+  self.state["scope"]["multiplayer"]=True; self.save()
   self.assertIn("SCOPE_DRIFT:multiplayer",M.verify(self.root)["errors"])
  def test_branch_drift_detected(self):
   self.state["active_production_branch"]="development"; self.save()

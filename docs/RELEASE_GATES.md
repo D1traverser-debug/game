@@ -1,16 +1,16 @@
-# Release Gates — Browser Game
+# Release Gates — One-Realm Single-Player
 
-Product remains NOT_READY until all gates pass on the exact hosted build.
+Product remains NOT_READY until every gate passes on the exact release build.
 
-1. WEB_PACKAGE: reproducible static frontend, byte-identical output, manifest, no CDN runtime.
-2. BROWSER_MATRIX: desktop Chromium/Firefox/WebKit and physical mobile Safari/Android Chrome.
-3. GAMEPLAY: natural solo victory/defeat and complete core loop; no forced state mutation.
-4. CONTENT: complete source-version inventory implemented or explicitly version-scoped.
-5. ART_AUDIO: original production-quality characters, environments, animation, VFX, UI, music and SFX with provenance.
-6. NETWORK: real 1/2/3/4-client WSS sessions; authority, latency/loss, reconnect, revive and boss tests.
-7. PERFORMANCE: frozen desktop 60 FPS and mobile 30 FPS targets under representative peak load.
-8. PERSISTENCE: versioned saves, migrations, corruption recovery, backup/export and reload on real origin.
-9. OPERATIONS: deployed frontend/room service, TLS, monitoring, versioning and rollback.
-10. ACCEPTANCE: owner and independent reviewers accept the exact hosted release candidate.
+1. PACKAGE: reproducible offline static frontend, all runtime modules included, byte/hash manifest, no CDN runtime.
+2. ROSTER: four selectable wizards; distinct stats, starter spell, passive, active ability and in-world identity.
+3. MAP: one bounded 2400 × 1800 realm; six named districts; seven landmarks; readable roads/river/bridges; minimap; objective navigation; no out-of-bounds softlocks.
+4. GAMEPLAY: full natural solo run, objectives, spell/element/upgrade progression, boss, victory/defeat, results, camp and replay.
+5. CONTENT: all included enemies, bosses, objectives, spells, augments and scrolls have tested behavior and coherent balance.
+6. PRESENTATION: original readable character/environment art, animations, VFX, UI, music and SFX; human visual/audio review.
+7. INPUT: keyboard/mouse, gamepad and mobile touch; responsive layouts and no blocked HUD controls.
+8. PERSISTENCE: selected wizard, currency, unlocks, upgrades, records and migrations survive reload; corrupted-save recovery.
+9. COMPATIBILITY/PERFORMANCE: desktop Chromium/Firefox/WebKit and physical mobile browser checks; representative hardware profiling.
+10. ACCEPTANCE: owner and independent reviewers accept the exact build after natural runs with all four characters.
 
-CI, packaging, screenshots or documentation alone cannot mark READY.
+CI, screenshots, packaging or documentation alone cannot mark READY. Multiplayer, additional realms and native builds are out of scope.

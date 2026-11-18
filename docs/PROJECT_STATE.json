@@ -1,18 +1,17 @@
 {
   "schema_version": 1,
-  "project": "Independent Full-Game Co-op Roguelite",
+  "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BROWSER_DAMAGE_PIPELINE_INTEGRATION_001",
+  "checkpoint": "ONE_REALM_FOUR_WIZARD_SOLO_SLICE_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
-    "product": "Original-IP browser-first 3D co-op roguelite inspired by observable spell-survivor gameplay",
+    "product": "Original-IP single-player browser action roguelite",
     "modes": [
-      "solo",
-      "online_coop_1_to_4"
+      "solo"
     ],
-    "players": "1-4",
-    "multiplayer": true,
+    "players": "1",
+    "multiplayer": false,
     "target_platform": "Modern desktop browsers first; mobile browser compatibility",
     "input": [
       "keyboard_mouse",
@@ -20,17 +19,18 @@
       "touch"
     ],
     "target_content": {
-      "wizards": 15,
-      "realms": 4,
-      "primary_elements": 5,
-      "advanced_infusion_candidates": 15,
-      "community_guide_element_identities": 7,
-      "community_guide_dual_element_combinations": 10,
-      "achievements": 78
+      "playable_characters": 4,
+      "realms": 1,
+      "map_regions": 6,
+      "landmarks": 7,
+      "enemy_archetypes": 7,
+      "boss_archetypes": 3,
+      "spell_definitions": 25,
+      "objective_families": 9
     },
-    "content_count_confidence": "provisional community inventory; element/infusion classification is disputed and must be reconciled against pinned current source version",
-    "engine": "WebGL2 3D world + DOM UI; raw WebGL2 vs bundled Three.js decision pending measured vertical-slice comparison",
-    "final_delivery": "Deployable static browser frontend plus separate authoritative WebSocket room service",
+    "content_count_confidence": "Counts reflect current repository implementation and are being validated by browser regression; not a claim of source-game completeness.",
+    "engine": "2.5D atlas renderer with Canvas 2D simulation; experimental WebGL2 is not a release dependency",
+    "final_delivery": "Offline-capable static browser game",
     "original_ip_required": true,
     "browser_first": true
   },
@@ -231,11 +231,15 @@
     "Integrated DamagePipeline into the live damageEnemy and damagePlayer functions after existing crit, elemental, armor and dodge calculations; existing modifiers remain in the legacy combat layer.",
     "Added per-run WeakMap-backed CombatantState identity and synchronized legacy HP/max-HP state at each damage application.",
     "Preserved solo ghost-phase attacks by treating the ghost player as an active damage source; friendly/self damage policy remains enabled to preserve current solo semantics.",
-    "Added Playwright integration coverage proving both actual production damage functions invoke the modular DamagePipeline."
+    "Added Playwright integration coverage proving both actual production damage functions invoke the modular DamagePipeline.",
+    "Owner scope narrowed to one offline single-player browser game; multiplayer, lobbies, servers, Unity/native builds and additional realms are explicitly out of scope.",
+    "Added four selectable playable wizards with persistent selection, unique base stats, starter spells, passive traits, active Q abilities and distinct atlas color/sigil treatments.",
+    "Added four distinct active abilities: Aster star nova, Ember meteor burst, Briar healing/root ward and Nyx shadow dash; Q and touch button inputs are wired.",
+    "Added one bounded 2400x1800 Verdant Wilds realm with six named districts, seven landmarks, stream, two bridges, road network, central rift and visible playable boundary.",
+    "Added a live minimap with player/objective/boss markers, current district label and M-key collapse; character selection includes a full realm map preview.",
+    "Player and enemy spawn coordinates now respect the single-realm bounds; character selection and map/ability behavior have a dedicated Playwright regression."
   ],
   "failed_or_open": [
-    "Current browser game is a single-player, one-hero, one-realm prototype. Full wizard roster, four realms and complete content are not implemented.",
-    "Online 1-4 player co-op has no lobby, authoritative WebSocket room service, reconnect or real multi-client acceptance.",
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
     "Production-quality original character, enemy, realm, animation, spell VFX, UI, music and SFX assets are not complete.",
     "Full wizard/spell/element/infusion/augmentation/enemy/objective/boss/quest/trial/meta inventories need source-version reconciliation.",
@@ -243,10 +247,15 @@
     "Firefox, WebKit, mobile Safari, Android Chrome, physical GPU performance and 15-minute stability are NOT_TESTED.",
     "Website hosting, TLS, authoritative room service deployment, monitoring and rollback are NOT_CONFIGURED.",
     "Human owner playtest and independent commercial-quality gameplay/art/audio/network acceptance are NOT_DONE.",
-    "Fixed-step clock and central damage pipeline are integrated; seeded RNG, projectile, spell and network modules remain independent contracts awaiting incremental integration."
+    "Fixed-step clock and central damage pipeline are integrated; seeded RNG, projectile, spell and network modules remain independent contracts awaiting incremental integration.",
+    "Current character portraits and in-world identities are palette/sigil adaptations of the existing atlas hero, not four separately authored production rigs. Owner visual review remains required.",
+    "Map regions and landmarks are authored and navigable, but collision/occlusion, environmental interaction and real player exploration review remain incomplete.",
+    "Natural full-run balance and boss victory have not yet been demonstrated for all four selectable wizards on this exact build.",
+    "Original music/SFX, bespoke character animation, hit reactions, spell VFX and production-quality visual/audio review remain incomplete.",
+    "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED."
   ],
-  "next_action": "Verify damage pipeline parity and all legacy regressions in CI; then integrate projectile simulation and deterministic RNG behind behavior-parity tests.",
-  "caos_boundary": "CAOS is read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
+  "next_action": "Run the full browser regression matrix including all four character abilities and map UI; fix failures, then execute natural solo runs and visual review for each wizard.",
+  "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
   "development_candidate_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
@@ -274,7 +283,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "BROWSER_DAMAGE_PIPELINE_INTEGRATION_CI_PENDING",
+  "latest_candidate_ci_status": "ONE_REALM_FOUR_WIZARD_SOLO_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -391,28 +400,35 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 736627,
-    "status": "PLAYABLE_SINGLE_PLAYER_PROTOTYPE_NOT_FULL_GAME",
+    "bytes": 760719,
+    "status": "FOUR_WIZARD_ONE_REALM_SOLO_BUILD_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
-    "runtime_dependencies": "self-contained prototype; no external runtime CDN"
+    "runtime_dependencies": "self-contained prototype; no external runtime CDN",
+    "map": "verdant_wilds · 2400x1800 · six districts · seven landmarks",
+    "characters": [
+      "aster",
+      "ember",
+      "briar",
+      "nyx"
+    ]
   },
   "web_runtime": {
     "delivery": "static_web_frontend",
-    "target_renderer": "WebGL2 3D world with DOM UI",
-    "current_renderer": "2.5D atlas default; raw WebGL2 experimental",
+    "target_renderer": "2.5D atlas renderer with Canvas 2D simulation",
+    "current_renderer": "2.5D atlas primary; experimental WebGL2 optional",
     "renderer_decision": "raw WebGL2 versus bundled Three.js; no CDN runtime",
     "input": [
       "keyboard_mouse",
       "controller",
       "touch"
     ],
-    "multiplayer": "NOT_IMPLEMENTED",
+    "multiplayer": "OUT_OF_SCOPE",
     "multiplayer_target": "authoritative secure WebSocket rooms for 1-4 players",
-    "hosting": "NOT_CONFIGURED",
+    "hosting": "offline_static_preview",
     "browser_matrix": "Chromium automation only; Firefox/WebKit/physical devices NOT_TESTED",
-    "status": "FOUNDATION_IN_PROGRESS",
-    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_AND_DAMAGE_PIPELINE_INTEGRATED; RNG/PROJECTILES/SPELLS/NETWORK_NOT_INTEGRATED",
+    "status": "SINGLE_PLAYER_ROSTER_AND_MAP_INTEGRATION",
+    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_AND_DAMAGE_PIPELINE_INTEGRATED; OTHER CORE MODULES STILL INCREMENTAL",
     "core_modules": [
       "fixed-step-clock",
       "seeded-rng",
@@ -423,12 +439,37 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 node:test contracts; clock browser integration passed on prior commit; damage browser integration pending",
+    "core_tests": "22 Node contract tests; browser clock and damage integration; single-player roster/map/ability regression added; CI pending",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
       "web/src/core/*.mjs",
       "build-manifest.json"
-    ]
-  }
+    ],
+    "characters": {
+      "count": 4,
+      "ids": [
+        "aster",
+        "ember",
+        "briar",
+        "nyx"
+      ],
+      "unique_starter_spells": true,
+      "unique_passives": true,
+      "unique_active_abilities": true,
+      "selection_persisted": true
+    },
+    "map": {
+      "id": "verdant_wilds",
+      "bounds": {
+        "width": 2400,
+        "height": 1800
+      },
+      "districts": 6,
+      "landmarks": 7,
+      "minimap": true,
+      "world_boundary": true
+    }
+  },
+  "last_single_player_ci": null
 }

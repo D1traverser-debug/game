@@ -1,16 +1,21 @@
-# Art and Audio Bible — Aetherwilds
+# Art and Audio Bible — Aetherwilds Single-Player
 
 ## Visual identity
-Original magical frontier; premium stylized 3D language; strong gameplay-distance silhouettes, readable value grouping, controlled materials, atmospheric depth, expressive animation and clear spell lighting. Do not imitate reference characters, creatures, UI composition, logo, fonts or effects.
+Original magical frontier with a painterly 2.5D presentation, readable silhouettes, restrained material highlights, atmospheric depth and clear combat telegraphs. The single realm is 翠影荒野 / Verdant Wilds: sunlit grove, broken sanctum, moonfen, mossfall, starwell ruins and the central rift.
 
-## Hero/enemy animation
-Heroes need idle/run/turn/cast/hit/dash/downed/revive/death. Enemies need locomotion, attack telegraph, active hit, recovery, hit reaction and death/drop. Boss phases need consistent readable telegraphs and hit geometry.
+## Four wizards
+- Aster: cool astral blue, star sigils and a luminous orbiting focus.
+- Ember: warm ember red/orange, flame crest and heated staff crystal.
+- Briar: moss green, leaf/branch motifs and a living ward.
+- Nyx: violet shadow palette, crescent motif and a sharp movement trail.
 
-## Realms and spells
-Each realm needs its own palette, terrain/material kit, landmarks, props, lighting, atmosphere, ambience, hazards and navigation cues. Each spell needs distinct cast/travel/impact/feedback. Element interactions must communicate mechanical change and danger.
+Each needs distinct selection portrait, gameplay tint/silhouette treatment, cast feedback, active-ability effect and damage reaction. Shared sprite reuse is acceptable only when identity remains immediately readable.
+
+## Realm presentation
+One bounded map with named districts, seven landmarks, river, bridges, weathered roads, central rift, foliage, ruins and map boundary. The minimap and world navigation must agree with the actual playable coordinates.
 
 ## Audio
-Original adaptive music, ambience, enemy cues, boss phases, spell casts/impacts, UI, damage, objectives, revive and results. Independent music/SFX/ambience/UI volume and mute controls.
+Original adaptive music, ambience, enemy cues, wizard-specific ability sounds, spell casts/impacts, damage, objectives, boss phases, UI and results. Add separate music/SFX/ambience/UI volume and mute controls.
 
-## Provenance and browser budgets
-Every model, texture, animation, font, VFX, music and sound needs editable source or documented commercial license, author/source, export settings, hash and usage record. Optimize GLB, textures, atlases and audio for startup/memory/GPU. Bundle assets or serve from controlled origin; no CDN runtime. Current prototype art/audio is not production acceptance.
+## Provenance and budgets
+No copied commercial character/creature designs, extracted assets or proprietary recordings. Every external asset needs documented commercial-use rights. Bundle assets or serve from controlled origin; no CDN runtime. Current atlas/procedural art and synthesized audio are prototypes until visually and aurally reviewed by the owner.

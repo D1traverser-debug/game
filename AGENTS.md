@@ -1,13 +1,15 @@
-# Agent Instructions — Aetherwilds Browser Game
+# Agent Instructions — Aetherwilds Single-Player Game
 
-The repository is canonical. Read PROJECT_STATE and HANDOFF before acting.
+The canonical project is this repository, branch full-game. Read docs/PROJECT_STATE.json and HANDOFF.md before acting.
 
-Owner directive: complete commercial-quality browser game, not Unity/native. Original-IP action roguelite; solo and 1–4 player online co-op; desktop browsers first, mobile compatibility; keyboard/mouse, controller and touch. Target WebGL2 3D world + DOM UI, with 2.5D fallback. Renderer choice raw WebGL2 vs bundled Three.js requires same-scene real-device evidence. Co-op uses authoritative WSS rooms. Unity/C# is historical only. CAOS is read-only.
+Owner scope: finish one complete, offline-capable browser single-player action roguelite. One authored realm (翠影荒野 / Verdant Wilds), four playable wizards, one complete run loop, existing enemy/objective/boss systems, progression and persistent camp. Desktop browser first with mobile controls. Do not implement online multiplayer, lobbies, room servers, Unity/native builds, or additional realms/rosters unless the owner changes scope.
 
-Engineering loop: intent → source/version evidence → requirements → root-cause analysis → compare repair/refactor/rebuild/reuse → implementation → deterministic tests → real browser/device integration → independent visual/audio/gameplay/network review → acceptance. Do not patch symptoms first.
+Engineering loop: intent → inspect exact runtime and evidence → identify root cause → compare refactor/reuse/rebuild → implement → deterministic tests → real browser integration → visual/gameplay review → acceptance. Avoid local symptom patches.
 
-Invariants: simulation independent of DOM/render/audio; fixed tick and seeded RNG independent of frame rate; presentation never consumes gameplay RNG; server owns network gameplay state; clients submit intent only; content has stable IDs and provenance; test hooks never ship.
+Invariants: simulation independent of DOM/render/audio; fixed-step simulation; presentation does not consume gameplay RNG; no production debug hooks; offline runtime with no CDN dependency; stable content IDs; save migration preserves existing currency, upgrades and progression.
 
-Synthetic mutations and component tests are not player-run acceptance. Report what each test proves and what remains untested. CI cannot certify fun, quality or release readiness.
+The one realm must have a bounded world, named districts, recognizable landmarks, navigation/minimap and playable traversal. Each wizard must have a unique starter spell, passive, active ability, base-stat profile and readable in-world visual identity. The run must include character selection, combat, objectives, upgrades, boss encounter, victory/defeat, results, camp and replay.
 
-Next: verify browser package/CI, build polished browser vertical slice, benchmark renderers, implement WSS co-op. Do not ask owner to repeat browser target.
+Automated checks prove only their listed behavior. Synthetic component probes are not owner acceptance. Do not call READY until the owner has played and accepted the exact build.
+
+CAOS repositories and configuration remain read-only.

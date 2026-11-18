@@ -1,39 +1,23 @@
-# Browser Game Architecture
+# Architecture — Single-Player Browser Game
 
-## Layers
-1. Bootstrap and capability detection.
-2. Input adapters: keyboard/mouse, Gamepad API, touch → normalized commands.
-3. Fixed-step simulation and seeded RNG.
-4. Entities: players, enemies, bosses, projectiles, pickups, objectives, hazards.
-5. Combat: targeting, spells, collision, damage, statuses, death and revive.
-6. Progression: XP, levels, spell slots, elements, infusions, augments, scrolls and unlocks.
-7. Versioned content data for wizards, spells, enemies, bosses, objectives, realms and meta.
-8. WebGL2 renderer: camera, meshes, materials, lighting, animation, instancing, VFX and culling; 2.5D fallback.
-9. DOM UI: menus, lobby, HUD, upgrade cards, codex, settings, pause and results.
-10. Audio adapter: music layers, SFX, ambience and independent mix.
-11. Versioned persistence, migration, backup/export and recovery.
-12. Authoritative WSS networking, snapshots/events and reconnect.
-13. Deterministic tests, Playwright, real-device profiling and human acceptance.
+## Runtime layers
+1. Bootstrap, offline capability and input setup.
+2. Input adapters: keyboard/mouse, Gamepad API and touch.
+3. Fixed-step simulation clock and gameplay state.
+4. World map: one bounded realm, six districts, landmarks, navigation and map data.
+5. Entities: one local player, enemies, bosses, projectiles, pickups, objectives and hazards.
+6. Combat: targeting, spells, active wizard abilities, collision, damage, status and death.
+7. Progression: XP, levels, spell slots, elements, infusions, augments, scrolls and unlocks.
+8. Character data: four stable wizard IDs, base stats, starter spells, passives, active abilities and visual palettes.
+9. Presentation: 2.5D atlas renderer, environment layers, minimap, UI, camera, VFX and animation.
+10. Audio adapter: music, SFX, ambience, UI and mute/volume controls.
+11. Versioned persistence, migration and recovery.
+12. Deterministic contracts, Playwright integration, natural-play pilots and owner acceptance.
 
-The root HTML is a monolithic solo prototype and rollback point, not final architecture. Migrate incrementally into modules.
+The root index.html remains a large legacy runtime and rollback surface. Modular core files are being integrated incrementally with browser parity tests. Do not claim standalone modules are authoritative until production calls them.
 
 ## Invariants
-Simulation is independent of DOM/render/audio. Fixed ticks and seeded gameplay RNG are independent of frame rate. Presentation never consumes gameplay RNG. Server owns networked gameplay-critical state; clients send intent only. Boss telegraph, collision and active damage derive from one attack instance.
+Simulation is independent of DOM/render/audio. Fixed ticks are independent of frame rate. Presentation does not consume gameplay RNG. The player remains inside the authored map bounds. Character selection persists safely. Every active ability has a defined cooldown and effect. No production debug mutation hooks or external CDN dependencies.
 
-## Deployment
-Static frontend plus separate WSS room service, TLS, versioned assets, monitoring and rollback. No CDN runtime.
-
-
-## Browser-native simulation module foundation
-
-`web/src/core` now contains ES modules for fixed-step clock, PCG seeded RNG, combatants/damage policy, sequenced events, input validation, swept-circle projectiles and data-driven spell casting. Node built-in tests cover the contracts. These modules are not yet wired into the legacy HTML game loop; integration and behavior parity are an explicit next gate.
-
-
-## Runtime integration checkpoint
-
-The live browser loop now uses the modular `FixedStepClock` at 30 Hz. The clock resets on new run and discards fractional debt while outside active play. A legacy fallback remains if the module cannot load in a standalone/file-origin preview. Static packaging copies and hash-verifies all eight ES modules. Other core modules are not yet integrated.
-
-
-## Damage pipeline integration checkpoint
-
-The production `damageEnemy` and `damagePlayer` paths now invoke the modular DamagePipeline after existing game-specific damage modifiers. A per-run WeakMap maps legacy entities to stable CombatantState IDs; HP and max HP are synchronized before each hit. Ghost-phase damage remains supported. A browser integration test proves both paths invoke the pipeline. RNG, projectile, spell and network modules remain unintegrated.
+## Out of scope
+Network authority, rooms, lobbies, reconnect, multiplayer replication, additional realms and Unity/native runtime.

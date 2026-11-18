@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-"""Mechanical browser-product checkpoint guard; this is not a game-quality test."""
+"""Mechanical single-player checkpoint guard; this is not a game-quality test."""
 from __future__ import annotations
 import argparse, json, re, sys
 from pathlib import Path
-
 OWNER_SCOPE={
- "product":"Original-IP browser-first 3D co-op roguelite inspired by observable spell-survivor gameplay",
- "modes":["solo","online_coop_1_to_4"],"players":"1-4","multiplayer":True,
+ "product":"Original-IP single-player browser action roguelite",
+ "modes":["solo"],"players":"1","multiplayer":False,
  "target_platform":"Modern desktop browsers first; mobile browser compatibility",
  "input":["keyboard_mouse","controller","touch"],
- "engine":"WebGL2 3D world + DOM UI; raw WebGL2 vs bundled Three.js decision pending measured vertical-slice comparison",
- "final_delivery":"Deployable static browser frontend plus separate authoritative WebSocket room service",
+ "engine":"2.5D atlas renderer with Canvas 2D simulation; experimental WebGL2 is not a release dependency",
+ "final_delivery":"Offline-capable static browser game",
  "original_ip_required":True,"browser_first":True,
 }
 def verify(root:Path)->dict:
@@ -37,8 +36,8 @@ def verify(root:Path)->dict:
  if not handoff.is_file(): errors.append("HANDOFF_MISSING")
  return {"status":"PASS_MECHANICAL_ONLY" if not errors else "FAIL","branch":state.get("active_production_branch"),
          "checkpoint":state.get("checkpoint"),"product_status":state.get("status"),"bytes":len(raw),"errors":errors,
-         "warning":"This checks scope metadata and static HTML integrity only. It does not prove full gameplay, co-op, production art/audio, browser compatibility, performance, hosting or player acceptance."}
+         "warning":"This checks owner scope metadata and static HTML integrity only. It does not prove complete gameplay, visual/audio quality, device performance or player acceptance."}
 def main()->int:
- p=argparse.ArgumentParser(); p.add_argument("--root",type=Path,default=Path(__file__).resolve().parents[1]); a=p.parse_args()
- result=verify(a.root); print(json.dumps(result,ensure_ascii=False,indent=2)); return 0 if result["status"]=="PASS_MECHANICAL_ONLY" else 1
-if __name__=="__main__": sys.exit(main())
+ p=argparse.ArgumentParser();p.add_argument("--root",type=Path,default=Path(__file__).resolve().parents[1]);a=p.parse_args()
+ result=verify(a.root);print(json.dumps(result,ensure_ascii=False,indent=2));return 0 if result["status"]=="PASS_MECHANICAL_ONLY" else 1
+if __name__=="__main__":sys.exit(main())
