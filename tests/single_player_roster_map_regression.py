@@ -10,6 +10,7 @@ PROBE=r"""
 window.__soloProbe={
  roster:()=>CHARACTERS.map(c=>({id:c.id,starter:c.starterSpell,passive:c.passive,ability:c.abilityName,hp:c.hp,move:c.move})),
  map:()=>({id:WORLD_MAP.id,bounds:WORLD_MAP.bounds,regions:WORLD_MAP.regions.map(x=>x.id),landmarks:WORLD_MAP.landmarks.map(x=>x.id),region:worldRegionAt(-850,-570).id}),
+ terrain:()=>({land:worldTerrainAt(0,0).id,stream:worldTerrainAt(800,550).id,bridge:worldTerrainAt(-360,346).id,streamSpeed:worldTerrainAt(800,550).speed}),
  ability:(id)=>{
   const ch=CHARACTER_BY_ID[id],p=makePlayer();p.characterId=id;p.x=0;p.y=0;p.hp=Math.max(30,p.maxHp*.35);p.facing=0;p.abilityCd=0;
   const e={id:'test-'+id,type:'crawler',x:155,y:0,r:18,hp:20000,max:20000,dead:false,state:'chase',slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0};
@@ -46,6 +47,10 @@ async def main():
   report["checks"]["one_bounded_realm"]=m["id"]=="verdant_wilds" and m["bounds"]["width"]==2400 and m["bounds"]["height"]==1800
   report["checks"]["six_districts"]=len(m["regions"])==6
   report["checks"]["seven_landmarks"]=len(m["landmarks"])==7
+  terrain=await page.evaluate("window.__soloProbe.terrain()");report["terrain"]=terrain
+  report["checks"]["river_slowdown"]=terrain["stream"]=="stream" and abs(terrain["streamSpeed"]-.72)<.001
+  report["checks"]["bridge_passage"]=terrain["bridge"]=="bridge"
+  report["checks"]["dry_ground"]=terrain["land"]=="ground"
   report["checks"]["live_minimap"]=await page.locator("#minimap").is_visible()
   abilities={cid:await page.evaluate("(id)=>window.__soloProbe.ability(id)",cid) for cid in ["aster","ember","briar","nyx"]}
   report["abilities"]=abilities
