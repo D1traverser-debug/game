@@ -242,7 +242,9 @@
     "Four wizard sprites now have distinct original headpiece overlays in addition to their palette, sigil and unique gameplay profiles; they still share the base atlas body.",
     "Character selection map preview no longer intercepts pointer input intended for wizard cards.",
     "The Verdant Wilds river and bridges now share a single map-data definition for world rendering, map preview and terrain queries; shallow water slows movement to 72 percent and both bridge crossings preserve normal speed.",
-    "Character-upgrade regression corrected to verify the dodge stat increase on top of each character's base dodge chance."
+    "Character-upgrade regression corrected to verify the dodge stat increase on top of each character's base dodge chance.",
+    "Procedural audio upgraded from isolated beeps to shaped filtered sound envelopes and a layered ambient score with chord pads, stereo arpeggios, bass and boss-intensity layers; mute control retained.",
+    "Added an audio-engine Playwright regression for AudioContext startup, advancing music steps, layered oscillator creation, mute behavior, zero browser errors and offline operation."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -288,7 +290,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "CI_PENDING_AFTER_RUNTIME_REPAIR_CHARACTER_PRESENTATION_AND_MAP_TERRAIN",
+  "latest_candidate_ci_status": "CI_PENDING_AFTER_HUD_FIX_MAP_TERRAIN_CHARACTER_ART_AND_AUDIO_ENGINE",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -405,7 +407,7 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 765075,
+    "bytes": 767207,
     "status": "FOUR_WIZARD_ONE_REALM_SOLO_BUILD_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
