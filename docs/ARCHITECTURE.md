@@ -22,3 +22,8 @@ Simulation is independent of DOM/render/audio. Fixed ticks and seeded gameplay R
 
 ## Deployment
 Static frontend plus separate WSS room service, TLS, versioned assets, monitoring and rollback. No CDN runtime.
+
+
+## Browser-native simulation module foundation
+
+`web/src/core` now contains ES modules for fixed-step clock, PCG seeded RNG, combatants/damage policy, sequenced events, input validation, swept-circle projectiles and data-driven spell casting. Node built-in tests cover the contracts. These modules are not yet wired into the legacy HTML game loop; integration and behavior parity are an explicit next gate.

@@ -10,3 +10,6 @@
 | WEB-006 | P1 | Static preview package not CI-verified | Package and artifact job added | CI_PENDING | Verify package hash, manifest and CI artifact |
 | WEB-007 | P0 | Browser/device/save acceptance incomplete | Chromium automation only | OPEN | Browser matrix, real-origin persistence, device profiling |
 | WEB-008 | P0 | Hosting/operations absent | No deployed frontend/WSS service | OPEN | TLS, monitoring, versioning and rollback |
+
+
+| WEB-009 | P0 | New modular JS simulation core is not yet integrated | Browser ES modules and 20 contract tests are added alongside the legacy HTML | IN_PROGRESS | Integrate incrementally with behavior-parity tests; retain HTML rollback |

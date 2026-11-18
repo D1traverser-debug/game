@@ -26,3 +26,12 @@ This is not full content, online co-op or commercial-quality acceptance.
 8. Run owner and independent full-game acceptance on the hosted build.
 
 Do not resume Unity work. Do not call READY from packaging or CI. Do not ask the owner to repeat the browser target.
+
+
+## Browser-native simulation core — added 2026-11-18
+
+- Added `web/src/core` ES modules: fixed-step clock, PCG seeded RNG, combatant/damage policy, sequenced simulation events, client-input validation, swept-circle projectile collision and data-driven spell casting.
+- Added Node built-in contract tests under `web/tests/core.test.mjs`; no external package is required for these tests.
+- Added a dedicated `web-core` CI job.
+- Important boundary: this is a modular browser-native core foundation alongside the existing playable HTML. It is **not yet integrated** into the current game loop, so it does not replace or prove the legacy game behavior.
+- Next: get module tests green, integrate one system at a time with parity regressions, and keep the old browser prototype as rollback.

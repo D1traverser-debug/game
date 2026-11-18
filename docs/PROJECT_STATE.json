@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Independent Full-Game Co-op Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BROWSER_FIRST_REBASELINE_001",
+  "checkpoint": "BROWSER_CORE_MODULES_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-18",
   "scope": {
@@ -222,7 +222,8 @@
     "Owner explicitly changed full-game delivery target to a browser-playable website; Unity/native delivery is superseded.",
     "Prototype menu branding updated to working title Aetherwilds / 以太荒境; gameplay logic was not rewritten by this branding change.",
     "Full-game scope now distinguishes the playable solo prototype from the unimplemented full browser product.",
-    "Static web packaging, browser-scope integrity checks and CI artifact publication added in this checkpoint."
+    "Static web packaging, browser-scope integrity checks and CI artifact publication added in this checkpoint.",
+    "Added browser-native ES modules for fixed-step time, deterministic RNG, damage, events, input validation, projectiles and data-driven spell casting, with Node built-in contract tests."
   ],
   "failed_or_open": [
     "Current browser game is a single-player, one-hero, one-realm prototype. Full wizard roster, four realms and complete content are not implemented.",
@@ -232,11 +233,11 @@
     "Full wizard/spell/element/infusion/augmentation/enemy/objective/boss/quest/trial/meta inventories need source-version reconciliation.",
     "Browser-origin save/reload, migration, corruption recovery, backup/export and multi-device persistence are NOT_TESTED.",
     "Firefox, WebKit, mobile Safari, Android Chrome, physical GPU performance and 15-minute stability are NOT_TESTED.",
-    "Static web packaging and browser-scope CI added; first CI run pending.",
     "Website hosting, TLS, authoritative room service deployment, monitoring and rollback are NOT_CONFIGURED.",
-    "Human owner playtest and independent commercial-quality gameplay/art/audio/network acceptance are NOT_DONE."
+    "Human owner playtest and independent commercial-quality gameplay/art/audio/network acceptance are NOT_DONE.",
+    "New modular JavaScript simulation core exists alongside the legacy monolith but is not yet wired into the playable game loop; integration and parity tests remain open."
   ],
-  "next_action": "Verify browser package and CI. Then build production browser vertical slice, benchmark raw WebGL2 against bundled Three.js on real devices, and implement authoritative WebSocket co-op.",
+  "next_action": "Run web-core contracts in CI; then connect the modular simulation core to the browser game without breaking the current playable fallback, followed by renderer/device bake-off and authoritative WSS service.",
   "caos_boundary": "CAOS is read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -265,7 +266,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "WEB_SCOPE_REBASELINE_CI_PENDING",
+  "latest_candidate_ci_status": "WEB_CORE_MODULES_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -402,6 +403,18 @@
     "multiplayer_target": "authoritative secure WebSocket rooms for 1-4 players",
     "hosting": "NOT_CONFIGURED",
     "browser_matrix": "Chromium automation only; Firefox/WebKit/physical devices NOT_TESTED",
-    "status": "FOUNDATION_IN_PROGRESS"
+    "status": "FOUNDATION_IN_PROGRESS",
+    "simulation_core": "MODULAR_JS_CORE_ADDED; NOT_YET_INTEGRATED_INTO_LEGACY_GAME_LOOP",
+    "core_modules": [
+      "fixed-step-clock",
+      "seeded-rng",
+      "combatant",
+      "damage-pipeline",
+      "event-buffer",
+      "input-validator",
+      "projectile-system",
+      "spell-system"
+    ],
+    "core_tests": "node:test; 20 contracts added; CI pending"
   }
 }
