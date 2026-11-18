@@ -53,3 +53,12 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Added short-range nameplates when the player approaches a landmark.
 - Added a browser render test that pixel-hashes all four hero renders and all seven landmark renders.
 - Current CI is pending. The game remains NOT_READY pending collision/navigation, natural full-run coverage for every wizard, device testing and owner acceptance.
+
+
+## Landmark navigation pass — 2026-11-18
+- Added solid collision footprints to all seven authored landmarks.
+- Player movement uses axis-separated collision resolution so the wizard slides along structures rather than sticking.
+- Nyx's dash respects the same collision boundaries.
+- Enemy/boss spawn points, chests and objective spawn locations are moved to nearby open ground; multi-rift nodes are also checked.
+- The roster/map browser regression now tests landmark blocking, wall sliding and safe spawn relocation.
+- Random meadow trees, bushes and stones remain decorative/non-solid. Natural monster/boss navigation still needs full-run verification.

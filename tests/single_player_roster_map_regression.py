@@ -13,6 +13,14 @@ window.__soloProbe={
  runSnapshot:()=>({characterId:game?.player?.characterId,starter:game?.player?.spells?.[0]?.id,screen}),
  map:()=>({id:WORLD_MAP.id,bounds:WORLD_MAP.bounds,regions:WORLD_MAP.regions.map(x=>x.id),landmarks:WORLD_MAP.landmarks.map(x=>x.id),region:worldRegionAt(-850,-570).id}),
  terrain:()=>({land:worldTerrainAt(0,0).id,stream:worldTerrainAt(800,550).id,bridge:worldTerrainAt(-360,346).id,streamSpeed:worldTerrainAt(800,550).speed}),
+ collision:()=>{
+  const l=WORLD_MAP.landmarks[0],radius=17,edge=l.solidRadius+radius,actor={x:l.x-edge-4,y:l.y};
+  const blockedAtCenter=worldPointBlocked(l.x,l.y,radius);
+  worldMoveEntity(actor,20,0,radius);const horizontalBlocked=actor.x<=l.x-edge+0.01;
+  const beforeY=actor.y;worldMoveEntity(actor,0,25,radius);const canSlide=actor.y>beforeY;
+  const open=worldFindOpenPoint(l.x,l.y,radius,320);
+  return{blockedAtCenter,horizontalBlocked,canSlide,relocatedClear:!worldPointBlocked(open.x,open.y,radius),relocatedDistance:Math.hypot(open.x-l.x,open.y-l.y)};
+ },
  ability:(id)=>{
   const ch=CHARACTER_BY_ID[id],p=makePlayer();p.characterId=id;p.x=0;p.y=0;p.hp=Math.max(30,p.maxHp*.35);p.facing=0;p.abilityCd=0;
   const e={id:'test-'+id,type:'crawler',x:155,y:0,r:18,hp:20000,max:20000,dead:false,state:'chase',slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0};
@@ -53,6 +61,10 @@ async def main():
   report["checks"]["river_slowdown"]=terrain["stream"]=="stream" and abs(terrain["streamSpeed"]-.72)<.001
   report["checks"]["bridge_passage"]=terrain["bridge"]=="bridge"
   report["checks"]["dry_ground"]=terrain["land"]=="ground"
+  collision=await page.evaluate("window.__soloProbe.collision()");report["collision"]=collision
+  report["checks"]["landmark_blocks_player"]=collision["blockedAtCenter"] and collision["horizontalBlocked"]
+  report["checks"]["player_slides_along_landmark"]=collision["canSlide"]
+  report["checks"]["spawn_points_avoid_landmarks"]=collision["relocatedClear"] and collision["relocatedDistance"]>0
   report["checks"]["live_minimap"]=await page.locator("#minimap").is_visible()
   abilities={cid:await page.evaluate("(id)=>window.__soloProbe.ability(id)",cid) for cid in ["aster","ember","briar","nyx"]}
   report["abilities"]=abilities

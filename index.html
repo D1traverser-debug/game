@@ -393,13 +393,13 @@ const WORLD_MAP={
   {id:'riftheart',name:'裂隙之心',x:0,y:0,r:245,color:'#e5c47c',glyph:'◎'}
  ],
  landmarks:[
-  {id:'sunspire',name:'日辉神殿',x:-850,y:-570,type:'ruin',glyph:'✦'},
-  {id:'oathgate',name:'断誓圣所',x:700,y:-460,type:'ruin',glyph:'⬡'},
-  {id:'moonfen_temple',name:'月影湿地祭坛',x:890,y:450,type:'ruin',glyph:'☾'},
-  {id:'mossfall_altar',name:'苔瀑祭坛',x:-650,y:590,type:'ruin',glyph:'♣'},
-  {id:'starwell',name:'星井遗迹',x:-160,y:810,type:'ruin',glyph:'◇'},
-  {id:'eastwatch',name:'东境哨塔',x:1150,y:-160,type:'ruin',glyph:'⌂'},
-  {id:'westshrine',name:'西风祭坛',x:-1120,y:20,type:'ruin',glyph:'✧'}
+  {id:'sunspire',name:'日辉神殿',x:-850,y:-570,type:'ruin',glyph:'✦',solidRadius:54},
+  {id:'oathgate',name:'断誓圣所',x:700,y:-460,type:'ruin',glyph:'⬡',solidRadius:74},
+  {id:'moonfen_temple',name:'月影湿地祭坛',x:890,y:450,type:'ruin',glyph:'☾',solidRadius:72},
+  {id:'mossfall_altar',name:'苔瀑祭坛',x:-650,y:590,type:'ruin',glyph:'♣',solidRadius:56},
+  {id:'starwell',name:'星井遗迹',x:-160,y:810,type:'ruin',glyph:'◇',solidRadius:58},
+  {id:'eastwatch',name:'东境哨塔',x:1150,y:-160,type:'ruin',glyph:'⌂',solidRadius:45},
+  {id:'westshrine',name:'西风祭坛',x:-1120,y:20,type:'ruin',glyph:'✧',solidRadius:48}
  ]
 };
 const CHARACTERS=[
@@ -418,6 +418,24 @@ function worldTerrainAt(x,y,radius=17){
  for(const [a,b] of WORLD_RIVER_EDGES){const dx=b.x-a.x,dy=b.y-a.y,den=dx*dx+dy*dy,t=den?clamp(((x-a.x)*dx+(y-a.y)*dy)/den,0,1):0,px=a.x+t*dx,py=a.y+t*dy;if((x-px)**2+(y-py)**2<limit)return{id:'stream',name:'浅溪',speed:.72}}
  return{id:'ground',name:worldRegionAt(x,y).name,speed:1}
 }
+const WORLD_LANDMARK_COLLIDERS=WORLD_MAP.landmarks.map(l=>({x:l.x,y:l.y,r:l.solidRadius||0}));
+function worldPointBlocked(x,y,radius=17){
+ for(const l of WORLD_LANDMARK_COLLIDERS){const r=l.r+radius,dx=x-l.x,dy=y-l.y;if(dx*dx+dy*dy<r*r)return true}
+ return false;
+}
+function worldFindOpenPoint(x,y,radius=17,searchRadius=320){
+ const ox=clamp(x,WORLD_MAP.bounds.minX+radius,WORLD_MAP.bounds.maxX-radius),oy=clamp(y,WORLD_MAP.bounds.minY+radius,WORLD_MAP.bounds.maxY-radius);
+ if(!worldPointBlocked(ox,oy,radius))return{x:ox,y:oy};
+ for(let ring=1;ring<=12;ring++){const d=searchRadius*ring/12;for(let i=0;i<32;i++){const a=i*TAU/32+ring*.137,nx=clamp(ox+Math.cos(a)*d,WORLD_MAP.bounds.minX+radius,WORLD_MAP.bounds.maxX-radius),ny=clamp(oy+Math.sin(a)*d,WORLD_MAP.bounds.minY+radius,WORLD_MAP.bounds.maxY-radius);if(!worldPointBlocked(nx,ny,radius))return{x:nx,y:ny}}}
+ return{x:ox,y:oy};
+}
+function worldMoveEntity(entity,dx,dy,radius=17){
+ const minX=WORLD_MAP.bounds.minX+radius,maxX=WORLD_MAP.bounds.maxX-radius,minY=WORLD_MAP.bounds.minY+radius,maxY=WORLD_MAP.bounds.maxY-radius;
+ const nx=clamp(entity.x+dx,minX,maxX);if(!worldPointBlocked(nx,entity.y,radius))entity.x=nx;
+ const ny=clamp(entity.y+dy,minY,maxY);if(!worldPointBlocked(entity.x,ny,radius))entity.y=ny;
+ return entity;
+}
+
 
 const scrolls=[
 {id:'blood',name:'血速',desc:'生命越低，移动速度越快，最高 +21%。',fn:p=>p.lowSpeed=true},
@@ -582,7 +600,7 @@ function makePlayer(){
 }
 function startRun(){if(coreClock)coreClock.reset();simulationDebt=0;game={time:0,mapId:WORLD_MAP.id,world:WORLD_MAP.bounds.width,damageStates:new WeakMap(),nextCombatantId:1,damageSource:{},player:makePlayer(),enemies:[],orbs:[],shots:[],plants:[],ghostImps:[],castSequence:0,ghostDamage:0,ghostTimer:0,fx:[],damageNumbers:[],decor:[],chests:[],hazards:[],boss:null,spawn:0,objective:null,nextObj:0,doneObj:0,nextChest:120,paused:false,ended:false,shake:0,killStreak:0,score:0,randomSeed:1,lockedOption:null,hudTick:0,pendingLevels:0,stats:{}};generateDecor();buildDecorCache(game.decor);for(let i=0;i<12;i++)spawnEnemy(true);document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now();sound(440,.15,'triangle');toast('远征开始：保护自己，收集奥术经验');renderHud()}
 function generateDecor(){let d=game.decor;for(let i=0;i<480;i++){let x=rand(WORLD_MAP.bounds.minX+20,WORLD_MAP.bounds.maxX-20),y=rand(WORLD_MAP.bounds.minY+20,WORLD_MAP.bounds.maxY-20);let r=Math.random();d.push({x,y,type:r<.52?'grass':r<.72?'flower':r<.85?'stone':r<.95?'bush':'tree',s:rand(.55,1.5),rot:rand(0,TAU),c:Math.floor(rand(0,4))})}}
-function spawnEnemy(initial=false,type){if(!game)return;if(game.enemies.filter(e=>!e.dead).length>=64)return;let p=game.player,ang=rand(0,TAU),dist=initial?rand(300,700):rand(530,780),x=clamp(p.x+Math.cos(ang)*dist,WORLD_MAP.bounds.minX+55,WORLD_MAP.bounds.maxX-55),y=clamp(p.y+Math.sin(ang)*dist,WORLD_MAP.bounds.minY+55,WORLD_MAP.bounds.maxY-55);let t=type||enemyType(game.time);let base={crawler:[34,45,48,18],sprout:[45,62,55,16],ranged:[58,52,62,16],buffer:[90,45,72,17],shield:[150,38,95,22],gnasher:[160,70,126,24],crabladon:[420,50,220,33]};let a=base[t]||base.crawler;let threat=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;let scale=(1+game.time/520)*threat;game.enemies.push({id:Math.random(),type:t,x,y,r:a[3],hp:a[0]*scale,max:a[0]*scale,speed:a[1]*(1+game.time/2400),dmg:a[2]*(1+game.time/1200)*threat,attack:rand(.3,2),heal:rand(1,4),state:'chase',stateT:0,slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0,elite:!initial&&Math.random()<.025+game.time/1800,dead:false,stagger:0})}
+function spawnEnemy(initial=false,type){if(!game)return;if(game.enemies.filter(e=>!e.dead).length>=64)return;let p=game.player,ang=rand(0,TAU),dist=initial?rand(300,700):rand(530,780),x=clamp(p.x+Math.cos(ang)*dist,WORLD_MAP.bounds.minX+55,WORLD_MAP.bounds.maxX-55),y=clamp(p.y+Math.sin(ang)*dist,WORLD_MAP.bounds.minY+55,WORLD_MAP.bounds.maxY-55);let t=type||enemyType(game.time);let base={crawler:[34,45,48,18],sprout:[45,62,55,16],ranged:[58,52,62,16],buffer:[90,45,72,17],shield:[150,38,95,22],gnasher:[160,70,126,24],crabladon:[420,50,220,33]};let a=base[t]||base.crawler,open=worldFindOpenPoint(x,y,a[3],220);x=open.x;y=open.y;let threat=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;let scale=(1+game.time/520)*threat;game.enemies.push({id:Math.random(),type:t,x,y,r:a[3],hp:a[0]*scale,max:a[0]*scale,speed:a[1]*(1+game.time/2400),dmg:a[2]*(1+game.time/1200)*threat,attack:rand(.3,2),heal:rand(1,4),state:'chase',stateT:0,slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0,elite:!initial&&Math.random()<.025+game.time/1800,dead:false,stagger:0})}
 function enemyType(t){let r=Math.random();if(t>600&&r<.05)return'crabladon';if(t>360&&r<.13)return'gnasher';if(t>250&&r<.22)return'shield';if(t>170&&r<.28)return'buffer';if(t>90&&r<.43)return'ranged';if(t>35&&r<.65)return'sprout';return'crawler'}
 function nearest(x,y,max=9999){let best=null,bd=max*max;for(let e of game.enemies){if(e.dead||e.state==='burrow')continue;let d=(e.x-x)**2+(e.y-y)**2;if(d<bd){bd=d;best=e}}return best}
 function damageEnemy(e,amount,source='spell',element=null,critAllowed=true){if(!e||e.dead||e.state==='burrow'||!Number.isFinite(amount)||amount<=0)return false;if(SPELL_ID_SET.has(source))e.lastSpellId=source;let p=game.player,crit=critAllowed&&Math.random()<p.crit;let dmg=amount*p.damage*(crit?p.critDmg:1);const fireHit=element==='fire'||(element&&typeof element==='object'&&(element.a==='fire'||element.b==='fire'));if(p.characterId==='ember'&&fireHit)dmg*=1.2;if(e.acid>0)dmg*=1.5;if(e.vulnerable>0)dmg*=3;if(e.type==='shield'&&e.shield>0)dmg*=.35;if(coreDamageApi)applyCoreDamage(p,e,1,2,dmg);else e.hp-=dmg;p.damageDone+=dmg;save.stats.damage=(save.stats.damage||0)+dmg;if(game.objective?.type==='sacrifice'&&game.objective.variant==='death'&&Math.hypot(e.x-game.objective.x,e.y-game.objective.y)<125){let shrine=game.objective;shrine.shrineHp-=dmg*.12;if(shrine.shrineHp<=0&&!shrine.done){shrine.shrineHp=0;completeObjective();toast('死亡神龛被摧毁！')}}if(source==='imp'&&p.ghost){game.ghostDamage=(game.ghostDamage||0)+dmg;save.questCounters=save.questCounters||{};save.questCounters.impGhostDamage=(save.questCounters.impGhostDamage||0)+dmg;if(game.ghostDamage>=12840){grantSpellQuest('imp');p.ghostTimer=Math.min(p.ghostTimer,1.2);game.ghostTimer=p.ghostTimer;toast('幽灵小恶魔挑战完成！')}}if(e.type==='boss')e.stagger=(e.stagger||0)+Math.min(8,dmg*.012);if(crit)p.critHits++;e.hitFlash=.12;game.damageNumbers.push({x:e.x,y:e.y-15,v:dmg,crit,life:.65,el:element});if(element)applyElement(e,element,dmg);if(p.vital&&crit)p.hp=Math.min(p.maxHp,p.hp+dmg*.003);if(e.hp<=0)killEnemy(e);return crit}
@@ -766,7 +784,7 @@ function startObjective(){
  let names={fungi:'魔化菌群',statues:'粉碎石像',crab:'黄金巨蟹',rift:'封印裂隙',sludge:'灵魂淤泥',sacrifice:'鲜血献祭',cores:'失控法术核心',brazier:'魔法火盆',beasts:'法力兽群'};
  let desc={fungi:'收集19朵魔化菌菇。',statues:'击碎8座石像。',crab:'追逐并击败黄金蟹。',rift:'站在裂隙内，持续完成封印。',sludge:'穿越污染区并净化12处淤泥。',sacrifice:'在献祭法阵内击败15只怪物。',cores:'收集5个不稳定核心。',brazier:'依次点亮4个火盆，靠近并按E。',beasts:'驱赶4只法力兽进入圆形祭坛。'};
  let target={fungi:19,statues:8,crab:1,rift:100,sludge:12,sacrifice:15,cores:5,brazier:4,beasts:4}[type];
- let p=game.player,o={type,name:names[type],desc:desc[type],progress:0,target,time:95,x:clamp(p.x+rand(-240,240),-920,920),y:clamp(p.y+rand(-180,180),-670,670),done:false,objects:[],variant:null};
+ let p=game.player,origin=worldFindOpenPoint(clamp(p.x+rand(-240,240),-920,920),clamp(p.y+rand(-180,180),-670,670),26,320),o={type,name:names[type],desc:desc[type],progress:0,target,time:95,x:origin.x,y:origin.y,done:false,objects:[],variant:null};
  let variantsUnlocked=(save.objectiveHistory||{})[type]>0;
  if(variantsUnlocked&&Math.random()<.45)o.variant=type==='rift'?'multi':type==='sacrifice'?'death':type==='fungi'?pick(['scared','explosive']):type==='crab'?pick(['mother','giant']):type==='statues'?'greater':type==='cores'?'heavy':type==='sludge'?'dark':type==='brazier'?'sequence':type==='beasts'?'devoted':null;
  if(type==='crab'){o.crab={x:o.x,y:o.y,r:o.variant==='giant'?32:o.variant==='mother'?24:15,hp:o.variant==='giant'?580:o.variant==='mother'?620:280,alive:true,mother:o.variant==='mother',spawnTimer:2.2,spawned:0}}
@@ -774,10 +792,10 @@ function startObjective(){
   const n=type==='brazier'||type==='beasts'?4:target;
   for(let i=0;i<n;i++){
    let angle=i*TAU/n+rand(-.2,.2),radius=type==='brazier'||type==='beasts'?rand(110,260):rand(80,350);
-   o.objects.push({x:clamp(o.x+Math.cos(angle)*radius,-1130,1130),y:clamp(o.y+Math.sin(angle)*radius,-810,810),hp:type==='statues'?(o.variant==='greater'?300:100):1,alive:true,index:i,activated:false,scared:type==='fungi'&&o.variant==='scared',explosive:type==='fungi'&&o.variant==='explosive',heavy:type==='cores'&&o.variant==='heavy'});
+   const spot=worldFindOpenPoint(clamp(o.x+Math.cos(angle)*radius,-1130,1130),clamp(o.y+Math.sin(angle)*radius,-810,810),15,140);o.objects.push({x:spot.x,y:spot.y,hp:type==='statues'?(o.variant==='greater'?300:100):1,alive:true,index:i,activated:false,scared:type==='fungi'&&o.variant==='scared',explosive:type==='fungi'&&o.variant==='explosive',heavy:type==='cores'&&o.variant==='heavy'});
   }
  }
- if(type==='rift'&&o.variant==='multi'){o.target=300;o.nodes=[{x:o.x-170,y:o.y-95,progress:0},{x:o.x+165,y:o.y-80,progress:0},{x:o.x+15,y:o.y+185,progress:0}]}
+ if(type==='rift'&&o.variant==='multi'){o.target=300;o.nodes=[[-170,-95],[165,-80],[15,185]].map(([dx,dy])=>{const q=worldFindOpenPoint(o.x+dx,o.y+dy,28,120);return{x:q.x,y:q.y,progress:0}})}
  if(type==='sacrifice'&&o.variant==='death'){o.shrineHp=o.shrineMax=1800}
  if(type==='brazier'&&o.variant==='sequence'){o.sequence=[0,1,2,3].sort(()=>Math.random()-.5);o.sequenceIndex=0}
  game.carriedCore=null;game.objective=o;toast('新目标：'+o.name);sound(360,.25,'triangle');
@@ -876,7 +894,7 @@ function objectiveAugments(active){
 }
 
 function completeObjective(){let o=game.objective;if(!o||o.done)return;o.done=true;game.carriedCore=null;game.player.objectives++;save.stats.objectives=(save.stats.objectives||0)+1;game.doneObj++;save.objectiveHistory=save.objectiveHistory||{};save.objectiveHistory[o.type]=(save.objectiveHistory[o.type]||0)+1;persist();game.player.hp=Math.min(game.player.maxHp,game.player.hp+20*(1+(game.player.healBonus||0))+(game.player.characterId==='briar'?game.player.maxHp*.08:0));let bonus=80+game.doneObj*25;game.bonusGold=(game.bonusGold||0)+bonus;toast('目标完成：'+o.name+' · +'+bonus+' 金币');let opts=objectiveAugments(game.player.spells);game.pending={opts:opts.map(x=>({...x,rarity:'AUGMENT'})),reason:'objective'};renderUpgrade();show('upgrade')}
-function spawnChest(){let p=game.player;let a=rand(0,TAU),d=rand(350,550);game.chests.push({x:clamp(p.x+Math.cos(a)*d,WORLD_MAP.bounds.minX+60,WORLD_MAP.bounds.maxX-60),y:clamp(p.y+Math.sin(a)*d,WORLD_MAP.bounds.minY+60,WORLD_MAP.bounds.maxY-60),open:false,r:24});toast('发现卷轴宝箱：靠近后按 E 开启')}
+function spawnChest(){let p=game.player;let a=rand(0,TAU),d=rand(350,550),spot=worldFindOpenPoint(clamp(p.x+Math.cos(a)*d,WORLD_MAP.bounds.minX+60,WORLD_MAP.bounds.maxX-60),clamp(p.y+Math.sin(a)*d,WORLD_MAP.bounds.minY+60,WORLD_MAP.bounds.maxY-60),24,280);game.chests.push({x:spot.x,y:spot.y,open:false,r:24});toast('发现卷轴宝箱：靠近后按 E 开启')}
 function interact(){if(!game||screen!=='playing')return;if(objectiveItemInteraction())return;let p=game.player;let c=game.chests.find(c=>!c.open&&Math.hypot(c.x-p.x,c.y-p.y)<74);if(c){if(p.spells.some(s=>s.id==='talon')&&p.hp<p.maxHp){let stolen=Math.min(24,p.maxHp-p.hp);p.hp+=stolen;grantSpellQuest('talon');toast('Talon Slash 从卷轴宝箱窃取了 '+Math.ceil(stolen)+' 点生命')}c.open=true;let pool=scrolls.filter(s=>!p.scrolls.includes(s.name));let arr=pool.sort(()=>Math.random()-.5).slice(0,3).map(s=>({kind:'scroll',name:s.name,title:s.name,desc:s.desc,icon:'▤',fn:s.fn,rarity:'SCROLL'}));game.pending={opts:arr,reason:'scroll'};renderUpgrade();show('upgrade');sound(720,.2,'triangle');return}toast('附近没有可开启的宝箱')}
 
 function useCharacterAbility(){
@@ -896,7 +914,7 @@ function useCharacterAbility(){
   for(const e of game.enemies)if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<205){damageEnemy(e,52+p.level*5,'briarRoots',null,false);e.slow=Math.max(e.slow||0,.48)}
   fx(p.x,p.y,205,ch.color);sound(420,.3,'triangle');
  }else if(ch.id==='nyx'){
-  const a=Number.isFinite(p.facing)?p.facing:-Math.PI/2,ox=p.x,oy=p.y,ex=clamp(ox+Math.cos(a)*270,WORLD_MAP.bounds.minX,WORLD_MAP.bounds.maxX),ey=clamp(oy+Math.sin(a)*270,WORLD_MAP.bounds.minY,WORLD_MAP.bounds.maxY),dx=ex-ox,dy=ey-oy,len2=dx*dx+dy*dy;
+  const a=Number.isFinite(p.facing)?p.facing:-Math.PI/2,ox=p.x,oy=p.y,dash={x:ox,y:oy};worldMoveEntity(dash,Math.cos(a)*270,Math.sin(a)*270,p.r);const ex=dash.x,ey=dash.y,dx=ex-ox,dy=ey-oy,len2=dx*dx+dy*dy;
   for(const e of game.enemies){if(e.dead)continue;const t=clamp(((e.x-ox)*dx+(e.y-oy)*dy)/(len2||1),0,1),qx=ox+dx*t,qy=oy+dy*t;if(Math.hypot(e.x-qx,e.y-qy)<78)damageEnemy(e,112+p.level*9,'nyxDash',null,false)}
   p.x=ex;p.y=ey;p.invuln=Math.max(p.invuln,.58);
   game.fx.push({x:ox,y:oy,r:22,life:.35,max:.35,color:ch.color,type:'ring'},{x:ex,y:ey,r:76,life:.45,max:.45,color:ch.color,type:'burst'});sound(250,.18,'sawtooth');
@@ -907,10 +925,10 @@ function useCharacterAbility(){
 function damagePlayer(n,source='enemy'){let p=game.player;if(p.ghost||p.invuln>0||!Number.isFinite(n)||n<=0)return;if(Math.random()<p.dodge){if(p.evasion)p.hp=Math.min(p.maxHp,p.hp+n*.2);if(p.characterId==='nyx'){for(const e of game.enemies)if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<128)damageEnemy(e,38+p.level*3,'shadowStep',null,false);game.fx.push({x:p.x,y:p.y,r:128,life:.3,max:.3,color:'#b9a2ec',type:'ring'})}toast('闪避！');return}let armor=p.armor+(p.thick?(1-p.hp/p.maxHp)*90:0);let dmg=Math.max(1,n*(100/(100+armor)));if(coreDamageApi)applyCoreDamage(game.damageSource,p,2,1,dmg);else p.hp-=dmg;p.damageTaken+=dmg;p.invuln=.65;if(p.fight)p.fightT=2;if(p.spells.some(s=>s.id==='talon'&&s.augments.includes('counterTalon')))p.nextTalonCount=2;game.shake=7;game.fx.push({x:p.x,y:p.y,r:30,life:.25,max:.25,color:'#f48d80',type:'ring'});sound(110,.1,'sawtooth',.02);if(source==='explosiveSprout')grantSpellQuest('sprout');if(p.hp<=0){if(!p.ghost&&p.spells.some(s=>s.id==='imp')&&!p.ghostUsed)beginGhostPhase();else if(!p.ghost)finish(false)}}
 function beginGhostPhase(){let p=game.player;if(p.ghostUsed)return;p.ghostUsed=true;p.ghost=true;p.hp=0;p.ghostTimer=12;game.ghostTimer=12;game.ghostDamage=0;game.ghostImps=Array.from({length:8},(_,i)=>({id:i,angle:i*Math.PI/4,attack:.1+i*.035,damage:92,range:520}));toast('巫师倒下，但小恶魔进入幽灵狂潮！');sound(170,.55,'sawtooth',.04)}
 function update(dt){if(!game||screen!=='playing')return;let g=game,p=g.player;g.time+=dt;if(p.invuln>0)p.invuln-=dt;if(p.fightT>0)p.fightT-=dt;if(p.abilityCd>0)p.abilityCd=Math.max(0,p.abilityCd-dt);if(p.regenBoostT>0){p.regenBoostT=Math.max(0,p.regenBoostT-dt);if(p.regenBoostT===0)p.regenBoost=0}if(!p.ghost&&(p.regen+(p.regenBoost||0))>0)p.hp=Math.min(p.maxHp,p.hp+(p.regen+(p.regenBoost||0))*dt);if(p.hp<=0&&!p.ghost){finish(false);return}if(p.ghost){p.ghostTimer-=dt;game.ghostTimer=p.ghostTimer;if(p.ghostTimer<=0){finish(false);return}}
-let mx=p.ghost?0:(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+joy.x,my=p.ghost?0:(keys.KeyS||keys.ArrowDown?1:0)-(keys.KeyW||keys.ArrowUp?1:0)+joy.y;let mag=Math.hypot(mx,my);if(mag>1){mx/=mag;my/=mag}if(mag<.05){p.stand+=dt;p.lastMove=0}else{p.stand=0;p.lastMove=mag;p.facing=Math.atan2(my,mx)}const terrain=worldTerrainAt(p.x,p.y,p.r);let speed=p.move*(game.carriedCore?.alive?.58:1)*(p.lowSpeed?1+(1-p.hp/p.maxHp)*.21:1)*(p.fightT>0?1.3:1)*terrain.speed;if(terrain.id==='stream'&&mag>.1){p.waterStep=(p.waterStep||0)-dt;if(p.waterStep<=0){g.fx.push({x:p.x,y:p.y+8,r:12,life:.32,max:.32,color:'#9edfe4',type:'ring'});p.waterStep=.34}}p.x=clamp(p.x+mx*speed*dt,WORLD_MAP.bounds.minX,WORLD_MAP.bounds.maxX);p.y=clamp(p.y+my*speed*dt,WORLD_MAP.bounds.minY,WORLD_MAP.bounds.maxY);
+let mx=p.ghost?0:(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+joy.x,my=p.ghost?0:(keys.KeyS||keys.ArrowDown?1:0)-(keys.KeyW||keys.ArrowUp?1:0)+joy.y;let mag=Math.hypot(mx,my);if(mag>1){mx/=mag;my/=mag}if(mag<.05){p.stand+=dt;p.lastMove=0}else{p.stand=0;p.lastMove=mag;p.facing=Math.atan2(my,mx)}const terrain=worldTerrainAt(p.x,p.y,p.r);let speed=p.move*(game.carriedCore?.alive?.58:1)*(p.lowSpeed?1+(1-p.hp/p.maxHp)*.21:1)*(p.fightT>0?1.3:1)*terrain.speed;if(terrain.id==='stream'&&mag>.1){p.waterStep=(p.waterStep||0)-dt;if(p.waterStep<=0){g.fx.push({x:p.x,y:p.y+8,r:12,life:.32,max:.32,color:'#9edfe4',type:'ring'});p.waterStep=.34}}worldMoveEntity(p,mx*speed*dt,my*speed*dt,p.r);
 // Mission schedule and pressure curve
 if(g.time>=120&&g.nextObj===0){g.nextObj=1;startObjective()}if(g.time>=360&&g.nextObj===1){g.nextObj=2;startObjective()}if(g.time>=660&&g.nextObj===2){g.nextObj=3;startObjective()}if(g.time>=840&&g.nextObj===3){g.nextObj=4;startObjective()}if(g.time>=120&&g.nextChest===120){spawnChest();g.nextChest=660}if(g.time>=660&&g.nextChest===660){spawnChest();g.nextChest=1140}if(g.time>=1140&&g.nextChest===1140){spawnChest();g.nextChest=99999}
-if(g.time>=1140&&!g.boss&&!g.bossPending){g.bossPending={x:p.x+rand(-400,400),y:p.y-520,t:3};toast('警告：裂隙正在召唤深渊首领！')}if(g.bossPending){g.bossPending.t-=dt;g.bossPending.pulse=(g.bossPending.pulse||0)-dt;if(g.bossPending.pulse<=0&&Math.hypot(p.x-g.bossPending.x,p.y-g.bossPending.y)<96){damagePlayer(9,'summon');g.bossPending.pulse=.7}if(g.bossPending.t<=0)spawnBoss()}
+if(g.time>=1140&&!g.boss&&!g.bossPending){g.bossPending={x:p.x+rand(-400,400),y:p.y-520,t:3};toast('警告：裂隙正在召唤深渊首领！')}if(g.bossPending){g.bossPending.t-=dt;g.bossPending.pulse=(g.bossPending.pulse||0)-dt;if(g.bossPending.pulse<=0&&Math.hypot(p.x-g.bossPending.x,p.y-g.bossPending.y)<96){damagePlayer(9,'summon');g.bossPending.pulse=.7}if(g.bossPending.t<=0){const spawn=worldFindOpenPoint(g.bossPending.x,g.bossPending.y,84,360);g.bossPending.x=spawn.x;g.bossPending.y=spawn.y;spawnBoss()}}
 // Enemy pressure director: pace new waves against the living population instead of stacking unlimited waves.
 const activeEnemies=g.enemies.reduce((n,e)=>n+(!e.dead?1:0),0);
 const targetEnemies=Math.min(64,18+Math.floor(g.time/34));
