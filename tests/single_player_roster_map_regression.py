@@ -10,6 +10,7 @@ PROBE=r"""
 window.__soloProbe={
  roster:()=>CHARACTERS.map(c=>({id:c.id,starter:c.starterSpell,passive:c.passive,ability:c.abilityName,hp:c.hp,move:c.move})),
  selectedCharacter:()=>save.selectedCharacterId,
+ runSnapshot:()=>({characterId:game?.player?.characterId,starter:game?.player?.spells?.[0]?.id,screen}),
  map:()=>({id:WORLD_MAP.id,bounds:WORLD_MAP.bounds,regions:WORLD_MAP.regions.map(x=>x.id),landmarks:WORLD_MAP.landmarks.map(x=>x.id),region:worldRegionAt(-850,-570).id}),
  terrain:()=>({land:worldTerrainAt(0,0).id,stream:worldTerrainAt(800,550).id,bridge:worldTerrainAt(-360,346).id,streamSpeed:worldTerrainAt(800,550).speed}),
  ability:(id)=>{
@@ -39,7 +40,7 @@ async def main():
   report["checks"]["selection_persists"]=await page.evaluate("window.__soloProbe.selectedCharacter()==='ember'")
   report["checks"]["map_preview"]=await page.locator("#mapPreview").evaluate("(c)=>c.width===420&&c.height===315")
   await page.locator("#characterStart").click()
-  report["checks"]["selected_character_starts"]=await page.evaluate("game.player.characterId==='ember'&&game.player.spells[0].id==='loadedDice'")
+  report["checks"]["selected_character_starts"]=await page.evaluate("(()=>{const x=window.__soloProbe.runSnapshot();return x.characterId==='ember'&&x.starter==='loadedDice'&&x.screen==='playing'})()")
   roster=await page.evaluate("window.__soloProbe.roster()");report["roster"]=roster
   report["checks"]["distinct_starters"]=len({x["starter"] for x in roster})==4
   report["checks"]["distinct_passives"]=len({x["passive"] for x in roster})==4
