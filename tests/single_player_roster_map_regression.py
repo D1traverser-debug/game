@@ -16,7 +16,7 @@ window.__soloProbe={
  ability:(id)=>{
   const ch=CHARACTER_BY_ID[id],p=makePlayer();p.characterId=id;p.x=0;p.y=0;p.hp=Math.max(30,p.maxHp*.35);p.facing=0;p.abilityCd=0;
   const e={id:'test-'+id,type:'crawler',x:155,y:0,r:18,hp:20000,max:20000,dead:false,state:'chase',slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0};
-  game={player:p,enemies:[e],fx:[],damageNumbers:[],shots:[],hazards:[],objective:null,damageStates:new WeakMap(),nextCombatantId:1,damageSource:{}};
+  game={player:p,enemies:[e],fx:[],damageNumbers:[],shots:[],hazards:[],plants:[],chests:[],orbs:[],decor:[],ghostImps:[],boss:null,objective:null,damageStates:new WeakMap(),nextCombatantId:1,damageSource:{}};
   const old=coreDamageApi;coreDamageApi=null;screen='playing';const before={hp:e.hp,playerHp:p.hp,x:p.x};
   const used=useCharacterAbility();const after={hp:e.hp,playerHp:p.hp,x:p.x,cd:p.abilityCd,burn:e.burn||0,slow:e.slow||0};coreDamageApi=old;
   return {used,before,after,ability:ch.abilityName};
