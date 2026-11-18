@@ -391,7 +391,7 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 734494,
+    "bytes": 736627,
     "status": "PLAYABLE_SINGLE_PLAYER_PROTOTYPE_NOT_FULL_GAME",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
@@ -423,7 +423,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 node:test contracts passed on prior checkpoint; browser clock and damage integration tests added; current checkpoint CI pending",
+    "core_tests": "22 node:test contracts; clock browser integration passed on prior commit; damage browser integration pending",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
