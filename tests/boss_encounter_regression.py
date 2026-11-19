@@ -41,7 +41,24 @@ window.__BOSS_QA={
  freezeCancel:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[0]);b.freeze=1.5;for(let i=0;i<15;i++){updateBossEncounter(.1);for(const h of game.hazards){h.timer-=.1;h.life-=.1}game.hazards=game.hazards.filter(h=>h.life>0)}return{oldAttackCancelled:b.attackInstance!==a,oldWarnings:game.hazards.filter(h=>h.bossAttackToken===a.token).length,remainingFreeze:b.freeze}},
  phaseCancel:()=>{const b=window.__BOSS_QA.spawn('krog'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[1]);b.hp=b.max*.6;bossSyncPhase(b);return{oldAttackCancelled:b.attackInstance!==a,oldWarnings:game.hazards.filter(h=>h.bossAttackToken===a.token).length,phase:b.phaseIndex}},
  staggerCancel:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[0]);b.stagger=100;updateBossEncounter(.05);return{oldAttackCancelled:b.attackInstance!==a,oldWarnings:game.hazards.filter(h=>h.bossAttackToken===a.token).length,vulnerable:b.vulnerable}},
- pullSnapshot:()=>{const b=window.__BOSS_QA.spawn('krog'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[0]),g=a.geometry,p=game.player;p.x=g.x-100;p.y=g.y;const before=p.x;b.x=g.x-300;bossApplyPull(b,a,.1);return{movedTowardSnapshot:p.x>before,after:p.x,snapshot:g.x,currentBoss:b.x}},
+ pullSnapshot:()=>{
+  const b=window.__BOSS_QA.spawn('krog'),p=game.player;
+  let lane=null;
+  const directions=[[1,0],[-1,0],[0,1],[0,-1]];
+  for(let y=-780;y<=780&&!lane;y+=48)for(let x=-1080;x<=1080&&!lane;x+=48){
+   if(worldPointBlocked(x,y,p.r))continue;
+   for(const [dx,dy] of directions){
+    if(!worldPointBlocked(x+dx*16,y+dy*16,p.r)&&!worldPointBlocked(x+dx*100,y+dy*100,p.r)){lane={x,y,dx,dy};break}
+   }
+  }
+  if(!lane)throw Error('no_open_pull_test_lane');
+  p.x=lane.x;p.y=lane.y;b.x=lane.x+lane.dx*100;b.y=lane.y+lane.dy*100;
+  const a=bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[0]),g=a.geometry;
+  b.x=lane.x-lane.dx*200;b.y=lane.y-lane.dy*200;
+  const before=Math.hypot(g.x-p.x,g.y-p.y);bossApplyPull(b,a,.1);
+  const after=Math.hypot(g.x-p.x,g.y-p.y);
+  return{movedTowardSnapshot:after<before,after,before,snapshot:{x:g.x,y:g.y},currentBoss:{x:b.x,y:b.y},lane};
+ },
  radialOrigin:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[1]),g=a.geometry;game.shots=[];b.x+=300;bossFireProjectiles(b,a);return{actual:game.shots[0]?.x,expected:g.x+b.r+8,match:Math.abs(game.shots[0]?.x-(g.x+b.r+8))<.001}},
  homingOrigin:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[2]),g=a.geometry,count=a.def.count+(a.def.phaseCount||0)*a.phaseIndex,base=Math.atan2(g.y-g.originY,g.x-g.originX),angle=base-(count-1)*.085;game.shots=[];b.x+=300;b.y+=100;bossFireProjectiles(b,a);const expectedX=g.originX+Math.cos(angle)*(b.r+8),expectedY=g.originY+Math.sin(angle)*(b.r+8),shot=game.shots[0];return{actual:{x:shot?.x,y:shot?.y},expected:{x:expectedX,y:expectedY},match:Math.abs(shot?.x-expectedX)<.001&&Math.abs(shot?.y-expectedY)<.001}},
  commitment:()=>{const b=window.__BOSS_QA.spawn('krog');bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[1]);const before={x:b.x,y:b.y};game.player.x=b.x+800;game.player.y=b.y;updateBossEncounter(.1);return{stationary:Math.abs(b.x-before.x)<.001&&Math.abs(b.y-before.y)<.001,before,after:{x:b.x,y:b.y}}},

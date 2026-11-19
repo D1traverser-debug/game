@@ -52,7 +52,7 @@ async def main():
       selectHandler:typeof document.querySelector('#selectCharacter')?.onclick,
       pageTitle:document.title})""")
     raise RuntimeError("CHARACTER_SELECT_UI_FAILED:"+json.dumps({"character":character,"diagnostic":diagnostic,"pageErrors":errors,"consoleErrors":console},ensure_ascii=False)) from exc
-   selected=await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1')).selectedCharacterId")
+   selected=character if "selected" in (await page.locator(f'#characterCards [data-character="{character}"]').get_attribute("class") or "") else None
    await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
    await page.locator("#characterStart").click()
    state=await asyncio.wait_for(page.evaluate("window.__fullRun(1500,false)"),timeout=180)

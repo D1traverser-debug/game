@@ -133,3 +133,11 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - The roster regression's Nyx dash check reused the 90 generated map-prop colliders from an earlier collision test. It now clears and restores only that test fixture so the dash ability is exercised on a known clear lane; production collision behavior is unchanged.
 - The mobile start assertion now reads the IIFE-local game state through the test-only probe, instead of trying to access lexical variables from the browser global scope.
 - The natural-run test's source assertion now matches the unique renamed ability-policy identifier. CI rerun pending.
+
+
+## Natural-run and boss-pull fixture correction — 2026-11-19
+
+- Four-wizard natural-run selection now reads the selected state from the actual production character card. It no longer attempts to read localStorage from Playwright's opaque about:blank document.
+- Actual persistent selection, reload, corrupted-save recovery and backup behavior remain covered by tests/save_persistence_regression.py on a real localhost origin.
+- Boss pull snapshot coverage now searches for a map lane where the player can move without hitting a solid landmark or prop. The production collision resolver remains enabled.
+- This commit changes regression fixtures only; it does not tune combat or make the game easier. CI must still validate the result.

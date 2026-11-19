@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "CHARACTER_SELECT_CANVAS_LAYOUT_001",
+  "checkpoint": "NATURAL_RUN_AND_BOSS_PULL_FIXTURE_002",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -274,7 +274,9 @@
     "Added desktop layout and mobile start-flow assertions to the roster/map browser regression; updated the natural-run harness to wait for the actual active character screen and dynamic card population, with diagnostic errors.",
     "Latest CI exposed a Python syntax error in the newly extended roster regression and a duplicate const identifier in the test-only natural-run Q-ability patch. Both test-harness defects were corrected; no production game logic change was needed.",
     "Roster regression now isolates the global decor-collider fixture before testing Nyx's dash, so unrelated generated map props cannot block the test's synthetic dash lane.",
-    "Mobile start-flow regression now reads the game state through its injected test-only closure probe rather than attempting to access IIFE-local variables from the page global scope."
+    "Mobile start-flow regression now reads the game state through its injected test-only closure probe rather than attempting to access IIFE-local variables from the page global scope.",
+    "Corrected natural-run selection assertion to inspect the selected state of the actual production character card. The prior test read localStorage from Playwright's opaque about:blank origin and failed with SecurityError; real-origin localStorage persistence remains covered by save_persistence_regression.py.",
+    "Corrected the boss pull snapshot test to search the actual map for a clear movement lane before asserting movement toward the snapshotted attack origin; solid landmark and prop collision remains enabled."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -293,7 +295,7 @@
     "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
     "Save export/import UI and multi-device synchronization are not implemented; browser-origin persistence, backup recovery and corruption fallback now have automated regression coverage."
   ],
-  "next_action": "Run the full single-player CI suite; analyze actual natural-run telemetry by wizard if any expedition or boss victory fails.",
+  "next_action": "Rerun full single-player CI. If natural-run or boss checks still fail, use the exact per-wizard and boss telemetry to fix production gameplay rather than weaken acceptance.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -322,7 +324,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "CHARACTER_SELECT_AND_NATURAL_RUN_REGRESSION_CI_PENDING",
+  "latest_candidate_ci_status": "NATURAL_RUN_AND_BOSS_PULL_FIXTURE_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -512,7 +514,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "EXPLORATORY: browser document now parses after unique ability-policy identifiers; the next CI run will determine whether each wizard can naturally clear the full expedition and boss."
+    "natural_run_matrix": "All four wizard selections are verified against the selected character card; actual localStorage persistence is covered by the separate real-origin save regression. Boss pull snapshot test now searches for an unobstructed cardinal lane. CI pending."
   },
   "last_single_player_ci": null
 }
