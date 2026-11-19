@@ -318,3 +318,8 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - Added a browser regression for same-seed/different-seed behavior, world-layout independence, render/audio/pause isolation, replay/new-seed behavior and result-screen diagnostics; added it to the required browser-component matrix.
 - Natural-run test harnesses now seed the new per-run stream with their existing fixed test seeds as well as the legacy stream.
 - Candidate branch: `work/objective-rng-integration-001`; implementation commit `9f9bf30df53fcde93b05ec035e2588b5dd163c73`; CI pending. Product status remains NOT_READY, and the rest of gameplay randomness remains unmigrated. CAOS remains read-only.
+
+
+### CI checkpoint correction — 2026-11-19
+
+Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667`) and the new `objective_rng_regression` browser test passed. The browser test reported 32/32 distinct objective traces across all nine objective families, eight distinct fresh run seeds, and passing render/audio/pause isolation, world-layout stability, result-screen seed visibility and offline/no-error checks. The checkpoint job then rejected stale project metadata (`803533` recorded versus `803536` actual). The metadata is corrected; full CI rerun is pending. No merge or owner acceptance has occurred.

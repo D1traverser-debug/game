@@ -89,3 +89,8 @@ The first bounded slice is implemented on `work/objective-rng-integration-001`:
 - Added `tests/objective_rng_regression.py` for same-seed trace, different-seed divergence, world-layout independence, render/audio/pause isolation, fresh-run seeds, result-screen seed visibility and offline/no-error checks. Added it to the required browser-component CI matrix.
 
 CI is pending. This does not claim full-run deterministic replay: enemy director, combat, loot, level-up, spell, chest and boss randomness remain to be migrated. No gameplay balance, map bounds, enemy values or objective targets were changed. CAOS remains read-only.
+
+
+## CI evidence update — 2026-11-19
+
+The first candidate run `44505974849` passed the offline package integrity check and the new objective RNG browser regression. The project-state checkpoint initially failed because the recorded HTML byte count was stale (803533 vs actual 803536); the metadata has been corrected to the package's measured byte count and SHA-256. Full required CI rerun remains pending.

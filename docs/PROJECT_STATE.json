@@ -323,7 +323,8 @@
     "GitHub Actions run 44484418951 passed all 24 jobs on commit 63fd96aeeaacabffd2fc0f211b3d973cd2e9e83a; Chromium/Firefox/WebKit desktop-mobile smoke passed and four natural wizard runs won their bosses.",
     "GitHub Actions run 44491163465 passed all 24 jobs on commit 266928c87a8ad5c4fd3340f258b34d348aa0ca9f; Chromium/Firefox/WebKit desktop-mobile smoke, 4/4 automated natural wizard boss wins, offline package, and exact 17/17 spell-catalogue checks passed.",
     "Exact catalogue regression on run 44491163465: 25 runtime definitions, 18 eligible solo IDs, 14 shared quest unlocks, four unique starters, seven excluded legacy signatures, migration, grant/rejection, size-upgrade eligibility, atlas and offline/no-error checks all passed.",
-    "Completed deterministic RNG boundary audit: 28 direct Math.random source occurrences (including rand/pick helper definitions), 45 rand references and 11 pick references classified. Identified mixed gameplay/render helper and random-sort shuffles; no runtime call sites changed."
+    "Completed deterministic RNG boundary audit: 28 direct Math.random source occurrences (including rand/pick helper definitions), 45 rand references and 11 pick references classified. Identified mixed gameplay/render helper and random-sort shuffles; no runtime call sites changed.",
+    "Objective RNG browser regression passed in CI run 44505974849: 32/32 distinct objective traces across all 9 objective families; fixed world-layout signature; render/audio/pause RNG isolation; 8/8 fresh run seeds; result-screen seed/version; no runtime errors or external requests."
   ],
   "failed_or_open": [
     "The four wizards still share a base atlas body beneath distinct mantles, headpieces, weapons and palettes; bespoke production rigs and authored animation remain incomplete.",
@@ -338,7 +339,7 @@
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
     "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines."
   ],
-  "next_action": "Complete the objective RNG integration candidate's full browser CI. If green, migrate enemy-director spawn RNG and entity IDs as a separate bounded slice; keep combat/loot/spell/chest/boss call sites unmigrated until their own parity tests. Do not claim full-run deterministic replay or READY.",
+  "next_action": "Rerun the full objective RNG candidate CI after correcting PROJECT_STATE artifact bytes/hash. If every required job passes, record the full CI run and continue with enemy-director RNG as the next bounded slice. Do not claim full-run deterministic replay or READY.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -367,7 +368,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PENDING_OBJECTIVE_RNG_INTEGRATION_CI_OWNER_ACCEPTANCE_PENDING",
+  "latest_candidate_ci_status": "PARTIAL_PASS_CHECKPOINT_METADATA_MISMATCH_FIXED_RERUN_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44491163465,
@@ -497,7 +498,7 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 803533,
+    "bytes": 803536,
     "status": "AUTOMATED_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
@@ -509,7 +510,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "PENDING_CI_ARTIFACT_MANIFEST"
+    "sha256": "ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
@@ -537,7 +538,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contracts plus fixed-step clock and damage-pipeline integration; objective RNG browser regression candidate added and awaiting CI.",
+    "core_tests": "22 Node contracts plus fixed-step clock and damage-pipeline integration; objective_rng_regression passed in CI run 44505974849; full matrix rerun pending after artifact metadata correction.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -643,6 +644,7 @@
     "The first exact-catalogue test candidate exposed a test-probe scope mismatch: SIZE_UPGRADE_SPELLS was local to offerUpgrade. Moved the unchanged eligibility Set to shared scope so the regression can inspect it; no upgrade values or runtime eligibility changed.",
     "Moved SIZE_UPGRADE_SPELLS to shared scope without changing eligibility values; exact-catalogue regression then passed 17/17 and full CI passed 24/24 on 266928c.",
     "Documented RNG stream ownership and bounded first integration slice: per-run SeededRng for objective generation, separate fixed world-layout/presentation/audio streams, and reproducibility/isolation acceptance tests.",
-    "Implemented bounded PCG objective RNG candidate: per-run seed/stream for objective selection, variants, spawn offsets and brazier Fisher–Yates order; fixed/versioned world-layout stream for collision-bearing decoration; result-screen seed/version; browser regression added to CI. Full-run RNG migration remains incomplete."
+    "Implemented bounded PCG objective RNG candidate: per-run seed/stream for objective selection, variants, spawn offsets and brazier Fisher–Yates order; fixed/versioned world-layout stream for collision-bearing decoration; result-screen seed/version; browser regression added to CI. Full-run RNG migration remains incomplete.",
+    "First CI run 44505974849: package integrity check passed with index.html 803536 bytes and SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667; objective_rng_regression passed. The checkpoint guard failed only because PROJECT_STATE still recorded 803533 bytes; metadata corrected, full CI rerun pending."
   ]
 }
