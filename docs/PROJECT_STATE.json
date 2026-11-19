@@ -295,7 +295,9 @@
     "Reduced Gnasher leap coefficient from 0.90 to 0.32 of its scaled base damage and enemy contact coefficient from 0.09 to 0.045; reduced ranged projectile coefficient from 0.52 to 0.36.",
     "Level-up offers now guarantee at least one defensive stat choice while the player's base defenses remain below survivability targets and no defensive card was rolled naturally.",
     "Enemy-balance regression now measures actual post-armor player damage for a late Gnasher leap and late Crabladon contact, not only raw coefficients.",
-    "Character-upgrade regression now asserts that an under-defended character receives a defensive level-up option."
+    "Character-upgrade regression now asserts that an under-defended character receives a defensive level-up option.",
+    "Balance candidate commit 3659664 passed enemy-balance post-armor checks, normal-play smoke, art renderer regression and all completed component checks at the time of inspection.",
+    "First natural-run retry aborted before simulation because its test-only ranged-shot source anchor still expected 0.52 after the production coefficient changed to 0.36; updating the anchor only."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -316,7 +318,7 @@
     "Four-wizard natural-run acceptance remains incomplete: previous exact-build result was 1/4 natural boss wins; this balance/upgrade candidate must rerun before any all-character completion claim.",
     "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted."
   ],
-  "next_action": "Run required browser regressions and the four-wizard natural solo expedition. Use the new post-armor damage budgets and survival-offer coverage to validate the balance change; do not claim release readiness until all four runs and human/device acceptance are complete.",
+  "next_action": "Rerun CI after syncing the natural-run instrumentation to the 0.36 ranged projectile coefficient; then inspect all four full-run traces.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -345,7 +347,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "SOLO_DAMAGE_AND_UPGRADE_BALANCE_003_CI_PENDING",
+  "latest_candidate_ci_status": "SOLO_DAMAGE_AND_UPGRADE_BALANCE_003_NATURAL_RUN_HARNESS_FIX_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -535,7 +537,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "CI #44447174307: all four characters selected; Briar won 1/4. Aster died at 384.7s after repeated Gnasher leaps (~93 raw each); Ember died at 278s after accumulated contact/friendly-fire; Nyx died at 812.3s from Crabladon contact. This candidate lowers Gnasher leap/contact and ranged damage, and guarantees a defensive level-up choice when the build remains under-defended. Rerun pending."
+    "natural_run_matrix": "The balance regressions passed on commit 3659664. The first four-wizard rerun did not start because its test-only source instrumentation still expected the previous 0.52 ranged projectile coefficient; updating the instrumentation to 0.36. No natural-run result can be inferred from that aborted job."
   },
   "last_single_player_ci": {
     "run_id": 44447174307,

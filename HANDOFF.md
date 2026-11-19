@@ -202,3 +202,10 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - Added a defensive level-up fallback: when a character remains below the minimum survival targets and the three naturally rolled cards contain no defensive stat, replace the third card with a valid max-HP, armor, regeneration or dodge option. The player still chooses; this does not auto-apply stats.
 - Strengthened the enemy-balance regression to measure actual post-armor damage for a late Gnasher leap and late Crabladon contact. Strengthened character-upgrade regression to require a defensive option for an underbuilt character.
 - CI for this candidate is pending. Do not claim all four wizard runs pass until the natural-run matrix is rerun.
+
+
+## Natural-run harness coefficient sync — 2026-11-19
+
+- The balance candidate passed the strengthened enemy damage regression, including post-armor Gnasher and Crabladon damage budgets.
+- The first four-wizard natural-run retry aborted before starting because its test-only ranged-shot instrumentation still matched the old 0.52 projectile coefficient after production changed to 0.36.
+- Updated the instrumentation and tagged-shot replacement to the current 0.36 coefficient. No gameplay code changed in this correction; rerun CI before reading any natural-run outcome.
