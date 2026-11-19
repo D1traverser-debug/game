@@ -237,3 +237,11 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - The telegraphed boss attack definitions and their damage values are unchanged.
 - Added deterministic browser checks for damage values, pushback, cooldown and source classification.
 - Candidate CI and the fresh four-wizard natural run are pending. Do not claim balance acceptance until both results are inspected.
+
+
+## Canonical boss source rebuild — 2026-11-19
+
+- The first boss-contact candidate exposed a build-boundary defect: the generated root HTML was edited directly while the canonical source fragment remained unchanged.
+- Moved the boss-contact implementation into `src/game/boss_encounters.js` and regenerated `index.html` using the exact `scripts/build_game.py` fragment and homing-projectile replacement rules.
+- The deterministic build test now checks that the exact canonical boss module is embedded in the shipped HTML.
+- Candidate CI and four-wizard natural-run validation are pending.

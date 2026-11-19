@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BOSS_CONTACT_COUNTERPLAY_001",
+  "checkpoint": "BOSS_CONTACT_COUNTERPLAY_002",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -307,7 +307,10 @@
     "CI run 44455707962: 19 of 20 jobs passed; deterministic boss/content, roster, map, save, audio, controller, launcher package and browser regressions passed. Exploratory four-wizard natural run was 2/4.",
     "Natural-run telemetry isolated Aster/Sol and Ember/Sol deaths to repeated boss body-contact calls at 32 raw damage (Krog 41), separate from the telegraphed attack pipeline; Briar/Mul and Nyx/Krog naturally won.",
     "Implemented a separate low-damage boss body-contact rule (Sol/Mul 10, Krog 12), 1.1-second contact cooldown and physical knockback to prevent the boss body from dealing repeated untelegraphed heavy hits.",
-    "Added deterministic browser regression for boss contact damage caps, pushback, independent cooldown and source classification; candidate CI pending."
+    "Added deterministic browser regression for boss contact damage caps, pushback, independent cooldown and source classification; candidate CI pending.",
+    "Corrected the source-of-truth layer: boss contact changes now live in src/game/boss_encounters.js, and index.html is regenerated with scripts/build_game.py semantics.",
+    "Root HTML now embeds the exact canonical boss source fragment; build reproducibility regression is expected to verify source/artifact parity.",
+    "Boss contact candidate uses 10 raw damage for Sol/Mul, 12 for Krog, 34–52 unit pushback and a 1.1-second cooldown; browser contact regression remains attached."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -331,7 +334,7 @@
     "One-click launch package awaits CI verification; local Windows/macOS/Linux execution and browser storage acceptance remain untested on owner hardware.",
     "The new boss body-contact counterplay patch has not yet passed CI or been evaluated by a fresh four-wizard natural run. Human playtest, visual/audio review, bespoke animation and cross-browser/device performance remain open."
   ],
-  "next_action": "Run all browser regressions and the four-wizard natural-run matrix on the boss-contact counterplay candidate; inspect remaining combat, presentation and save issues before owner acceptance.",
+  "next_action": "Run checkpoint, build reproducibility, all browser component/content tests and the four-wizard natural-run matrix against the canonical source-module build. Inspect failures before tuning further.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -360,7 +363,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "BOSS_CONTACT_COUNTERPLAY_001_CI_PENDING",
+  "latest_candidate_ci_status": "BOSS_CONTACT_COUNTERPLAY_002_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -478,7 +481,7 @@
     "branch": "full-game",
     "path": "index.html",
     "bytes": 787117,
-    "status": "BOSS_CONTACT_COUNTERPLAY_001_CI_PENDING",
+    "status": "BOSS_CONTACT_COUNTERPLAY_002_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",

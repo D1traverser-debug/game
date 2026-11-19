@@ -50,3 +50,8 @@ During the Mul'gath encounter, auto-cast spells prioritize an in-range live heal
 ## Boss body-contact contract
 
 Boss body collision is a low-damage bump, distinct from committed telegraphed attacks. Sol and Mul contact for 10 raw damage; Krog contacts for 12. Contact pushes the player 34–52 world units and uses a 1.1-second cooldown. Boss skill telegraphs, projectiles and their damage remain independent. Browser regression verifies the contact contract; full-run and human balance acceptance remain separate.
+
+
+## Canonical source/build boundary
+
+Boss encounter logic is authored in `src/game/boss_encounters.js`. The root `index.html` is a generated, offline browser artifact and must be refreshed with `python scripts/build_game.py`; direct edits to the embedded fragment are rejected by `tests/test_build_reproducible.py`. This keeps the boss implementation and shipped HTML byte-aligned.

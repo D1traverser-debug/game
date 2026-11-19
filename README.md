@@ -45,3 +45,7 @@ The game is single-player and offline-capable. The local server does not expose 
 
 ### Boss collision and counterplay
 Boss body contact is deliberately weaker than a telegraphed boss ability and applies a short knockback plus an independent cooldown. The boss's authored attacks remain the primary high-damage threats and retain their visible warning windows. The current counterplay candidate is awaiting CI and a fresh four-wizard natural run.
+
+
+### Source build rule
+Boss encounter logic lives in `src/game/boss_encounters.js`. After editing it, regenerate the offline browser entry with `python scripts/build_game.py`; `python scripts/build_game.py --check` and the build reproducibility tests verify that the shipped HTML contains the exact source fragment.
