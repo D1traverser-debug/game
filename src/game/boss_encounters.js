@@ -95,7 +95,7 @@ function bossFireProjectiles(b,a){
 }
 function bossApplyPull(b,a,dt){
  const geo=a.geometry,p=game.player,dx=geo.x-p.x,dy=geo.y-p.y,dist=Math.hypot(dx,dy)||1,def=a.def;
- if(dist<geo.r){const strength=.35+.65*(1-dist/geo.r),step=def.pullSpeed*strength*dt;p.x+=dx/dist*step;p.y+=dy/dist*step;if(dist<118&&!a.hitOnce){a.hitOnce=true;damagePlayer(def.damage,'bossInhale')}}
+ if(dist<geo.r){const strength=.35+.65*(1-dist/geo.r),step=def.pullSpeed*strength*dt;worldMoveEntity(p,dx/dist*step,dy/dist*step,p.r);if(dist<118&&!a.hitOnce){a.hitOnce=true;damagePlayer(def.damage,'bossInhale')}}
 }
 function bossResolveAttack(b,a,dt){
  const def=a.def,p=game.player;
@@ -125,17 +125,17 @@ function bossUpdateHomingProjectile(s,dt,p){
 function bossApplyMagneticField(b,dt){
  if(!b.fieldActive||!b.fieldCenter)return;
  const p=game.player,dx=p.x-b.fieldCenter.x,dy=p.y-b.fieldCenter.y,dist=Math.hypot(dx,dy)||1,limit=b.fieldRadius-24;
- if(dist>limit){const pull=Math.min(dist-limit,235*dt);p.x-=dx/dist*pull;p.y-=dy/dist*pull}
+ if(dist>limit){const pull=Math.min(dist-limit,235*dt);worldMoveEntity(p,-dx/dist*pull,-dy/dist*pull,p.r)}
 }
 function spawnBoss(){
- const p=game.player,loc=game.bossPending||{x:p.x+rand(-400,400),y:p.y-520},archetype=pick(BOSS_ARCHETYPES),mult=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;
+ const p=game.player,archetype=pick(BOSS_ARCHETYPES),rawLoc=game.bossPending||{x:p.x+rand(-400,400),y:p.y-520},loc=worldFindOpenPoint(rawLoc.x,rawLoc.y,Math.min(38,archetype.r*.45),360),mult=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;
  const b={id:'boss',type:'boss',bossId:archetype.id,name:archetype.name,x:loc.x,y:loc.y,r:archetype.r,hp:archetype.hp*mult,max:archetype.hp*mult,speed:archetype.speed,attack:2.5,rune:4,stagger:0,vulnerable:0,dead:false,hitFlash:0,elite:true,burn:0,burnDmg:0,acid:0,slow:0,freeze:0,weakness:0,corrupt:0,corruptT:0,age:0,phase:'hunt',phaseT:0,healTimer:8,phaseIndex:0,phaseCount:archetype.phaseCount,headCount:1,phaseTransitionTimer:0,attackCooldown:1.65,attackSequence:0,attackInstance:null,fieldActive:false,fieldCenter:null,fieldRadius:0,fieldHazard:null};
  save.stats.bossesEncountered=(save.stats.bossesEncountered||0)+1;persist();game.boss=b;game.bossPending=null;game.enemies.push(b);toast(archetype.name+' 正在穿越裂隙！');sound(75,.7,'sawtooth',.04);
 }
 function spawnBossHealer(b){
  if(game.enemies.filter(e=>!e.dead&&e.bossHealer).length>=5)return;
  spawnEnemy(false,'buffer');const e=game.enemies[game.enemies.length-1];
- e.x=b.x+rand(-210,210);e.y=b.y+rand(-190,190);e.hp=e.max=400;e.speed=52;e.dmg=22;e.bossHealer=true;e.bossOwnerId=b.id;e.heal=999999;e.elite=false;e.type='buffer';e.state='chase';
+ const open=worldFindOpenPoint(b.x+rand(-210,210),b.y+rand(-190,190),e.r,260);e.x=open.x;e.y=open.y;e.hp=e.max=400;e.speed=52;e.dmg=22;e.bossHealer=true;e.bossOwnerId=b.id;e.heal=999999;e.elite=false;e.type='buffer';e.state='chase';
  game.fx.push({x:e.x,y:e.y,r:55,life:.4,max:.4,color:'#c0e6a0',type:'ring'});
  return e;
 }
@@ -147,9 +147,9 @@ function bossUpdateMulMinions(b,dt){
   if(e.dead||!e.bossHealer||e.bossOwnerId!==b.id)continue;
   const dx=b.x-e.x,dy=b.y-e.y,dist=Math.hypot(dx,dy)||1;
   if(e.corruptT>0||e.state==='corrupt'){
-   if(dist>b.r+e.r+16){e.x+=dx/dist*e.speed*1.35*dt;e.y+=dy/dist*e.speed*1.35*dt}
+   if(dist>b.r+e.r+16){worldMoveEntity(e,dx/dist*e.speed*1.35*dt,dy/dist*e.speed*1.35*dt,e.r)}
    else{damageEnemy(b,b.max*(.035+(b.phaseIndex||0)*.008),'corruptedHealer',null,false);e.dead=true;game.fx.push({x:e.x,y:e.y,r:65,life:.45,max:.45,color:'#c98cf0',type:'burst'})}
-  }else{if(dist>82){e.x+=dx/dist*e.speed*dt;e.y+=dy/dist*e.speed*dt}if(dist<250)b.hp=Math.min(b.max,b.hp+dt*b.max*.00072)}
+  }else{if(dist>82){worldMoveEntity(e,dx/dist*e.speed*dt,dy/dist*e.speed*dt,e.r)}if(dist<250)b.hp=Math.min(b.max,b.hp+dt*b.max*.00072)}
  }
 }
 function updateBossEncounter(dt){
@@ -163,7 +163,7 @@ function updateBossEncounter(dt){
  if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;bossCancelAttack(b);b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
  b.phaseTransitionTimer=Math.max(0,(b.phaseTransitionTimer||0)-dt);
  const dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx);
- const committedAttack=!!b.attackInstance&&(b.attackInstance.stage==='telegraph'||b.attackInstance.stage==='active');if(b.vulnerable<=0&&b.freeze<=0&&!committedAttack&&b.phaseTransitionTimer<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);b.x+=Math.cos(a)*speed*(1-b.slow)*dt;b.y+=Math.sin(a)*speed*(1-b.slow)*dt}
+ const committedAttack=!!b.attackInstance&&(b.attackInstance.stage==='telegraph'||b.attackInstance.stage==='active');if(b.vulnerable<=0&&b.freeze<=0&&!committedAttack&&b.phaseTransitionTimer<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);worldMoveEntity(b,Math.cos(a)*speed*(1-b.slow)*dt,Math.sin(a)*speed*(1-b.slow)*dt,Math.min(38,b.r*.45))}
  bossApplyMagneticField(b,dt);bossUpdateMulMinions(b,dt);if(b.dead)return;bossUpdateAttack(b,dt);
  const phaseText=b.phaseCount>1?' · 阶段 '+((b.phaseIndex||0)+1)+'/'+b.phaseCount:'';
  const headText=b.bossId==='mul'?' · '+(b.headCount||1)+'首':'';
