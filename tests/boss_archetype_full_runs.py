@@ -528,12 +528,13 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
   };
 };
 """
-GNASHER_HIT="if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');"
+GNASHER_HIT="if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(gnasherLeapDamage(e),'gnasher');"
+GNASHER_INSTRUMENTED="if(Math.hypot(p.x-e.x,p.y-e.y)<60){window.__gnasherHits.push({t:+g.time.toFixed(1),id:e.id,state:e.state,stateT:+e.stateT.toFixed(2),x:+e.x.toFixed(1),y:+e.y.toFixed(1),leapX:+e.leapX.toFixed(1),leapY:+e.leapY.toFixed(1),playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),distance:+Math.hypot(p.x-e.x,p.y-e.y).toFixed(1),dmg:+gnasherLeapDamage(e).toFixed(1)});damagePlayer(gnasherLeapDamage(e),'gnasher');}"
 assert SOURCE.count(GNASHER_HIT)==1,"Gnasher hit instrumentation anchor must occur exactly once"
-CONTACT_HIT="if(d<e.r+p.r+3&&e.state!=='corrupt'){e.touch=(e.touch||0)-dt;if(e.touch<=0){damagePlayer(e.dmg*.14*(e.weakness>0?.65:1),'contact');e.touch=.65}}"
-CONTACT_INSTRUMENTED="if(d<e.r+p.r+3&&e.state!=='corrupt'){e.touch=(e.touch||0)-dt;if(e.touch<=0){window.__contactSource={type:e.type,state:e.state,id:e.id,hp:+e.hp.toFixed(1),dmg:+e.dmg.toFixed(1),distance:+d.toFixed(1),damage:+(e.dmg*.14*(e.weakness>0?.65:1)).toFixed(1)};damagePlayer(e.dmg*.14*(e.weakness>0?.65:1),'contact');e.touch=.65}}"
-RANGED_SHOT="g.shots.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,life:3,dmg:e.dmg*.65,r:6,kind:'enemy',color:'#d28fcb'})"
-TAGGED_RANGED_SHOT="g.shots.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,life:3,dmg:e.dmg*.65,r:6,kind:'enemy',sourceType:e.type,sourceId:e.id,sourceDamage:e.dmg,color:'#d28fcb'})"
+CONTACT_HIT="if(d<e.r+p.r+3&&e.state!=='corrupt'){e.touch=(e.touch||0)-dt;if(e.touch<=0){damagePlayer(enemyContactDamage(e),'contact');e.touch=.65}}"
+CONTACT_INSTRUMENTED="if(d<e.r+p.r+3&&e.state!=='corrupt'){e.touch=(e.touch||0)-dt;if(e.touch<=0){window.__contactSource={type:e.type,state:e.state,id:e.id,hp:+e.hp.toFixed(1),dmg:+e.dmg.toFixed(1),distance:+d.toFixed(1),damage:+enemyContactDamage(e).toFixed(1)};damagePlayer(enemyContactDamage(e),'contact');e.touch=.65}}"
+RANGED_SHOT="g.shots.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,life:3,dmg:e.dmg*.52,r:6,kind:'enemy',color:'#d28fcb'})"
+TAGGED_RANGED_SHOT="g.shots.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,life:3,dmg:e.dmg*.52,r:6,kind:'enemy',sourceType:e.type,sourceId:e.id,sourceDamage:e.dmg,color:'#d28fcb'})"
 assert SOURCE.count(CONTACT_HIT)==1,"Contact source instrumentation anchor must occur exactly once"
 assert SOURCE.count(RANGED_SHOT)==1,"Ranged projectile source instrumentation anchor must occur exactly once"
 DRAW_SHAKE="let sx=g?.shake?rand(-g.shake,g.shake):0,sy=g?.shake?rand(-g.shake,g.shake):0;"
@@ -546,7 +547,7 @@ DETERMINISTIC_SHAKE="let sx=g?.shake?Math.sin(g.time*37)*g.shake:0,sy=g?.shake?M
 DETERMINISTIC_SHAKE_25D="ctx.translate(-cx+(g?.shake?Math.sin(g.time*37)*g.shake:0),-cy+(g?.shake?Math.cos(g.time*41)*g.shake:0));"
 TRACKED_RENDER="window.__renderPhase=true;try{if(save.renderMode==='3d'&&window.Game3D?.available){window.Game3D.render(game,game?.time||t/1000);drawOverlay3D();}else drawWorld();}finally{window.__renderPhase=false;}"
 DOCUMENT=(SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
-  .replace(GNASHER_HIT,"if(Math.hypot(p.x-e.x,p.y-e.y)<60){window.__gnasherHits.push({t:+g.time.toFixed(1),id:e.id,state:e.state,stateT:+e.stateT.toFixed(2),x:+e.x.toFixed(1),y:+e.y.toFixed(1),leapX:+e.leapX.toFixed(1),leapY:+e.leapY.toFixed(1),playerX:+p.x.toFixed(1),playerY:+p.y.toFixed(1),distance:+Math.hypot(p.x-e.x,p.y-e.y).toFixed(1),dmg:+e.dmg.toFixed(1)});damagePlayer(e.dmg*1.7,'gnasher');}")
+  .replace(GNASHER_HIT,GNASHER_INSTRUMENTED)
   .replace(CONTACT_HIT,CONTACT_INSTRUMENTED)
   .replace(RANGED_SHOT,TAGGED_RANGED_SHOT)
   .replace(DRAW_SHAKE,DETERMINISTIC_SHAKE)

@@ -187,3 +187,8 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Enemy population target grows more slowly late in a run.
 - Added `tests/enemy_balance_regression.py` to verify actual runtime damage formulas and the real burrow-to-leap warning transition.
 - The four-wizard natural-run matrix must be rerun. This change is not yet proof of a complete run or player acceptance.
+
+
+## Natural-run harness synchronization — 2026-11-19
+
+The balance patch extracted enemy damage into named helpers. The long-run Playwright instrumentation still expected the previous inline formulas and aborted before simulating any wizard. Updated the test-only instrumentation to wrap `gnasherLeapDamage`, `enemyContactDamage` and the new ranged damage coefficient. This is a harness fix, not a gameplay result; the four-wizard natural run must be rerun.
