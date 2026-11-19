@@ -209,3 +209,12 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - The balance candidate passed the strengthened enemy damage regression, including post-armor Gnasher and Crabladon damage budgets.
 - The first four-wizard natural-run retry aborted before starting because its test-only ranged-shot instrumentation still matched the old 0.52 projectile coefficient after production changed to 0.36.
 - Updated the instrumentation and tagged-shot replacement to the current 0.36 coefficient. No gameplay code changed in this correction; rerun CI before reading any natural-run outcome.
+
+
+## Boss counterplay and natural-run pilot correction — 2026-11-19
+
+- The four-wizard run after the survival patch improved to 2/4 wins: Ember and Nyx defeated their bosses; Aster reached Sol but died under repeated boss contact/projectile pressure; Briar survived to the 25-minute cap with Mul'gath still at 8,594 / 24,000 HP.
+- Production auto-cast targeting now prioritizes an in-range live Mul'gath healing servant over the boss or nearby enemies. This makes the healing mechanic's intended counterplay discoverable without changing target behavior in other boss encounters.
+- The natural-run pilot now evaluates the committed line segment and every point in grid-shaped boss telegraphs, rather than treating all boss warnings as circles at the boss center. It also keeps explicit separation from boss contact range.
+- Added a boss regression proving a homing spell targets an in-range Mul'gath healer even when the boss itself is closer.
+- CI and a fresh four-wizard run are pending. Do not interpret the pilot correction as a natural win until the rerun completes.

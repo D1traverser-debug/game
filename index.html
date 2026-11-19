@@ -816,6 +816,18 @@ $('reroll').onclick=()=>{if(!game?.pending)return;let p=game.player;if(p.rerolls
 function spellInfusion(sp){return sp.infusions.length>1?{a:sp.infusions[0],b:sp.infusions[1]}:sp.infusions.length?sp.infusions[0]:null}function fireSpell(sp){let p=game.player,t=nearest(p.x,p.y,(sp.kind==='orbit'?540:sp.range*1.5)),el=spellInfusion(sp),castId=++game.castSequence;game.lastCastId=castId;
  if(game.objective?.type==='crab'&&game.objective.crab?.alive){let c=game.objective.crab;if(Math.hypot(c.x-p.x,c.y-p.y)<sp.range*1.5+150)t={...c,type:'crabladon',objectiveCrab:true,dead:false,r:c.r||15};}
  if(sp.id==='astral'&&sp.augments.includes('seeking')){const maxR=sp.range*1.5;const choices=game.enemies.filter(e=>!e.dead&&e.state!=='burrow'&&Math.hypot(e.x-p.x,e.y-p.y)<maxR);if(choices.length)t=choices.reduce((a,b)=>b.hp>a.hp?b:a)}
+ // Mul'gath's healing servants are the encounter's explicit counterplay target.
+ // Keep normal nearest-target behavior for every other encounter.
+ if(game.boss?.bossId==='mul'&&!game.boss.dead){
+  const maxR=sp.kind==='orbit'?540:sp.range*1.5;
+  let healer=null,healerD=maxR;
+  for(const e of game.enemies){
+   if(e.dead||!e.bossHealer)continue;
+   const d=Math.hypot(e.x-p.x,e.y-p.y);
+   if(d<healerD){healerD=d;healer=e;}
+  }
+  if(healer)t=healer;
+ }
  const ang=t?Math.atan2(t.y-p.y,t.x-p.x):rand(0,TAU);let base=sp.dmg*(1+sp.level*.13);if(sp.id==='solar'&&sp.augments.includes('solarZenith'))base*=1+Math.min(1.2,p.stand*.08)*sp.augments.filter(a=>a==='solarZenith').length;const size=p.spellSize*(1+sp.level*.012),range=sp.range*size;
  sp.cdNow=sp.cd/p.cast*(1-(p.attune&&p.stand>.5?.2:0));p.casts++;save.stats.casts=(save.stats.casts||0)+1;
 if(p.characterId==='aster'&&p.casts%6===0){const star=nearest(p.x,p.y,560);if(star){damageEnemy(star,72+p.level*6,'starEcho',null,false);game.fx.push({x:star.x,y:star.y,r:42,life:.38,max:.38,color:'#a8e9f3',type:'burst'})}}

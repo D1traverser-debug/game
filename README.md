@@ -27,3 +27,7 @@ The latest candidate includes a slower late-run enemy damage curve, a readable G
 
 ### Current solo survival balance candidate
 The latest patch reduces Gnasher leap, enemy contact and ranged projectile damage and ensures an under-defended build can be offered a defensive level-up card. Required browser CI and the four-wizard natural-run matrix are pending; prior natural-run acceptance was 1/4 boss wins, so the product remains NOT READY.
+
+
+### Boss counterplay candidate
+Mul'gath's live healing servants are now explicit auto-target priorities when in range. The natural-run test pilot now reads the boss's committed line/grid telegraph geometry instead of approximating every warning as a circle. Four-wizard boss acceptance is still pending.

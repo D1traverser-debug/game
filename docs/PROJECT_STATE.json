@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "SOLO_DAMAGE_AND_UPGRADE_BALANCE_003",
+  "checkpoint": "SOLO_BOSS_TARGETING_AND_TELEGRAPH_004",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -297,7 +297,11 @@
     "Enemy-balance regression now measures actual post-armor player damage for a late Gnasher leap and late Crabladon contact, not only raw coefficients.",
     "Character-upgrade regression now asserts that an under-defended character receives a defensive level-up option.",
     "Balance candidate commit 3659664 passed enemy-balance post-armor checks, normal-play smoke, art renderer regression and all completed component checks at the time of inspection.",
-    "First natural-run retry aborted before simulation because its test-only ranged-shot source anchor still expected 0.52 after the production coefficient changed to 0.36; updating the anchor only."
+    "First natural-run retry aborted before simulation because its test-only ranged-shot source anchor still expected 0.52 after the production coefficient changed to 0.36; updating the anchor only.",
+    "Balance candidate 3659664 passed strengthened post-armor enemy damage budgets and the under-defended level-up offer regression.",
+    "Four-wizard natural run improved from 1/4 to 2/4 boss wins: Ember and Nyx won; Aster reached Sol but died to repeated boss contact/projectile pressure; Briar survived to 25 minutes but Mul'gath retained 8594 of 24000 HP.",
+    "Production auto-cast targeting now prioritizes live Mul'gath healing servants when they are within the spell's actual target range, allowing the player to counter the boss's healing mechanic without changing other encounters.",
+    "Natural-run pilot now evaluates committed boss line and grid telegraph geometry and actively avoids boss contact range; prior pilot only treated these shapes as a circle around the boss."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -315,10 +319,11 @@
     "Save export/import is implemented; current Playwright download/import regression and cross-browser file chooser behavior are pending CI and Firefox/WebKit acceptance.",
     "Controller input mapping is implemented and under Chromium automation; physical Xbox/PlayStation controller pairing and browser-specific Gamepad API behavior remain untested.",
     "The four-wizard natural full-run matrix must be rerun on this balance candidate; automated and human full-run wins remain unverified until then.",
-    "Four-wizard natural-run acceptance remains incomplete: previous exact-build result was 1/4 natural boss wins; this balance/upgrade candidate must rerun before any all-character completion claim.",
+    "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted.",
+    "Four-wizard natural-run acceptance remains incomplete: latest balance candidate achieved 2/4 wins; Aster/Sol and Briar/Mul'gath need a new natural-run result after healer auto-target and telegraph-aware pilot changes.",
     "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted."
   ],
-  "next_action": "Rerun CI after syncing the natural-run instrumentation to the 0.36 ranged projectile coefficient; then inspect all four full-run traces.",
+  "next_action": "Run boss encounter regression and the four-wizard natural solo expedition. Confirm healer targeting and geometry-aware boss dodging, then address any remaining boss-phase or DPS bottleneck from the new traces.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -347,7 +352,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "SOLO_DAMAGE_AND_UPGRADE_BALANCE_003_NATURAL_RUN_HARNESS_FIX_CI_PENDING",
+  "latest_candidate_ci_status": "SOLO_BOSS_TARGETING_AND_TELEGRAPH_004_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -464,8 +469,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 786274,
-    "status": "SOLO_DAMAGE_AND_UPGRADE_BALANCE_003_CI_PENDING",
+    "bytes": 786729,
+    "status": "SOLO_BOSS_TARGETING_AND_TELEGRAPH_004_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -537,7 +542,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "The balance regressions passed on commit 3659664. The first four-wizard rerun did not start because its test-only source instrumentation still expected the previous 0.52 ranged projectile coefficient; updating the instrumentation to 0.36. No natural-run result can be inferred from that aborted job."
+    "natural_run_matrix": "Enemy damage/defensive-offer patch improved natural-run results from 1/4 to 2/4. Aster reached Sol but died after repeated boss contact/projectile hits at 1184s; Briar survived to 1500s but Mul'gath retained 8594/24000 HP. Root cause: Mul'gath healers were not explicitly prioritized by production auto-targeting, and the exploratory pilot treated line/grid boss telegraphs as simple circles. This candidate prioritizes live Mul'gath healers for auto-cast spells and makes the test pilot read committed line/grid geometry plus boss proximity."
   },
   "last_single_player_ci": {
     "run_id": 44447174307,

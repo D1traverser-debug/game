@@ -50,6 +50,16 @@ window.__BOSS_QA={
   const beforeCorrupt=b.hp;bossUpdateMulMinions(b,.05);
   return{moved,healed,corruptedDead:corrupted.dead,bossDamaged:b.hp<beforeCorrupt};
  },
+ healerTarget:()=>{
+  const b=window.__BOSS_QA.spawn('mul'),p=game.player;
+  p.x=0;p.y=0;b.x=80;b.y=0;
+  const healer=spawnBossHealer(b);healer.x=160;healer.y=0;
+  const source=spells.find(x=>x.id==='missile');
+  const shotCount=game.shots.length;
+  fireSpell({...source,level:1,augments:[],infusions:[],cdNow:0,casts:0});
+  const shot=game.shots.slice(shotCount).find(x=>x.kind==='homing');
+  return{targetIsHealer:shot?.target===healer,targetType:shot?.target?.type,targetIsBoss:shot?.target===b};
+ },
  collision:()=>{const p={x:20,y:0,r:5};return{circle:bossAttackContainsPlayer({kind:'circle',x:0,y:0,r:20},p),outside:!bossAttackContainsPlayer({kind:'circle',x:0,y:0,r:10},p),line:bossAttackContainsPlayer({kind:'line',x:0,y:0,tx:100,ty:0,width:20},{x:55,y:8,r:5}),grid:bossAttackContainsPlayer({kind:'grid',points:[{x:0,y:0,r:12}]},{x:15,y:0,r:5})}},
  homing:()=>{const p={x:1000,y:1000,r:16},s={x:0,y:0,vx:180,vy:0,speed:190,turnRate:3,life:3,dmg:1,r:7,kind:'enemyHoming'};bossUpdateHomingProjectile(s,.12,p);return{vy:s.vy,turnsTowardTarget:s.vy>0}},
  warning:(id,attackId)=>{const b=window.__BOSS_QA.spawn(id),def=BOSS_ATTACK_DEFS[id].find(x=>x.id===attackId),a=bossBeginAttack(b,def),h=game.hazards.find(x=>x.bossAttackToken===a.token);return{token:a.token,count:game.hazards.filter(x=>x.bossAttackToken===a.token).length,shape:h?.bossShape,geometryMatches:JSON.stringify(h?.bossGeometry)===JSON.stringify(a.geometry)}},
@@ -103,6 +113,7 @@ async def main():
   c["active_obelisk_resolves_hit"]=life["hpAtActive"]<life["hp0"]
   field=await page.evaluate("__BOSS_QA.field()");c["krog_field_constrains_arena"]=field["active"] and field["after"]<field["before"]
   minions=await page.evaluate("__BOSS_QA.minions()");c["mul_minions_seek_and_heal_boss"]=minions["moved"] and minions["healed"];c["corrupted_minion_damages_boss"]=minions["corruptedDead"] and minions["bossDamaged"]
+  healerTarget=await page.evaluate("__BOSS_QA.healerTarget()");c["mul_healers_are_auto_targeted_by_spells"]=healerTarget["targetIsHealer"] and not healerTarget["targetIsBoss"]
   collision=await page.evaluate("__BOSS_QA.collision()");c["circle_line_grid_collision_contracts"]=all(collision.values())
   homing=await page.evaluate("__BOSS_QA.homing()");c["homing_projectile_turns_toward_player"]=homing["turnsTowardTarget"]
   warning=await page.evaluate("__BOSS_QA.warning('mul','spikeGrid')");c["telegraph_payload_preserves_geometry"]=warning["count"]==1 and warning["shape"]=="grid" and warning["geometryMatches"]

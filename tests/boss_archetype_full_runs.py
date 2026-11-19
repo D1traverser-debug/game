@@ -221,6 +221,11 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
         rx-=dx/d*w;ry-=dy/d*w;
       }
     }
+    if(game.boss&&!game.boss.dead){
+      const dx=game.boss.x-p.x,dy=game.boss.y-p.y,d=Math.hypot(dx,dy)||1;
+      minThreat=Math.min(minThreat,d);
+      if(d<245){const w=((245-d)/245)**1.4*1.8;rx-=dx/d*w;ry-=dy/d*w;}
+    }
     // Score a fresh heading each frame against all active leap landing points.
     // A locked heading can become unusable when the player reaches a world edge.
     let gnasherThreat=false,gnasherEscapeX=0,gnasherEscapeY=0,gnasherMode=null,gnasherStateT=null;
@@ -262,8 +267,18 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
         let hazardPenalty=0;
         for(const h of game.hazards){
           if(h.hit||!Number.isFinite(h.timer)||h.timer>1.4)continue;
-          const hd=Math.hypot(nx-h.x,ny-h.y),hr=(h.r||0)+p.r+35;
-          if(hd<hr)hazardPenalty+=(hr-hd)*.75;
+          const g=h.bossGeometry;
+          if(g?.kind==='line'){
+            const dx=g.tx-g.x,dy=g.ty-g.y,den=dx*dx+dy*dy;
+            const t=den?Math.max(0,Math.min(1,((nx-g.x)*dx+(ny-g.y)*dy)/den)):0;
+            const d=Math.hypot(nx-(g.x+t*dx),ny-(g.y+t*dy)),r=g.width*.5+p.r+35;
+            if(d<r)hazardPenalty+=(r-d)*1.1;
+          }else if(g?.kind==='grid'){
+            for(const q of g.points||[]){const d=Math.hypot(nx-q.x,ny-q.y),r=(q.r||0)+p.r+35;if(d<r)hazardPenalty+=(r-d)*1.1;}
+          }else{
+            const hx=g?.x??h.x,hy=g?.y??h.y,r=(g?.r??h.r??0)+p.r+35,d=Math.hypot(nx-hx,ny-hy);
+            if(d<r)hazardPenalty+=(r-d)*.75;
+          }
         }
         let projectilePenalty=0;
         for(const shot of game.shots){
@@ -324,7 +339,24 @@ window.__fullRun = async (maxSeconds, stopAtBossSpawn=false) => {
     }
     for(const h of game.hazards){
       if(h.hit||!['warning','runestone','krogLeap','krogAcid','meteor','bell','bomb','slam','dice','explosiveSprout','explosiveMushroom'].includes(h.kind))continue;
-      const dx=p.x-h.x,dy=p.y-h.y,d=Math.hypot(dx,dy)||1,range=(h.r||0)+95;
+      const g=h.bossGeometry;
+      if(g?.kind==='line'){
+        const sx=g.tx-g.x,sy=g.ty-g.y,den=sx*sx+sy*sy;
+        const t=den?Math.max(0,Math.min(1,((p.x-g.x)*sx+(p.y-g.y)*sy)/den)):0;
+        const qx=g.x+t*sx,qy=g.y+t*sy,dx=p.x-qx,dy=p.y-qy,d=Math.hypot(dx,dy)||1,range=g.width*.5+p.r+95;
+        if(d<range){const w=(range-d)/range*2.8;rx+=dx/d*w;ry+=dy/d*w;hazardRx+=dx/d*w;hazardRy+=dy/d*w;window.__pilotDodgeStats.hazard++;}
+        if(Number.isFinite(h.timer)&&h.timer<.9&&d<range+85)imminentHazard=true;
+        continue;
+      }
+      if(g?.kind==='grid'){
+        for(const q of g.points||[]){
+          const dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy)||1,range=(q.r||0)+p.r+95;
+          if(d<range){const w=(range-d)/range*2.4;rx+=dx/d*w;ry+=dy/d*w;hazardRx+=dx/d*w;hazardRy+=dy/d*w;window.__pilotDodgeStats.hazard++;}
+          if(Number.isFinite(h.timer)&&h.timer<.9&&d<range+85)imminentHazard=true;
+        }
+        continue;
+      }
+      const hx=g?.x??h.x,hy=g?.y??h.y,dx=p.x-hx,dy=p.y-hy,d=Math.hypot(dx,dy)||1,range=(g?.r??h.r??0)+p.r+95;
       if(d<range){const w=(range-d)/range*2;rx+=dx/d*w;ry+=dy/d*w;hazardRx+=dx/d*w;hazardRy+=dy/d*w;window.__pilotDodgeStats.hazard++;}
       if(Number.isFinite(h.timer)&&h.timer<.9&&d<range+85)imminentHazard=true;
     }
