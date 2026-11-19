@@ -329,7 +329,9 @@
     "Objective RNG regression passed: 32/32 distinct objective traces across all nine objective families; fixed world-layout signature independent of run seed; render/audio/pause isolation; 8/8 unique ordinary run seeds; seed and algorithm version visible on result; no runtime errors or external requests.",
     "Four-wizard natural-run regression passed 4/4 after test-only seed recalibration for the new fixed world-layout stream: Aster seed 45 defeated Mul'gath at 1322.9s; Ember seed 42 defeated Sol'phish at 1242.5s; Briar seed 43 defeated Sol'phish at 1190.8s; Nyx seed 48 defeated Mul'gath at 1226.4s. All reached result screen with one recorded win.",
     "Offline package uploaded as artifact 14519897430 (516232-byte ZIP; ZIP SHA-256 bb95c95e44437837782173cfa1da6b59b72546045785dcdf7ab16f13ca45dff1); embedded index.html is 803536 bytes with SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667.",
-    "Enemy-director RNG candidate added on stacked branch work/enemy-director-rng-001: isolated per-run enemyRng PCG stream (sequence 0xE11E), deterministic monotonic enemy IDs, stable visual phase derived from ID, and extracted updateEnemyDirector for direct regression. Full CI pending."
+    "Enemy-director RNG candidate added on stacked branch work/enemy-director-rng-001: isolated per-run enemyRng PCG stream (sequence 0xE11E), deterministic monotonic enemy IDs, stable visual phase derived from ID, and extracted updateEnemyDirector for direct regression. Full CI pending.",
+    "Enemy RNG seed scout CI 44526303755 passed the four-wizard natural boss gate using deterministic candidates: Aster seed49/Krog'wa/1338.5s; Ember seed42/Sol'phish/1218.5s; Briar seed49/Mul'gath/1229.4s; Nyx seed51/Mul'gath/1287.1s. Each won and reached result screen with no runtime/network errors.",
+    "Normal-play seed scout CI 44526718332 passed using first candidate seed20261117: 90.73s simulated, 64 kills, level3, two real upgrades, 97.4/100 HP, no runtime/console/network errors. The single fixed seed is restored for the final gate."
   ],
   "failed_or_open": [
     "The four wizards still share a base atlas body beneath distinct mantles, headpieces, weapons and palettes; bespoke production rigs and authored animation remain incomplete.",
@@ -346,7 +348,7 @@
     "Enemy-director RNG candidate CI run 44525204498: new enemy_director_rng_regression passed 15/15 and other completed jobs passed, but original fixed natural-run seeds produced only 1/4 boss wins (Ember seed 42). Aster/Briar/Nyx survived to 1500s with bosses alive; no runtime/console/network errors. Test-only seed sweep is being used to identify stable per-wizard replay fixtures; no production balance changes planned.",
     "CI run 44526303755 exposed a second fixture dependency: 90-second normal_play_smoke seed 20261117 produced 66 kills but only 14/18 XP and no upgrade within 90 seconds; player remained healthy and runtime/offline checks passed. The test now scouts a fixed ordered short seed list for a natural upgrade without granting XP or forcing upgrades."
   ],
-  "next_action": "Complete the natural-run and 90-second smoke fixture seed scouting under the enemy RNG stream. Freeze stable per-character and smoke seeds, then rerun the complete CI matrix. No production balance, XP values or time limits are to be changed.",
+  "next_action": "Run the final complete CI matrix with the frozen single-run fixtures (Aster49, Ember42, Briar49, Nyx51; smoke seed20261117). If all jobs pass, record the enemy-director RNG slice as automated-CI green and proceed to audit combat RNG separately.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -375,7 +377,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "ENEMY_RNG_NATURAL_RUN_SEED_SCOUT_AND_NORMAL_SMOKE_RECALIBRATION",
+  "latest_candidate_ci_status": "SEED_SCOUT_PASS_FIXED_NATURAL_AND_SMOKE_FIXTURES_PENDING_FINAL_CI",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44491163465,
@@ -545,7 +547,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contracts plus fixed-step clock and damage-pipeline integration; objective_rng_regression passed in CI 44507473452; enemy_director_rng_regression candidate added and awaiting full CI.",
+    "core_tests": "22 Node contracts plus fixed-step clock/damage integration; objective_rng_regression and enemy_director_rng_regression pass. Natural-run seed scouting passed 4/4; normal 90-second seed scouting passed on 20261117. Final fixed-fixture full CI pending.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -578,7 +580,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "PASS on candidate commit b99802cb1bc300a22dce1780d969cd42541db02c / CI 44507473452: Aster defeated Mul'gath, Ember defeated Sol'phish, Briar defeated Sol'phish, Nyx defeated Mul'gath (4/4). Automated test-only pilot; human playtest and owner acceptance remain open.",
+    "natural_run_matrix": "Seed scout PASS: Aster seed 49 / Krog'wa / 1338.5s; Ember seed 42 / Sol'phish / 1218.5s; Briar seed 49 / Mul'gath / 1229.4s; Nyx seed 51 / Mul'gath / 1287.1s. Fixed-seed single-run gate restored with these fixtures; final full CI pending.",
     "launcher": {
       "windows": "PLAY.bat",
       "unix": "PLAY.sh",
@@ -656,6 +658,7 @@
     "First CI run 44505974849: package integrity check passed with index.html 803536 bytes and SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667; objective_rng_regression passed. The checkpoint guard failed only because PROJECT_STATE still recorded 803533 bytes; metadata corrected, full CI rerun pending.",
     "Objective RNG candidate full CI is green: run 44507473452, 25/25 jobs. All four natural wizard runs win after test-only seed fixture recalibration (Aster 45, Ember 42, Briar 43, Nyx 48). No production combat/balance changes were made for the recalibration.",
     "Enemy-director RNG integration candidate: enemy spawns now use an independent PCG stream for spawn angle/distance, type selection, initial attack/heal timers and elite chance; boss-healer and objective crab-child spawn offsets use the same enemy stream. Enemy IDs are sequential per run and do not consume RNG. Added browser regression for same-seed traces, seven archetypes, stream isolation, director population pacing, ID uniqueness/cap and offline/no-error checks.",
-    "Enemy-director candidate now displays the enemy RNG stream sequence on the result screen; the required regression asserts run seed, algorithm version and enemy sequence are visible. Stacked PR CI trigger includes the objective RNG base branch."
+    "Enemy-director candidate now displays the enemy RNG stream sequence on the result screen; the required regression asserts run seed, algorithm version and enemy sequence are visible. Stacked PR CI trigger includes the objective RNG base branch.",
+    "Seed scouting is complete and the test harness has been returned to single fixed-seed runs: Aster49, Ember42, Briar49, Nyx51; normal 90-second smoke seed20261117. No production XP, combat balance, boss health or time-limit changes."
   ]
 }

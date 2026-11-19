@@ -360,3 +360,10 @@ CI run `44525204498` passed the checkpoint, package, new 15/15 enemy-director RN
 ### 90-second smoke fixture update — 2026-11-19
 
 Run `44526303755` also found that the prior normal-play smoke seed `20261117` no longer naturally reaches an upgrade within 90 seconds under the independent enemy RNG: it recorded 66 kills, 14/18 XP, level 1 and 100/100 HP, with no runtime or network errors. The smoke test now tries a fixed ordered list of seeds and accepts the first run that naturally reaches the real production upgrade handler; it never grants XP or forces an upgrade. This is test-fixture scouting only; production XP values and the 90-second duration remain unchanged.
+
+
+## Enemy RNG fixture scouting completed — 2026-11-19
+
+The bounded seed scout completed 4/4 natural boss victories in CI run `44526303755` (the run's only failure was the then-fixed 90-second smoke seed). Winning deterministic fixtures: Aster seed `49`, Krog'wa, 1338.5s, level 21, 442.9/500 HP; Ember seed `42`, Sol'phish, 1218.5s, level 20, 382.8 HP; Briar seed `49`, Mul'gath, 1229.4s, level 21, 320 HP; Nyx seed `51`, Mul'gath, 1287.1s, level 20, 562.5 HP. The scout stopped at the first win for each wizard; failed trials were retained in the CI log. No production balance or 1500-second limit changes.
+
+The 90-second smoke seed scout passed in CI run `44526718332` with the first candidate `20261117`: 90.73s, 64 kills, level 3, two real upgrades, 97.4/100 HP. Both scouting loops have now been removed. The permanent gate is back to one fixed natural run per wizard and one fixed 90-second smoke run: Aster49, Ember42, Briar49, Nyx51; smoke 20261117. Full fixed-fixture CI is pending.

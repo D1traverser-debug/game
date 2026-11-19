@@ -37,3 +37,8 @@ The QA workflow now allows pull requests targeting `work/objective-rng-integrati
 ## Natural-run parity checkpoint — 2026-11-19
 
 The first enemy RNG candidate CI run `44525204498` passed the dedicated enemy spawn regression, but natural-run fixtures 45/42/43/48 produced only one boss victory (Ember). Aster/Briar/Nyx survived to the 1500-second cap with Boss HP remaining; no runtime/console/network errors. The test-only pilot was not changed to force damage, HP, boss death or objective completion. A bounded ordered seed sweep is being used to find deterministic replay fixtures per wizard. Production balance and the 1500-second acceptance limit remain unchanged.
+
+
+## Seed scouting and fixture freeze — 2026-11-19
+
+The bounded ordered seed scout completed all four natural boss victories in run `44526303755`: Aster 49/Krog'wa/1338.5s, Ember 42/Sol'phish/1218.5s, Briar 49/Mul'gath/1229.4s, Nyx 51/Mul'gath/1287.1s. The smoke seed scout passed on seed `20261117` in run `44526718332` with 90.73s, 64 kills, level 3 and two real upgrades. The exploratory loops are removed; permanent CI fixtures are frozen to Aster49, Ember42, Briar49, Nyx51 and smoke20261117. No production balance/XP/time-limit values were changed. Final single-run full CI is pending.

@@ -151,7 +151,7 @@ jobs:
   # Required gate: every selectable wizard must finish a natural solo expedition on the same build.
   wizard-natural-run:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
