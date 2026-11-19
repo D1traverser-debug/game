@@ -14,7 +14,7 @@ window.__compatProbe={
  snapshot:()=>({screen,time:game?.time||0,ended:!!game?.ended,visible:document.visibilityState,clockReady:!!coreClock,tick:coreClock?.tick||0,accumulator:coreClock?.pendingSeconds||0})
 };
 """
-DOCUMENT=SOURCE.replace(MARKER,PROBE+"\\n"+MARKER)
+DOCUMENT=SOURCE.replace(MARKER,PROBE+"\n"+MARKER)
 async def fulfill_test_document(route):
  await route.fulfill(status=200,content_type="text/html",body=DOCUMENT)
 async def wait_for_simulation(page):
@@ -43,8 +43,8 @@ async def main():
    await desktop.locator('[data-character="nyx"]').click()
    report["checks"]["selected_wizard_highlighted"]="selected" in (await desktop.locator('[data-character="nyx"]').get_attribute("class"))
    await desktop.locator("#characterStart").click();await desktop.locator("#hud.active").wait_for(timeout=5000)
-   const desktopState=await wait_for_simulation(desktop);report["diagnostics"]["desktop_simulation"]=desktopState
-   report["checks"]["desktop_simulation_advances"]=desktopState.time>=.5
+   desktop_state=await wait_for_simulation(desktop);report["diagnostics"]["desktop_simulation"]=desktop_state
+   report["checks"]["desktop_simulation_advances"]=desktop_state["time"]>=.5
    await desktop.locator("#pauseBtn").click()
    report["checks"]["pause_overlay_works"]=await desktop.locator("#pause.active").count()==1
    await desktop.locator("#resume").click()
@@ -59,8 +59,8 @@ async def main():
    report["checks"]["mobile_virtual_joystick_visible"]=await mobile.locator("#joy").is_visible()
    report["checks"]["mobile_interact_button_visible"]=await mobile.locator("#interact").is_visible()
    report["checks"]["mobile_ability_button_visible"]=await mobile.locator("#abilityBtn").is_visible()
-   const mobileState=await wait_for_simulation(mobile);report["diagnostics"]["mobile_simulation"]=mobileState
-   report["checks"]["mobile_simulation_advances"]=mobileState.time>=.5
+   mobile_state=await wait_for_simulation(mobile);report["diagnostics"]["mobile_simulation"]=mobile_state
+   report["checks"]["mobile_simulation_advances"]=mobile_state["time"]>=.5
    report["checks"]["no_external_runtime_requests"]=not report["external_requests"]
    report["checks"]["no_page_or_console_errors"]=not report["page_errors"] and not report["console_errors"]
    report["pass"]=all(report["checks"].values());print(json.dumps(report,ensure_ascii=False,indent=2))
