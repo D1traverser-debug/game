@@ -65,7 +65,7 @@ async def main():
   await page.locator("#selectCharacter").click()
   await page.locator("#characterScreen.active").wait_for(state="visible")
   await page.wait_for_function("document.querySelectorAll('#characterCards .character-card').length===4")
-  const desktopLayout=await page.evaluate("window.__soloProbe.layout()")
+  desktopLayout=await page.evaluate("window.__soloProbe.layout()")
   report["character_layout"]=desktopLayout
   report["checks"]["portrait_canvas_stays_inside_card"]=desktopLayout["portraitPosition"]=="static" and desktopLayout["portraitInsideCard"]
   report["checks"]["map_preview_stays_inside_modal"]=desktopLayout["mapPosition"]=="static" and desktopLayout["mapInsideModal"]

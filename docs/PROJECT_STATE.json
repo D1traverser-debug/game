@@ -271,7 +271,8 @@
     "Corrected UI canvas positioning so portrait canvases and map preview remain in normal document flow; compacted the character grid and expanded the desktop modal's usable height.",
     "Local Chromium verification at 1280x800 confirms four visible character cards, portrait canvas contained by its card, map preview contained by modal, and primary start action fully inside the modal.",
     "Local Chromium verification at 390x844 confirms responsive character selection, scrollable modal, and successful transition into gameplay after selecting the primary start action; zero JS/console errors.",
-    "Added desktop layout and mobile start-flow assertions to the roster/map browser regression; updated the natural-run harness to wait for the actual active character screen and dynamic card population, with diagnostic errors."
+    "Added desktop layout and mobile start-flow assertions to the roster/map browser regression; updated the natural-run harness to wait for the actual active character screen and dynamic card population, with diagnostic errors.",
+    "Latest CI exposed a Python syntax error in the newly extended roster regression and a duplicate const identifier in the test-only natural-run Q-ability patch. Both test-harness defects were corrected; no production game logic change was needed."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -290,7 +291,7 @@
     "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
     "Save export/import UI and multi-device synchronization are not implemented; browser-origin persistence, backup recovery and corruption fallback now have automated regression coverage."
   ],
-  "next_action": "Run CI on the character-selection canvas/layout correction. Then inspect and resolve any remaining natural-run failures from telemetry, continue production art/audio, browser compatibility, performance and owner acceptance.",
+  "next_action": "Rerun CI with the corrected Python/browser test harness and exact artifact byte count; inspect natural-run telemetry only after the test enters the actual game.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -319,7 +320,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "CHARACTER_SELECT_CANVAS_LAYOUT_CI_PENDING",
+  "latest_candidate_ci_status": "CHARACTER_SELECT_AND_NATURAL_RUN_HARNESS_FIX_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -436,8 +437,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 781615,
-    "status": "CHARACTER_SELECT_CANVAS_LAYOUT_CI_PENDING",
+    "bytes": 781674,
+    "status": "CHARACTER_SELECT_AND_NATURAL_RUN_HARNESS_FIX_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -476,7 +477,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contract tests; clock/damage browser integration; roster/map/ability; desktop/mobile character-selection canvas layout; objective; save; audio; normal-play; and natural-run harness regressions. CI pending.",
+    "core_tests": "22 Node contract tests; clock/damage browser integration; roster/map/ability; desktop/mobile character-selection layout; objective; save; audio; normal-play; and natural-run harness regressions. CI pending.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -509,7 +510,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "EXPLORATORY: previous run reached a stale character-card visibility timeout; production UI canvas layout and test selector now corrected, with diagnostics added. Re-run pending."
+    "natural_run_matrix": "EXPLORATORY: last run revealed a test-only duplicate lexical declaration in the wizard ability pilot, not a production gameplay defect. Pilot identifiers were isolated; rerun pending."
   },
   "last_single_player_ci": null
 }

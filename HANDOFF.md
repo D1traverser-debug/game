@@ -118,3 +118,11 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Local Chromium verified the mobile layout at 390×844: the modal scrolls, all four cards remain available and the primary start action enters gameplay without JS/console errors.
 - Added these layout assertions to the roster/map regression. Updated the four-wizard natural-run harness to wait for the actual active selection screen and dynamically populated cards, and to emit useful diagnostics if selection fails.
 - CI is pending. Natural full-run boss victories for all four wizards are still not established; do not tune balance until the test reaches gameplay and produces evidence.
+
+
+## CI test-harness correction — 2026-11-19
+
+- The first layout-fix CI attempt exposed a Python syntax typo in the added roster test (the JavaScript `const` keyword was used in Python); corrected.
+- The natural-run browser document failed to parse because the test-only Q-ability pilot redeclared `hpRatio` in an existing function scope. Renamed all injected ability-policy locals to unique `__wizardAbility*` identifiers.
+- The checkpoint guard reported the exact candidate HTML size as 781674 bytes; synchronized PROJECT_STATE to the CI-measured size.
+- These are test/handoff metadata corrections. No production combat values were changed. Rerun CI before recording any natural-run gameplay result.

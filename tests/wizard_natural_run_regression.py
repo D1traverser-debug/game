@@ -11,15 +11,15 @@ SPEC.loader.exec_module(PILOT)
 CHARACTERS=[("aster",41),("ember",42),("briar",43),("nyx",44)]
 PILOT_ABILITY_ANCHOR="if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}\n    window.__manualTick=true;"
 PILOT_ABILITY_PATCH="""if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}
-    const hpRatio=p.hp/Math.max(1,p.maxHp),closeThreat=game.enemies.some(e=>!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<260);
-    const abilityReady=p.abilityCd<=0;
-    const shouldUseAbility=abilityReady&&(
-      (p.characterId==='aster'&&closeThreat)||
+    const __wizardAbilityHpRatio=p.hp/Math.max(1,p.maxHp),__wizardAbilityCloseThreat=game.enemies.some(e=>!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<260);
+    const __wizardAbilityReady=p.abilityCd<=0;
+    const __wizardShouldUseAbility=__wizardAbilityReady&&(
+      (p.characterId==='aster'&&__wizardAbilityCloseThreat)||
       (p.characterId==='ember'&&game.enemies.some(e=>!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<700))||
-      (p.characterId==='briar'&&(hpRatio<.92||closeThreat))||
-      (p.characterId==='nyx'&&closeThreat)
+      (p.characterId==='briar'&&(__wizardAbilityHpRatio<.92||__wizardAbilityCloseThreat))||
+      (p.characterId==='nyx'&&__wizardAbilityCloseThreat)
     );
-    if(shouldUseAbility)useCharacterAbility();
+    if(__wizardShouldUseAbility)useCharacterAbility();
     window.__manualTick=true;"""
 DOCUMENT=PILOT.DOCUMENT.replace(PILOT_ABILITY_ANCHOR,PILOT_ABILITY_PATCH)
 assert DOCUMENT!=PILOT.DOCUMENT
