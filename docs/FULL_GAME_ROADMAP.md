@@ -27,3 +27,8 @@
 - Owner playtest and independent gameplay/visual review.
 
 No networking, extra realms, Unity/native build or larger character roster is planned.
+
+
+## Production art/audio pass — 2026-11-19 candidate
+
+A first original-IP wizard identity pass is integrated: four unique sprite rows, four action poses per wizard, selection portraits, movement/cast/ability-driven pose selection and character-specific animated orbit VFX. The procedural score now has four distinct character motifs and sparse forest ambience calls. The pass is awaiting CI and live browser inspection; it does not close the remaining environment/enemy/spell/UI art inventory, recorded audio decision, owner listening review or release acceptance.
