@@ -16,6 +16,8 @@ jobs:
           python-version: '3.12'
       - name: Validate browser source
         run: python scripts/package_web.py --check
+      - name: Verify deterministic single-file build
+        run: python scripts/build_game.py --check
       - name: Verify browser scope and artifact checkpoint
         run: python scripts/verify_project_state.py
       - name: Run positive and negative controls
@@ -108,7 +110,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [progression_regression, normal_play_smoke, objective_collection_regression, character_upgrade_regression, single_player_roster_map_regression, audio_engine_regression, save_persistence_regression, controller_regression, enemy_balance_regression]
+        test: [progression_regression, normal_play_smoke, objective_collection_regression, objective_rng_regression, character_upgrade_regression, single_player_roster_map_regression, audio_engine_regression, save_persistence_regression, controller_regression, enemy_balance_regression]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -128,7 +130,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [game3d_integration, trial_unlock_regression, art_renderer_regression, solo_spell_catalog_regression, boss_encounter_regression, wizard_visual_identity_regression]
+        test: [game3d_integration, trial_unlock_regression, art_renderer_regression, solo_spell_catalog_regression, boss_encounter_regression, wizard_visual_identity_regression, environment_visual_regression]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

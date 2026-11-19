@@ -2,7 +2,7 @@
 
 Date: 2026-11-19
 Branch: `full-game`
-Status: AUDIT COMPLETE · RUNTIME INTEGRATION NOT STARTED
+Status: AUDIT COMPLETE · OBJECTIVE RNG SLICE IMPLEMENTED · CI PENDING · FULL RUN RNG INCOMPLETE
 Scope: source inspection only. No gameplay behavior or random-call site was changed in this audit.
 
 ## Current evidence
@@ -75,3 +75,29 @@ Do not rewrite all random call sites at once. The first integration slice should
 ## Audit conclusion
 
 The deterministic RNG module is soundly isolated as a core contract, but it is not yet authoritative for the browser simulation. The correct next action is one subsystem integration with render/audio independence tests, not a bulk rewrite. Product status remains NOT_READY.
+
+
+## Objective-generation integration candidate — 2026-11-19
+
+The first bounded slice is implemented on `work/objective-rng-integration-001`:
+- The canonical `SeededRng` module is embedded into `index.html` by `scripts/build_game.py`; the generated artifact remains usable without a module import succeeding under a local/offline preview.
+- Each expedition gets a fresh unsigned 32-bit `runSeed`, a `runRng`, and a visible seed/algorithm result entry. Passing an explicit seed to `startRun(seed)` reproduces the objective stream; ordinary replay calls `startRun()` and gets a fresh seed.
+- Objective type choice, variant chance/choice, objective origin and object placement, and brazier order now use the per-run PCG stream. The random-comparator objective shuffle is replaced with Fisher–Yates.
+- Collision-bearing static world decoration now uses the independent fixed `WORLD_LAYOUT_SEED` / `WORLD_LAYOUT_VERSION` stream. `worldFindOpenPoint` therefore sees a stable world layout across run seeds.
+- Camera shake still uses the legacy presentation helper; audio noise keeps its private LCG. Neither advances `runRng`.
+- Natural-run test seed injection now passes the same fixed seed into the per-run PCG stream as well as the legacy `Math.random` stream.
+- Added `tests/objective_rng_regression.py` for same-seed trace, different-seed divergence, world-layout independence, render/audio/pause isolation, fresh-run seeds, result-screen seed visibility and offline/no-error checks. Added it to the required browser-component CI matrix.
+
+CI is pending. This does not claim full-run deterministic replay: enemy director, combat, loot, level-up, spell, chest and boss randomness remain to be migrated. No gameplay balance, map bounds, enemy values or objective targets were changed. CAOS remains read-only.
+
+
+## CI evidence update — 2026-11-19
+
+The first candidate run `44505974849` passed the offline package integrity check and the new objective RNG browser regression. The project-state checkpoint initially failed because the recorded HTML byte count was stale (803533 vs actual 803536); the metadata has been corrected to the package's measured byte count and SHA-256. Full required CI rerun remains pending.
+
+
+## Objective RNG slice closed — CI PASS — 2026-11-19
+
+The bounded objective RNG slice is now automated-CI green. Run `44507473452` passed 25/25 jobs on `b99802cb1bc300a22dce1780d969cd42541db02c`. The objective-specific regression passed 32/32 unique traces across nine objective families and verified world-layout independence, render/audio/pause isolation, fresh run seeds, result diagnostics and offline/no-error behavior. Four natural wizard runs all defeated a boss and reached the result screen. See `docs/experiments/OBJECTIVE_RNG_INTEGRATION_001.md` for the exact seeds, outcomes and artifact hashes.
+
+Next audit boundary: enemy director spawn decisions and entity identity allocation. Inspect every relevant random call and ID generation site, distinguish spawn scheduling/selection/position from combat, loot and presentation, and define a minimal replay trace before implementation. No global random replacement.
