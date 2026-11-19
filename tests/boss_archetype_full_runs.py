@@ -59,7 +59,11 @@ damagePlayer=function(n,source='enemy'){
   if(source==='contact')window.__contactSource=null;
   return __baseDamagePlayer(n,source);
 };
+let __pendingRunSeedForPilot=null;
+const __originalStartRunForPilot=startRun;
+startRun=(seed=null)=>{const effectiveSeed=seed===null?__pendingRunSeedForPilot:seed;__pendingRunSeedForPilot=null;return __originalStartRunForPilot(effectiveSeed)};
 window.__setRunSeed=(seed)=>{
+  __pendingRunSeedForPilot=seed>>>0;
   window.__simulationHarness={manualTicks:0,blockedFrameUpdates:0,renderRandomCalls:0};window.__manualTick=false;window.__renderPhase=false;window.__pilotHeading={x:0,y:0};window.__contactSource=null;joy.x=0;joy.y=0;joy.active=true;
   let state=seed>>>0;
   Math.random=()=>{

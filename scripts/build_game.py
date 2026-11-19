@@ -6,6 +6,9 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 INDEX=ROOT/"index.html"
 BOSS_MODULE=ROOT/"src"/"game"/"boss_encounters.js"
+RNG_MODULE=ROOT/"web"/"src"/"core"/"seeded-rng.mjs"
+RNG_START="/* Shared deterministic gameplay RNG. */"
+RNG_END="\nlet coreClock=null;"
 START="/* Shared, data-driven boss attack lifecycle."
 END="\nfunction pause("
 SHOT_OLD="}else if(s.kind==='imp'){"
@@ -30,6 +33,8 @@ def replace_idempotent(text,old,new,label):
  return replace_once(text,old,new)
 def build_html():
  text=INDEX.read_text(encoding="utf-8")
+ rng=replace_once(RNG_MODULE.read_text(encoding="utf-8"),"export class SeededRng","class SeededRng")
+ text=replace_range(text,RNG_START,RNG_END,RNG_START+"\n"+rng)
  text=replace_range(text,START,END,BOSS_MODULE.read_text(encoding="utf-8"))
  text=replace_idempotent(text,SHOT_OLD,SHOT_NEW,"HOMING_UPDATE")
  text=replace_idempotent(text,SHOT_2D_OLD,SHOT_2D_NEW,"HOMING_2D_STYLE")
@@ -43,6 +48,6 @@ def main():
   status="PASS_REPRODUCIBLE"
  else:INDEX.write_text(generated,encoding="utf-8",newline="");current=generated;status="BUILT"
  raw=current.encode("utf-8")
- print(json.dumps({"status":status,"artifact":"index.html","bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest(),"source_fragments":["src/game/boss_encounters.js"],"offline_single_file":True},ensure_ascii=False,indent=2))
+ print(json.dumps({"status":status,"artifact":"index.html","bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest(),"source_fragments":["web/src/core/seeded-rng.mjs","src/game/boss_encounters.js"],"offline_single_file":True},ensure_ascii=False,indent=2))
  return 0
 if __name__=="__main__":sys.exit(main())

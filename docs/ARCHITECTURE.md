@@ -17,7 +17,7 @@
 The root index.html remains a large legacy runtime and rollback surface. Modular core files are being integrated incrementally with browser parity tests. Do not claim standalone modules are authoritative until production calls them.
 
 ## Invariants
-Simulation is independent of DOM/render/audio. Fixed ticks are independent of frame rate. Presentation does not consume gameplay RNG. The player remains inside the authored map bounds. Character selection persists safely. Every active ability has a defined cooldown and effect. No production debug mutation hooks or external CDN dependencies.
+Simulation is independent of DOM/render/audio. Fixed ticks are independent of frame rate. Presentation never consumes the per-run PCG stream; legacy shared `Math.random` call sites remain to be separated by subsystem. The player remains inside the authored map bounds. Character selection persists safely. Every active ability has a defined cooldown and effect. No production debug mutation hooks or external CDN dependencies.
 
 ## Out of scope
 Network authority, rooms, lobbies, reconnect, multiplayer replication, additional realms and Unity/native runtime.
@@ -65,3 +65,12 @@ The 2.5D character renderer reads three short-lived player presentation pulses: 
 ## Adaptive audio architecture
 
 The procedural score runs only while the browser AudioContext is active and the run is playing. It uses a fixed 0.24-second sequencer, four-chord progression, per-wizard melodic motifs, bass/pad/pluck layers and a cached deterministic noise buffer for percussion. Boss presence/phase and critical health add tension layers. The noise generator uses a private deterministic LCG, never gameplay `Math.random`. This is a procedural score, not a replacement for recorded music or owner listening acceptance.
+
+
+## Deterministic RNG ownership — first integrated slice
+
+`web/src/core/seeded-rng.mjs` is the canonical PCG-XSH-RR 32-bit implementation. `scripts/build_game.py` embeds that exact implementation into the root HTML so the per-run RNG does not depend on a module import succeeding under a local/offline preview. Each expedition receives a fresh `runSeed` and `runRng`; an explicit `startRun(seed)` is retained for reproducible diagnostics. Ordinary menu/replay starts generate a new seed, and the result screen displays both the seed and RNG algorithm version.
+
+Objective type selection, variant chance/choice, objective origin and object placement, and the brazier sequence use only the per-run stream. Collision-bearing static meadow decoration uses `WORLD_LAYOUT_SEED` and `WORLD_LAYOUT_VERSION` through a separate world-layout stream, so objective open-point resolution sees the same world layout across runs. Camera shake continues to use the legacy presentation helper; procedural audio noise keeps its private LCG. These streams cannot advance `runRng`.
+
+This is deliberately not a full deterministic-replay claim. Enemy spawning, combat rolls, loot, level-up offers, spell execution, chests and boss selection still contain legacy random call sites and must be migrated in separate bounded slices with behavior-parity tests.
