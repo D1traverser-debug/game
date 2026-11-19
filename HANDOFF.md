@@ -141,3 +141,10 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Actual persistent selection, reload, corrupted-save recovery and backup behavior remain covered by tests/save_persistence_regression.py on a real localhost origin.
 - Boss pull snapshot coverage now searches for a map lane where the player can move without hitting a solid landmark or prop. The production collision resolver remains enabled.
 - This commit changes regression fixtures only; it does not tune combat or make the game easier. CI must still validate the result.
+
+
+## Boss magnetic-field regression fixture — 2026-11-19
+
+- The Krog'wa arena-field test now finds an unobstructed map point outside the field radius and verifies that the magnetic pull reduces distance to the field center.
+- The previous fixed test coordinate could overlap a solid landmark, so the collision resolver correctly blocked movement and produced a false negative.
+- No boss attack or player collision behavior was changed. Re-run CI to confirm.

@@ -26,7 +26,22 @@ window.__BOSS_QA={
   updateBossEncounter(def.active+.02);const recoveryStage=a.stage;updateBossEncounter(def.recovery+.02);
   return{telegraphStage,hpDuringTelegraph,hp0,activeStage,hpAtActive,recoveryStage,cleared:!b.attackInstance,cooldown:b.attackCooldown};
  },
- field:()=>{const b=window.__BOSS_QA.spawn('krog');b.hp=b.max*.6;bossSyncPhase(b);const p=game.player,c=b.fieldCenter;p.x=c.x+b.fieldRadius+100;p.y=c.y;const before=Math.hypot(p.x-c.x,p.y-c.y);bossApplyMagneticField(b,.1);return{active:b.fieldActive,before,after:Math.hypot(p.x-c.x,p.y-c.y),radius:b.fieldRadius}},
+ field:()=>{
+  const b=window.__BOSS_QA.spawn('krog');b.hp=b.max*.6;bossSyncPhase(b);
+  const p=game.player,c=b.fieldCenter,limit=b.fieldRadius-24;
+  let lane=null;
+  for(let y=-780;y<=780&&!lane;y+=48)for(let x=-1080;x<=1080&&!lane;x+=48){
+   if(worldPointBlocked(x,y,p.r))continue;
+   const dx=x-c.x,dy=y-c.y,dist=Math.hypot(dx,dy);
+   if(dist<=limit+30||dist>limit+180)continue;
+   const step=Math.min(dist-limit,23.5),nx=x-dx/dist*step,ny=y-dy/dist*step;
+   if(!worldPointBlocked(nx,y,p.r)&&!worldPointBlocked(nx,ny,p.r))lane={x,y,dist};
+  }
+  if(!lane)throw Error('no_open_field_test_lane');
+  p.x=lane.x;p.y=lane.y;
+  const before=Math.hypot(p.x-c.x,p.y-c.y);bossApplyMagneticField(b,.1);
+  return{active:b.fieldActive,before,after:Math.hypot(p.x-c.x,p.y-c.y),radius:b.fieldRadius,lane};
+ },
  minions:()=>{
   const b=window.__BOSS_QA.spawn('mul');b.hp=b.max*.7;const healer=spawnBossHealer(b);healer.x=b.x+220;healer.y=b.y;
   const before=Math.hypot(healer.x-b.x,healer.y-b.y),hpBefore=b.hp;bossUpdateMulMinions(b,.25);
