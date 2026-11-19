@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "SINGLE_PLAYER_SAVE_EXPORT_IMPORT_001",
+  "checkpoint": "SINGLE_PLAYER_SAVE_EXPORT_IMPORT_002",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -287,8 +287,6 @@
     "Production-quality original character, enemy, realm, animation, spell VFX, UI, music and SFX assets are not complete.",
     "Full wizard/spell/element/infusion/augmentation/enemy/objective/boss/quest/trial/meta inventories need source-version reconciliation.",
     "Firefox, WebKit, mobile Safari, Android Chrome, physical GPU performance and 15-minute stability are NOT_TESTED.",
-    "Website hosting, TLS, authoritative room service deployment, monitoring and rollback are NOT_CONFIGURED.",
-    "Human owner playtest and independent commercial-quality gameplay/art/audio/network acceptance are NOT_DONE.",
     "Fixed-step clock and central damage pipeline are integrated; seeded RNG, projectile, spell and network modules remain independent contracts awaiting incremental integration.",
     "Current character portraits and in-world identities are palette/sigil adaptations of the existing atlas hero, not four separately authored production rigs. Owner visual review remains required.",
     "Map regions and landmarks are authored and navigable, but collision/occlusion, environmental interaction and real player exploration review remain incomplete.",
@@ -297,9 +295,11 @@
     "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED.",
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
     "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
-    "Save import/export is implemented and under CI verification; cross-browser file chooser/download behavior still requires Firefox/WebKit and physical-device acceptance."
+    "Save import/export is implemented and under CI verification; cross-browser file chooser/download behavior still requires Firefox/WebKit and physical-device acceptance.",
+    "Automated natural-run pilot currently fails to win with all four wizards: Aster, Ember and Nyx die before the boss schedule; Briar reaches the Mul'gath boss but dies during the encounter. Diagnose player-build choices, objective routing and combat pressure before claiming balance acceptance.",
+    "Save export/import is implemented; current Playwright download/import regression and cross-browser file chooser behavior are pending CI and Firefox/WebKit acceptance."
   ],
-  "next_action": "Verify save export/import in CI; then continue combat balance and objective acceptance, bespoke character animation/VFX and cross-browser/device testing.",
+  "next_action": "Verify save export/import and package checks; investigate natural-run telemetry and tune the solo mission pacing, objective routing and damage pressure without weakening boss mechanics; then continue bespoke animation/VFX and browser/device acceptance.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -445,8 +445,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 781674,
-    "status": "CHARACTER_SELECT_AND_NATURAL_RUN_HARNESS_FIX_CI_PENDING",
+    "bytes": 784868,
+    "status": "SINGLE_PLAYER_SAVE_EXPORT_IMPORT_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -457,7 +457,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "e66012b4e59d64d5de83e73cfad439b5968c5999f31eb1a4671a62c282424980"
+    "sha256": "9fdaa81c967ec2ce7ecb1a2b49efd29d13f03fdba464026e46d53baf657ae895"
   },
   "web_runtime": {
     "delivery": "static_web_frontend",
@@ -470,10 +470,10 @@
       "touch"
     ],
     "multiplayer": "OUT_OF_SCOPE",
-    "multiplayer_target": "authoritative secure WebSocket rooms for 1-4 players",
+    "multiplayer_target": "NONE",
     "hosting": "offline_static_preview",
     "browser_matrix": "Chromium automation only; Firefox/WebKit/physical devices NOT_TESTED",
-    "status": "SINGLE_PLAYER_ROSTER_AND_MAP_INTEGRATION",
+    "status": "SINGLE_PLAYER_BROWSER_BUILD",
     "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_AND_DAMAGE_PIPELINE_INTEGRATED; OTHER CORE MODULES STILL INCREMENTAL",
     "core_modules": [
       "fixed-step-clock",
@@ -485,7 +485,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contract tests; clock/damage browser integration; roster/map/ability; desktop/mobile character-selection layout; objective; save; audio; normal-play; and natural-run harness regressions. CI pending.",
+    "core_tests": "22 Node contract tests; clock/damage browser integration; roster/map/ability; desktop/mobile character-selection layout; objective; save export/import; audio; normal-play; and natural-run exploratory regressions. Current save export/import CI pending.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -518,7 +518,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "All four wizard selections are verified against the selected character card; actual localStorage persistence is covered by the separate real-origin save regression. Boss pull snapshot test now searches for an unobstructed cardinal lane. CI pending."
+    "natural_run_matrix": "All four wizard selections are verified. Automated natural-run pilot currently dies before defeating the 19-minute boss in three characters; Briar reaches the boss but does not win. Treat as a balance/playstyle investigation, not a passing victory claim."
   },
   "last_single_player_ci": null
 }
