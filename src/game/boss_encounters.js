@@ -135,7 +135,7 @@ function spawnBoss(){
 function spawnBossHealer(b){
  if(game.enemies.filter(e=>!e.dead&&e.bossHealer).length>=5)return;
  spawnEnemy(false,'buffer');const e=game.enemies[game.enemies.length-1];
- const open=worldFindOpenPoint(b.x+rand(-210,210),b.y+rand(-190,190),e.r,260);e.x=open.x;e.y=open.y;e.hp=e.max=400;e.speed=52;e.dmg=22;e.bossHealer=true;e.bossOwnerId=b.id;e.heal=999999;e.elite=false;e.type='buffer';e.state='chase';
+ const open=worldFindOpenPoint(b.x+enemyRand(-210,210),b.y+enemyRand(-190,190),e.r,260);e.x=open.x;e.y=open.y;e.hp=e.max=400;e.speed=52;e.dmg=22;e.bossHealer=true;e.bossOwnerId=b.id;e.heal=999999;e.elite=false;e.type='buffer';e.state='chase';
  game.fx.push({x:e.x,y:e.y,r:55,life:.4,max:.4,color:'#c0e6a0',type:'ring'});
  return e;
 }
