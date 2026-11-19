@@ -1,0 +1,21 @@
+name: Game Core Regression
+
+on:
+  push:
+    branches:
+      - main
+      - work/**
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  core-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run game core regression tests
+        run: node --test tests/game-core.test.mjs
