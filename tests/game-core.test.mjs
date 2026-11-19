@@ -143,7 +143,9 @@ function boot(seed) {
     clearTimeout() {},
     console
   };
-  vm.runInContext(instrumentedScript, vm.createContext(sandbox), {timeout:2000});
+  const context = vm.createContext(sandbox);
+  const compiled = new vm.Script(instrumentedScript, {filename:'game-inline.js'});
+  compiled.runInContext(context, {timeout:2000});
   return {api: window.__TEST_API, store};
 }
 
