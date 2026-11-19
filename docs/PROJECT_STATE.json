@@ -362,8 +362,8 @@
   "latest_local_candidate": {
     "artifact": "index.html",
     "delivery_filename": "Aetherwilds-Production-Art-Audio-Candidate.html",
-    "bytes": 842408,
-    "sha256": "22ddefba0226b7c090444dcc29fce540bd74e10dfeef71b10507038913199c72",
+    "bytes": 842422,
+    "sha256": "f25f45870d83db5a40bbafded5068d5ddca1e544c67cf051d983ac401b021fc9",
     "source_base": "objective RNG integration candidate plus original four-wizard art, action-pose renderer, character-specific VFX and adaptive music pass",
     "repository_sync": "SYNCED_TO_GITHUB_BRANCH_EXACT_BYTES",
     "scope": "single-player / four original wizards / Verdant Wilds / offline HTML",
@@ -502,7 +502,7 @@
   "web_game_artifact": {
     "branch": "work/production-art-vfx-audio-002",
     "path": "index.html",
-    "bytes": 842408,
+    "bytes": 842422,
     "status": "CANDIDATE_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
     "renderer_default": "2.5D atlas renderer with original four-wizard action atlas",
     "renderer_experimental": "raw WebGL2 3D",
@@ -514,7 +514,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "22ddefba0226b7c090444dcc29fce540bd74e10dfeef71b10507038913199c72"
+    "sha256": "f25f45870d83db5a40bbafded5068d5ddca1e544c67cf051d983ac401b021fc9"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
