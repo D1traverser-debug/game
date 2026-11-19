@@ -297,6 +297,41 @@ try{boot3D()}catch(err){console.warn('3D renderer initialization failed, preserv
 </script>
 <script>
 (()=>{'use strict';
+/* Shared deterministic gameplay RNG.
+const MASK_64 = (1n << 64n) - 1n;
+const UINT32_RANGE = 1n << 32n;
+
+// PCG-XSH-RR 32-bit stream. Keep gameplay RNG out of rendering, UI and audio.
+class SeededRng {
+  constructor(seed, sequence = 54n) {
+    if (!(typeof seed === "bigint" || Number.isSafeInteger(seed))) throw new TypeError("seed must be a bigint or safe integer");
+    if (!(typeof sequence === "bigint" || Number.isSafeInteger(sequence))) throw new TypeError("sequence must be a bigint or safe integer");
+    this.state = 0n;
+    this.increment = ((BigInt(sequence) << 1n) | 1n) & MASK_64;
+    this.nextUint32();
+    this.state = (this.state + BigInt(seed)) & MASK_64;
+    this.nextUint32();
+  }
+  nextUint32() {
+    const oldState = this.state;
+    this.state = (oldState * 6364136223846793005n + this.increment) & MASK_64;
+    const shifted = Number(BigInt.asUintN(32, ((oldState >> 18n) ^ oldState) >> 27n));
+    const rotation = Number(oldState >> 59n);
+    return ((shifted >>> rotation) | (shifted << ((-rotation) & 31))) >>> 0;
+  }
+  nextFloat01() { return (this.nextUint32() >>> 8) / 16777216; }
+  nextInt(minInclusive, maxExclusive) {
+    if (!Number.isSafeInteger(minInclusive) || !Number.isSafeInteger(maxExclusive) || maxExclusive <= minInclusive) {
+      throw new RangeError("integer range must be non-empty and safe");
+    }
+    const span = BigInt(maxExclusive - minInclusive);
+    if (span > UINT32_RANGE) throw new RangeError("range cannot exceed 2^32");
+    const threshold = (UINT32_RANGE - span) % span;
+    let value;
+    do { value = BigInt(this.nextUint32()); } while (value < threshold);
+    return minInclusive + Number(value % span);
+  }
+}
 let coreClock=null;
 import('./web/src/core/fixed-step-clock.mjs').then(({FixedStepClock})=>{
  coreClock=new FixedStepClock({stepSeconds:1/30,maxStepsPerAdvance:7});
@@ -342,6 +377,16 @@ function applyCoreDamage(source,target,sourceTeam,targetTeam,rawDamage){
 }
 const $=id=>document.getElementById(id), canvas=$('world');let ctx=canvas.getContext('2d');
 const W=()=>innerWidth,H=()=>innerHeight,TAU=Math.PI*2,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)],fmt=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+const RUN_RNG_VERSION='pcg-xsh-rr32-v1',WORLD_LAYOUT_SEED=0xA37E2026,WORLD_LAYOUT_VERSION='verdant-wilds-layout-v1';
+let lastGeneratedRunSeed=null;
+function createRunSeed(){const values=new Uint32Array(1);try{if(window.crypto?.getRandomValues)window.crypto.getRandomValues(values);else values[0]=(Date.now()^Math.floor(performance.now()*1000))>>>0}catch(e){values[0]=(Date.now()^Math.floor(performance.now()*1000))>>>0}let seed=values[0]>>>0;if(seed===lastGeneratedRunSeed)seed=(seed+1)>>>0;lastGeneratedRunSeed=seed;return seed}
+function normalizeRunSeed(seed){if(!Number.isSafeInteger(seed)||seed<0||seed>0xffffffff)throw new RangeError('run seed must be an unsigned 32-bit integer');return seed>>>0}
+function runRandom(){if(!game?.runRng)throw new Error('RUN_RNG_UNAVAILABLE');return game.runRng.nextFloat01()}
+function runRand(min,max){return min+runRandom()*(max-min)}
+function runPick(items){if(!Array.isArray(items)||!items.length)throw new RangeError('cannot choose from an empty collection');return items[game.runRng.nextInt(0,items.length)]}
+function runShuffle(items){const out=items.slice();for(let i=out.length-1;i>0;i--){const j=game.runRng.nextInt(0,i+1);[out[i],out[j]]=[out[j],out[i]]}return out}
+function worldRandom(){if(!game?.worldRng)throw new Error('WORLD_LAYOUT_RNG_UNAVAILABLE');return game.worldRng.nextFloat01()}
+function worldRand(min,max){return min+worldRandom()*(max-min)}
 let dpr=1,screen='menu',last=0,toastTimer=0,audio=null,muted=false,musicVolume=.58,sfxVolume=.78,ambienceVolume=.32,uiVolume=.72,keys={},joy={x:0,y:0,active:false},pointer={x:0,y:0};
 function resize(){dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.floor(W()*dpr);canvas.height=Math.floor(H()*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
 const SAVEKEY='spellbrigade_solo_v1',SAVEBACKUPKEY=SAVEKEY+'_backup',SAVERECOVERYKEY=SAVEKEY+'_recovery';
@@ -698,13 +743,13 @@ function makePlayer(){
  if(save.trialSpellId){const trial=spells.find(x=>x.id===save.trialSpellId);if(trial&&SOLO_SPELL_CATALOG_IDS.has(trial.id)&&!INITIAL_SPELL_IDS.includes(trial.id)&&trial.id!==starter.id){p.spells.push({...trial,cd:trial.cd*.88,level:1,cdNow:0,infusions:[],augments:[]});save.trialSpellId=null;persist()}}
  return p;
 }
-function startRun(){ensureAudioContext();if(coreClock)coreClock.reset();simulationDebt=0;game={time:0,mapId:WORLD_MAP.id,world:WORLD_MAP.bounds.width,damageStates:new WeakMap(),nextCombatantId:1,damageSource:{},player:makePlayer(),enemies:[],orbs:[],shots:[],plants:[],ghostImps:[],castSequence:0,ghostDamage:0,ghostTimer:0,fx:[],damageNumbers:[],decor:[],chests:[],hazards:[],boss:null,spawn:0,objective:null,nextObj:0,doneObj:0,nextChest:120,paused:false,ended:false,shake:0,killStreak:0,score:0,randomSeed:1,lockedOption:null,hudTick:0,pendingLevels:0,stats:{}};generateDecor();buildDecorCache(game.decor);for(let i=0;i<12;i++)spawnEnemy(true);document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now();sound(440,.15,'triangle');toast('远征开始：保护自己，收集奥术经验');renderHud()}
+function startRun(seedOverride=null){const runSeed=seedOverride===null?createRunSeed():normalizeRunSeed(seedOverride);lastGeneratedRunSeed=runSeed;ensureAudioContext();if(coreClock)coreClock.reset();simulationDebt=0;game={time:0,mapId:WORLD_MAP.id,world:WORLD_MAP.bounds.width,damageStates:new WeakMap(),nextCombatantId:1,damageSource:{},player:makePlayer(),enemies:[],orbs:[],shots:[],plants:[],ghostImps:[],castSequence:0,ghostDamage:0,ghostTimer:0,fx:[],damageNumbers:[],decor:[],chests:[],hazards:[],boss:null,spawn:0,objective:null,nextObj:0,doneObj:0,nextChest:120,paused:false,ended:false,shake:0,killStreak:0,score:0,runSeed,randomSeed:runSeed,rngVersion:RUN_RNG_VERSION,worldLayoutSeed:WORLD_LAYOUT_SEED,worldLayoutVersion:WORLD_LAYOUT_VERSION,runRng:new SeededRng(runSeed),worldRng:new SeededRng(WORLD_LAYOUT_SEED),seenObjectives:[],lockedOption:null,hudTick:0,pendingLevels:0,stats:{}};generateDecor();buildDecorCache(game.decor);for(let i=0;i<12;i++)spawnEnemy(true);document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now();sound(440,.15,'triangle');toast('远征开始：保护自己，收集奥术经验');renderHud()}
 function generateDecor(){
  let d=game.decor;WORLD_DECOR_COLLIDERS=[];
  for(let i=0;i<480;i++){
-  let x=rand(WORLD_MAP.bounds.minX+20,WORLD_MAP.bounds.maxX-20),y=rand(WORLD_MAP.bounds.minY+20,WORLD_MAP.bounds.maxY-20),roll=Math.random();
+  let x=worldRand(WORLD_MAP.bounds.minX+20,WORLD_MAP.bounds.maxX-20),y=worldRand(WORLD_MAP.bounds.minY+20,WORLD_MAP.bounds.maxY-20),roll=worldRandom();
   let type=roll<.52?'grass':roll<.72?'flower':roll<.85?'stone':roll<.95?'bush':'tree';
-  const size=rand(.55,1.5),rot=rand(0,TAU),c=Math.floor(rand(0,4));
+  const size=worldRand(.55,1.5),rot=worldRand(0,TAU),c=game.worldRng.nextInt(0,4);
   const solidRadius=type==='tree'?12*size:type==='stone'?12*size:type==='bush'?15*size:0;
   if(solidRadius>0){
    const nearLandmark=WORLD_LANDMARK_COLLIDERS.some(l=>Math.hypot(x-l.x,y-l.y)<l.r+solidRadius+42);
@@ -925,24 +970,24 @@ function startObjective(){
  let types=['fungi','statues','crab','rift','sludge',...(count>=5?['sacrifice']:[]),...(count>=12?['cores']:[]),...(count>=25?['brazier']:[]),...(count>=40?['beasts']:[])];
  // Prefer unique objectives within one run. If all have been tried, replay is allowed.
  let unseen=types.filter(k=>!game.seenObjectives?.includes(k));if(!unseen.length)unseen=types;
- let type=pick(unseen);game.seenObjectives=game.seenObjectives||[];game.seenObjectives.push(type);
+ let type=runPick(unseen);game.seenObjectives=game.seenObjectives||[];game.seenObjectives.push(type);
  let names={fungi:'魔化菌群',statues:'粉碎石像',crab:'黄金巨蟹',rift:'封印裂隙',sludge:'灵魂淤泥',sacrifice:'鲜血献祭',cores:'失控法术核心',brazier:'魔法火盆',beasts:'法力兽群'};
  let desc={fungi:'收集19朵魔化菌菇。',statues:'击碎8座石像。',crab:'追逐并击败黄金蟹。',rift:'站在裂隙内，持续完成封印。',sludge:'穿越污染区并净化12处淤泥。',sacrifice:'在献祭法阵内击败15只怪物。',cores:'收集5个不稳定核心。',brazier:'依次点亮4个火盆，靠近并按E。',beasts:'驱赶4只法力兽进入圆形祭坛。'};
  let target={fungi:19,statues:8,crab:1,rift:100,sludge:12,sacrifice:15,cores:5,brazier:4,beasts:4}[type];
- let p=game.player,origin=worldFindOpenPoint(clamp(p.x+rand(-240,240),-920,920),clamp(p.y+rand(-180,180),-670,670),26,320),o={type,name:names[type],desc:desc[type],progress:0,target,time:95,x:origin.x,y:origin.y,done:false,objects:[],variant:null};
+ let p=game.player,origin=worldFindOpenPoint(clamp(p.x+runRand(-240,240),-920,920),clamp(p.y+runRand(-180,180),-670,670),26,320),o={type,name:names[type],desc:desc[type],progress:0,target,time:95,x:origin.x,y:origin.y,done:false,objects:[],variant:null};
  let variantsUnlocked=(save.objectiveHistory||{})[type]>0;
- if(variantsUnlocked&&Math.random()<.45)o.variant=type==='rift'?'multi':type==='sacrifice'?'death':type==='fungi'?pick(['scared','explosive']):type==='crab'?pick(['mother','giant']):type==='statues'?'greater':type==='cores'?'heavy':type==='sludge'?'dark':type==='brazier'?'sequence':type==='beasts'?'devoted':null;
+ if(variantsUnlocked&&runRandom()<.45)o.variant=type==='rift'?'multi':type==='sacrifice'?'death':type==='fungi'?runPick(['scared','explosive']):type==='crab'?runPick(['mother','giant']):type==='statues'?'greater':type==='cores'?'heavy':type==='sludge'?'dark':type==='brazier'?'sequence':type==='beasts'?'devoted':null;
  if(type==='crab'){o.crab={x:o.x,y:o.y,r:o.variant==='giant'?32:o.variant==='mother'?24:15,hp:o.variant==='giant'?580:o.variant==='mother'?620:280,alive:true,mother:o.variant==='mother',spawnTimer:2.2,spawned:0}}
  else if(['fungi','sludge','cores','statues','brazier','beasts'].includes(type)){
   const n=type==='brazier'||type==='beasts'?4:target;
   for(let i=0;i<n;i++){
-   let angle=i*TAU/n+rand(-.2,.2),radius=type==='brazier'||type==='beasts'?rand(110,260):rand(80,350);
+   let angle=i*TAU/n+runRand(-.2,.2),radius=type==='brazier'||type==='beasts'?runRand(110,260):runRand(80,350);
    const spot=worldFindOpenPoint(clamp(o.x+Math.cos(angle)*radius,-1130,1130),clamp(o.y+Math.sin(angle)*radius,-810,810),15,140);o.objects.push({x:spot.x,y:spot.y,hp:type==='statues'?(o.variant==='greater'?300:100):1,alive:true,index:i,activated:false,scared:type==='fungi'&&o.variant==='scared',explosive:type==='fungi'&&o.variant==='explosive',heavy:type==='cores'&&o.variant==='heavy'});
   }
  }
  if(type==='rift'&&o.variant==='multi'){o.target=300;o.nodes=[[-170,-95],[165,-80],[15,185]].map(([dx,dy])=>{const q=worldFindOpenPoint(o.x+dx,o.y+dy,28,120);return{x:q.x,y:q.y,progress:0}})}
  if(type==='sacrifice'&&o.variant==='death'){o.shrineHp=o.shrineMax=1800}
- if(type==='brazier'&&o.variant==='sequence'){o.sequence=[0,1,2,3].sort(()=>Math.random()-.5);o.sequenceIndex=0}
+ if(type==='brazier'&&o.variant==='sequence'){o.sequence=runShuffle([0,1,2,3]);o.sequenceIndex=0}
  game.carriedCore=null;game.objective=o;toast('新目标：'+o.name);sound(360,.25,'triangle');
 }
 function updateObjective(dt){
@@ -1324,7 +1369,7 @@ function updateBossEncounter(dt){
 }
 function pause(){if(screen!=='playing')return;let p=game.player;$('pauseStats').innerHTML=[['等级',p.level],['击杀',p.kills],['伤害',Math.floor(p.damageDone)],['目标',p.objectives]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');show('pause')}
 function resume(){document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now()}
-function finish(win,abandon=false){if(!game||game.ended)return;game.ended=true;let p=game.player;let secs=Math.floor(game.time),gold=Math.floor((p.kills*.12+p.objectives*90+secs*.12)*(1+(save.enchant.bounty||0)*.05));if(win)gold+=600;gold+=(game.bonusGold||0);if(abandon)gold=Math.floor(gold*.35);save.gold+=gold;save.runs++;if(win){save.wins++;const id=game.boss?.bossId||'sol';save.bossKills=save.bossKills||{};save.bossKills[id]=(save.bossKills[id]||0)+1;}save.best=Math.max(save.best||0,secs);persist();$('resultEyebrow').textContent=win?'MISSION COMPLETE':'MISSION FAILED';$('resultIcon').textContent=win?'✦':'☽';$('resultTitle').textContent=win?'秘境已净化':'巫师倒下了';$('resultDesc').textContent=win?'你击败了 '+(game.boss?.name||'深渊首领')+'，翠影荒野暂时恢复了宁静。':abandon?'你放弃了本次远征。':'魔潮吞没了最后的防线。';$('resultStats').innerHTML=[['生存时间',fmt(secs)],['击败敌人',p.kills],['最高等级',p.level],['完成目标',p.objectives],['造成伤害',Math.floor(p.damageDone)],['拾取卷轴',p.scrollCount],['暴击次数',p.critHits],['施法次数',p.casts]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');$('reward').textContent=gold;$('totalDamage').textContent=Math.floor(p.damageDone);$('hud').classList.remove('active');show('result');playSfx(win?'victory':'defeat')}
+function finish(win,abandon=false){if(!game||game.ended)return;game.ended=true;let p=game.player;let secs=Math.floor(game.time),gold=Math.floor((p.kills*.12+p.objectives*90+secs*.12)*(1+(save.enchant.bounty||0)*.05));if(win)gold+=600;gold+=(game.bonusGold||0);if(abandon)gold=Math.floor(gold*.35);save.gold+=gold;save.runs++;if(win){save.wins++;const id=game.boss?.bossId||'sol';save.bossKills=save.bossKills||{};save.bossKills[id]=(save.bossKills[id]||0)+1;}save.best=Math.max(save.best||0,secs);persist();$('resultEyebrow').textContent=win?'MISSION COMPLETE':'MISSION FAILED';$('resultIcon').textContent=win?'✦':'☽';$('resultTitle').textContent=win?'秘境已净化':'巫师倒下了';$('resultDesc').textContent=win?'你击败了 '+(game.boss?.name||'深渊首领')+'，翠影荒野暂时恢复了宁静。':abandon?'你放弃了本次远征。':'魔潮吞没了最后的防线。';$('resultStats').innerHTML=[['生存时间',fmt(secs)],['击败敌人',p.kills],['最高等级',p.level],['完成目标',p.objectives],['造成伤害',Math.floor(p.damageDone)],['拾取卷轴',p.scrollCount],['暴击次数',p.critHits],['施法次数',p.casts],['远征种子',game.runSeed],['随机算法',RUN_RNG_VERSION]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');$('reward').textContent=gold;$('totalDamage').textContent=Math.floor(p.damageDone);$('hud').classList.remove('active');show('result');playSfx(win?'victory':'defeat')}
 function renderHud(){if(!game)return;let p=game.player,ch=CHARACTER_BY_ID[p.characterId]||CHARACTERS[0];$('heroName').textContent=ch.name;$('heroTitle').innerHTML=ch.title+' · LV <b id="level">'+p.level+'</b>';$('heroAvatar').textContent=ch.icon;$('heroAvatar').style.background='radial-gradient(circle,'+ch.color+','+ch.robe+')';if(!Number.isFinite(p.maxHp)||p.maxHp<=0)p.maxHp=100;if(!Number.isFinite(p.hp))p.hp=0;p.hp=clamp(p.hp,0,p.maxHp);$('level').textContent=p.level;$('hptext').textContent=(p.ghost?'幽靈階段 · ':'')+Math.ceil(p.hp)+' / '+Math.ceil(p.maxHp);$('hpbar').style.width=clamp(p.hp/p.maxHp*100,0,100)+'%';$('xptext').textContent=Math.floor(p.xp)+' / '+p.nextXp;$('xpbar').style.width=clamp(p.xp/p.nextXp*100,0,100)+'%';$('timer').textContent=fmt(game.time);$('kills').textContent=p.kills;$('objtitle').textContent=game.objective&&!game.objective.done?game.objective.name:game.boss?'击败 '+(game.boss.name||'深渊首领'):'抵御魔潮';$('objdesc').textContent=game.objective&&!game.objective.done?game.objective.desc:'完成目标，强化咒语，在第十九分钟迎战首领。';if(game.objective&&!game.objective.done){let o=game.objective;if(o.variant==='multi')$('objdesc').textContent='封印地图上三个小型裂隙，逐个站在裂隙内完成封印。';if(o.variant==='death')$('objdesc').textContent='死亡神龛会吸收区域内伤害；站在法阵内攻击它并抵御怪物。';if(o.variant==='scared')$('objdesc').textContent='这些蘑菇会逃离你，快速追上并收集。';if(o.variant==='explosive')$('objdesc').textContent='爆裂蘑菇靠近后会引爆，注意生命值并利用爆炸清理怪物。';if(o.variant==='mother')$('objdesc').textContent='击败黄金母蟹；它会持续孵化小蟹。';if(o.variant==='giant')$('objdesc').textContent='追击生命值更高的巨型黄金蟹。';if(o.variant==='greater')$('objdesc').textContent='击碎更坚固的石像。';if(o.variant==='heavy')$('objdesc').textContent='按 E 拾取重型法术核心，搬运到祭坛中心。';if(o.variant==='dark')$('objdesc').textContent='暗色淤泥会遮蔽视野，穿越污染区净化淤泥。';if(o.variant==='sequence')$('objdesc').textContent='按符文顺序点亮火盆：'+(o.sequence||[]).map(i=>i+1).join(' → ');if(o.variant==='devoted')$('objdesc').textContent='这些法力兽会追随你，把它们引到祭坛。'}let obj=game.objective&&!game.objective.done?game.objective:null,chest=game.chests.find(c=>!c.open);if(obj){let d=Math.round(Math.hypot(obj.x-p.x,obj.y-p.y));$('objnav').textContent='目标方位 '+Math.round(Math.atan2(obj.y-p.y,obj.x-p.x)*180/Math.PI)+'° · '+d+'m · 剩余 '+Math.ceil(obj.time)+'s'}else if(chest){let d=Math.round(Math.hypot(chest.x-p.x,chest.y-p.y));$('objnav').textContent='宝箱方位 '+Math.round(Math.atan2(chest.y-p.y,chest.x-p.x)*180/Math.PI)+'° · '+d+'m'}else $('objnav').textContent='';$('objbar').style.width=(game.objective&&!game.objective.done?clamp(game.objective.progress/game.objective.target*100,0,100):0)+'%';const bossValid=!!game.boss&&!game.boss.dead&&Number.isFinite(game.boss.hp)&&Number.isFinite(game.boss.max)&&game.boss.max>0;$('bossbar').classList.toggle('show',bossValid);if(bossValid){$('bosshp').style.width=clamp(game.boss.hp/game.boss.max*100,0,100)+'%';$('staggerFill').style.width=clamp(game.boss.stagger||0,0,100)+'%';$('staggerPct').textContent=game.boss.vulnerable>0?'失衡中':Math.floor(clamp(game.boss.stagger||0,0,100))+'%'}$('spellrow').innerHTML=p.spells.map(s=>`<div class="spellslot"><div class="ico">${s.icon}</div><b>${s.name}</b><small>Lv.${s.level}${s.infusions.length?' · '+s.infusions.map(x=>elements[x].name).join('+'):''}</small></div>`).join('');
  $('abilityIcon').textContent=ch.abilityIcon;$('abilityCooldown').textContent=p.abilityCd>0?Math.ceil(p.abilityCd)+'s':'Q';
  $('abilityBtn').title=ch.abilityName+' · '+ch.abilityDesc;$('abilityBtn').classList.toggle('ready',p.abilityCd<=0);
