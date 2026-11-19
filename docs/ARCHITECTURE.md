@@ -25,3 +25,8 @@ Network authority, rooms, lobbies, reconnect, multiplayer replication, additiona
 
 ## Realm and character presentation
 The 2.5D renderer now uses seven distinct landmark structures and nearby nameplates rather than repeating one ruin wall. Each of the four wizards has a unique mantle silhouette and signature focus/weapon overlay in addition to its palette, headpiece and sigil. The base atlas body is still shared; fully bespoke skeletal rigs and animation clips are not yet implemented.
+
+
+## One-realm natural-prop collision and navigation
+
+The shared world collision resolver now combines seven authored landmark footprints with generated tree, stone and bush footprints. Decorative solid props are rejected from landmark buffers, the central start/rift safe zone, river/bridge corridors and overlapping prop clusters. Player movement, enemy locomotion, boss locomotion, boss minions and moving objective actors use the same axis-separated slide resolver. Grass and flowers remain passable.

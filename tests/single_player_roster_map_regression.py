@@ -21,6 +21,17 @@ window.__soloProbe={
   const open=worldFindOpenPoint(l.x,l.y,radius,320);
   return{blockedAtCenter,horizontalBlocked,canSlide,relocatedClear:!worldPointBlocked(open.x,open.y,radius),relocatedDistance:Math.hypot(open.x-l.x,open.y-l.y)};
  },
+ decorCollision:()=>{
+  const prop=game.decor.find(x=>['tree','stone','bush'].includes(x.type));
+  if(!prop)return{found:false,colliders:WORLD_DECOR_COLLIDERS.length};
+  const collider=WORLD_DECOR_COLLIDERS.find(x=>x.x===prop.x&&x.y===prop.y);
+  if(!collider)return{found:false,colliders:WORLD_DECOR_COLLIDERS.length};
+  const radius=17,actor={x:prop.x-collider.r-radius-5,y:prop.y},before=actor.x;
+  worldMoveEntity(actor,12,0,radius);const blocked=Math.abs(actor.x-before)<.001;
+  const yBefore=actor.y;worldMoveEntity(actor,0,20,radius);const wallSlide=actor.y>yBefore;
+  const open=worldFindOpenPoint(prop.x,prop.y,radius,220);
+  return{found:true,colliders:WORLD_DECOR_COLLIDERS.length,blocked,wallSlide,spawnClear:!worldPointBlocked(open.x,open.y,radius),relocated:Math.hypot(open.x-prop.x,open.y-prop.y)>0};
+ },
  ability:(id)=>{
   const ch=CHARACTER_BY_ID[id],p=makePlayer();p.characterId=id;p.x=0;p.y=0;p.hp=Math.max(30,p.maxHp*.35);p.facing=0;p.abilityCd=0;
   const e={id:'test-'+id,type:'crawler',x:155,y:0,r:18,hp:20000,max:20000,dead:false,state:'chase',slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0};
@@ -65,6 +76,10 @@ async def main():
   report["checks"]["landmark_blocks_player"]=collision["blockedAtCenter"] and collision["horizontalBlocked"]
   report["checks"]["player_slides_along_landmark"]=collision["canSlide"]
   report["checks"]["spawn_points_avoid_landmarks"]=collision["relocatedClear"] and collision["relocatedDistance"]>0
+  decor=await page.evaluate("window.__soloProbe.decorCollision()");report["decor_collision"]=decor
+  report["checks"]["decorative_trees_stones_bushes_are_solid"]=decor["found"] and decor["colliders"]>=20 and decor["blocked"]
+  report["checks"]["decor_collision_allows_wall_sliding"]=decor["wallSlide"]
+  report["checks"]["decor_spawn_relocation"]=decor["spawnClear"] and decor["relocated"]
   report["checks"]["live_minimap"]=await page.locator("#minimap").is_visible()
   abilities={cid:await page.evaluate("(id)=>window.__soloProbe.ability(id)",cid) for cid in ["aster","ember","briar","nyx"]}
   report["abilities"]=abilities

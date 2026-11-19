@@ -419,8 +419,10 @@ function worldTerrainAt(x,y,radius=17){
  return{id:'ground',name:worldRegionAt(x,y).name,speed:1}
 }
 const WORLD_LANDMARK_COLLIDERS=WORLD_MAP.landmarks.map(l=>({x:l.x,y:l.y,r:l.solidRadius||0}));
+let WORLD_DECOR_COLLIDERS=[];
 function worldPointBlocked(x,y,radius=17){
  for(const l of WORLD_LANDMARK_COLLIDERS){const r=l.r+radius,dx=x-l.x,dy=y-l.y;if(dx*dx+dy*dy<r*r)return true}
+ for(const d of WORLD_DECOR_COLLIDERS){const r=d.r+radius,dx=x-d.x,dy=y-d.y;if(dx*dx+dy*dy<r*r)return true}
  return false;
 }
 function worldFindOpenPoint(x,y,radius=17,searchRadius=320){
@@ -599,7 +601,24 @@ function makePlayer(){
  return p;
 }
 function startRun(){if(coreClock)coreClock.reset();simulationDebt=0;game={time:0,mapId:WORLD_MAP.id,world:WORLD_MAP.bounds.width,damageStates:new WeakMap(),nextCombatantId:1,damageSource:{},player:makePlayer(),enemies:[],orbs:[],shots:[],plants:[],ghostImps:[],castSequence:0,ghostDamage:0,ghostTimer:0,fx:[],damageNumbers:[],decor:[],chests:[],hazards:[],boss:null,spawn:0,objective:null,nextObj:0,doneObj:0,nextChest:120,paused:false,ended:false,shake:0,killStreak:0,score:0,randomSeed:1,lockedOption:null,hudTick:0,pendingLevels:0,stats:{}};generateDecor();buildDecorCache(game.decor);for(let i=0;i<12;i++)spawnEnemy(true);document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now();sound(440,.15,'triangle');toast('远征开始：保护自己，收集奥术经验');renderHud()}
-function generateDecor(){let d=game.decor;for(let i=0;i<480;i++){let x=rand(WORLD_MAP.bounds.minX+20,WORLD_MAP.bounds.maxX-20),y=rand(WORLD_MAP.bounds.minY+20,WORLD_MAP.bounds.maxY-20);let r=Math.random();d.push({x,y,type:r<.52?'grass':r<.72?'flower':r<.85?'stone':r<.95?'bush':'tree',s:rand(.55,1.5),rot:rand(0,TAU),c:Math.floor(rand(0,4))})}}
+function generateDecor(){
+ let d=game.decor;WORLD_DECOR_COLLIDERS=[];
+ for(let i=0;i<480;i++){
+  let x=rand(WORLD_MAP.bounds.minX+20,WORLD_MAP.bounds.maxX-20),y=rand(WORLD_MAP.bounds.minY+20,WORLD_MAP.bounds.maxY-20),roll=Math.random();
+  let type=roll<.52?'grass':roll<.72?'flower':roll<.85?'stone':roll<.95?'bush':'tree';
+  const size=rand(.55,1.5),rot=rand(0,TAU),c=Math.floor(rand(0,4));
+  const solidRadius=type==='tree'?12*size:type==='stone'?12*size:type==='bush'?15*size:0;
+  if(solidRadius>0){
+   const nearLandmark=WORLD_LANDMARK_COLLIDERS.some(l=>Math.hypot(x-l.x,y-l.y)<l.r+solidRadius+42);
+   const protectedTerrain=worldTerrainAt(x,y,0).id!=='ground';
+   const nearStart=Math.hypot(x,y)<180;
+   const overlaps=WORLD_DECOR_COLLIDERS.some(o=>Math.hypot(x-o.x,y-o.y)<solidRadius+o.r+28);
+   if(nearLandmark||protectedTerrain||nearStart||overlaps)type=(i%4===0?'flower':'grass');
+   else WORLD_DECOR_COLLIDERS.push({x,y,r:solidRadius,type});
+  }
+  d.push({x,y,type,s:size,rot,c});
+ }
+}
 function spawnEnemy(initial=false,type){if(!game)return;if(game.enemies.filter(e=>!e.dead).length>=64)return;let p=game.player,ang=rand(0,TAU),dist=initial?rand(300,700):rand(530,780),x=clamp(p.x+Math.cos(ang)*dist,WORLD_MAP.bounds.minX+55,WORLD_MAP.bounds.maxX-55),y=clamp(p.y+Math.sin(ang)*dist,WORLD_MAP.bounds.minY+55,WORLD_MAP.bounds.maxY-55);let t=type||enemyType(game.time);let base={crawler:[34,45,48,18],sprout:[45,62,55,16],ranged:[58,52,62,16],buffer:[90,45,72,17],shield:[150,38,95,22],gnasher:[160,70,126,24],crabladon:[420,50,220,33]};let a=base[t]||base.crawler,open=worldFindOpenPoint(x,y,a[3],220);x=open.x;y=open.y;let threat=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;let scale=(1+game.time/520)*threat;game.enemies.push({id:Math.random(),type:t,x,y,r:a[3],hp:a[0]*scale,max:a[0]*scale,speed:a[1]*(1+game.time/2400),dmg:a[2]*(1+game.time/1200)*threat,attack:rand(.3,2),heal:rand(1,4),state:'chase',stateT:0,slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0,elite:!initial&&Math.random()<.025+game.time/1800,dead:false,stagger:0})}
 function enemyType(t){let r=Math.random();if(t>600&&r<.05)return'crabladon';if(t>360&&r<.13)return'gnasher';if(t>250&&r<.22)return'shield';if(t>170&&r<.28)return'buffer';if(t>90&&r<.43)return'ranged';if(t>35&&r<.65)return'sprout';return'crawler'}
 function nearest(x,y,max=9999){let best=null,bd=max*max;for(let e of game.enemies){if(e.dead||e.state==='burrow')continue;let d=(e.x-x)**2+(e.y-y)**2;if(d<bd){bd=d;best=e}}return best}
@@ -805,10 +824,10 @@ function updateObjective(dt){
  if(o.type==='rift'){
   if(o.variant==='multi'&&o.nodes){for(const node of o.nodes){let near=Math.hypot(p.x-node.x,p.y-node.y)<82;if(node.progress<100)node.progress=clamp(node.progress+(near?3.0:-.35)*dt,0,100)}o.progress=o.nodes.reduce((n,x)=>n+x.progress,0);if(o.nodes.every(x=>x.progress>=100))completeObjective()}
   else{const near=Math.hypot(p.x-o.x,p.y-o.y)<120;o.progress=clamp(o.progress+(near?1.8:-.8)*dt,0,o.target);if(o.progress>=o.target)completeObjective()}
- }else if(o.type==='crab'&&o.crab?.alive){let c=o.crab,d=Math.hypot(c.x-p.x,c.y-p.y),a=Math.atan2(c.y-p.y,c.x-p.x);c.x=clamp(c.x+Math.cos(a)*dt*(c.mother?56:70),-1140,1140);c.y=clamp(c.y+Math.sin(a)*dt*(c.mother?56:70),-820,820);if(d<230&&Math.random()<dt*2)c.x+=Math.cos(a+Math.PI/2)*rand(-20,20);if(c.mother){c.spawnTimer-=dt;if(c.spawnTimer<=0&&c.spawned<8){c.spawnTimer=2.5;spawnEnemy(false,'shield');let child=game.enemies[game.enemies.length-1];if(child){child.type='shield';child.x=c.x+rand(-65,65);child.y=c.y+rand(-65,65);child.hp=child.max=38;child.r=11;child.speed=92;child.dmg=15;child.elite=false;c.spawned++}}}if(c.hp<=0){c.alive=false;objectiveProgress(1)}}
+ }else if(o.type==='crab'&&o.crab?.alive){let c=o.crab,d=Math.hypot(c.x-p.x,c.y-p.y),a=Math.atan2(c.y-p.y,c.x-p.x);worldMoveEntity(c,Math.cos(a)*dt*(c.mother?56:70),Math.sin(a)*dt*(c.mother?56:70),c.r||14);if(d<230&&Math.random()<dt*2)c.x+=Math.cos(a+Math.PI/2)*rand(-20,20);if(c.mother){c.spawnTimer-=dt;if(c.spawnTimer<=0&&c.spawned<8){c.spawnTimer=2.5;spawnEnemy(false,'shield');let child=game.enemies[game.enemies.length-1];if(child){child.type='shield';child.x=c.x+rand(-65,65);child.y=c.y+rand(-65,65);child.hp=child.max=38;child.r=11;child.speed=92;child.dmg=15;child.elite=false;c.spawned++}}}if(c.hp<=0){c.alive=false;objectiveProgress(1)}}
  else if(o.type==='beasts')for(const beast of o.objects){if(!beast.alive)continue;
   let dist=Math.hypot(p.x-beast.x,p.y-beast.y),a=Math.atan2(beast.y-p.y,beast.x-p.x);
-  if(o.variant==='devoted'){if(dist>45){beast.x=clamp(beast.x-Math.cos(a)*95*dt,-1160,1160);beast.y=clamp(beast.y-Math.sin(a)*95*dt,-860,860)}}else if(dist<150){beast.x=clamp(beast.x+Math.cos(a)*110*dt,-1160,1160);beast.y=clamp(beast.y+Math.sin(a)*110*dt,-860,860)}
+  if(o.variant==='devoted'){if(dist>45){worldMoveEntity(beast,-Math.cos(a)*95*dt,-Math.sin(a)*95*dt,12)}}else if(dist<150){worldMoveEntity(beast,Math.cos(a)*110*dt,Math.sin(a)*110*dt,12)}
   if(Math.hypot(beast.x-o.x,beast.y-o.y)<78){beast.alive=false;objectiveProgress(1)}
  }
  if(o.type==='fungi'&&o.objects){for(const mushroom of o.objects){if(!mushroom.alive)continue;let d=Math.hypot(mushroom.x-p.x,mushroom.y-p.y),a=Math.atan2(mushroom.y-p.y,mushroom.x-p.x);
@@ -816,7 +835,7 @@ function updateObjective(dt){
   // Explosive fungi keep their larger proximity trigger and count on detonation.
   if(mushroom.explosive&&d<54){mushroom.alive=false;game.hazards.push({x:mushroom.x,y:mushroom.y,r:92,timer:.02,dmg:58,kind:'explosiveMushroom',color:'#e9a36d',life:.6});objectiveProgress(1);toast('爆裂蘑菇引爆！');continue}
   if(d<34){mushroom.alive=false;objectiveProgress(1);continue}
-  if(mushroom.scared&&d<190){mushroom.x=clamp(mushroom.x+Math.cos(a)*75*dt,-1130,1130);mushroom.y=clamp(mushroom.y+Math.sin(a)*75*dt,-810,810)}
+  if(mushroom.scared&&d<190){worldMoveEntity(mushroom,Math.cos(a)*75*dt,Math.sin(a)*75*dt,7)}
  }}
  // Soul Sludge is completed by walking over the purple ground patches.
  if(o.type==='sludge'&&o.objects){for(const patch of o.objects){if(!patch.alive)continue;if(Math.hypot(patch.x-p.x,patch.y-p.y)<36){patch.alive=false;objectiveProgress(1);game.fx.push({x:patch.x,y:patch.y,r:30,life:.32,max:.32,color:'#c58be8',type:'ring'})}}}
@@ -941,8 +960,8 @@ if(g.spawn<=0&&activeEnemies<targetEnemies){
 }
 if(g.spawn<=0)g.spawn=spawnRate;
 // enemies
-for(let e of g.enemies){if(e.dead||e.type==='boss')continue;e.hitFlash=Math.max(0,e.hitFlash-dt);e.slow=Math.max(0,e.slow-dt*.025);e.freeze=Math.max(0,e.freeze-dt);e.acid=Math.max(0,e.acid-dt);e.weakness=Math.max(0,(e.weakness||0)-dt);e.burn=Math.max(0,e.burn-dt);if(e.burn>0){e.burnTick=(e.burnTick||0)-dt;if(e.burnTick<=0){e.burnTick=.5;damageEnemy(e,e.burnDmg||4,'burn',null,!!e.wildfire)}}if(e.corruptT>0){e.corruptT-=dt;if(e.corruptT<=0)e.state='chase'}if(e.state==='burrow'){e.stateT-=dt;let a=Math.atan2(p.y-e.y,p.x-e.x);e.x+=Math.cos(a)*e.speed*3*dt;e.y+=Math.sin(a)*e.speed*3*dt;if(e.stateT<=0){e.state='leap';e.stateT=.55;e.leapX=p.x;e.leapY=p.y;game.fx.push({x:e.x,y:e.y,r:55,life:.45,max:.45,color:'#b48ac7',type:'ring'})}continue}if(e.state==='leap'){e.stateT-=dt;let q=1-e.stateT/.55;e.x+=(e.leapX-e.x)*Math.min(1,dt*6);e.y+=(e.leapY-e.y)*Math.min(1,dt*6);if(e.stateT<=0){if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');for(let o of g.enemies)if(o!==e&&!o.dead&&Math.hypot(o.x-e.x,o.y-e.y)<90)damageEnemy(o,200,'gnasher');e.state='chase';e.attack=1.6}continue}
-if(e.freeze>0)continue;let tx=g.bossPending?g.bossPending.x:p.x,ty=g.bossPending?g.bossPending.y:p.y;let dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx),sp=e.speed*(1-e.slow);if(e.state==='corrupt'){let target=nearest(e.x,e.y,360);if(target){let aa=Math.atan2(target.y-e.y,target.x-e.x);e.x+=Math.cos(aa)*sp*dt;e.y+=Math.sin(aa)*sp*dt;if(Math.hypot(target.x-e.x,target.y-e.y)<e.r+target.r)damageEnemy(target,8*dt,'corrupt',e.holyfire?'fire':e.corruptAcid?'acid':e.corruptIce?'ice':e.void?'dark':null,false)}}else if(e.type==='ranged'&&d<300){if(d>210){e.x+=Math.cos(a)*sp*.45*dt;e.y+=Math.sin(a)*sp*.45*dt}else{e.x-=Math.cos(a)*sp*.3*dt;e.y-=Math.sin(a)*sp*.3*dt}e.attack-=dt;if(e.attack<=0){e.attack=2.3;g.shots.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,life:3,dmg:e.dmg*.65,r:6,kind:'enemy',color:'#d28fcb'})}}else{e.x+=Math.cos(a)*sp*dt;e.y+=Math.sin(a)*sp*dt}
+for(let e of g.enemies){if(e.dead||e.type==='boss')continue;e.hitFlash=Math.max(0,e.hitFlash-dt);e.slow=Math.max(0,e.slow-dt*.025);e.freeze=Math.max(0,e.freeze-dt);e.acid=Math.max(0,e.acid-dt);e.weakness=Math.max(0,(e.weakness||0)-dt);e.burn=Math.max(0,e.burn-dt);if(e.burn>0){e.burnTick=(e.burnTick||0)-dt;if(e.burnTick<=0){e.burnTick=.5;damageEnemy(e,e.burnDmg||4,'burn',null,!!e.wildfire)}}if(e.corruptT>0){e.corruptT-=dt;if(e.corruptT<=0)e.state='chase'}if(e.state==='burrow'){e.stateT-=dt;let a=Math.atan2(p.y-e.y,p.x-e.x);e.x+=Math.cos(a)*e.speed*3*dt;e.y+=Math.sin(a)*e.speed*3*dt;if(e.stateT<=0){e.state='leap';e.stateT=.55;e.leapX=p.x;e.leapY=p.y;game.fx.push({x:e.x,y:e.y,r:55,life:.45,max:.45,color:'#b48ac7',type:'ring'})}continue}if(e.state==='leap'){e.stateT-=dt;let q=1-e.stateT/.55,leapStep=Math.min(1,dt*6);worldMoveEntity(e,(e.leapX-e.x)*leapStep,(e.leapY-e.y)*leapStep,Math.max(8,e.r*.55));if(e.stateT<=0){if(Math.hypot(p.x-e.x,p.y-e.y)<60)damagePlayer(e.dmg*1.7,'gnasher');for(let o of g.enemies)if(o!==e&&!o.dead&&Math.hypot(o.x-e.x,o.y-e.y)<90)damageEnemy(o,200,'gnasher');e.state='chase';e.attack=1.6}continue}
+if(e.freeze>0)continue;let tx=g.bossPending?g.bossPending.x:p.x,ty=g.bossPending?g.bossPending.y:p.y;let dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx),sp=e.speed*(1-e.slow);if(e.state==='corrupt'){let target=nearest(e.x,e.y,360);if(target){let aa=Math.atan2(target.y-e.y,target.x-e.x);worldMoveEntity(e,Math.cos(aa)*sp*dt,Math.sin(aa)*sp*dt,e.r);if(Math.hypot(target.x-e.x,target.y-e.y)<e.r+target.r)damageEnemy(target,8*dt,'corrupt',e.holyfire?'fire':e.corruptAcid?'acid':e.corruptIce?'ice':e.void?'dark':null,false)}}else if(e.type==='ranged'&&d<300){if(d>210){worldMoveEntity(e,Math.cos(a)*sp*.45*dt,Math.sin(a)*sp*.45*dt,e.r)}else{worldMoveEntity(e,-Math.cos(a)*sp*.3*dt,-Math.sin(a)*sp*.3*dt,e.r)}e.attack-=dt;if(e.attack<=0){e.attack=2.3;g.shots.push({x:e.x,y:e.y,vx:Math.cos(a)*190,vy:Math.sin(a)*190,life:3,dmg:e.dmg*.65,r:6,kind:'enemy',color:'#d28fcb'})}}else{worldMoveEntity(e,Math.cos(a)*sp*dt,Math.sin(a)*sp*dt,e.r)}
 if(e.type==='gnasher'&&e.state==='chase'){e.attack-=dt;if(e.attack<=0&&d<440){e.state='burrow';e.stateT=1.25;e.attack=4.5;game.fx.push({x:e.x,y:e.y,r:30,life:.3,max:.3,color:'#b48ac7',type:'ring'})}}
 if(e.type==='buffer'){e.heal-=dt;if(e.heal<=0){e.heal=5;let n=0;for(let o of g.enemies){if(!o.dead&&Math.hypot(o.x-e.x,o.y-e.y)<240&&o.hp<o.max){o.hp=Math.min(o.max,o.hp+45);n++;if(n>=4)break}}if(n)game.fx.push({x:e.x,y:e.y,r:80,life:.4,max:.4,color:'#8ad9a6',type:'ring'})}}
 if(e.type==='shield')e.shield=(e.shield||0)>0?e.shield-dt:0;
@@ -1083,7 +1102,7 @@ function bossFireProjectiles(b,a){
 }
 function bossApplyPull(b,a,dt){
  const geo=a.geometry,p=game.player,dx=geo.x-p.x,dy=geo.y-p.y,dist=Math.hypot(dx,dy)||1,def=a.def;
- if(dist<geo.r){const strength=.35+.65*(1-dist/geo.r),step=def.pullSpeed*strength*dt;p.x+=dx/dist*step;p.y+=dy/dist*step;if(dist<118&&!a.hitOnce){a.hitOnce=true;damagePlayer(def.damage,'bossInhale')}}
+ if(dist<geo.r){const strength=.35+.65*(1-dist/geo.r),step=def.pullSpeed*strength*dt;worldMoveEntity(p,dx/dist*step,dy/dist*step,p.r);if(dist<118&&!a.hitOnce){a.hitOnce=true;damagePlayer(def.damage,'bossInhale')}}
 }
 function bossResolveAttack(b,a,dt){
  const def=a.def,p=game.player;
@@ -1113,17 +1132,17 @@ function bossUpdateHomingProjectile(s,dt,p){
 function bossApplyMagneticField(b,dt){
  if(!b.fieldActive||!b.fieldCenter)return;
  const p=game.player,dx=p.x-b.fieldCenter.x,dy=p.y-b.fieldCenter.y,dist=Math.hypot(dx,dy)||1,limit=b.fieldRadius-24;
- if(dist>limit){const pull=Math.min(dist-limit,235*dt);p.x-=dx/dist*pull;p.y-=dy/dist*pull}
+ if(dist>limit){const pull=Math.min(dist-limit,235*dt);worldMoveEntity(p,-dx/dist*pull,-dy/dist*pull,p.r)}
 }
 function spawnBoss(){
- const p=game.player,loc=game.bossPending||{x:p.x+rand(-400,400),y:p.y-520},archetype=pick(BOSS_ARCHETYPES),mult=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;
+ const p=game.player,archetype=pick(BOSS_ARCHETYPES),rawLoc=game.bossPending||{x:p.x+rand(-400,400),y:p.y-520},loc=worldFindOpenPoint(rawLoc.x,rawLoc.y,Math.min(38,archetype.r*.45),360),mult=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;
  const b={id:'boss',type:'boss',bossId:archetype.id,name:archetype.name,x:loc.x,y:loc.y,r:archetype.r,hp:archetype.hp*mult,max:archetype.hp*mult,speed:archetype.speed,attack:2.5,rune:4,stagger:0,vulnerable:0,dead:false,hitFlash:0,elite:true,burn:0,burnDmg:0,acid:0,slow:0,freeze:0,weakness:0,corrupt:0,corruptT:0,age:0,phase:'hunt',phaseT:0,healTimer:8,phaseIndex:0,phaseCount:archetype.phaseCount,headCount:1,phaseTransitionTimer:0,attackCooldown:1.65,attackSequence:0,attackInstance:null,fieldActive:false,fieldCenter:null,fieldRadius:0,fieldHazard:null};
  save.stats.bossesEncountered=(save.stats.bossesEncountered||0)+1;persist();game.boss=b;game.bossPending=null;game.enemies.push(b);toast(archetype.name+' 正在穿越裂隙！');sound(75,.7,'sawtooth',.04);
 }
 function spawnBossHealer(b){
  if(game.enemies.filter(e=>!e.dead&&e.bossHealer).length>=5)return;
  spawnEnemy(false,'buffer');const e=game.enemies[game.enemies.length-1];
- e.x=b.x+rand(-210,210);e.y=b.y+rand(-190,190);e.hp=e.max=400;e.speed=52;e.dmg=22;e.bossHealer=true;e.bossOwnerId=b.id;e.heal=999999;e.elite=false;e.type='buffer';e.state='chase';
+ const open=worldFindOpenPoint(b.x+rand(-210,210),b.y+rand(-190,190),e.r,260);e.x=open.x;e.y=open.y;e.hp=e.max=400;e.speed=52;e.dmg=22;e.bossHealer=true;e.bossOwnerId=b.id;e.heal=999999;e.elite=false;e.type='buffer';e.state='chase';
  game.fx.push({x:e.x,y:e.y,r:55,life:.4,max:.4,color:'#c0e6a0',type:'ring'});
  return e;
 }
@@ -1135,9 +1154,9 @@ function bossUpdateMulMinions(b,dt){
   if(e.dead||!e.bossHealer||e.bossOwnerId!==b.id)continue;
   const dx=b.x-e.x,dy=b.y-e.y,dist=Math.hypot(dx,dy)||1;
   if(e.corruptT>0||e.state==='corrupt'){
-   if(dist>b.r+e.r+16){e.x+=dx/dist*e.speed*1.35*dt;e.y+=dy/dist*e.speed*1.35*dt}
+   if(dist>b.r+e.r+16){worldMoveEntity(e,dx/dist*e.speed*1.35*dt,dy/dist*e.speed*1.35*dt,e.r)}
    else{damageEnemy(b,b.max*(.035+(b.phaseIndex||0)*.008),'corruptedHealer',null,false);e.dead=true;game.fx.push({x:e.x,y:e.y,r:65,life:.45,max:.45,color:'#c98cf0',type:'burst'})}
-  }else{if(dist>82){e.x+=dx/dist*e.speed*dt;e.y+=dy/dist*e.speed*dt}if(dist<250)b.hp=Math.min(b.max,b.hp+dt*b.max*.00072)}
+  }else{if(dist>82){worldMoveEntity(e,dx/dist*e.speed*dt,dy/dist*e.speed*dt,e.r)}if(dist<250)b.hp=Math.min(b.max,b.hp+dt*b.max*.00072)}
  }
 }
 function updateBossEncounter(dt){
@@ -1151,7 +1170,7 @@ function updateBossEncounter(dt){
  if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;bossCancelAttack(b);b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
  b.phaseTransitionTimer=Math.max(0,(b.phaseTransitionTimer||0)-dt);
  const dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx);
- const committedAttack=!!b.attackInstance&&(b.attackInstance.stage==='telegraph'||b.attackInstance.stage==='active');if(b.vulnerable<=0&&b.freeze<=0&&!committedAttack&&b.phaseTransitionTimer<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);b.x+=Math.cos(a)*speed*(1-b.slow)*dt;b.y+=Math.sin(a)*speed*(1-b.slow)*dt}
+ const committedAttack=!!b.attackInstance&&(b.attackInstance.stage==='telegraph'||b.attackInstance.stage==='active');if(b.vulnerable<=0&&b.freeze<=0&&!committedAttack&&b.phaseTransitionTimer<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);worldMoveEntity(b,Math.cos(a)*speed*(1-b.slow)*dt,Math.sin(a)*speed*(1-b.slow)*dt,Math.min(38,b.r*.45))}
  bossApplyMagneticField(b,dt);bossUpdateMulMinions(b,dt);if(b.dead)return;bossUpdateAttack(b,dt);
  const phaseText=b.phaseCount>1?' · 阶段 '+((b.phaseIndex||0)+1)+'/'+b.phaseCount:'';
  const headText=b.bossId==='mul'?' · '+(b.headCount||1)+'首':'';

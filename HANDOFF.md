@@ -87,3 +87,13 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 ## Natural-run probe injection correction
 - The previous selected-character getter was not present on `window` at runtime. The test now injects it adjacent to the pilot's existing `window.__setRunSeed` hook inside the game closure.
 - The Q-ability pilot logic remains injected into the full-run harness. No production game API was added.
+
+
+## Natural prop collision and AI navigation — 2026-11-19
+
+- Trees, stones and bushes now have small solid footprints; grass and flowers remain passable.
+- Decorative blockers are excluded from landmark buffers, the central start/rift safe zone, the river and bridge corridors, and from overlapping prop clusters.
+- Enemy locomotion, ranged spacing, corruption movement, Gnasher leap movement, bosses, boss healers, crabs, beasts and scared fungi use the same collision-aware axis-slide resolver.
+- Boss/minion spawn positions are relocated to clear ground.
+- The map regression now checks prop collision, wall sliding and safe relocation.
+- This is a code-level navigation pass; natural-run tests and human exploration are still required.

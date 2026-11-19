@@ -2,9 +2,9 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "FOUR_WIZARD_NATURAL_RUN_MATRIX_004",
+  "checkpoint": "ONE_REALM_DECOR_COLLISION_AND_AI_NAVIGATION_001",
   "status": "NOT_READY",
-  "updated_at": "2026-11-18",
+  "updated_at": "2026-11-19",
   "scope": {
     "product": "Original-IP single-player browser action roguelite",
     "modes": [
@@ -258,7 +258,12 @@
     "Extended the roster/map browser regression to verify blocking, wall sliding and safe spawn relocation.",
     "Added a four-character deterministic natural-run harness reusing the same non-cheating movement/upgrade pilot and production runtime.",
     "Each wizard receives a separate clean browser context and seed, runs up to 1500 in-game seconds, and must naturally spawn and defeat its boss; no direct game-state or boss mutation is performed.",
-    "Added a temporary non-blocking CI job to collect all-four-wizard full-run telemetry before promoting it to a required release gate."
+    "Added a temporary non-blocking CI job to collect all-four-wizard full-run telemetry before promoting it to a required release gate.",
+    "Added collision footprints for non-decorative-scale trees, stones and bushes; retained grass and flowers as passable ground detail.",
+    "Solid props are rejected from landmark buffers, the starting/rift safe zone, river/bridge corridors and overlapping prop footprints without consuming extra gameplay RNG.",
+    "Player, standard enemies, ranged enemies, corrupted enemies, Gnasher leap movement, bosses, boss healers and moving objective creatures now share the collision-aware world movement resolver.",
+    "Boss and boss-minion spawn points are relocated to open terrain; existing player/objective/chest/enemy spawn relocation now also respects natural props.",
+    "Expanded the roster/map browser regression to prove solid natural-prop collision, wall sliding and safe-point relocation."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -275,9 +280,9 @@
     "Original music/SFX, bespoke character animation, hit reactions, spell VFX and production-quality visual/audio review remain incomplete.",
     "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED.",
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
-    "Landmark collision currently covers authored ruin footprints; random meadow trees/bushes/stones remain non-solid decorative props. Monster pathing and boss movement around structures require natural-run verification."
+    "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence."
   ],
-  "next_action": "Run the four-wizard natural-run harness after correcting the test probe injection point; collect survival and boss telemetry.",
+  "next_action": "Verify the four-wizard natural-run matrix after the production UI harness correction and collision-aware AI migration; fix any real gameplay failures from recorded traces.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -306,7 +311,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "CI_PENDING_AFTER_HUD_FIX_MAP_TERRAIN_CHARACTER_ART_AND_AUDIO_ENGINE",
+  "latest_candidate_ci_status": "ONE_REALM_DECOR_COLLISION_AND_AI_NAVIGATION_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -423,8 +428,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 779131,
-    "status": "ONE_REALM_COLLISION_CI_PENDING",
+    "bytes": 780077,
+    "status": "ONE_REALM_DECOR_COLLISION_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -462,7 +467,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contract tests; browser clock/damage integration; roster/map/ability; objective; save; audio; normal-play regressions. CI recheck pending. Browser visual identity regression added; CI pending. Landmark collision/browser navigation regression added; CI pending.",
+    "core_tests": "22 Node contract tests; browser clock/damage integration; roster/map/ability; objective; save; audio; normal-play regressions. CI recheck pending. Browser visual identity regression added; CI pending. Landmark collision/browser navigation regression added; CI pending. Decor collision and AI navigation regression added; current CI pending.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -491,7 +496,9 @@
       "districts": 6,
       "landmarks": 7,
       "minimap": true,
-      "world_boundary": true
+      "world_boundary": true,
+      "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
+      "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
     "natural_run_matrix": "EXPLORATORY: test-only selected-character access now injects directly into the pilot's existing setRunSeed hook inside the game closure. Q-ability pilot patch retained. Rerun pending."
   },
