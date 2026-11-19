@@ -9,7 +9,6 @@ SPEC=importlib.util.spec_from_file_location("aetherwilds_boss_pilot",PILOT_PATH)
 PILOT=importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(PILOT)
 CHARACTERS=[("aster",41),("ember",42),("briar",43),("nyx",44)]
-MARKER="// Production build: internal debug mutations are test-only and not shipped."
 PILOT_ABILITY_ANCHOR="if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}\n    window.__manualTick=true;"
 PILOT_ABILITY_PATCH="""if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}
     const hpRatio=p.hp/Math.max(1,p.maxHp),closeThreat=game.enemies.some(e=>!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<260);
@@ -22,13 +21,9 @@ PILOT_ABILITY_PATCH="""if(!gnasherThreat&&(chestNear||itemNear)){interact();inte
     );
     if(shouldUseAbility)useCharacterAbility();
     window.__manualTick=true;"""
-PILOT_PROBE_ANCHOR="window.__setRunSeed=(seed)=>{"
-PILOT_PROBE_PATCH="window.__setSelectedWizardForTest=(id)=>{save.selectedCharacterId=id;persist();};window.__getSelectedWizardForTest=()=>game?.player?.characterId||save.selectedCharacterId;\n"+PILOT_PROBE_ANCHOR
-DOCUMENT=(PILOT.DOCUMENT
- .replace(PILOT_PROBE_ANCHOR,PILOT_PROBE_PATCH)
- .replace(PILOT_ABILITY_ANCHOR,PILOT_ABILITY_PATCH))
-assert DOCUMENT!=PILOT.DOCUMENT and DOCUMENT.count("window.__setSelectedWizardForTest")==1
-assert "if(shouldUseAbility)useCharacterAbility();" in DOCUMENT
+DOCUMENT=PILOT.DOCUMENT.replace(PILOT_ABILITY_ANCHOR,PILOT_ABILITY_PATCH)
+assert DOCUMENT!=PILOT.DOCUMENT
+assert DOCUMENT.count("if(shouldUseAbility)useCharacterAbility();")==1
 
 async def main():
  report={"runs":[],"checks":{}}
@@ -43,10 +38,12 @@ async def main():
    page.on("request",lambda r:requests.append(r.url) if r.url.startswith(("http://","https://")) else None)
    page.set_default_timeout(180000)
    await page.set_content(DOCUMENT,wait_until="load")
-   await page.evaluate("(id)=>window.__setSelectedWizardForTest(id)",character)
+   # Select each wizard through the actual production character-selection UI.
+   await page.locator("#selectCharacter").click()
+   await page.locator(f'[data-character="{character}"]').click()
+   selected=await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1')).selectedCharacterId")
    await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
-   await page.locator("#start").click()
-   selected=await page.evaluate("window.__getSelectedWizardForTest()")
+   await page.locator("#characterStart").click()
    state=await asyncio.wait_for(page.evaluate("window.__fullRun(1500,false)"),timeout=180)
    natural_win=bool(state["bossDead"] and state["ended"] and state["screen"]=="result" and state["wins"]>=1)
    row={
