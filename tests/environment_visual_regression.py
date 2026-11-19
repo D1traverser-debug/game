@@ -10,7 +10,7 @@ assert SOURCE.count(MARKER) == 1
 
 PROBE = r"""
 window.__environmentProbe = {
- ready: () => ['v2riverShimmer','v2ambientWorld','v2filmGrain','v2spellImpact'].every(n => typeof window[n] === 'function'),
+ ready: () => [typeof v2riverShimmer,typeof v2ambientWorld,typeof v2filmGrain,typeof v2spellImpact].every(t => t === 'function'),
  render: (kind, time) => {
   const oldCtx=ctx, oldAge=V2.age, off=document.createElement('canvas');
   off.width=640;off.height=480;ctx=off.getContext('2d');V2.age=time;
@@ -29,7 +29,7 @@ window.__environmentProbe = {
  },
  grain: () => ({count:Array.isArray(V2.grain)?V2.grain.length:0,width:V2.grain?.[0]?.width||0,height:V2.grain?.[0]?.height||0}),
  sourceChecks: () => ({
-  no_random_calls:['v2riverShimmer','v2ambientWorld','v2filmGrain','v2spellImpact'].every(n=>!String(window[n]).includes('Math.random')&&!String(window[n]).includes('worldRandom')),
+  no_random_calls:[String(v2riverShimmer),String(v2ambientWorld),String(v2filmGrain),String(v2spellImpact)].every(src=>!src.includes('Math.random')&&!src.includes('worldRandom')),
   ambient_connected:String(drawWorld).includes('v2ambientWorld(cx,cy,rw,rh)'),
   film_grain_connected:String(drawWorld).includes('v2filmGrain(w,h)'),
   river_connected:String(drawMapEnvironment).includes('v2riverShimmer()'),
