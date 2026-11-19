@@ -298,3 +298,13 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - Offline artifact: [aetherwilds-browser-preview](https://github.com/D1traverser-debug/game/actions/runs/44491163465/artifacts/14513370931); artifact ID 14513370931; ZIP 514,562 bytes. HTML source is 800,030 bytes, SHA-256 b985aa5f1227ed10e55d6ed3522f12fe5cf45c2e83b38568e09f0e8aada2a34d.
 - Product remains NOT_READY. Automation does not substitute for human playtest, physical iOS/Android/controller tests, representative hardware performance, source-version content reconciliation, final art/audio, or owner/independent acceptance.
 - Next engineering slice is a bounded deterministic gameplay-RNG audit and integration. Classify current random calls first; preserve separate render/audio randomness and avoid a bulk rewrite. CAOS repository remains outside this game task and unchanged.
+
+
+## Deterministic RNG boundary audit — 2026-11-19
+
+- Audit document: `docs/experiments/DETERMINISTIC_RNG_AUDIT_001.md`.
+- Source inspection found 28 textual `Math.random()` occurrences (including generic `rand`/`pick` definitions), 45 `rand(` references and 11 `pick(` references. Gameplay, collision-bearing world layout, rendering and audio currently have mixed entropy ownership.
+- Existing `web/src/core/seeded-rng.mjs` is a PCG-XSH-RR implementation with unit tests; `web/src/core/spell-system.mjs` already uses it for random targeting. The production browser simulation does not yet inject it.
+- Do not globally replace `Math.random`: camera shake and static decor must not consume the per-run stream; local background/audio LCGs remain isolated. Random-comparator sorts must be replaced by deterministic Fisher–Yates only when their subsystem is integrated.
+- Next bounded slice: per-run RNG for objective selection/generation, with same-seed trace, different-seed divergence, render/audio isolation, pause/resume and replay-seed tests. No runtime code changed during this audit.
+- CAOS remains outside this game task and unchanged.

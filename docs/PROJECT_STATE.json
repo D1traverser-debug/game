@@ -322,14 +322,15 @@
     "Reworked the procedural soundtrack into a denser adaptive score with deterministic synthesized percussion, character-specific melodic motifs, boss-phase tension and low-health tension layers; expanded audio regression to verify these layers.",
     "GitHub Actions run 44484418951 passed all 24 jobs on commit 63fd96aeeaacabffd2fc0f211b3d973cd2e9e83a; Chromium/Firefox/WebKit desktop-mobile smoke passed and four natural wizard runs won their bosses.",
     "GitHub Actions run 44491163465 passed all 24 jobs on commit 266928c87a8ad5c4fd3340f258b34d348aa0ca9f; Chromium/Firefox/WebKit desktop-mobile smoke, 4/4 automated natural wizard boss wins, offline package, and exact 17/17 spell-catalogue checks passed.",
-    "Exact catalogue regression on run 44491163465: 25 runtime definitions, 18 eligible solo IDs, 14 shared quest unlocks, four unique starters, seven excluded legacy signatures, migration, grant/rejection, size-upgrade eligibility, atlas and offline/no-error checks all passed."
+    "Exact catalogue regression on run 44491163465: 25 runtime definitions, 18 eligible solo IDs, 14 shared quest unlocks, four unique starters, seven excluded legacy signatures, migration, grant/rejection, size-upgrade eligibility, atlas and offline/no-error checks all passed.",
+    "Completed deterministic RNG boundary audit: 28 direct Math.random source occurrences (including rand/pick helper definitions), 45 rand references and 11 pick references classified. Identified mixed gameplay/render helper and random-sort shuffles; no runtime call sites changed."
   ],
   "failed_or_open": [
     "The four wizards still share a base atlas body beneath distinct mantles, headpieces, weapons and palettes; bespoke production rigs and authored animation remain incomplete.",
     "Production-quality original environment, enemy, spell VFX, UI, animation, music and SFX assets are incomplete; current art/audio includes procedural placeholders.",
     "The full source-version content manifest remains unresolved across spells, augments, elements/infusions, enemies, objectives, bosses, quests and meta progression.",
     "Physical iOS Safari/Android Chrome, real hardware controllers, representative GPU performance, memory and 15-minute stability are NOT_TESTED; current Chromium/Firefox/WebKit automation passed.",
-    "The modular simulation core is partial: fixed-step clock and damage pipeline are integrated; seeded RNG, event buffer, input validator, projectile and spell modules remain independent contracts.",
+    "The modular simulation core remains partial: fixed-step clock and damage pipeline are integrated; deterministic RNG boundary audit is complete but per-run browser integration is not started; event buffer, input validator, projectile and spell modules remain independent contracts.",
     "Map collision and navigation code has automated coverage, but real-player exploration and landmark/river/bridge readability review remain incomplete.",
     "Save import/export file chooser/download behavior on physical and cross-browser targets remains unverified despite Chromium automation passing.",
     "The procedural adaptive soundtrack and SFX have not received owner listening/loudness acceptance or been replaced by authored/recorded production assets.",
@@ -337,7 +338,7 @@
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
     "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines."
   ],
-  "next_action": "Audit the deterministic-RNG boundary before integrating it: classify each runtime random call as gameplay, rendering, audio or UI; keep rendering/audio streams isolated; define per-run seed/reset semantics; then integrate one bounded gameplay system with same-seed reproducibility and existing natural-run behavior checks. Do not bulk-replace Math.random or rewrite the monolith.",
+  "next_action": "Integrate deterministic RNG in one bounded gameplay subsystem (objective selection/generation) using the audited entropy boundaries. Add same-seed trace, different-seed divergence, render/audio isolation, pause/resume and replay-seed tests. Do not bulk-replace Math.random or rewrite the monolith.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -640,6 +641,7 @@
     "Renamed the implemented 18-ID shared solo spell allowlist from the stale Reginald-only identifier and aligned its regression test and research notes with the four-wizard product.",
     "Hardening the shared spell catalogue regression to assert the exact 25 runtime definitions, exact 18 eligible IDs, fourteen shared quest unlocks, four unique character starters, all research entries, save migration and size-upgrade eligibility. The candidate is not yet CI-verified.",
     "The first exact-catalogue test candidate exposed a test-probe scope mismatch: SIZE_UPGRADE_SPELLS was local to offerUpgrade. Moved the unchanged eligibility Set to shared scope so the regression can inspect it; no upgrade values or runtime eligibility changed.",
-    "Moved SIZE_UPGRADE_SPELLS to shared scope without changing eligibility values; exact-catalogue regression then passed 17/17 and full CI passed 24/24 on 266928c."
+    "Moved SIZE_UPGRADE_SPELLS to shared scope without changing eligibility values; exact-catalogue regression then passed 17/17 and full CI passed 24/24 on 266928c.",
+    "Documented RNG stream ownership and bounded first integration slice: per-run SeededRng for objective generation, separate fixed world-layout/presentation/audio streams, and reproducibility/isolation acceptance tests."
   ]
 }
