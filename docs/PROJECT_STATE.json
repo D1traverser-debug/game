@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BOSS_FIELD_COLLISION_AWARE_FIXTURE_001",
+  "checkpoint": "SINGLE_PLAYER_SAVE_EXPORT_IMPORT_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -277,7 +277,10 @@
     "Mobile start-flow regression now reads the game state through its injected test-only closure probe rather than attempting to access IIFE-local variables from the page global scope.",
     "Corrected natural-run selection assertion to inspect the selected state of the actual production character card. The prior test read localStorage from Playwright's opaque about:blank origin and failed with SecurityError; real-origin localStorage persistence remains covered by save_persistence_regression.py.",
     "Corrected the boss pull snapshot test to search the actual map for a clear movement lane before asserting movement toward the snapshotted attack origin; solid landmark and prop collision remains enabled.",
-    "Boss magnetic-field regression now places the player outside the field boundary on a verified unobstructed inward movement lane. The prior synthetic point could overlap a solid map landmark, causing the legitimate collision resolver to block the pull."
+    "Boss magnetic-field regression now places the player outside the field boundary on a verified unobstructed inward movement lane. The prior synthetic point could overlap a solid map landmark, causing the legitimate collision resolver to block the pull.",
+    "Added user-facing JSON save export/import in the camp, with a versioned AETHERWILDS_SAVE envelope, a 512 KB size cap, format/schema validation, current-save recovery archive before import, schema normalization and immediate persistence.",
+    "Extended real-origin save regression to verify exported payload contents, restoration of gold and selected wizard, and rejection of unsupported save versions without overwriting the active save.",
+    "Corrected a duplicated 'THE' in the main menu's world-title artwork."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -294,9 +297,9 @@
     "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED.",
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
     "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
-    "Save export/import UI and multi-device synchronization are not implemented; browser-origin persistence, backup recovery and corruption fallback now have automated regression coverage."
+    "Save import/export is implemented and under CI verification; cross-browser file chooser/download behavior still requires Firefox/WebKit and physical-device acceptance."
   ],
-  "next_action": "Rerun boss encounter regression and full CI; investigate remaining natural-run deaths using damage and objective telemetry, then tune production balance only where evidence supports it.",
+  "next_action": "Verify save export/import in CI; then continue combat balance and objective acceptance, bespoke character animation/VFX and cross-browser/device testing.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -325,7 +328,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "BOSS_FIELD_COLLISION_AWARE_FIXTURE_CI_PENDING",
+  "latest_candidate_ci_status": "SAVE_EXPORT_IMPORT_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,

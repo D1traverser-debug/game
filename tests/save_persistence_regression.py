@@ -1,6 +1,8 @@
 """Real-origin offline startup and persistent wizard-selection regression."""
 import asyncio
 import json
+import os
+import tempfile
 import threading
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -37,6 +39,52 @@ async def main():
             await page.locator("#selectCharacter").click()
             classes = await page.locator('[data-character="nyx"]').get_attribute("class")
             report["checks"]["selection_survives_reload"] = "selected" in classes
+            await page.locator("#characterBack").click()
+            await page.evaluate("""() => {
+                const key = "spellbrigade_solo_v1";
+                const data = JSON.parse(localStorage.getItem(key));
+                data.gold = 321;
+                localStorage.setItem(key, JSON.stringify(data));
+                localStorage.setItem(key + "_backup", JSON.stringify(data));
+            }""")
+            await page.reload(wait_until="load")
+            await page.locator("#camp").click()
+            report["checks"]["camp_save_tools_visible"] = await page.locator("#saveExport").is_visible() and await page.locator("#saveImport").is_visible()
+            async with page.expect_download() as download_info:
+                await page.locator("#saveExport").click()
+            download = await download_info.value
+            export_path = await download.path()
+            with open(export_path, "r", encoding="utf-8") as handle:
+                exported = json.load(handle)
+            report["export"] = {"format": exported.get("format"), "formatVersion": exported.get("formatVersion"), "gold": exported.get("save", {}).get("gold"), "selectedCharacterId": exported.get("save", {}).get("selectedCharacterId")}
+            report["checks"]["save_export_contains_valid_versioned_payload"] = exported.get("format") == "AETHERWILDS_SAVE" and exported.get("formatVersion") == 1 and exported.get("save", {}).get("gold") == 321 and exported.get("save", {}).get("selectedCharacterId") == "nyx"
+            await page.evaluate("""() => {
+                const key = "spellbrigade_solo_v1";
+                const data = JSON.parse(localStorage.getItem(key));
+                data.gold = 999;
+                data.selectedCharacterId = "aster";
+                localStorage.setItem(key, JSON.stringify(data));
+                localStorage.setItem(key + "_backup", JSON.stringify(data));
+            }""")
+            await page.reload(wait_until="load")
+            await page.locator("#camp").click()
+            await page.locator("#saveImportFile").set_input_files(export_path)
+            await page.wait_for_function("document.getElementById('toast').textContent.includes('存档已导入')", timeout=5000)
+            imported = await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1'))")
+            report["import"] = {"gold": imported.get("gold"), "selectedCharacterId": imported.get("selectedCharacterId"), "schemaVersion": imported.get("schemaVersion")}
+            report["checks"]["save_import_restores_exported_progress"] = imported.get("gold") == 321 and imported.get("selectedCharacterId") == "nyx" and imported.get("schemaVersion") == 4
+            with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as invalid:
+                invalid.write(json.dumps({"format": "AETHERWILDS_SAVE", "formatVersion": 99, "save": {}}))
+                invalid_path = invalid.name
+            try:
+                await page.locator("#saveImportFile").set_input_files(invalid_path)
+                await page.wait_for_function("document.getElementById('toast').textContent.includes('存档导入失败')", timeout=5000)
+                after_invalid = await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1'))")
+                report["checks"]["unsupported_import_is_rejected_without_overwriting_save"] = after_invalid.get("gold") == 321 and after_invalid.get("selectedCharacterId") == "nyx"
+            finally:
+                os.unlink(invalid_path)
+            await page.locator("#campBack").click()
+            await page.locator("#selectCharacter").click()
             await page.locator("#characterStart").click()
             await page.wait_for_timeout(250)
             report["run"] = {

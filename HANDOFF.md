@@ -148,3 +148,14 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - The Krog'wa arena-field test now finds an unobstructed map point outside the field radius and verifies that the magnetic pull reduces distance to the field center.
 - The previous fixed test coordinate could overlap a solid landmark, so the collision resolver correctly blocked movement and produced a false negative.
 - No boss attack or player collision behavior was changed. Re-run CI to confirm.
+
+
+## Single-player save export/import — 2026-11-19
+
+- Camp now provides JSON export and import.
+- Export format is versioned with the AETHERWILDS_SAVE identifier and the current save schema.
+- Import rejects files above 512 KB, unknown format versions, future save schemas, malformed objects and invalid persistent currency/counters.
+- Valid imports are normalized through the same save migration path and persisted immediately.
+- Before import, the prior primary and backup records are copied into the recovery archive.
+- Browser regression covers download payload, restore of gold and selected wizard, and rejection of unsupported format versions without overwriting the current save.
+- Fixed the duplicated word in the menu's realm title.
