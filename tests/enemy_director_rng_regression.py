@@ -72,6 +72,10 @@ window.__enemyDirectorProbe={
   game.player.x=0;game.player.y=0;game.seenObjectives=[];
   startObjective();
   return {before,after:game.enemyRng.state.toString()};
+ },
+ finishSeed(seed) {
+  startRun(seed);finish(false,true);
+  return {text:$('resultStats').innerText,seed:game.runSeed,version:RUN_RNG_VERSION,enemySequence:game.enemyRngSequence};
  }
 };
 """
@@ -99,6 +103,7 @@ async def main():
   allocator=await page.evaluate("(seed)=>window.__enemyDirectorProbe.allocator(seed)",20261119)
   cap=await page.evaluate("(seed)=>window.__enemyDirectorProbe.cap(seed)",20261119)
   objectiveIsolation=await page.evaluate("(seed)=>window.__enemyDirectorProbe.objectiveIsolation(seed)",20261119)
+  result=await page.evaluate("(seed)=>window.__enemyDirectorProbe.finishSeed(seed)",20261119)
   unique={signature(row) for row in samples}
   types={enemy["type"] for row in samples for enemy in row["rows"]}
   ids=baseline["rows"] and [row["id"] for row in baseline["rows"]]
@@ -118,6 +123,7 @@ async def main():
   report["checks"]["enemy_population_director_respects_target"]=director["before"]==12 and director["afterFirst"]==14 and director["afterSecond"]==15 and director["target"]==25
   report["checks"]["enemy_population_cap_and_id_allocator_hold"]=cap["count"]==64 and cap["next"]==65 and cap["nextAfter"]==65 and cap["state"]==cap["stateAfter"] and len(set(cap["ids"]))==64
   report["checks"]["enemy_rng_metadata_is_versioned"]=baseline["enemyRngVersion"]=="pcg-xsh-rr32-v1" and baseline["enemyRngSequence"]==0xE11E
+  report["checks"]["run_seed_algorithm_and_enemy_sequence_are_visible_on_result"]=str(result["seed"]) in result["text"] and result["version"] in result["text"] and str(result["enemySequence"]) in result["text"]
   report["checks"]["no_runtime_errors"]=not report["page_errors"] and not report["console_errors"]
   report["checks"]["offline_no_external_requests"]=not report["external_requests"]
   report["pass"]=all(report["checks"].values())

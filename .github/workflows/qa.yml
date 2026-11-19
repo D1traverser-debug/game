@@ -3,7 +3,7 @@ on:
   push:
     branches: [development, main, full-game]
   pull_request:
-    branches: [main, full-game]
+    branches: [main, full-game, work/objective-rng-integration-001]
   workflow_dispatch:
 
 jobs:
