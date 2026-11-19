@@ -32,3 +32,8 @@ No networking, extra realms, Unity/native build or larger character roster is pl
 ## Production art/audio pass — 2026-11-19 candidate
 
 A first original-IP wizard identity pass is integrated: four unique sprite rows, four action poses per wizard, selection portraits, movement/cast/ability-driven pose selection and character-specific animated orbit VFX. The procedural score now has four distinct character motifs and sparse forest ambience calls. The pass is awaiting CI and live browser inspection; it does not close the remaining environment/enemy/spell/UI art inventory, recorded audio decision, owner listening review or release acceptance.
+
+
+## Environment/VFX presentation candidate — 2026-11-20
+
+A bounded renderer pass adds animated water caustics, deterministic world-space ambience, a subtle moving grain layer and richer spell-impact geometry. The automated visual gate verifies these effects are wired into the 2.5D play path and remain independent of gameplay randomness. Next priorities remain authored enemy/creature animation, spell-specific VFX, UI hierarchy, source-version content reconciliation and human playtest.

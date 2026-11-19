@@ -2,9 +2,9 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "PRODUCTION_ART_AUDIO_CANDIDATE_001_PENDING",
+  "checkpoint": "PRODUCTION_ENVIRONMENT_VFX_CANDIDATE_001_PENDING",
   "status": "NOT_READY",
-  "updated_at": "2026-11-19",
+  "updated_at": "2026-11-20",
   "scope": {
     "product": "Original-IP single-player browser action roguelite",
     "modes": [
@@ -332,7 +332,7 @@
   ],
   "failed_or_open": [
     "Four unique original wizard sprite rows and idle/walk/cast/ability poses now render from a bespoke 4x4 atlas; final silhouette readability, pose timing, hit feedback and owner acceptance remain open.",
-    "Original wizard identity art is integrated, but production-quality environment, enemy, spell VFX, UI and complete animation coverage remain incomplete.",
+    "Original wizard identity art is integrated; deterministic environment atmosphere and layered spell-impact presentation now have a CI-pending candidate, while bespoke enemy animation, spell-specific VFX, UI and full animation coverage remain incomplete.",
     "The full source-version content manifest remains unresolved across spells, augments, elements/infusions, enemies, objectives, bosses, quests and meta progression.",
     "Physical iOS Safari/Android Chrome, real hardware controllers, representative GPU performance, memory and 15-minute stability are NOT_TESTED; current Chromium/Firefox/WebKit automation passed.",
     "Deterministic RNG integration is partial: per-run PCG covers objective generation and a fixed world-layout stream covers collision-bearing decoration; enemy director, combat, loot, level-up, spell, chest and boss random call sites remain on legacy randomness.",
@@ -343,7 +343,7 @@
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
     "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines."
   ],
-  "next_action": "Run the full required CI matrix on work/production-art-vfx-audio-002. Inspect the wizard atlas decode, portraits, all four action poses, animated VFX, adaptive music motifs, audio mixer, offline package and natural-run gates. If green, inspect the packaged browser build and record exact evidence; then request owner visual/audio acceptance. Product remains NOT_READY.",
+  "next_action": "Run the full required CI matrix on work/production-environment-vfx-001. Inspect the environment visual regression and packaged browser artifact; then continue enemy/creature animation, spell-specific VFX and UI art. Product remains NOT_READY.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -361,18 +361,18 @@
   },
   "latest_local_candidate": {
     "artifact": "index.html",
-    "delivery_filename": "Aetherwilds-Production-Art-Audio-Candidate.html",
-    "bytes": 842422,
-    "sha256": "f25f45870d83db5a40bbafded5068d5ddca1e544c67cf051d983ac401b021fc9",
-    "source_base": "objective RNG integration candidate plus original four-wizard art, action-pose renderer, character-specific VFX and adaptive music pass",
-    "repository_sync": "SYNCED_TO_GITHUB_BRANCH_EXACT_BYTES",
-    "scope": "single-player / four original wizards / Verdant Wilds / offline HTML",
-    "tested": "Pending candidate CI. Added original 4x4 AVIF wizard atlas, four action poses per wizard, portrait integration, animated character-specific VFX and distinct adaptive music motifs.",
+    "delivery_filename": "Aetherwilds-Environment-VFX-Candidate.html",
+    "bytes": 847131,
+    "sha256": "PENDING_CI_MANIFEST",
+    "source_base": "green original wizard art/audio candidate plus deterministic environment atmosphere and layered spell-impact renderer",
+    "repository_sync": "COMMIT_PENDING",
+    "scope": "single-player / four original wizards / one Verdant Wilds realm / offline HTML",
+    "tested": "Environment visual regression authored and wired into required CI; full candidate CI pending.",
     "not_tested": "Owner visual/audio acceptance, physical device/controller compatibility, hardware performance, full content source-fidelity audit and release acceptance.",
-    "branch": "work/production-art-vfx-audio-002",
-    "status": "PRODUCTION_ART_AUDIO_CANDIDATE_PENDING_CI"
+    "branch": "work/production-environment-vfx-001",
+    "status": "PRODUCTION_ENVIRONMENT_VFX_CANDIDATE_PENDING_CI"
   },
-  "latest_candidate_ci_status": "PENDING_PRODUCTION_ART_AUDIO_CANDIDATE_CI",
+  "latest_candidate_ci_status": "PENDING_PRODUCTION_ENVIRONMENT_VFX_CANDIDATE_CI",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44491163465,
@@ -500,11 +500,11 @@
     "note": "Historical Unity skeleton only; not production target or active CI."
   },
   "web_game_artifact": {
-    "branch": "work/production-art-vfx-audio-002",
+    "branch": "work/production-environment-vfx-001",
     "path": "index.html",
-    "bytes": 842422,
-    "status": "CANDIDATE_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
-    "renderer_default": "2.5D atlas renderer with original four-wizard action atlas",
+    "bytes": 847131,
+    "status": "ENVIRONMENT_VFX_CANDIDATE_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
+    "renderer_default": "2.5D atlas renderer with original four-wizard action atlas, deterministic world atmosphere and layered spell-impact VFX",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "offline-capable static browser package with local ES modules; no external runtime CDN",
     "map": "verdant_wilds · 2400x1800 · six districts · seven landmarks",
@@ -652,6 +652,7 @@
     "Implemented bounded PCG objective RNG candidate: per-run seed/stream for objective selection, variants, spawn offsets and brazier Fisher–Yates order; fixed/versioned world-layout stream for collision-bearing decoration; result-screen seed/version; browser regression added to CI. Full-run RNG migration remains incomplete.",
     "First CI run 44505974849: package integrity check passed with index.html 803536 bytes and SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667; objective_rng_regression passed. The checkpoint guard failed only because PROJECT_STATE still recorded 803533 bytes; metadata corrected, full CI rerun pending.",
     "Objective RNG candidate full CI is green: run 44507473452, 25/25 jobs. All four natural wizard runs win after test-only seed fixture recalibration (Aster 45, Ember 42, Briar 43, Nyx 48). No production combat/balance changes were made for the recalibration.",
-    "Production art/audio candidate on work/production-art-vfx-audio-002: generated and integrated an original 4x4 AVIF atlas (Aster/Ember/Briar/Nyx × idle/walk/cast/ability), selection portraits, action-driven in-world poses, deterministic character-specific orbit VFX, four adaptive music motifs and forest bird ambience. Added visual/art/audio regressions and build-time offline atlas embedding. CI pending; no owner acceptance claimed."
+    "Production art/audio candidate on work/production-art-vfx-audio-002: generated and integrated an original 4x4 AVIF atlas (Aster/Ember/Briar/Nyx × idle/walk/cast/ability), selection portraits, action-driven in-world poses, deterministic character-specific orbit VFX, four adaptive music motifs and forest bird ambience. Added visual/art/audio regressions and build-time offline atlas embedding. CI pending; no owner acceptance claimed.",
+    "Environment/VFX presentation candidate on work/production-environment-vfx-001: added deterministic animated river shimmer, world-anchored pollen/fireflies, three-frame film grain and layered spell beam/slash/burst/ring impacts. Added environment_visual_regression.py to required CI. No gameplay RNG changes; CI pending."
   ]
 }

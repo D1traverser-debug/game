@@ -350,3 +350,12 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 - CAOS remains read-only and unchanged.
 
 - CI plumbing: the objective-RNG base branch now triggers the full PR matrix for objective/enemy feature branches and runs `python scripts/build_game.py --check` before packaging, so the embedded wizard atlas must be reproducible from its versioned source asset.
+
+
+## Environment atmosphere and spell-impact candidate — 2026-11-20
+
+- Stacked branch: `work/production-environment-vfx-001`, based on the green original wizard art/audio candidate `db0c29119cb0da62f977d9300b57343f476275dd`.
+- Added deterministic animated river shimmer, world-anchored ambient motes, three pre-baked grain frames and layered spell beam/slash/burst/ring rendering to the 2.5D Canvas path.
+- Presentation code uses `V2.age` and stable coordinate hashes only; no `Math.random`, world-layout RNG or per-run RNG calls were added.
+- Added `tests/environment_visual_regression.py` and wired it into the required browser-content-visual matrix. CI pending.
+- This does not close bespoke enemy animation, full spell-specific VFX, UI art, source-game fidelity, owner visual acceptance or physical-device/performance gates. Product remains `NOT_READY`; CAOS remains read-only.

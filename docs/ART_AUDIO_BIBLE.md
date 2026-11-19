@@ -34,3 +34,8 @@ No copied commercial character/creature designs, extracted assets or proprietary
 - Replaced the shared index-based lead phrase with four character-specific interval motifs while retaining the existing harmonic pad, bass pulse, percussion, boss tension layer and independent volume controls.
 - Added sparse, deterministic forest bird-call phrases to the ambience channel. They respect the ambience slider and master mute, and do not advance gameplay RNG.
 - Music and ambience remain procedural Web Audio, not recorded production stems. Mix translation, loudness, fatigue, headphones/speakers and owner listening acceptance remain open.
+
+
+## Environment atmosphere and spell-impact presentation — 2026-11-20 candidate
+
+The 2.5D renderer adds deterministic moving river highlights, world-anchored pollen/fireflies, a three-frame film-grain overlay and layered beam/slash/burst/ring impacts. These effects use render time and coordinate hashes only; they do not consume gameplay RNG or add runtime network assets. The environment visual regression checks visible output, temporal variation, render-path wiring, offline behavior and runtime errors. This is an original atmospheric treatment, not source-game asset parity or owner acceptance.
