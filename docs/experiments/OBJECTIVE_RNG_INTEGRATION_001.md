@@ -3,8 +3,8 @@
 Date: 2026-11-19
 Branch: `work/objective-rng-integration-001`
 Base: `full-game` at `d9abb5401ad7f68e886958f910868363c1c046e0`
-Implementation commit: `9f9bf30df53fcde93b05ec035e2588b5dd163c73`
-Status: IMPLEMENTED · CI PENDING · OWNER ACCEPTANCE NOT REQUESTED
+Implementation commits: `9f9bf30df53fcde93b05ec035e2588b5dd163c73` (integration), `fb9b88b372f78f8be1338113463dbdedf26d9424` (closed build marker), `74f232620439c5d93e9c9cec9c81b1a283a701a3` (executable-source assertion)
+Status: IMPLEMENTED · FULL CI PASS (25/25) · OWNER ACCEPTANCE PENDING
 
 ## Scope
 
@@ -40,3 +40,17 @@ The natural-run harnesses also pass their fixed seeds into the new run RNG, pres
 This slice does not make the entire game deterministic. Enemy director, combat, loot, level-up offers, spell execution, chest placement and boss selection still use legacy random call sites. It does not change gameplay balance or map geometry. Product status remains `NOT_READY`.
 
 CAOS is read-only and was not modified.
+
+
+## First CI attempt
+
+Run `44505974849` passed the offline package check and the new `objective_rng_regression` browser job. The browser job reported 32 unique objective traces from 32 seeds, coverage of all nine objective families, stable world-layout signature across run seeds, unchanged run-RNG state through render/audio/pause/resume, eight unique ordinary run seeds, visible seed/version on the result screen, and no runtime errors or external requests. The checkpoint job failed only because the project-state artifact byte count had not yet been updated from 803533 to the generated 803536 bytes. The project state now records the exact package SHA-256 and byte count; the full matrix must rerun before this candidate can be considered green.
+
+
+## Full CI acceptance result — 2026-11-19
+
+GitHub Actions run `44507473452` on commit `b99802cb1bc300a22dce1780d969cd42541db02c` completed `success`, 25/25 jobs. The objective RNG browser regression passed 32/32 unique traces across all nine objective families, world-layout independence, render/audio/pause isolation, fresh run seeds, result diagnostics and offline/no-error checks. Chromium, Firefox and WebKit compatibility jobs passed. The four-wizard natural-run gate passed: Aster (seed 45) defeated Mul'gath at 1322.9s; Ember (seed 42) defeated Sol'phish at 1242.5s; Briar (seed 43) defeated Sol'phish at 1190.8s; Nyx (seed 48) defeated Mul'gath at 1226.4s. All four reached the result screen with one win. Seeds 45/42/43/48 are test-fixture recalibration only; production combat/balance values were not changed.
+
+The uploaded offline package is artifact `14519897430` (516232-byte ZIP; SHA-256 `bb95c95e44437837782173cfa1da6b59b72546045785dcdf7ab16f13ca45dff1`). Embedded `index.html` is 803536 bytes with SHA-256 `ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667`.
+
+Automated acceptance for this bounded slice is complete. The PR remains draft and unmerged pending owner review. This is not full-run deterministic replay; enemy director, combat, loot, level-up, spell, chest and boss randomness still require separate migrations. Product status remains `NOT_READY`.
