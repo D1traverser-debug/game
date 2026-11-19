@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "ONE_REALM_DECOR_COLLISION_AND_AI_NAVIGATION_001",
+  "checkpoint": "SAVE_RECOVERY_AND_ONE_REALM_NAVIGATION_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -263,13 +263,15 @@
     "Solid props are rejected from landmark buffers, the starting/rift safe zone, river/bridge corridors and overlapping prop footprints without consuming extra gameplay RNG.",
     "Player, standard enemies, ranged enemies, corrupted enemies, Gnasher leap movement, bosses, boss healers and moving objective creatures now share the collision-aware world movement resolver.",
     "Boss and boss-minion spawn points are relocated to open terrain; existing player/objective/chest/enemy spawn relocation now also respects natural props.",
-    "Expanded the roster/map browser regression to prove solid natural-prop collision, wall sliding and safe-point relocation."
+    "Expanded the roster/map browser regression to prove solid natural-prop collision, wall sliding and safe-point relocation.",
+    "Added a rotating last-known-good localStorage backup; every successful save commit updates both the primary and backup records.",
+    "Corrupt primary saves are quarantined and restored from the backup; if both copies are invalid, both raw values are preserved in a recovery archive and a clean schema-v4 save is initialized.",
+    "Persistent gold, run counters, wins and best-time fields are normalized to finite non-negative values before the save is committed."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
     "Production-quality original character, enemy, realm, animation, spell VFX, UI, music and SFX assets are not complete.",
     "Full wizard/spell/element/infusion/augmentation/enemy/objective/boss/quest/trial/meta inventories need source-version reconciliation.",
-    "Browser-origin save/reload, migration, corruption recovery, backup/export and multi-device persistence are NOT_TESTED.",
     "Firefox, WebKit, mobile Safari, Android Chrome, physical GPU performance and 15-minute stability are NOT_TESTED.",
     "Website hosting, TLS, authoritative room service deployment, monitoring and rollback are NOT_CONFIGURED.",
     "Human owner playtest and independent commercial-quality gameplay/art/audio/network acceptance are NOT_DONE.",
@@ -280,9 +282,10 @@
     "Original music/SFX, bespoke character animation, hit reactions, spell VFX and production-quality visual/audio review remain incomplete.",
     "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED.",
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
-    "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence."
+    "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
+    "Save export/import UI and multi-device synchronization are not implemented; browser-origin persistence, backup recovery and corruption fallback now have automated regression coverage."
   ],
-  "next_action": "Verify the four-wizard natural-run matrix after the production UI harness correction and collision-aware AI migration; fix any real gameplay failures from recorded traces.",
+  "next_action": "Validate save recovery and natural-run outcomes on the current build; then finish browser compatibility, performance, and final presentation review.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -311,7 +314,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "ONE_REALM_DECOR_COLLISION_AND_AI_NAVIGATION_CI_PENDING",
+  "latest_candidate_ci_status": "SAVE_RECOVERY_AND_ONE_REALM_NAVIGATION_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -428,8 +431,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 780077,
-    "status": "ONE_REALM_DECOR_COLLISION_CI_PENDING",
+    "bytes": 781456,
+    "status": "SAVE_RECOVERY_AND_DECOR_COLLISION_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -467,7 +470,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contract tests; browser clock/damage integration; roster/map/ability; objective; save; audio; normal-play regressions. CI recheck pending. Browser visual identity regression added; CI pending. Landmark collision/browser navigation regression added; CI pending. Decor collision and AI navigation regression added; current CI pending.",
+    "core_tests": "22 Node contract tests; browser clock/damage integration; roster/map/ability; objective; save; audio; normal-play regressions. CI recheck pending. Browser visual identity regression added; CI pending. Landmark collision/browser navigation regression added; CI pending. Decor collision and AI navigation regression added; current CI pending. Save backup/corruption recovery regression added; current CI pending.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",

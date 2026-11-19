@@ -367,7 +367,7 @@ function persist(){
   if(current){try{parseStoredSave(current);localStorage.setItem(SAVEBACKUPKEY,current)}catch(e){}}
   const serialized=JSON.stringify(save);
   localStorage.setItem(SAVEKEY,serialized);
-  if(!localStorage.getItem(SAVEBACKUPKEY))localStorage.setItem(SAVEBACKUPKEY,serialized);
+  localStorage.setItem(SAVEBACKUPKEY,serialized);
  }catch(e){}
  $('goldTop').textContent=save.gold;if($('renderMode'))$('renderMode').textContent='画面：'+(save.renderMode==='3d'?'3D 实验':'2.5D 高清')
 }

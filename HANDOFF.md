@@ -97,3 +97,14 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Boss/minion spawn positions are relocated to clear ground.
 - The map regression now checks prop collision, wall sliding and safe relocation.
 - This is a code-level navigation pass; natural-run tests and human exploration are still required.
+
+
+## Save recovery and collision-aware one-realm build — 2026-11-19
+
+- The save system now keeps a last-known-good backup in localStorage.
+- If the primary record is malformed, it is quarantined and the backup is restored.
+- If both records are malformed, both raw values are preserved in a recovery archive and a clean schema-v4 save is initialized.
+- Gold, runs, wins and best-time fields are normalized before persistence.
+- Browser regression now exercises primary corruption recovery and the both-copies-corrupt fallback.
+- The one-realm collision pass makes trees, stones and bushes solid, while preserving clear landmark, river, bridge and start/rift corridors. Player, enemy, boss, healer and moving objective actors share the same movement resolver.
+- Product status remains NOT_READY until natural full-run acceptance and device/performance/art/audio review.
