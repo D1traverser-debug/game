@@ -503,7 +503,7 @@
   "web_game_artifact": {
     "branch": "work/enemy-director-rng-001",
     "path": "index.html",
-    "bytes": 804222,
+    "bytes": 804261,
     "status": "AUTOMATED_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
@@ -515,7 +515,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "0633fec15f368461fbc1e7c3b6ca5fc47b577fa48b188926d048c30950bbd934"
+    "sha256": "0161b492aa0d7079e942513443e27d8e4a25c43fe0f3d52437a859dbc41086bb"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
@@ -653,6 +653,7 @@
     "Implemented bounded PCG objective RNG candidate: per-run seed/stream for objective selection, variants, spawn offsets and brazier Fisher–Yates order; fixed/versioned world-layout stream for collision-bearing decoration; result-screen seed/version; browser regression added to CI. Full-run RNG migration remains incomplete.",
     "First CI run 44505974849: package integrity check passed with index.html 803536 bytes and SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667; objective_rng_regression passed. The checkpoint guard failed only because PROJECT_STATE still recorded 803533 bytes; metadata corrected, full CI rerun pending.",
     "Objective RNG candidate full CI is green: run 44507473452, 25/25 jobs. All four natural wizard runs win after test-only seed fixture recalibration (Aster 45, Ember 42, Briar 43, Nyx 48). No production combat/balance changes were made for the recalibration.",
-    "Enemy-director RNG integration candidate: enemy spawns now use an independent PCG stream for spawn angle/distance, type selection, initial attack/heal timers and elite chance; boss-healer and objective crab-child spawn offsets use the same enemy stream. Enemy IDs are sequential per run and do not consume RNG. Added browser regression for same-seed traces, seven archetypes, stream isolation, director population pacing, ID uniqueness/cap and offline/no-error checks."
+    "Enemy-director RNG integration candidate: enemy spawns now use an independent PCG stream for spawn angle/distance, type selection, initial attack/heal timers and elite chance; boss-healer and objective crab-child spawn offsets use the same enemy stream. Enemy IDs are sequential per run and do not consume RNG. Added browser regression for same-seed traces, seven archetypes, stream isolation, director population pacing, ID uniqueness/cap and offline/no-error checks.",
+    "Enemy-director candidate now displays the enemy RNG stream sequence on the result screen; the required regression asserts run seed, algorithm version and enemy sequence are visible. Stacked PR CI trigger includes the objective RNG base branch."
   ]
 }

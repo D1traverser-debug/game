@@ -5,6 +5,8 @@ Branch: `work/enemy-director-rng-001`
 Base checkpoint: objective RNG green commit `a6abff5e857142b5153dca659682d5018de34a96`
 Status: IMPLEMENTED · CI PENDING · OWNER ACCEPTANCE NOT REQUESTED
 
+Artifact checkpoint: `index.html` 804261 bytes; SHA-256 `0161b492aa0d7079e942513443e27d8e4a25c43fe0f3d52437a859dbc41086bb`. Result screen includes expedition seed, PCG algorithm version and enemy RNG sequence 57630.
+
 ## Source audit
 
 `spawnEnemy` used legacy shared randomness for: spawn angle, initial/normal spawn distance, enemy archetype selection, random enemy ID, initial attack timer, initial heal timer, and elite chance. The deterministic population director separately computed a time-scaled target and spawn batch. Enemy IDs are consumed by gnasher warning `sourceId`, projectile `uniqueHits`, and the 2.5D enemy bobbing phase. Boss identity is the stable string `boss`; `bossOwnerId` associates Mul'gath healers with it. Damage-pipeline `nextCombatantId` is a distinct identity namespace and remains unchanged.
@@ -25,3 +27,8 @@ Status: IMPLEMENTED · CI PENDING · OWNER ACCEPTANCE NOT REQUESTED
 ## Non-claims
 
 This slice does not make combat or full-run outcomes deterministic. It does not change enemy base stats, damage, speed, elite threshold, population target, spawn rate, objective targets, map bounds or boss archetype selection. CI and natural-run parity are pending. Product remains `NOT_READY`; CAOS is read-only.
+
+
+## CI wiring
+
+The QA workflow now allows pull requests targeting `work/objective-rng-integration-001`, the base of this stacked change. This ensures the complete required matrix runs for the enemy-director slice without combining it into the earlier objective RNG PR.

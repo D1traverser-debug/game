@@ -345,3 +345,8 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 - Added `tests/enemy_director_rng_regression.py` to the required browser-component matrix. It checks same-seed spawn traces, different-seed divergence across all seven enemy archetypes, monotonic unique IDs, render/audio/pause isolation, objective/enemy stream isolation, director population repeatability/targeting, ID allocation non-consumption, 64-enemy cap, offline behavior and runtime errors.
 - The builder's canonical source reconstruction was checked against `web/src/core/seeded-rng.mjs` and `src/game/boss_encounters.js`; the boss-healer spawn-offset change was applied to the canonical boss source as well as the generated HTML.
 - Candidate artifact checkpoint: `index.html` is 804222 bytes; SHA-256 `0633fec15f368461fbc1e7c3b6ca5fc47b577fa48b188926d048c30950bbd934`. CI pending. No combat/loot/spell/boss RNG migration, no enemy balance or population tuning changes. Product remains `NOT_READY`; CAOS remains read-only.
+
+
+### Enemy RNG replay metadata and CI wiring — 2026-11-19
+
+The result screen now displays the enemy RNG sequence (`0xE11E`, decimal 57630) alongside the expedition seed and PCG algorithm version, so the spawn stream's seed/sequence contract is inspectable. The new regression verifies all three values appear. The workflow's PR base-branch filter includes `work/objective-rng-integration-001` so this stacked PR receives the same complete required CI matrix. Candidate `index.html` checkpoint: 804261 bytes, SHA-256 `0161b492aa0d7079e942513443e27d8e4a25c43fe0f3d52437a859dbc41086bb`. CI pending.
