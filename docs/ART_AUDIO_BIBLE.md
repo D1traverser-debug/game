@@ -19,3 +19,18 @@ Original adaptive procedural music with character motifs, looped forest ambience
 
 ## Provenance and budgets
 No copied commercial character/creature designs, extracted assets or proprietary recordings. Every external asset needs documented commercial-use rights. Bundle assets or serve from controlled origin; no CDN runtime. Current atlas/procedural art and synthesized audio are prototypes until visually and aurally reviewed by the owner.
+
+
+## Original wizard identity pass — 2026-11-19 candidate
+
+- Added a bespoke original-IP 4×4 wizard action atlas, 384×384 AVIF with alpha. Each cell is 96×96; rows are Aster, Ember, Briar and Nyx; columns are idle, walk, cast and ability.
+- The art was generated for this project rather than extracted from the commercial reference game. The generated checkerboard was removed by edge-connected neutral-background masking; the resulting transparent atlas is embedded into the offline HTML by `scripts/build_game.py`.
+- Character selection portraits and in-world player rendering now use the same character-specific source art. Runtime pose selection follows actual movement, cast pulse and ability pulse. Facing, ghost alpha, hurt flash and camera-scale readability remain renderer-controlled.
+- Added deterministic character-specific orbiting motes and action rings: Aster star sparks, Ember cinders, Briar leaves and Nyx shadow crescents. Motion derives from the visual clock, not gameplay RNG.
+- This closes the shared-base-body implementation gap for the current 2D atlas renderer. It does not constitute a final rig/animation acceptance: sprite silhouette, readability at normal gameplay scale, attack-pose clarity and frame pacing still require browser and owner review.
+
+## Adaptive audio identity pass — 2026-11-19 candidate
+
+- Replaced the shared index-based lead phrase with four character-specific interval motifs while retaining the existing harmonic pad, bass pulse, percussion, boss tension layer and independent volume controls.
+- Added sparse, deterministic forest bird-call phrases to the ambience channel. They respect the ambience slider and master mute, and do not advance gameplay RNG.
+- Music and ambience remain procedural Web Audio, not recorded production stems. Mix translation, loudness, fatigue, headphones/speakers and owner listening acceptance remain open.
