@@ -34,6 +34,19 @@ class WebPackageTests(unittest.TestCase):
                 self.assertEqual(M.verify_output(),manifest)
                 for module in manifest["runtime_modules"]:
                     self.assertTrue((M.OUTPUT/module["path"]).is_file())
+                self.assertTrue((M.OUTPUT/"PLAY.bat").is_file())
+                self.assertTrue((M.OUTPUT/"PLAY.sh").is_file())
+                self.assertTrue((M.OUTPUT/"scripts"/"serve_web.py").is_file())
+                self.assertEqual(manifest["launcher"]["default_host"],"127.0.0.1")
             finally: M.OUTPUT=original
+
+    def test_local_server_is_loopback_only_and_launcher_opens_browser(self):
+        server=(M.ROOT/"scripts"/"serve_web.py").read_text(encoding="utf-8")
+        windows=(M.ROOT/"PLAY.bat").read_text(encoding="utf-8")
+        unix=(M.ROOT/"PLAY.sh").read_text(encoding="utf-8")
+        self.assertIn('("127.0.0.1", port)',server)
+        self.assertIn("webbrowser.open_new_tab(url)",server)
+        self.assertIn("scripts\\serve_web.py --open",windows)
+        self.assertIn("python3 scripts/serve_web.py --open",unix)
 
 if __name__=="__main__": unittest.main()

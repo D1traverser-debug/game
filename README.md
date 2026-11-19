@@ -31,3 +31,13 @@ The latest patch reduces Gnasher leap, enemy contact and ranged projectile damag
 
 ### Boss counterplay candidate
 Mul'gath's live healing servants are now explicit auto-target priorities when in range. The natural-run test pilot now reads the boss's committed line/grid telegraph geometry instead of approximating every warning as a circle. Four-wizard boss acceptance is still pending.
+
+
+## Start the single-player browser game
+
+1. Download the latest `aetherwilds-browser-preview` artifact from the GitHub Actions run and extract the ZIP.
+2. On Windows, double-click `PLAY.bat`. On macOS/Linux, run `sh PLAY.sh`.
+3. The launcher starts a loopback-only local server and opens the game in your default browser. Keep the terminal window open while playing; press Ctrl+C to stop the server.
+4. If Python 3 is not installed on Windows, `PLAY.bat` falls back to opening `index.html` directly. The local server is preferred because it loads the modular runtime and provides more reliable browser storage.
+
+The game is single-player and offline-capable. The local server does not expose the game to the public internet.

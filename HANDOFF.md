@@ -218,3 +218,12 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - The natural-run pilot now evaluates the committed line segment and every point in grid-shaped boss telegraphs, rather than treating all boss warnings as circles at the boss center. It also keeps explicit separation from boss contact range.
 - Added a boss regression proving a homing spell targets an in-range Mul'gath healer even when the boss itself is closer.
 - CI and a fresh four-wizard run are pending. Do not interpret the pilot correction as a natural win until the rerun completes.
+
+
+## Offline browser package launchers — 2026-11-19
+
+- Added `PLAY.bat` for Windows and `PLAY.sh` for macOS/Linux.
+- Added `scripts/serve_web.py`, a Python 3 static server bound only to `127.0.0.1`; it selects the next free port in a short range and optionally opens the default browser.
+- The package builder now includes both launchers and the server, records their paths/loopback endpoint in the manifest, and verifies byte-identical copies.
+- If Python is missing on Windows, `PLAY.bat` falls back to opening the standalone HTML. The local server remains preferred for module loading and storage consistency.
+- CI and owner-machine launch verification are pending. This is still an offline local website package, not a publicly hosted site.

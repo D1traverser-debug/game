@@ -11,6 +11,7 @@ CORE_FILES = (
     "fixed-step-clock.mjs", "seeded-rng.mjs", "combatant.mjs", "damage-pipeline.mjs",
     "event-buffer.mjs", "input-validator.mjs", "projectile-system.mjs", "spell-system.mjs",
 )
+LAUNCHER_FILES = ("PLAY.bat", "PLAY.sh", "scripts/serve_web.py")
 
 def sha256(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
@@ -45,9 +46,17 @@ def validate(raw: bytes) -> dict:
     if "import('./web/src/core/fixed-step-clock.mjs')" not in html:
         raise ValueError("FIXED_STEP_RUNTIME_IMPORT_MISSING")
     modules=runtime_manifest()
+    for relative in LAUNCHER_FILES:
+        launcher_path=ROOT/relative
+        if not launcher_path.is_file():
+            raise ValueError(f"LAUNCHER_FILE_MISSING:{relative}")
+        try: launcher_path.read_bytes().decode("utf-8")
+        except UnicodeDecodeError as exc: raise ValueError(f"LAUNCHER_FILE_NOT_UTF8:{relative}") from exc
+    launcher={"windows":"PLAY.bat","unix":"PLAY.sh","server":"scripts/serve_web.py",
+              "default_host":"127.0.0.1","default_port":8000,"offline":True}
     return {"artifact":"index.html","bytes":len(raw),"sha256":sha256(raw),
             "delivery":"static-browser-preview","external_runtime_dependencies":0,
-            "runtime_modules":modules,"product_status":"NOT_READY"}
+            "runtime_modules":modules,"launcher":launcher,"product_status":"NOT_READY"}
 
 def package() -> dict:
     raw=SOURCE.read_bytes()
@@ -62,6 +71,11 @@ def package() -> dict:
         shutil.copyfile(source,target)
     readme=ROOT/"web"/"README.md"
     if readme.is_file(): shutil.copyfile(readme,OUTPUT/"web"/"README.md")
+    for relative in LAUNCHER_FILES:
+        source=ROOT/relative
+        target=OUTPUT/relative
+        target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(source,target)
     (OUTPUT/"build-manifest.json").write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     return manifest
 
@@ -78,6 +92,11 @@ def verify_output() -> dict:
         raw_module=packaged.read_bytes()
         if len(raw_module)!=module["bytes"] or sha256(raw_module)!=module["sha256"]:
             raise ValueError(f"PACKAGED_RUNTIME_MODULE_MISMATCH:{module['path']}")
+    for relative in LAUNCHER_FILES:
+        source=ROOT/relative
+        packaged=OUTPUT/relative
+        if not packaged.is_file() or packaged.read_bytes()!=source.read_bytes():
+            raise ValueError(f"PACKAGED_LAUNCHER_MISSING_OR_MISMATCHED:{relative}")
     return expected
 
 def main() -> int:
