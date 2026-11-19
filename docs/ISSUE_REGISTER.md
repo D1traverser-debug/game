@@ -14,3 +14,8 @@
 | WEB-010 | P1 | Real-player exploration of landmark, prop, river and bridge navigation is still required | Shared collision resolver and map regression | OPEN | Play the map without debug assistance and record blocked paths, softlocks and readability issues |
 
 Multiplayer, WSS hosting, additional realms, production WebGL2 and native builds are not open issues: they are explicitly OUT_OF_SCOPE.
+
+
+## Latest automated evidence — 2026-11-19
+
+CI 44491163465 on 266928c passed 24/24 jobs, including the exact 17-check solo spell catalogue regression, browser compatibility, four-wizard natural boss runs and offline packaging. This closes the catalogue-regression implementation gap for the current candidate; it does not close the broader source-fidelity, production art/audio, physical-device, performance or owner-acceptance issues above.

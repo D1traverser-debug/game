@@ -12,10 +12,17 @@ A complete, offline-capable, browser-playable original-IP single-player action r
 Online co-op, lobbies, room servers, Unity/native builds, additional realms and roster expansion are OUT_OF_SCOPE.
 
 ## Latest verified automation baseline
-- Commit: 63fd96aeeaacabffd2fc0f211b3d973cd2e9e83a
-- CI: https://github.com/D1traverser-debug/game/actions/runs/44484418951
+- Commit: 266928c87a8ad5c4fd3340f258b34d348aa0ca9f
+- CI: https://github.com/D1traverser-debug/game/actions/runs/44491163465
+- Result: 24/24 jobs passed; no failed or skipped jobs.
+- Offline HTML: 800,030 bytes · SHA-256 b985aa5f1227ed10e55d6ed3522f12fe5cf45c2e83b38568e09f0e8aada2a34d.
+- Browser matrix: Chromium, Firefox and WebKit desktop/mobile smoke passed.
+- Spell catalogue: 17/17 regression checks passed (25 definitions, 18 playable IDs, 14 shared quests, four unique starters, save migration and eligibility).
+- Natural solo expedition: Aster/Sol'phish, Ember/Sol'phish, Briar/Mul'gath and Nyx/Krog'wa achieved automated natural boss wins (4/4).
+- Download: [aetherwilds-browser-preview artifact](https://github.com/D1traverser-debug/game/actions/runs/44491163465/artifacts/14513370931) (ZIP 514,562 bytes).
+- CI: https://github.com/D1traverser-debug/game/actions/runs/44491163465
 - Result: 24/24 jobs passed.
-- Offline HTML: 799,918 bytes · SHA-256 8bc83ce3ee62a8c65b583376b2d6b9d488953ef54d7d680dc3ddb2ae1d4ff5d3.
+- Offline HTML: 800,030 bytes · SHA-256 b985aa5f1227ed10e55d6ed3522f12fe5cf45c2e83b38568e09f0e8aada2a34d.
 - Browser matrix: Chromium, Firefox and WebKit desktop/mobile smoke passed.
 - Natural solo expedition: Aster/Sol'phish, Ember/Sol'phish, Briar/Mul'gath and Nyx/Krog'wa all achieved automated natural boss wins (4/4).
 

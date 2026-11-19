@@ -286,3 +286,15 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - The 18-ID shared pool passed the current 13-check browser regression. A follow-up test-hardening pass is being prepared to assert the exact 25-definition inventory, exact 18-ID eligible set, all 14 quest entries, four unique wizard starters and size-upgrade eligibility.
 - Product status remains NOT_READY. Bespoke character rigs/animation, authored art/VFX/UI/audio, source-version content reconciliation, physical device/controller testing, representative-hardware performance, real-player map exploration and owner/independent acceptance remain open.
 - CAOS remains read-only; all work is confined to this game repository.
+
+
+## Exact spell-catalogue regression and latest CI — 2026-11-19
+
+- Latest verified branch head: 266928c87a8ad5c4fd3340f258b34d348aa0ca9f.
+- GitHub Actions run 44491163465 completed SUCCESS: 24/24 jobs passed, no failed or skipped jobs. Run: https://github.com/D1traverser-debug/game/actions/runs/44491163465
+- The initial hardening candidate failed because its injected test probe attempted to read SIZE_UPGRADE_SPELLS while that Set was local to offerUpgrade. The fix moved the unchanged Set to shared scope; no upgrade values or runtime eligibility rules changed.
+- The exact catalogue browser regression then passed 17/17 checks: 25 runtime definitions, 18 eligible solo IDs, 14 shared quest unlocks, four unique starters, initial save contents, legacy exclusion, size-upgrade eligibility, research UI, v3 migration, quest grant/rejection, atlas load, zero runtime errors and zero external requests.
+- Browser matrix: Chromium, Firefox and WebKit desktop/mobile smoke passed. Natural-run matrix: Aster/Sol'phish, Ember/Sol'phish, Briar/Mul'gath and Nyx/Krog'wa all achieved automated boss wins (4/4).
+- Offline artifact: [aetherwilds-browser-preview](https://github.com/D1traverser-debug/game/actions/runs/44491163465/artifacts/14513370931); artifact ID 14513370931; ZIP 514,562 bytes. HTML source is 800,030 bytes, SHA-256 b985aa5f1227ed10e55d6ed3522f12fe5cf45c2e83b38568e09f0e8aada2a34d.
+- Product remains NOT_READY. Automation does not substitute for human playtest, physical iOS/Android/controller tests, representative hardware performance, source-version content reconciliation, final art/audio, or owner/independent acceptance.
+- Next engineering slice is a bounded deterministic gameplay-RNG audit and integration. Classify current random calls first; preserve separate render/audio randomness and avoid a bulk rewrite. CAOS repository remains outside this game task and unchanged.

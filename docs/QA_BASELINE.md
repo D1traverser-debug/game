@@ -4,12 +4,13 @@
 
 - Repository: D1traverser-debug/game
 - Branch: full-game
-- Verified commit: 63fd96aeeaacabffd2fc0f211b3d973cd2e9e83a
-- GitHub Actions run: https://github.com/D1traverser-debug/game/actions/runs/44484418951
+- Verified commit: 266928c87a8ad5c4fd3340f258b34d348aa0ca9f
+- GitHub Actions run: https://github.com/D1traverser-debug/game/actions/runs/44491163465
 - Result: 24/24 jobs passed, no failed or skipped jobs.
-- Offline HTML: 799,918 UTF-8 bytes; SHA-256 8bc83ce3ee62a8c65b583376b2d6b9d488953ef54d7d680dc3ddb2ae1d4ff5d3.
-- Checkpoint: PASS_MECHANICAL_ONLY; 15 Python unit tests passed.
+- Offline HTML: 800,030 UTF-8 bytes; SHA-256 b985aa5f1227ed10e55d6ed3522f12fe5cf45c2e83b38568e09f0e8aada2a34d.
+- Checkpoint: PASS_MECHANICAL_ONLY; 15 Python unit tests passed; exact spell catalogue regression passed 17/17 checks.
 - Browser matrix: Chromium, Firefox and WebKit desktop/mobile smoke all passed.
+- Spell catalogue: 17/17 checks passed, including exact runtime/eligible/quest/starter inventories, unsupported legacy filtering, save migration, quest grants, size-upgrade pool and offline/no-error checks.
 - Natural solo expedition: Aster defeated Sol'phish; Ember defeated Sol'phish; Briar defeated Mul'gath; Nyx defeated Krog'wa. 4/4 automated natural wins.
 
 ## Coverage represented by the run
