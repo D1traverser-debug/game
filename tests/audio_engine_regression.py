@@ -14,6 +14,7 @@ const __baseNoiseHit=studioNoiseHit;studioNoiseHit=function(...args){window.__au
 const __basePlaySfx=playSfx;playSfx=function(...args){window.__sfxEvents.push(args);return __basePlaySfx(...args)};
 const __basePlayUiSfx=playUiSfx;playUiSfx=function(...args){window.__uiEvents.push(args);return __basePlayUiSfx(...args)};
 window.__audioProbe={
+ playSfx:(...args)=>playSfx(...args),playUiSfx:(...args)=>playUiSfx(...args),
  snapshot:()=>({state:audio?.state||'uninitialized',time:audio?.currentTime||0,oscillators:window.__audioOscillators||0,muted,musicStep:STUDIO_AUDIO.step,noiseBufferReady:!!STUDIO_AUDIO.noiseBuffer,ambientNext:STUDIO_AUDIO.ambientNext,layers:STUDIO_AUDIO.lastLayers,motif:STUDIO_AUDIO.motif,volumes:{music:musicVolume,sfx:sfxVolume,ambience:ambienceVolume,ui:uiVolume},sfxEvents:window.__sfxEvents.slice(),uiEvents:window.__uiEvents.slice()}),
  bossMix:()=>{const oldBoss=game.boss,oldHp=game.player.hp;game.boss={dead:false,phaseIndex:2};game.player.hp=game.player.maxHp*.2;STUDIO_AUDIO.next=0;STUDIO_AUDIO.step=2;const before=window.__audioNoiseHits;studioMusicTick();const result={layers:STUDIO_AUDIO.lastLayers,noiseHits:window.__audioNoiseHits-before,motif:STUDIO_AUDIO.motif};game.boss=oldBoss;game.player.hp=oldHp;return result}
 };
@@ -52,7 +53,7 @@ async def main():
   report["checks"]["deterministic_noise_buffer_created"]=state["noiseBufferReady"] is True
   report["checks"]["ambient_layer_scheduled"]=state["ambientNext"]>state["time"]
   report["checks"]["character_motif_selected"]=state["motif"] in ("aster","ember","briar","nyx")
-  await page.evaluate("playSfx('cast','aster');playSfx('impact','fire');playUiSfx('click')")
+  await page.evaluate("window.__audioProbe.playSfx('cast','aster');window.__audioProbe.playSfx('impact','fire');window.__audioProbe.playUiSfx('click')")
   events=await page.evaluate("window.__audioProbe.snapshot()")
   report["checks"]["named_combat_sfx_dispatched"]=any(x[0]=="cast" for x in events["sfxEvents"]) and any(x[0]=="impact" for x in events["sfxEvents"])
   report["checks"]["ui_sfx_dispatched"]=any(x[0]=="click" for x in events["uiEvents"])
