@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "SCOPE_AND_SOLO_CATALOGUE_GOVERNANCE_001",
+  "checkpoint": "OBJECTIVE_RNG_INTEGRATION_CANDIDATE_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -330,7 +330,7 @@
     "Production-quality original environment, enemy, spell VFX, UI, animation, music and SFX assets are incomplete; current art/audio includes procedural placeholders.",
     "The full source-version content manifest remains unresolved across spells, augments, elements/infusions, enemies, objectives, bosses, quests and meta progression.",
     "Physical iOS Safari/Android Chrome, real hardware controllers, representative GPU performance, memory and 15-minute stability are NOT_TESTED; current Chromium/Firefox/WebKit automation passed.",
-    "The modular simulation core remains partial: fixed-step clock and damage pipeline are integrated; deterministic RNG boundary audit is complete but per-run browser integration is not started; event buffer, input validator, projectile and spell modules remain independent contracts.",
+    "Deterministic RNG integration is partial: per-run PCG covers objective generation and a fixed world-layout stream covers collision-bearing decoration; enemy director, combat, loot, level-up, spell, chest and boss random call sites remain on legacy randomness.",
     "Map collision and navigation code has automated coverage, but real-player exploration and landmark/river/bridge readability review remain incomplete.",
     "Save import/export file chooser/download behavior on physical and cross-browser targets remains unverified despite Chromium automation passing.",
     "The procedural adaptive soundtrack and SFX have not received owner listening/loudness acceptance or been replaced by authored/recorded production assets.",
@@ -338,7 +338,7 @@
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
     "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines."
   ],
-  "next_action": "Integrate deterministic RNG in one bounded gameplay subsystem (objective selection/generation) using the audited entropy boundaries. Add same-seed trace, different-seed divergence, render/audio isolation, pause/resume and replay-seed tests. Do not bulk-replace Math.random or rewrite the monolith.",
+  "next_action": "Complete the objective RNG integration candidate's full browser CI. If green, migrate enemy-director spawn RNG and entity IDs as a separate bounded slice; keep combat/loot/spell/chest/boss call sites unmigrated until their own parity tests. Do not claim full-run deterministic replay or READY.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -367,7 +367,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PASS_24_OF_24_OWNER_ACCEPTANCE_PENDING",
+  "latest_candidate_ci_status": "PENDING_OBJECTIVE_RNG_INTEGRATION_CI_OWNER_ACCEPTANCE_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44491163465,
@@ -497,8 +497,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 800030,
-    "status": "AUTOMATED_CI_PASS_OWNER_ACCEPTANCE_PENDING",
+    "bytes": 803533,
+    "status": "AUTOMATED_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "offline-capable static browser package with local ES modules; no external runtime CDN",
@@ -509,7 +509,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "b985aa5f1227ed10e55d6ed3522f12fe5cf45c2e83b38568e09f0e8aada2a34d"
+    "sha256": "PENDING_CI_ARTIFACT_MANIFEST"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
@@ -526,7 +526,7 @@
     "hosting": "offline_static_preview_with_loopback_launcher",
     "browser_matrix": "PASS: GitHub Actions run 44491163465; Chromium, Firefox and WebKit desktop/mobile smoke all passed. Physical iOS Safari/Android Chrome and real-device performance remain NOT_TESTED.",
     "status": "SINGLE_PLAYER_BROWSER_BUILD",
-    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_AND_DAMAGE_PIPELINE_INTEGRATED; OTHER CORE MODULES STILL INCREMENTAL",
+    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_AND_DAMAGE_PIPELINE_INTEGRATED; OBJECTIVE_RNG_CANDIDATE_PENDING_CI; OTHER CORE MODULES STILL INCREMENTAL",
     "core_modules": [
       "fixed-step-clock",
       "seeded-rng",
@@ -537,7 +537,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contracts plus fixed-step clock and damage-pipeline integration passed; 15 Python unit tests and the current 24-job CI baseline passed, including exact solo spell catalogue regression.",
+    "core_tests": "22 Node contracts plus fixed-step clock and damage-pipeline integration; objective RNG browser regression candidate added and awaiting CI.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -642,6 +642,7 @@
     "Hardening the shared spell catalogue regression to assert the exact 25 runtime definitions, exact 18 eligible IDs, fourteen shared quest unlocks, four unique character starters, all research entries, save migration and size-upgrade eligibility. The candidate is not yet CI-verified.",
     "The first exact-catalogue test candidate exposed a test-probe scope mismatch: SIZE_UPGRADE_SPELLS was local to offerUpgrade. Moved the unchanged eligibility Set to shared scope so the regression can inspect it; no upgrade values or runtime eligibility changed.",
     "Moved SIZE_UPGRADE_SPELLS to shared scope without changing eligibility values; exact-catalogue regression then passed 17/17 and full CI passed 24/24 on 266928c.",
-    "Documented RNG stream ownership and bounded first integration slice: per-run SeededRng for objective generation, separate fixed world-layout/presentation/audio streams, and reproducibility/isolation acceptance tests."
+    "Documented RNG stream ownership and bounded first integration slice: per-run SeededRng for objective generation, separate fixed world-layout/presentation/audio streams, and reproducibility/isolation acceptance tests.",
+    "Implemented bounded PCG objective RNG candidate: per-run seed/stream for objective selection, variants, spawn offsets and brazier Fisher–Yates order; fixed/versioned world-layout stream for collision-bearing decoration; result-screen seed/version; browser regression added to CI. Full-run RNG migration remains incomplete."
   ]
 }

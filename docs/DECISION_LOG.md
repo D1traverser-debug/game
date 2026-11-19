@@ -14,3 +14,7 @@ The product is an original-IP browser action roguelite with one Verdant Wilds re
 
 ## D-037 — Renderer and runtime baseline (2026-11-18) — ACTIVE
 The 2.5D atlas renderer with Canvas 2D simulation is the default production path. Raw WebGL2 is an optional experiment, not a mandatory release dependency. No CDN runtime is allowed. A renderer replacement requires evidence from the same scene on representative hardware and must preserve the offline package and gameplay contracts.
+
+
+## D-038 — Explicit entropy ownership for browser simulation (2026-11-19) — ACTIVE
+The browser runtime will migrate random decisions one subsystem at a time to the canonical PCG-XSH-RR stream. Each expedition owns a recorded run seed; collision-bearing static world layout owns a separate fixed/versioned seed; presentation and audio must never consume the per-run stream. The first integrated subsystem is objective selection/generation. No global `Math.random` replacement and no full-run replay claim are permitted until all gameplay call sites have been migrated and validated.

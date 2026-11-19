@@ -2,7 +2,7 @@
 
 Date: 2026-11-19
 Branch: `full-game`
-Status: AUDIT COMPLETE · RUNTIME INTEGRATION NOT STARTED
+Status: AUDIT COMPLETE · OBJECTIVE RNG SLICE IMPLEMENTED · CI PENDING · FULL RUN RNG INCOMPLETE
 Scope: source inspection only. No gameplay behavior or random-call site was changed in this audit.
 
 ## Current evidence
@@ -75,3 +75,17 @@ Do not rewrite all random call sites at once. The first integration slice should
 ## Audit conclusion
 
 The deterministic RNG module is soundly isolated as a core contract, but it is not yet authoritative for the browser simulation. The correct next action is one subsystem integration with render/audio independence tests, not a bulk rewrite. Product status remains NOT_READY.
+
+
+## Objective-generation integration candidate — 2026-11-19
+
+The first bounded slice is implemented on `work/objective-rng-integration-001`:
+- The canonical `SeededRng` module is embedded into `index.html` by `scripts/build_game.py`; the generated artifact remains usable without a module import succeeding under a local/offline preview.
+- Each expedition gets a fresh unsigned 32-bit `runSeed`, a `runRng`, and a visible seed/algorithm result entry. Passing an explicit seed to `startRun(seed)` reproduces the objective stream; ordinary replay calls `startRun()` and gets a fresh seed.
+- Objective type choice, variant chance/choice, objective origin and object placement, and brazier order now use the per-run PCG stream. The random-comparator objective shuffle is replaced with Fisher–Yates.
+- Collision-bearing static world decoration now uses the independent fixed `WORLD_LAYOUT_SEED` / `WORLD_LAYOUT_VERSION` stream. `worldFindOpenPoint` therefore sees a stable world layout across run seeds.
+- Camera shake still uses the legacy presentation helper; audio noise keeps its private LCG. Neither advances `runRng`.
+- Natural-run test seed injection now passes the same fixed seed into the per-run PCG stream as well as the legacy `Math.random` stream.
+- Added `tests/objective_rng_regression.py` for same-seed trace, different-seed divergence, world-layout independence, render/audio/pause isolation, fresh-run seeds, result-screen seed visibility and offline/no-error checks. Added it to the required browser-component CI matrix.
+
+CI is pending. This does not claim full-run deterministic replay: enemy director, combat, loot, level-up, spell, chest and boss randomness remain to be migrated. No gameplay balance, map bounds, enemy values or objective targets were changed. CAOS remains read-only.

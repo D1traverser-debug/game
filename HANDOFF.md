@@ -18,7 +18,7 @@ The owner narrowed the product to one complete, offline-capable browser single-p
 - Q activates the wizard ability; M collapses/opens the minimap; touch has a dedicated ability button.
 - Map movement and enemy/chest/boss spawn coordinates are clamped to the realm bounds.
 - Existing enemy/objective/boss/spell/progression/camp systems are retained.
-- Browser regression now covers roster, abilities, map districts, river slowdown and bridge passage; CI status pending.
+- Last verified browser baseline: CI run 44491163465 passed 24/24 jobs on commit 266928c87a8ad5c4fd3340f258b34d348aa0ca9f. The objective RNG integration candidate adds a required browser regression; its full CI matrix is pending.
 - A malformed HUD gradient expression that prevented the main runtime from parsing has been fixed; both inline scripts pass syntax parsing.
 
 ## Important limitations
@@ -31,11 +31,11 @@ The owner narrowed the product to one complete, offline-capable browser single-p
 - Status stays NOT_READY until exact-build owner acceptance.
 
 ## Next sequence
-1. Run roster/map/ability/audio browser regressions and the complete CI matrix.
-2. Fix failures and preserve all existing solo regressions.
-3. Run natural solo missions for each wizard and boss archetype; balance only from recorded evidence.
-4. Finish one-realm navigation/obstacle/collision and character visual readability.
-5. Complete audio, VFX, save recovery, browser/device performance and owner acceptance.
+1. Complete the objective RNG candidate's full CI matrix, including same-seed traces, different-seed divergence, world-layout independence, render/audio/pause isolation and the four-wizard natural-run gate.
+2. If green, migrate enemy-director spawn decisions and entity IDs in a separate bounded RNG slice; preserve all existing solo regressions.
+3. Continue combat/loot/spell/chest/boss RNG migration only as individually scoped, behavior-parity-tested changes; do not claim full-run replay until all gameplay entropy is owned.
+4. Continue one-realm navigation, obstacle/collision, character identity, VFX/audio and save-recovery work.
+5. Complete physical browser/device/controller and representative-hardware performance checks, followed by owner/independent acceptance.
 
 CAOS is read-only. Do not touch CAOS repositories or configuration.
 
@@ -308,3 +308,13 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - Do not globally replace `Math.random`: camera shake and static decor must not consume the per-run stream; local background/audio LCGs remain isolated. Random-comparator sorts must be replaced by deterministic Fisher–Yates only when their subsystem is integrated.
 - Next bounded slice: per-run RNG for objective selection/generation, with same-seed trace, different-seed divergence, render/audio isolation, pause/resume and replay-seed tests. No runtime code changed during this audit.
 - CAOS remains outside this game task and unchanged.
+
+
+## Objective RNG integration candidate — 2026-11-19
+
+- Integrated the canonical PCG-XSH-RR module into the generated browser HTML through `scripts/build_game.py`; no runtime RNG-module import is required.
+- Each expedition now has an explicit run seed and per-run RNG. Objective type, variant, origin, object placement and brazier sequence use that stream. The result screen displays the seed and algorithm version; normal replay creates a new seed, while `startRun(seed)` supports explicit reproduction.
+- Static collision-bearing meadow decoration now uses a fixed/versioned world-layout stream so open-point collision resolution is stable across run seeds. Render camera shake and procedural audio remain isolated from the per-run stream.
+- Added a browser regression for same-seed/different-seed behavior, world-layout independence, render/audio/pause isolation, replay/new-seed behavior and result-screen diagnostics; added it to the required browser-component matrix.
+- Natural-run test harnesses now seed the new per-run stream with their existing fixed test seeds as well as the legacy stream.
+- Candidate branch: `work/objective-rng-integration-001`; implementation commit `9f9bf30df53fcde93b05ec035e2588b5dd163c73`; CI pending. Product status remains NOT_READY, and the rest of gameplay randomness remains unmigrated. CAOS remains read-only.
