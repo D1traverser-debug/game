@@ -7,7 +7,7 @@ const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const match = html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match, 'single inline game script must exist');
 
-const qaBlock = /\nif\(new URLSearchParams\(location\.search\)\.has\('qa'\)\)window\.__QA=\{[\s\S]*?\n \};\n\n\/\/ Input/;
+const qaBlock = /\nif\(new URLSearchParams\(location\.search\)\.has\('qa'\)\)window\.__QA=\{[\s\S]*?\n\};\n\n\/\/ Input/;
 const productionScript = match[1].replace(qaBlock, '\n// Input');
 assert.notEqual(productionScript, match[1], 'production QA hooks must be removed before testing');
 
