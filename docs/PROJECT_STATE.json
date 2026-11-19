@@ -343,9 +343,10 @@
     "The four-wizard natural-run matrix achieved 4/4 automated wins on commit 63fd96a; repeated seeds, all threat levels and human difficulty acceptance remain open.",
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
     "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines.",
-    "Enemy-director RNG candidate CI run 44525204498: new enemy_director_rng_regression passed 15/15 and other completed jobs passed, but original fixed natural-run seeds produced only 1/4 boss wins (Ember seed 42). Aster/Briar/Nyx survived to 1500s with bosses alive; no runtime/console/network errors. Test-only seed sweep is being used to identify stable per-wizard replay fixtures; no production balance changes planned."
+    "Enemy-director RNG candidate CI run 44525204498: new enemy_director_rng_regression passed 15/15 and other completed jobs passed, but original fixed natural-run seeds produced only 1/4 boss wins (Ember seed 42). Aster/Briar/Nyx survived to 1500s with bosses alive; no runtime/console/network errors. Test-only seed sweep is being used to identify stable per-wizard replay fixtures; no production balance changes planned.",
+    "CI run 44526303755 exposed a second fixture dependency: 90-second normal_play_smoke seed 20261117 produced 66 kills but only 14/18 XP and no upgrade within 90 seconds; player remained healthy and runtime/offline checks passed. The test now scouts a fixed ordered short seed list for a natural upgrade without granting XP or forcing upgrades."
   ],
-  "next_action": "Complete bounded deterministic natural-run seed scouting for each wizard under the new enemy RNG stream, freeze the first successful seed per wizard, and rerun the full CI matrix. Do not change production combat balance or the 1500-second gate to manufacture a pass.",
+  "next_action": "Complete the natural-run and 90-second smoke fixture seed scouting under the enemy RNG stream. Freeze stable per-character and smoke seeds, then rerun the complete CI matrix. No production balance, XP values or time limits are to be changed.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -374,7 +375,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PARTIAL_PASS_ENEMY_RNG_15_OF_15_NATURAL_RUN_1_OF_4",
+  "latest_candidate_ci_status": "ENEMY_RNG_NATURAL_RUN_SEED_SCOUT_AND_NORMAL_SMOKE_RECALIBRATION",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44491163465,

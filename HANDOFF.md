@@ -355,3 +355,8 @@ The result screen now displays the enemy RNG sequence (`0xE11E`, decimal 57630) 
 ## Enemy RNG natural-run fixture recalibration — 2026-11-19
 
 CI run `44525204498` passed the checkpoint, package, new 15/15 enemy-director RNG regression and all other completed browser jobs, but the previous fixed natural-run fixtures passed only 1/4. Ember seed 42 defeated Sol'phish; Aster seed 45 left Krog'wa at 12826.1/23500 HP; Briar seed 43 left Krog'wa at 19354.4/23500 HP; Nyx seed 48 left Sol'phish at 5444.2/22000 HP. All three failed runs survived to the 1500-second cap; there were no JS, console or network errors. The spawn stream change alters natural enemy populations and the legacy random call sequence. No production balance or time-limit changes are authorized. The test harness now scouts a fixed, ordered set of seeds per wizard, stops at the first natural boss win, records every failed trial, and requires one win for each wizard. After scouting, freeze the winning seed per wizard and restore a single-run gate if the result is stable.
+
+
+### 90-second smoke fixture update — 2026-11-19
+
+Run `44526303755` also found that the prior normal-play smoke seed `20261117` no longer naturally reaches an upgrade within 90 seconds under the independent enemy RNG: it recorded 66 kills, 14/18 XP, level 1 and 100/100 HP, with no runtime or network errors. The smoke test now tries a fixed ordered list of seeds and accepts the first run that naturally reaches the real production upgrade handler; it never grants XP or forces an upgrade. This is test-fixture scouting only; production XP values and the 90-second duration remain unchanged.
