@@ -41,8 +41,17 @@ async def main():
    await page.wait_for_timeout(450)
    # Select each wizard through the actual production character-selection UI.
    await page.locator("#selectCharacter").click()
-   await page.locator(".character-card").first.wait_for(state="visible",timeout=10000)
-   await page.locator(f'[data-character="{character}"]').click()
+   try:
+    await page.locator("#characterScreen.active").wait_for(state="visible",timeout=10000)
+    await page.wait_for_function("document.querySelectorAll('#characterCards .character-card').length===4",timeout=10000)
+    await page.locator(f'#characterCards [data-character="{character}"]').wait_for(state="visible",timeout=10000)
+    await page.locator(f'#characterCards [data-character="{character}"]').click()
+   except Exception as exc:
+    diagnostic=await page.evaluate("""()=>({characterScreen:document.querySelector('#characterScreen')?.className,
+      cards:document.querySelectorAll('#characterCards .character-card').length,
+      selectHandler:typeof document.querySelector('#selectCharacter')?.onclick,
+      pageTitle:document.title})""")
+    raise RuntimeError("CHARACTER_SELECT_UI_FAILED:"+json.dumps({"character":character,"diagnostic":diagnostic,"pageErrors":errors,"consoleErrors":console},ensure_ascii=False)) from exc
    selected=await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1')).selectedCharacterId")
    await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
    await page.locator("#characterStart").click()

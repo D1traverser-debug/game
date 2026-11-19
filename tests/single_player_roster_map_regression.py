@@ -10,6 +10,16 @@ PROBE=r"""
 window.__soloProbe={
  roster:()=>CHARACTERS.map(c=>({id:c.id,starter:c.starterSpell,passive:c.passive,ability:c.abilityName,hp:c.hp,move:c.move})),
  selectedCharacter:()=>save.selectedCharacterId,
+ layout:()=>{
+  const modal=document.querySelector('#characterScreen .character-modal'),grid=document.querySelector('#characterCards'),card=grid?.querySelector('.character-card'),portrait=card?.querySelector('canvas'),map=document.querySelector('#mapPreview'),start=document.querySelector('#characterStart');
+  const rect=x=>{const r=x.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom,right:r.right}};
+  const inside=(a,b)=>a.x>=b.x-1&&a.y>=b.y-1&&a.right<=b.right+1&&a.bottom<=b.bottom+1;
+  return{modal:rect(modal),grid:rect(grid),card:rect(card),portrait:rect(portrait),map:rect(map),start:rect(start),
+   portraitPosition:getComputedStyle(portrait).position,mapPosition:getComputedStyle(map).position,
+   portraitInsideCard:inside(rect(portrait),rect(card)),mapInsideModal:inside(rect(map),rect(modal)),
+   startInsideModal:inside(rect(start),rect(modal)),gridLeftOfMap:rect(grid).right<=rect(map).x+1,
+   modalScrollGap:modal.scrollHeight-modal.clientHeight};
+ },
  runSnapshot:()=>({characterId:game?.player?.characterId,starter:game?.player?.spells?.[0]?.id,screen}),
  map:()=>({id:WORLD_MAP.id,bounds:WORLD_MAP.bounds,regions:WORLD_MAP.regions.map(x=>x.id),landmarks:WORLD_MAP.landmarks.map(x=>x.id),region:worldRegionAt(-850,-570).id}),
  terrain:()=>({land:worldTerrainAt(0,0).id,stream:worldTerrainAt(800,550).id,bridge:worldTerrainAt(-360,346).id,streamSpeed:worldTerrainAt(800,550).speed}),
@@ -53,6 +63,14 @@ async def main():
   page.on("request",lambda r:report["external_requests"].append(r.url) if r.url.startswith(("http://","https://")) else None)
   await page.set_content(DOC,wait_until="load");await page.wait_for_timeout(450)
   await page.locator("#selectCharacter").click()
+  await page.locator("#characterScreen.active").wait_for(state="visible")
+  await page.wait_for_function("document.querySelectorAll('#characterCards .character-card').length===4")
+  const desktopLayout=await page.evaluate("window.__soloProbe.layout()")
+  report["character_layout"]=desktopLayout
+  report["checks"]["portrait_canvas_stays_inside_card"]=desktopLayout["portraitPosition"]=="static" and desktopLayout["portraitInsideCard"]
+  report["checks"]["map_preview_stays_inside_modal"]=desktopLayout["mapPosition"]=="static" and desktopLayout["mapInsideModal"]
+  report["checks"]["character_grid_and_map_do_not_overlap"]=desktopLayout["gridLeftOfMap"]
+  report["checks"]["primary_start_action_fits_desktop_modal"]=desktopLayout["startInsideModal"]
   report["checks"]["character_screen_opens"]=await page.locator("#characterScreen").is_visible()
   report["checks"]["four_character_cards"]=await page.locator(".character-card").count()==4
   await page.locator('[data-character="ember"]').click()
@@ -87,6 +105,23 @@ async def main():
   report["checks"]["ember_burn"]=abilities["ember"]["used"] and abilities["ember"]["after"]["hp"]<abilities["ember"]["before"]["hp"] and abilities["ember"]["after"]["burn"]>0
   report["checks"]["briar_heal"]=abilities["briar"]["used"] and abilities["briar"]["after"]["playerHp"]>abilities["briar"]["before"]["playerHp"]
   report["checks"]["nyx_dash"]=abilities["nyx"]["used"] and abilities["nyx"]["after"]["x"]>abilities["nyx"]["before"]["x"] and abilities["nyx"]["after"]["hp"]<abilities["nyx"]["before"]["hp"]
+  # A separate narrow viewport verifies the responsive modal and a real start action.
+  mobile=await browser.new_page(viewport={"width":390,"height":844},device_scale_factor=1,is_mobile=True,has_touch=True)
+  mobile_errors=[];mobile_console=[]
+  mobile.on("pageerror",lambda e:mobile_errors.append(str(e)))
+  mobile.on("console",lambda m:mobile_console.append(m.text) if m.type=="error" else None)
+  await mobile.set_content(DOC,wait_until="load")
+  await mobile.locator("#selectCharacter").click()
+  await mobile.locator("#characterScreen.active").wait_for(state="visible")
+  await mobile.wait_for_function("document.querySelectorAll('#characterCards .character-card').length===4")
+  mobile_layout=await mobile.evaluate("window.__soloProbe.layout()")
+  report["mobile_character_layout"]=mobile_layout
+  report["checks"]["mobile_portraits_and_map_are_in_flow"]=mobile_layout["portraitPosition"]=="static" and mobile_layout["mapPosition"]=="static" and mobile_layout["portraitInsideCard"] and mobile_layout["mapInsideModal"]
+  await mobile.locator("#characterStart").scroll_into_view_if_needed()
+  await mobile.locator("#characterStart").click()
+  report["checks"]["mobile_character_start_reaches_gameplay"]=await mobile.evaluate("screen==='playing'&&!!game?.player")
+  report["checks"]["mobile_character_select_no_runtime_errors"]=not mobile_errors and not mobile_console
+  await mobile.close()
   report["checks"]["no_runtime_errors"]=not report["page_errors"] and not report["console_errors"]
   report["checks"]["offline"]=not report["external_requests"]
   report["pass"]=all(report["checks"].values());print(json.dumps(report,ensure_ascii=False,indent=2));await browser.close()

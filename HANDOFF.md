@@ -108,3 +108,13 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Browser regression now exercises primary corruption recovery and the both-copies-corrupt fallback.
 - The one-realm collision pass makes trees, stones and bushes solid, while preserving clear landmark, river, bridge and start/rift corridors. Player, enemy, boss, healer and moving objective actors share the same movement resolver.
 - Product status remains NOT_READY until natural full-run acceptance and device/performance/art/audio review.
+
+
+## Character selection canvas-layout repair — 2026-11-19
+
+- Local visual inspection of the exact CI package exposed a global canvas rule leaking into the character-selection portrait and map-preview canvases. They were positioned as full-screen layers and the map preview covered the modal.
+- Portrait and map-preview canvases now explicitly use normal document flow; the character grid is top-aligned and the desktop modal uses the available viewport height more effectively.
+- Local Chromium verified the desktop layout at 1280×800: four character cards, portrait containment, map-preview containment and the primary start action all fit inside the modal.
+- Local Chromium verified the mobile layout at 390×844: the modal scrolls, all four cards remain available and the primary start action enters gameplay without JS/console errors.
+- Added these layout assertions to the roster/map regression. Updated the four-wizard natural-run harness to wait for the actual active selection screen and dynamically populated cards, and to emit useful diagnostics if selection fails.
+- CI is pending. Natural full-run boss victories for all four wizards are still not established; do not tune balance until the test reaches gameplay and produces evidence.
