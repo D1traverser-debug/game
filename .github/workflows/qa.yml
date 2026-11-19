@@ -16,6 +16,8 @@ jobs:
           python-version: '3.12'
       - name: Validate browser source
         run: python scripts/package_web.py --check
+      - name: Verify deterministic single-file build
+        run: python scripts/build_game.py --check
       - name: Verify browser scope and artifact checkpoint
         run: python scripts/verify_project_state.py
       - name: Run positive and negative controls
