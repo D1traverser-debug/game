@@ -86,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [progression_regression, normal_play_smoke, objective_collection_regression, character_upgrade_regression, single_player_roster_map_regression, audio_engine_regression, save_persistence_regression]
+        test: [progression_regression, normal_play_smoke, objective_collection_regression, character_upgrade_regression, single_player_roster_map_regression, audio_engine_regression, save_persistence_regression, controller_regression]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

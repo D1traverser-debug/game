@@ -166,3 +166,12 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - The natural-run regression now records the last damage sources, Gnasher hits, boss HP, selected upgrades, and objective progress timeline for each wizard.
 - This is diagnostic instrumentation only. It does not alter production gameplay or relax the natural-victory acceptance criteria.
 - Use the resulting evidence to identify whether deaths are caused by contact damage, ranged projectiles, Gnasher leaps, boss attacks, poor upgrade choices or objective routing before changing balance.
+
+
+## Gamepad input completion — 2026-11-19
+
+- Added standard Gamepad API mapping: left stick moves, button 0 (A/Cross) interacts, button 1 (B/Circle) activates the selected wizard's ability, and button 9 (Start) pauses/resumes.
+- Interaction, ability and pause actions trigger only on button-down edges; holding a button cannot repeat the action.
+- Added controller instructions to the field manual.
+- Added a Chromium browser regression for analog movement, deadzone, edge-triggered interaction/ability and pause/resume.
+- Physical controller pairing and browser/device-specific Gamepad API behavior remain untested.

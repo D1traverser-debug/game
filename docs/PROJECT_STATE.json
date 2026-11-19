@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "NATURAL_RUN_DIAGNOSTIC_TELEMETRY_001",
+  "checkpoint": "GAMEPAD_CONTROL_COMPLETION_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -280,7 +280,10 @@
     "Boss magnetic-field regression now places the player outside the field boundary on a verified unobstructed inward movement lane. The prior synthetic point could overlap a solid map landmark, causing the legitimate collision resolver to block the pull.",
     "Added user-facing JSON save export/import in the camp, with a versioned AETHERWILDS_SAVE envelope, a 512 KB size cap, format/schema validation, current-save recovery archive before import, schema normalization and immediate persistence.",
     "Extended real-origin save regression to verify exported payload contents, restoration of gold and selected wizard, and rejection of unsupported save versions without overwriting the active save.",
-    "Corrected a duplicated 'THE' in the main menu's world-title artwork."
+    "Corrected a duplicated 'THE' in the main menu's world-title artwork.",
+    "Completed standard Gamepad API mapping: left stick movement, button 0 (A/Cross) interaction, button 1 (B/Circle) wizard ability, button 9 (Start) pause/resume.",
+    "All controller actions are edge-triggered; holding an input no longer repeats interaction, ability activation or pause toggles.",
+    "Updated the in-game manual with the standard controller mapping and added Playwright coverage for analog movement, deadzone, action edges and pause/resume."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -292,14 +295,14 @@
     "Map regions and landmarks are authored and navigable, but collision/occlusion, environmental interaction and real player exploration review remain incomplete.",
     "Natural full-run balance and boss victory have not yet been demonstrated for all four selectable wizards on this exact build.",
     "Original music/SFX, bespoke character animation, hit reactions, spell VFX and production-quality visual/audio review remain incomplete.",
-    "Firefox/WebKit, physical mobile hardware, controller hardware, real-origin save reload, performance and owner playtest remain NOT_TESTED.",
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
     "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
     "Save import/export is implemented and under CI verification; cross-browser file chooser/download behavior still requires Firefox/WebKit and physical-device acceptance.",
     "Automated natural-run pilot currently fails to win with all four wizards: Aster, Ember and Nyx die before the boss schedule; Briar reaches the Mul'gath boss but dies during the encounter. Diagnose player-build choices, objective routing and combat pressure before claiming balance acceptance.",
-    "Save export/import is implemented; current Playwright download/import regression and cross-browser file chooser behavior are pending CI and Firefox/WebKit acceptance."
+    "Save export/import is implemented; current Playwright download/import regression and cross-browser file chooser behavior are pending CI and Firefox/WebKit acceptance.",
+    "Controller input mapping is implemented and under Chromium automation; physical Xbox/PlayStation controller pairing and browser-specific Gamepad API behavior remain untested."
   ],
-  "next_action": "Collect diagnostic telemetry from each wizard's natural run, then adjust the underlying solo balance/objective/AI issue based on measured causes.",
+  "next_action": "Verify gamepad regression and package integrity; then use natural-run combat telemetry to fix objective routing and solo difficulty, followed by art/audio and cross-browser acceptance.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -328,7 +331,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "NATURAL_RUN_DIAGNOSTIC_CI_PENDING",
+  "latest_candidate_ci_status": "GAMEPAD_CONTROL_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -445,8 +448,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 784868,
-    "status": "SINGLE_PLAYER_SAVE_EXPORT_IMPORT_CI_PENDING",
+    "bytes": 0,
+    "status": "GAMEPAD_CONTROL_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -457,7 +460,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "9fdaa81c967ec2ce7ecb1a2b49efd29d13f03fdba464026e46d53baf657ae895"
+    "sha256": ""
   },
   "web_runtime": {
     "delivery": "static_web_frontend",
