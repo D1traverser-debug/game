@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "AUDIO_MIXER_SFX_AMBIENCE_AND_BROWSER_MATRIX_001",
+  "checkpoint": "CI_RECONCILIATION_SOURCE_AND_HARNESS_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -342,7 +342,7 @@
     "Chromium, Firefox and WebKit desktop/mobile automated smoke matrix added; current candidate CI pending.",
     "Physical iOS/Android devices, real controllers, low-end GPU frame-time and long-session thermal/performance acceptance still require target-device testing."
   ],
-  "next_action": "Run the new required CI matrix; fix any cross-browser or audio regression; then create a release candidate package for owner playtest.",
+  "next_action": "Rerun the complete required CI matrix after regenerating index.html from src/game/boss_encounters.js and correcting the audio/browser test harness; inspect every job and retain NOT_READY until all automated gates and owner acceptance are complete.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -371,7 +371,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "AUDIO_AND_CROSS_BROWSER_CANDIDATE_CI_PENDING",
+  "latest_candidate_ci_status": "SOURCE_BUILD_AND_BROWSER_HARNESS_RECONCILIATION_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -488,8 +488,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 799896,
-    "status": "ADAPTIVE_AUDIO_SCORE_001_CI_PENDING",
+    "bytes": 799918,
+    "status": "SOURCE_BUILD_AND_CROSS_BROWSER_RECONCILIATION_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -500,7 +500,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": ""
+    "sha256": "8bc83ce3ee62a8c65b583376b2d6b9d488953ef54d7d680dc3ddb2ae1d4ff5d3"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
@@ -613,6 +613,9 @@
     "Added throttled named SFX for wizard-specific casting/abilities, elemental impacts, pickups, objectives, boss arrival/stagger, ghost phase and run results.",
     "Added low-level looping forest ambience that is separately controlled from adaptive music.",
     "Added Chromium/Firefox/WebKit desktop and mobile-flow regression matrix.",
-    "Promoted four-wizard natural boss-win simulation from exploratory continue-on-error to a required CI gate."
+    "Promoted four-wizard natural boss-win simulation from exploratory continue-on-error to a required CI gate.",
+    "Regenerated the offline root HTML from the canonical Boss encounter source fragment using scripts/build_game.py rules; no combat tuning.",
+    "Corrected audio regression to dispatch lexical IIFE functions through a test-only closure probe rather than assuming they are window globals.",
+    "Changed browser compatibility smoke to wait for the visible simulation timer to advance with a bounded timeout instead of fixed sub-second sleeps."
   ]
 }

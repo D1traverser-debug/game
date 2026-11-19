@@ -27,7 +27,8 @@ async def main():
    report["checks"]["four_wizards_render"]=await desktop.locator("[data-character]").count()==4
    await desktop.locator('[data-character="nyx"]').click()
    report["checks"]["selected_wizard_highlighted"]="selected" in (await desktop.locator('[data-character="nyx"]').get_attribute("class"))
-   await desktop.locator("#characterStart").click();await desktop.locator("#hud.active").wait_for(timeout=5000);await desktop.wait_for_timeout(1100)
+   await desktop.locator("#characterStart").click();await desktop.locator("#hud.active").wait_for(timeout=5000)
+   await desktop.wait_for_function("document.querySelector('#timer') !== null && document.querySelector('#timer').innerText.trim() !== '00:00'",timeout=7000)
    report["checks"]["desktop_simulation_advances"]=await desktop.locator("#timer").inner_text()!="00:00"
    await desktop.locator("#pauseBtn").click()
    report["checks"]["pause_overlay_works"]=await desktop.locator("#pause.active").count()==1
@@ -43,7 +44,7 @@ async def main():
    report["checks"]["mobile_virtual_joystick_visible"]=await mobile.locator("#joy").is_visible()
    report["checks"]["mobile_interact_button_visible"]=await mobile.locator("#interact").is_visible()
    report["checks"]["mobile_ability_button_visible"]=await mobile.locator("#abilityBtn").is_visible()
-   await mobile.wait_for_timeout(900)
+   await mobile.wait_for_function("document.querySelector('#timer') !== null && document.querySelector('#timer').innerText.trim() !== '00:00'",timeout=7000)
    report["checks"]["mobile_simulation_advances"]=await mobile.locator("#timer").inner_text()!="00:00"
    report["checks"]["no_external_runtime_requests"]=not report["external_requests"]
    report["checks"]["no_page_or_console_errors"]=not report["page_errors"] and not report["console_errors"]

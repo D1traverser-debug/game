@@ -1261,7 +1261,7 @@ function bossApplyMagneticField(b,dt){
 function spawnBoss(){
  const p=game.player,archetype=pick(BOSS_ARCHETYPES),rawLoc=game.bossPending||{x:p.x+rand(-400,400),y:p.y-520},loc=worldFindOpenPoint(rawLoc.x,rawLoc.y,Math.min(38,archetype.r*.45),360),mult=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;
  const b={id:'boss',type:'boss',bossId:archetype.id,name:archetype.name,x:loc.x,y:loc.y,r:archetype.r,hp:archetype.hp*mult,max:archetype.hp*mult,speed:archetype.speed,attack:2.5,rune:4,stagger:0,vulnerable:0,dead:false,hitFlash:0,elite:true,burn:0,burnDmg:0,acid:0,slow:0,freeze:0,weakness:0,corrupt:0,corruptT:0,age:0,phase:'hunt',phaseT:0,healTimer:8,phaseIndex:0,phaseCount:archetype.phaseCount,headCount:1,phaseTransitionTimer:0,attackCooldown:1.65,attackSequence:0,attackInstance:null,fieldActive:false,fieldCenter:null,fieldRadius:0,fieldHazard:null};
- save.stats.bossesEncountered=(save.stats.bossesEncountered||0)+1;persist();game.boss=b;game.bossPending=null;game.enemies.push(b);toast(archetype.name+' 正在穿越裂隙！');playSfx('boss');
+ save.stats.bossesEncountered=(save.stats.bossesEncountered||0)+1;persist();game.boss=b;game.bossPending=null;game.enemies.push(b);toast(archetype.name+' 正在穿越裂隙！');sound(75,.7,'sawtooth',.04);
 }
 function spawnBossHealer(b){
  if(game.enemies.filter(e=>!e.dead&&e.bossHealer).length>=5)return;
@@ -1300,7 +1300,7 @@ function updateBossEncounter(dt){
  if(b.burn>0){b.burnTick=(b.burnTick||0)-dt;if(b.burnTick<=0){b.burnTick=.5;damageEnemy(b,b.burnDmg||4,'burn',null,false)}}
  if(b.dead)return;
  bossSyncPhase(b);
- if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;bossCancelAttack(b);b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');playSfx('stagger')}
+ if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;bossCancelAttack(b);b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
  b.phaseTransitionTimer=Math.max(0,(b.phaseTransitionTimer||0)-dt);
  const dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx);
  const committedAttack=!!b.attackInstance&&(b.attackInstance.stage==='telegraph'||b.attackInstance.stage==='active');if(b.vulnerable<=0&&b.freeze<=0&&!committedAttack&&b.phaseTransitionTimer<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);worldMoveEntity(b,Math.cos(a)*speed*(1-b.slow)*dt,Math.sin(a)*speed*(1-b.slow)*dt,Math.min(38,b.r*.45))}
