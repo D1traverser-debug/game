@@ -45,6 +45,20 @@ async def main():
                 "hud": await page.locator("#hud").is_visible()
             }
             report["checks"]["selected_wizard_starts_after_reload"] = report["run"]["hero"] == "Nyx" and report["run"]["ability"] == "☾" and report["run"]["hud"]
+            # Corrupt the primary record; the previous valid backup must restore the selected wizard.
+            await page.evaluate("localStorage.setItem('spellbrigade_solo_v1','{broken-json')")
+            await page.reload(wait_until="load")
+            await page.wait_for_timeout(200)
+            recovered = await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1'))")
+            recovery_archive = await page.evaluate("localStorage.getItem('spellbrigade_solo_v1_recovery')")
+            report["save_recovery"] = {"selectedCharacterId": recovered.get("selectedCharacterId"), "archive": recovery_archive}
+            report["checks"]["corrupt_primary_recovers_from_backup"] = recovered.get("selectedCharacterId") == "nyx" and bool(recovery_archive)
+            # If both copies are corrupt, preserve both raw records and create a valid fresh save.
+            await page.evaluate("localStorage.setItem('spellbrigade_solo_v1','not-json');localStorage.setItem('spellbrigade_solo_v1_backup','also-not-json')")
+            await page.reload(wait_until="load")
+            reset = await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1'))")
+            archived = await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1_recovery'))")
+            report["checks"]["double_corruption_recovers_to_defaults"] = reset.get("selectedCharacterId") == "aster" and reset.get("schemaVersion") == 4 and archived.get("source") == "primary_and_backup_corrupt"
             report["checks"]["no_runtime_errors"] = not report["page_errors"] and not report["console_errors"]
             report["checks"]["no_external_runtime_requests"] = not report["external_requests"]
             report["pass"] = all(report["checks"].values())

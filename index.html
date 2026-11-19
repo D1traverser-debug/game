@@ -341,7 +341,36 @@ const $=id=>document.getElementById(id), canvas=$('world');let ctx=canvas.getCon
 const W=()=>innerWidth,H=()=>innerHeight,TAU=Math.PI*2,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)],fmt=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 let dpr=1,screen='menu',last=0,toastTimer=0,audio=null,muted=false,keys={},joy={x:0,y:0,active:false},pointer={x:0,y:0};
 function resize(){dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.floor(W()*dpr);canvas.height=Math.floor(H()*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
-const SAVEKEY='spellbrigade_solo_v1';let save=loadSave();function loadSave(){try{return Object.assign({gold:0,runs:0,wins:0,best:0,selectedCharacterId:'aster',enchant:{},unlocks:['astral'],stats:{kills:0,casts:0,damage:0,fire:0,lightning:0,acid:0,ice:0,dark:0,lightningHits:0,iceHits:0,objectives:0,scrolls:0}},JSON.parse(localStorage.getItem(SAVEKEY)||'{}'))}catch(e){return {gold:0,runs:0,wins:0,best:0,selectedCharacterId:'aster',enchant:{},unlocks:['astral'],stats:{}}}}function persist(){try{localStorage.setItem(SAVEKEY,JSON.stringify(save))}catch(e){}$('goldTop').textContent=save.gold;if($('renderMode'))$('renderMode').textContent='画面：'+(save.renderMode==='3d'?'3D 实验':'2.5D 高清')}
+const SAVEKEY='spellbrigade_solo_v1',SAVEBACKUPKEY=SAVEKEY+'_backup',SAVERECOVERYKEY=SAVEKEY+'_recovery';
+function defaultSave(){return{gold:0,runs:0,wins:0,best:0,selectedCharacterId:'aster',enchant:{},unlocks:['astral'],stats:{kills:0,casts:0,damage:0,fire:0,lightning:0,acid:0,ice:0,dark:0,lightningHits:0,iceHits:0,objectives:0,scrolls:0}}}
+function parseStoredSave(raw){if(typeof raw!=='string'||!raw.trim())return null;const value=JSON.parse(raw);return value&&typeof value==='object'&&!Array.isArray(value)?value:null}
+function loadSave(){
+ let primaryRaw=null,backupRaw=null,primary=null,backup=null;
+ try{primaryRaw=localStorage.getItem(SAVEKEY);backupRaw=localStorage.getItem(SAVEBACKUPKEY)}catch(e){return defaultSave()}
+ try{primary=parseStoredSave(primaryRaw)}catch(e){}
+ try{backup=parseStoredSave(backupRaw)}catch(e){}
+ if(primary)return Object.assign(defaultSave(),primary);
+ if(backup){
+  const restored=Object.assign(defaultSave(),backup);
+  try{if(primaryRaw)localStorage.setItem(SAVERECOVERYKEY,JSON.stringify({source:'primary_corrupt',raw:primaryRaw}));localStorage.setItem(SAVEKEY,JSON.stringify(restored))}catch(e){}
+  return restored;
+ }
+ if(primaryRaw||backupRaw){
+  try{localStorage.setItem(SAVERECOVERYKEY,JSON.stringify({source:'primary_and_backup_corrupt',primary:primaryRaw,backup:backupRaw,at:new Date().toISOString()}));localStorage.removeItem(SAVEKEY);localStorage.removeItem(SAVEBACKUPKEY)}catch(e){}
+ }
+ return defaultSave();
+}
+let save=loadSave();
+function persist(){
+ try{
+  const current=localStorage.getItem(SAVEKEY);
+  if(current){try{parseStoredSave(current);localStorage.setItem(SAVEBACKUPKEY,current)}catch(e){}}
+  const serialized=JSON.stringify(save);
+  localStorage.setItem(SAVEKEY,serialized);
+  if(!localStorage.getItem(SAVEBACKUPKEY))localStorage.setItem(SAVEBACKUPKEY,serialized);
+ }catch(e){}
+ $('goldTop').textContent=save.gold;if($('renderMode'))$('renderMode').textContent='画面：'+(save.renderMode==='3d'?'3D 实验':'2.5D 高清')
+}
 const spells=[
 {id:'astral',name:'星界灵球',en:'Astral Orbs',icon:'✧',desc:'环绕巫师的奥术灵球周期性飞向敌人。',kind:'orbit',dmg:32,cd:.99,range:440},
 {id:'missile',name:'魔法飞弹',en:'Magic Missile',icon:'➶',desc:'追踪最近敌人的高速奥术飞弹。',kind:'homing',dmg:34,cd:1.35,range:460},
@@ -485,6 +514,7 @@ function normalizeSave(){
  save.renderMode=save.renderMode==='3d'?'3d':'2.5d';
  const supportsWebGL2=!!window.Game3D?.available;
  if(!supportsWebGL2) save.renderMode='2.5d';
+ for(const key of ['gold','runs','wins','best']){const value=Number(save[key]);save[key]=Number.isFinite(value)&&value>=0?value:0}
  save.selectedCharacterId=CHARACTER_BY_ID[save.selectedCharacterId]?save.selectedCharacterId:'aster';
  save.schemaVersion=4; persist();
  const renderModeButton=$('renderMode');
