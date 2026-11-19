@@ -275,3 +275,14 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - Added a CI matrix for Chromium, Firefox and WebKit covering desktop and mobile single-player flows.
 - The baseline natural run completed 4/4 wizard boss victories. Its job is now a required gate rather than continue-on-error.
 - Product status remains NOT_READY pending new CI, owner listening/visual acceptance and physical-device performance testing.
+
+
+## Scope, shared spell catalogue and CI reconciliation — 2026-11-19
+
+- Owner-approved scope is one offline single-player browser game: one Verdant Wilds realm, four original wizards, one complete solo loop. Source-game co-op, WSS, additional realms, roster expansion, Unity/native delivery and mandatory production WebGL2 are OUT_OF_SCOPE.
+- Commit 841178169fb2b3c8ea833a9a4a7fcb6f5f365465 reconciled the runtime spell allowlist and project governance. GitHub Actions run 44487444334 passed 24/24 jobs, including Chromium, Firefox and WebKit desktop/mobile smoke, the shared spell catalogue regression, four-wizard natural boss runs and offline package verification.
+- Verified HTML artifact: 799,965 bytes; SHA-256 8faf86ac248a15f89d12a74dd052458bf3ea5dfcb680417a880f1fca828d0f85. CI artifact ID 14511171526; compressed ZIP 514,531 bytes. Download: https://github.com/D1traverser-debug/game/actions/runs/44487444334/artifacts/14511171526
+- The current playable spell pool has 18 IDs: four wizard starters plus fourteen shared quest unlocks. The runtime still carries 25 definitions; seven unsupported legacy signatures are excluded from research, quest, trial and level-up eligibility. This is a product allowlist, not a claim of complete source-game parity.
+- The 18-ID shared pool passed the current 13-check browser regression. A follow-up test-hardening pass is being prepared to assert the exact 25-definition inventory, exact 18-ID eligible set, all 14 quest entries, four unique wizard starters and size-upgrade eligibility.
+- Product status remains NOT_READY. Bespoke character rigs/animation, authored art/VFX/UI/audio, source-version content reconciliation, physical device/controller testing, representative-hardware performance, real-player map exploration and owner/independent acceptance remain open.
+- CAOS remains read-only; all work is confined to this game repository.

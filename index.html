@@ -770,7 +770,8 @@ function offerUpgrade(reason){if(screen!=='playing')return;let p=game.player,opt
  }
 let rarity=()=>{let r=Math.random(),luck=p.luck+(save.enchant.luck||0)*1;if(r<.04+luck*.003)return'LEGENDARY';if(r<.29+luck*.007)return'EPIC';if(r<.54+luck*.01)return'RARE';return'COMMON'};
 // Source-backed global character upgrades are offered alongside spell improvements.
-const SIZE_UPGRADE_SPELLS=new Set(['sword','solar','bell','hex','necro','blades','rocky','sickle','sprout','talon']);
+// Only spells in the current shared solo catalogue may unlock the size-stat offer.
+const SIZE_UPGRADE_SPELLS=new Set(['sword','solar','bell','blades','rocky','sprout','talon']);
 const CHARACTER_UPGRADES=[
  {k:'maxHp',name:'生命锻造 · Vitality Forge',icon:'♡',values:{COMMON:100,RARE:200,EPIC:300,LEGENDARY:400},desc:v=>'最大生命值提高 '+v+'，并立即恢复新增生命上限的 25%生命。'},
  {k:'regen',name:'复苏回响 · Rejuvenating Echo',icon:'✚',values:{COMMON:1,RARE:2,EPIC:3,LEGENDARY:4},desc:v=>'每秒生命恢复提高 '+v+'。'},

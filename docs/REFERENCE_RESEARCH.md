@@ -77,7 +77,9 @@ Source: https://steamcommunity.com/app/2904000/allnews/ (6 Oct 2026 entry, lines
 - These are pilot-control defects, not proof of production balance. Keep product damage/objective values unchanged pending a competent natural-run test.
 
 
-## Full-game scope rebaseline — 2026-11-18
+## Original source-game product research — REFERENCE ONLY, NOT AETHERWILDS SCOPE (2026-11-18)
+
+This section describes the commercial source game, not this repository's product scope. Aetherwilds remains one offline single-player realm with four original wizards. Source-game co-op, additional realms, larger rosters and achievements are research references only; they do not authorize implementation or release gates.
 
 **Official sources**
 - Steam product page: https://store.steampowered.com/app/2904000/The_Spell_Brigade/?l=schinese — product description explicitly states 1–4 player online co-op, team objectives, friendly fire and spell synergies; feature list includes solo, online co-op and cross-platform multiplayer.
@@ -103,4 +105,4 @@ The current research cannot yet support a single authoritative count:
 - The detailed `MECHANIC_REFERENCE_MATRIX.md` records five primary elements (Fire, Lightning, Acid, Ice, Dark), five advanced self-pair effects (Wildfire, Thunder, Corrosion, Frost, Void), and ten mixed-pair effects (Plasma, Flux, Shadowbolt, Glint, Brimstone, Hellfire, Frostbite, Miasma, Blight, Wither).
 - A separate community elements guide summarizes seven element identities and ten dual-element combinations.
 - Official 1.2.0.20127 patch notes confirm Plasma infusion burn behavior and crit scaling for Flux, Glint and Shadowbolt, but do not publish the complete current infusion matrix.
-- Therefore the product brief must not claim a verified "7 + 10" catalogue. Current working hypothesis is five primary elements plus fifteen advanced infusion candidates; this remains unverified. Capture the full current in-game infusion UI and reconcile every pair/effect before implementation.
+- Therefore Aetherwilds must not claim source-game parity for a verified "7 + 10" catalogue. Five primary elements plus fifteen advanced infusion candidates remains an unverified source-game research hypothesis, not a current product requirement. Reconcile every pair/effect only when it materially informs the selected single-player design.

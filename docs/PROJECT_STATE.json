@@ -25,10 +25,12 @@
       "landmarks": 7,
       "enemy_archetypes": 7,
       "boss_archetypes": 3,
-      "spell_definitions": 25,
-      "objective_families": 9
+      "spell_definitions": 18,
+      "objective_families": 9,
+      "runtime_spell_definitions": 25,
+      "legacy_out_of_scope_spell_definitions": 7
     },
-    "content_count_confidence": "Counts reflect current repository implementation and are being validated by browser regression; not a claim of source-game completeness.",
+    "content_count_confidence": "18 eligible shared solo spell IDs (4 starters + 14 quest unlocks); 25 definitions remain in runtime, with 7 legacy signatures excluded. Counts describe this repository's implementation, not source-game completeness.",
     "engine": "2.5D atlas renderer with Canvas 2D simulation; experimental WebGL2 is not a release dependency",
     "final_delivery": "Offline-capable static browser game",
     "original_ip_required": true,
@@ -333,7 +335,7 @@
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
     "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines."
   ],
-  "next_action": "Run the full CI matrix on the scope/catalogue governance candidate. Then audit all 25 spell definitions and 18 eligible IDs with evidence-backed disposition, followed by a controlled deterministic-RNG integration experiment. Keep physical-device, production art/audio and owner acceptance gates open.",
+  "next_action": "Run the full CI matrix on the exact-catalogue hardening candidate. If it passes, proceed to one bounded deterministic-RNG integration slice, separating gameplay randomness from render/audio randomness. Keep production art/audio, source-version reconciliation, physical-device performance and owner acceptance gates open.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -362,7 +364,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "SCOPE_AND_CATALOGUE_RECONCILIATION_CANDIDATE_CI_PENDING",
+  "latest_candidate_ci_status": "SPELL_CATALOGUE_HARDENING_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44484418951,
@@ -479,11 +481,11 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 799965,
-    "status": "SCOPE_AND_CATALOGUE_RECONCILIATION_CANDIDATE_CI_PENDING",
+    "bytes": 800026,
+    "status": "SPELL_CATALOGUE_HARDENING_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
-    "runtime_dependencies": "self-contained prototype; no external runtime CDN",
+    "runtime_dependencies": "offline-capable static browser package with local ES modules; no external runtime CDN",
     "map": "verdant_wilds · 2400x1800 · six districts · seven landmarks",
     "characters": [
       "aster",
@@ -491,13 +493,13 @@
       "briar",
       "nyx"
     ],
-    "sha256": "8faf86ac248a15f89d12a74dd052458bf3ea5dfcb680417a880f1fca828d0f85"
+    "sha256": "4cb637011ae5b670ddc183bc07434b3b7a84c1fa1227291021cdd8c0119be50a"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
     "target_renderer": "2.5D atlas renderer with Canvas 2D simulation",
     "current_renderer": "2.5D atlas primary; experimental WebGL2 optional",
-    "renderer_decision": "raw WebGL2 versus bundled Three.js; no CDN runtime",
+    "renderer_decision": "2.5D atlas/Canvas 2D is the production default; raw WebGL2 is optional experimental work and not a release dependency.",
     "input": [
       "keyboard_mouse",
       "controller",
@@ -613,6 +615,7 @@
     "CI run 44484418951 passed 24/24 jobs on commit 63fd96a; Chromium/Firefox/WebKit desktop/mobile smoke passed and all four natural wizard runs defeated their selected bosses.",
     "Reconciled product requirements and issue register with the owner-approved one-realm four-wizard offline solo scope; multiplayer, WSS, extra realms, native builds and mandatory production WebGL2 are explicitly OUT_OF_SCOPE.",
     "Renamed the implemented 18-ID shared solo spell allowlist from the stale Reginald-only identifier and aligned its regression test and research notes with the four-wizard product.",
-    "This scope/catalogue governance candidate has not yet been CI-verified; retain NOT_READY until its own CI and human acceptance."
+    "This scope/catalogue governance candidate has not yet been CI-verified; retain NOT_READY until its own CI and human acceptance.",
+    "Hardening the shared spell catalogue regression to assert the exact 25 runtime definitions, exact 18 eligible IDs, fourteen shared quest unlocks, four unique character starters, all research entries, save migration and size-upgrade eligibility. The candidate is not yet CI-verified."
   ]
 }
