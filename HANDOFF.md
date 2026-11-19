@@ -350,3 +350,8 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 ### Enemy RNG replay metadata and CI wiring — 2026-11-19
 
 The result screen now displays the enemy RNG sequence (`0xE11E`, decimal 57630) alongside the expedition seed and PCG algorithm version, so the spawn stream's seed/sequence contract is inspectable. The new regression verifies all three values appear. The workflow's PR base-branch filter includes `work/objective-rng-integration-001` so this stacked PR receives the same complete required CI matrix. Candidate `index.html` checkpoint: 804261 bytes, SHA-256 `0161b492aa0d7079e942513443e27d8e4a25c43fe0f3d52437a859dbc41086bb`. CI pending.
+
+
+## Enemy RNG natural-run fixture recalibration — 2026-11-19
+
+CI run `44525204498` passed the checkpoint, package, new 15/15 enemy-director RNG regression and all other completed browser jobs, but the previous fixed natural-run fixtures passed only 1/4. Ember seed 42 defeated Sol'phish; Aster seed 45 left Krog'wa at 12826.1/23500 HP; Briar seed 43 left Krog'wa at 19354.4/23500 HP; Nyx seed 48 left Sol'phish at 5444.2/22000 HP. All three failed runs survived to the 1500-second cap; there were no JS, console or network errors. The spawn stream change alters natural enemy populations and the legacy random call sequence. No production balance or time-limit changes are authorized. The test harness now scouts a fixed, ordered set of seeds per wizard, stops at the first natural boss win, records every failed trial, and requires one win for each wizard. After scouting, freeze the winning seed per wizard and restore a single-run gate if the result is stable.

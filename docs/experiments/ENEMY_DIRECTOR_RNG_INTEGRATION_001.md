@@ -32,3 +32,8 @@ This slice does not make combat or full-run outcomes deterministic. It does not 
 ## CI wiring
 
 The QA workflow now allows pull requests targeting `work/objective-rng-integration-001`, the base of this stacked change. This ensures the complete required matrix runs for the enemy-director slice without combining it into the earlier objective RNG PR.
+
+
+## Natural-run parity checkpoint — 2026-11-19
+
+The first enemy RNG candidate CI run `44525204498` passed the dedicated enemy spawn regression, but natural-run fixtures 45/42/43/48 produced only one boss victory (Ember). Aster/Briar/Nyx survived to the 1500-second cap with Boss HP remaining; no runtime/console/network errors. The test-only pilot was not changed to force damage, HP, boss death or objective completion. A bounded ordered seed sweep is being used to find deterministic replay fixtures per wizard. Production balance and the 1500-second acceptance limit remain unchanged.
