@@ -159,3 +159,10 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Before import, the prior primary and backup records are copied into the recovery archive.
 - Browser regression covers download payload, restore of gold and selected wizard, and rejection of unsupported format versions without overwriting the current save.
 - Fixed the duplicated word in the menu's realm title.
+
+
+## Natural-run telemetry expansion — 2026-11-19
+
+- The natural-run regression now records the last damage sources, Gnasher hits, boss HP, selected upgrades, and objective progress timeline for each wizard.
+- This is diagnostic instrumentation only. It does not alter production gameplay or relax the natural-victory acceptance criteria.
+- Use the resulting evidence to identify whether deaths are caused by contact damage, ranged projectiles, Gnasher leaps, boss attacks, poor upgrade choices or objective routing before changing balance.

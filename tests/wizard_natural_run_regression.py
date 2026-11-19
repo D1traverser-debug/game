@@ -64,7 +64,11 @@ async def main():
     "wins":state["wins"],"hp":round(state["hp"],1),"maxHp":state["maxHp"],
     "level":state["level"],"kills":state["kills"],"objectives":state["objectives"],
     "armor":state["armor"],"regen":state["regen"],"enemyCount":state["enemyCount"],
-    "position":state["position"],"trace":state["trace"][-8:],
+    "position":state["position"],"bossHp":state["bossHp"],"bossMax":state["bossMax"],
+    "damageEvents":state["damageEvents"][-8:],"pilotDodgeStats":state["pilotDodgeStats"],
+    "recentGnasherHits":state["gnasherHits"][-5:],"recentUpgrades":state["upgradeLog"][-8:],
+    "objectiveTimeline":[{"t":x["t"],"type":x["objective"],"progress":x["objectiveProgress"],"target":x["objectiveTarget"],"time":x["objectiveTime"],"position":x["position"]} for x in state["trace"] if x["objective"]],
+    "trace":state["trace"][-8:],
     "pageErrors":errors,"consoleErrors":console,"externalRequests":requests,
     "simulationHarness":state["simulationHarness"],"renderRandomCalls":state["renderRandomCalls"]
    }
