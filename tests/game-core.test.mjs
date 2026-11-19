@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import { writeFile } from 'node:fs/promises';
+import { writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
@@ -151,7 +151,7 @@ function boot(seed) {
     compiled = new vm.Script(instrumentedScript, {filename:'game-inline.js'});
   } catch (error) {
     const path = '/tmp/game-inline-debug.js';
-    await writeFile(path, instrumentedScript);
+    writeFileSync(path, instrumentedScript);
     const check = spawnSync(process.execPath, ['--check', path], {encoding:'utf8'});
     console.error(check.stderr || error.stack);
     throw error;
