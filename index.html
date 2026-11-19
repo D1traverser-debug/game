@@ -1241,6 +1241,15 @@ function bossUpdateMulMinions(b,dt){
   }else{if(dist>82){worldMoveEntity(e,dx/dist*e.speed*dt,dy/dist*e.speed*dt,e.r)}if(dist<250)b.hp=Math.min(b.max,b.hp+dt*b.max*.00072)}
  }
 }
+function bossContactDamage(b){
+ // Body contact is a low-level bump, not a substitute for the boss's telegraphed attacks.
+ return b.bossId==='krog'?12:10;
+}
+function bossContactKnockback(b,p,dx,dy,d){
+ const overlap=Math.max(0,b.r+p.r+8-d);
+ const push=clamp(34+overlap,34,52);
+ worldMoveEntity(p,dx/d*push,dy/d*push,p.r);
+}
 function updateBossEncounter(dt){
  const g=game,b=g?.boss,p=g?.player;if(!b)return;if(b.dead){if(b.fieldHazard)b.fieldHazard.life=0;return}
  const spec=BOSS_ARCHETYPES.find(x=>x.id===b.bossId)||BOSS_ARCHETYPES[0];
@@ -1259,7 +1268,14 @@ function updateBossEncounter(dt){
  const attackText=b.attackInstance?.stage==='telegraph'?' · 蓄势：'+b.attackInstance.def.label:'';
  const status=$('bossname');status.textContent=spec.label+phaseText+headText+(b.vulnerable>0?' · 失衡 +200%':'')+attackText;
  status.style.textShadow=b.vulnerable>0?'0 0 14px #ffd887':'0 2px 9px #060e0d';
- if(d<b.r+p.r+8&&b.vulnerable<=0){b.touch=(b.touch||0)-dt;if(b.touch<=0){damagePlayer(b.bossId==='krog'?41:32,'boss');b.touch=.9}}
+ if(d<b.r+p.r+8&&b.vulnerable<=0){
+  b.touch=(b.touch||0)-dt;
+  if(b.touch<=0){
+   damagePlayer(bossContactDamage(b),'bossContact');
+   bossContactKnockback(b,p,dx,dy,d);
+   b.touch=1.1;
+  }
+ }
  if(b.hp<=0&&!b.dead)killEnemy(b);
 }
 function pause(){if(screen!=='playing')return;let p=game.player;$('pauseStats').innerHTML=[['等级',p.level],['击杀',p.kills],['伤害',Math.floor(p.damageDone)],['目标',p.objectives]].map(a=>`<div class="statbox"><b>${a[1]}</b><span>${a[0]}</span></div>`).join('');show('pause')}

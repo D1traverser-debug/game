@@ -45,3 +45,8 @@ A Gnasher leap is a telegraphed heavy hit, not a near-full-health one-shot. Stan
 ## Boss healing counterplay
 
 During the Mul'gath encounter, auto-cast spells prioritize an in-range live healing servant. This exposes the intended counterplay in a game with automatic targeting; the priority is limited to the Mul'gath encounter and falls back to normal nearest-target behavior when no servant is in range. Boss telegraph shapes remain committed at attack start and must be evaluated as circles, lines, or grids by any automated player policy.
+
+
+## Boss body-contact contract
+
+Boss body collision is a low-damage bump, distinct from committed telegraphed attacks. Sol and Mul contact for 10 raw damage; Krog contacts for 12. Contact pushes the player 34–52 world units and uses a 1.1-second cooldown. Boss skill telegraphs, projectiles and their damage remain independent. Browser regression verifies the contact contract; full-run and human balance acceptance remain separate.

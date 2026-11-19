@@ -227,3 +227,13 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - The package builder now includes both launchers and the server, records their paths/loopback endpoint in the manifest, and verifies byte-identical copies.
 - If Python is missing on Windows, `PLAY.bat` falls back to opening the standalone HTML. The local server remains preferred for module loading and storage consistency.
 - CI and owner-machine launch verification are pending. This is still an offline local website package, not a publicly hosted site.
+
+
+## Boss body-contact counterplay — 2026-11-19
+
+- The four-wizard natural-run trace on commit `5d6aedb` showed Aster and Ember dying during Sol'phish after repeated `source: boss` body-contact calls at 32 raw damage; Krog used 41. These are distinct from telegraphed boss attacks and their projectiles.
+- Boss body contact is now treated as a low-damage bump: Sol/Mul 10 raw, Krog 12 raw.
+- Each body contact applies 34–52 units of physical pushback and has a separate 1.1-second contact cooldown.
+- The telegraphed boss attack definitions and their damage values are unchanged.
+- Added deterministic browser checks for damage values, pushback, cooldown and source classification.
+- Candidate CI and the fresh four-wizard natural run are pending. Do not claim balance acceptance until both results are inspected.

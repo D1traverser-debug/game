@@ -89,6 +89,24 @@ window.__BOSS_QA={
  commitment:()=>{const b=window.__BOSS_QA.spawn('krog');bossBeginAttack(b,BOSS_ATTACK_DEFS.krog[1]);const before={x:b.x,y:b.y};game.player.x=b.x+800;game.player.y=b.y;updateBossEncounter(.1);return{stationary:Math.abs(b.x-before.x)<.001&&Math.abs(b.y-before.y)<.001,before,after:{x:b.x,y:b.y}}},
  pauseClock:()=>{const b=window.__BOSS_QA.spawn('sol'),a=bossBeginAttack(b,BOSS_ATTACK_DEFS.sol[0]),life=game.hazards.find(h=>h.bossAttackToken===a.token)?.life,time=game.time,timer=a.timer;pause();update(.2);const result={timeUnchanged:game.time===time,attackTimerUnchanged:a.timer===timer,warningLifeUnchanged:game.hazards.find(h=>h.bossAttackToken===a.token)?.life===life};resume();return result},
  invulnerability:()=>{const p=game.player;p.hp=100;p.maxHp=100;p.invuln=1;p.dodge=0;const a={def:{effect:'impact',damage:50},geometry:{kind:'circle',x:p.x,y:p.y,r:100},resolved:false};bossResolveAttack(null,a,.1);const afterFirst=p.hp;p.invuln=0;bossResolveAttack(null,a,.1);return{blocked:afterFirst===100,notReplayed:p.hp===100,resolved:a.resolved}},
+  contact:()=>{
+   const b=window.__BOSS_QA.spawn('sol'),p=game.player;
+   const open=worldFindOpenPoint(0,0,p.r,500);
+   p.x=open.x;p.y=open.y;p.hp=p.maxHp=1000;p.armor=0;p.dodge=0;p.invuln=0;p.ghost=false;
+   b.x=open.x+58;b.y=open.y;b.speed=0;b.vulnerable=0;b.phaseTransitionTimer=0;b.touch=0;
+   const beforeDistance=Math.hypot(p.x-b.x,p.y-b.y);
+   const sources=[],baseDamagePlayer=damagePlayer;
+   damagePlayer=function(n,source='enemy'){sources.push(source);return baseDamagePlayer(n,source)};
+   updateBossEncounter(.01);
+   damagePlayer=baseDamagePlayer;
+   const firstDamage=1000-p.hp,afterDistance=Math.hypot(p.x-b.x,p.y-b.y),cooldown=b.touch;
+   p.x=b.x-20;p.y=b.y;p.invuln=0;
+   const beforeRepeat=p.hp;
+   updateBossEncounter(.01);
+   const repeatBlocked=p.hp===beforeRepeat;
+   return{firstDamage,beforeDistance,afterDistance,cooldown,repeatBlocked,sources,
+    archetypeDamage:{sol:bossContactDamage({bossId:'sol'}),krog:bossContactDamage({bossId:'krog'}),mul:bossContactDamage({bossId:'mul'})}};
+  },
   renderAll:()=>{let twoD=0,threeD=0,has3D=!!window.Game3D?.available;for(const [id,defs] of Object.entries(BOSS_ATTACK_DEFS)){for(const def of defs){game.hazards=game.hazards.filter(h=>!h.bossAttackToken);window.__BOSS_QA.spawn(id);bossBeginAttack(game.boss,def);drawWorld();twoD++;if(has3D){window.Game3D.render(game,game.time);threeD++}}}return{twoD,threeD,has3D}}
 };
 """
@@ -126,6 +144,11 @@ async def main():
   commitment=await page.evaluate("__BOSS_QA.commitment()");c["boss_commits_position_during_telegraph"]=commitment["stationary"]
   paused=await page.evaluate("__BOSS_QA.pauseClock()");c["pause_freezes_attack_and_warning_clocks"]=paused["timeUnchanged"] and paused["attackTimerUnchanged"] and paused["warningLifeUnchanged"]
   invuln=await page.evaluate("__BOSS_QA.invulnerability()");c["invulnerability_blocks_attack_once"]=invuln["blocked"] and invuln["notReplayed"] and invuln["resolved"]
+  contact=await page.evaluate("__BOSS_QA.contact()")
+  c["boss_body_contact_is_lower_than_telegraphed_attacks"]=contact["archetypeDamage"]=={"sol":10,"krog":12,"mul":10} and contact["firstDamage"]==10
+  c["boss_body_contact_pushes_player_out_of_overlap"]=contact["afterDistance"]>contact["beforeDistance"]+25 and contact["afterDistance"]>80
+  c["boss_body_contact_has_separate_cooldown"]=contact["cooldown"]>=1.09 and contact["repeatBlocked"]
+  c["boss_body_contact_is_classified_separately"]=contact["sources"]==["bossContact"]
   # Exercise every attack shape through the available render paths; this is smoke, not human acceptance.
   rendered=await page.evaluate("__BOSS_QA.renderAll()");c["all_nine_attack_telegraphs_render"]=rendered["twoD"]==9 and (not rendered["has3D"] or rendered["threeD"]==9)
   c["no_runtime_exceptions"]=not outcome["page_errors"];c["no_external_requests"]=not outcome["requests"]

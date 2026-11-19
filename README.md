@@ -41,3 +41,7 @@ Mul'gath's live healing servants are now explicit auto-target priorities when in
 4. If Python 3 is not installed on Windows, `PLAY.bat` falls back to opening `index.html` directly. The local server is preferred because it loads the modular runtime and provides more reliable browser storage.
 
 The game is single-player and offline-capable. The local server does not expose the game to the public internet.
+
+
+### Boss collision and counterplay
+Boss body contact is deliberately weaker than a telegraphed boss ability and applies a short knockback plus an independent cooldown. The boss's authored attacks remain the primary high-damage threats and retain their visible warning windows. The current counterplay candidate is awaiting CI and a fresh four-wizard natural run.
