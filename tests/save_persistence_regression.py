@@ -40,6 +40,19 @@ async def main():
             classes = await page.locator('[data-character="nyx"]').get_attribute("class")
             report["checks"]["selection_survives_reload"] = "selected" in classes
             await page.locator("#characterBack").click()
+            await page.locator("#settings").click()
+            for selector, value in [("musicRange", 41), ("sfxRange", 62), ("ambienceRange", 29), ("uiRange", 73)]:
+                await page.locator("#" + selector).evaluate("(e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}))}", value)
+            await page.locator("#audioMute").click()
+            audio_before_reload = await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1')).audio")
+            report["audio_before_reload"] = audio_before_reload
+            report["checks"]["audio_mixer_saved_to_local_storage"] = audio_before_reload == {"music": 0.41, "sfx": 0.62, "ambience": 0.29, "ui": 0.73, "muted": True}
+            await page.reload(wait_until="load")
+            await page.locator("#settings").click()
+            audio_after_reload = await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1')).audio")
+            report["checks"]["audio_mixer_survives_reload"] = audio_after_reload == audio_before_reload and await page.locator("#musicRange").input_value() == "41" and await page.locator("#sfxRange").input_value() == "62"
+            await page.locator("#audioMute").click()
+            await page.locator("#settingsBack").click()
             await page.evaluate("""() => {
                 const key = "spellbrigade_solo_v1";
                 const data = JSON.parse(localStorage.getItem(key));

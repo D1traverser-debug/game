@@ -57,3 +57,7 @@ The four wizards now show simulation-timed spell-cast sparks, an active-ability 
 
 ### Adaptive procedural soundtrack
 The offline score layers sustained harmony, bass, per-character melodies, plucked harmonics and deterministic percussion. Boss phases and critical health add tension layers. It uses the Web Audio API without external audio files or CDN requests. Listening review and professionally recorded asset production remain separate acceptance items.
+
+
+## Audio and browser compatibility
+Open **音频设置** from the main menu to independently adjust music, combat sound effects, forest ambience and UI cues; the mix and master-mute preference persist locally. The soundtrack, ambience and named combat cues are synthesized in Web Audio, so the static build remains offline and ships no external audio dependencies. CI runs desktop/mobile smoke coverage in Chromium, Firefox and WebKit.

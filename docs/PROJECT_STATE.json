@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "ADAPTIVE_AUDIO_SCORE_001",
+  "checkpoint": "AUDIO_MIXER_SFX_AMBIENCE_AND_BROWSER_MATRIX_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -329,20 +329,20 @@
     "Map regions and landmarks are authored and navigable, but collision/occlusion, environmental interaction and real player exploration review remain incomplete.",
     "Natural full-run balance and boss victory have not yet been demonstrated for all four selectable wizards on this exact build.",
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
-    "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
     "Save import/export is implemented and under CI verification; cross-browser file chooser/download behavior still requires Firefox/WebKit and physical-device acceptance.",
     "Save export/import is implemented; current Playwright download/import regression and cross-browser file chooser behavior are pending CI and Firefox/WebKit acceptance.",
     "Controller input mapping is implemented and under Chromium automation; physical Xbox/PlayStation controller pairing and browser-specific Gamepad API behavior remain untested.",
     "The four-wizard natural full-run matrix must be rerun on this balance candidate; automated and human full-run wins remain unverified until then.",
     "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted.",
-    "Four-wizard natural-run acceptance remains incomplete: latest balance candidate achieved 2/4 wins; Aster/Sol and Briar/Mul'gath need a new natural-run result after healer auto-target and telegraph-aware pilot changes.",
     "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted.",
     "One-click launch package awaits CI verification; local Windows/macOS/Linux execution and browser storage acceptance remain untested on owner hardware.",
-    "The new boss body-contact counterplay patch has not yet passed CI or been evaluated by a fresh four-wizard natural run. Human playtest, visual/audio review, bespoke animation and cross-browser/device performance remain open.",
     "Spell-cast/ability/hit feedback animation candidate is awaiting browser visual regression; full bespoke skeletal rigs, authored animation clips, original recorded music/SFX and human art review remain open.",
-    "Adaptive procedural score candidate awaits CI and listening review; it is not a substitute for professionally recorded/original audio assets. Bespoke skeletal rigs, authored animation clips, VFX polish, cross-browser/physical-device performance and owner playtest remain open."
+    "Adaptive procedural score candidate awaits CI and listening review; it is not a substitute for professionally recorded/original audio assets. Bespoke skeletal rigs, authored animation clips, VFX polish, cross-browser/physical-device performance and owner playtest remain open.",
+    "Audio system is synthesized and now has independent persistent channel controls plus named event cues; owner still needs to listen on target speakers/headphones and approve mix/loudness.",
+    "Chromium, Firefox and WebKit desktop/mobile automated smoke matrix added; current candidate CI pending.",
+    "Physical iOS/Android devices, real controllers, low-end GPU frame-time and long-session thermal/performance acceptance still require target-device testing."
   ],
-  "next_action": "Verify adaptive soundtrack regression and the latest four-wizard natural-run on the exact current build; then continue single-player visual, VFX, accessibility and owner acceptance.",
+  "next_action": "Run the new required CI matrix; fix any cross-browser or audio regression; then create a release candidate package for owner playtest.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -371,7 +371,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "ADAPTIVE_AUDIO_SCORE_001_CI_PENDING",
+  "latest_candidate_ci_status": "AUDIO_AND_CROSS_BROWSER_CANDIDATE_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -488,7 +488,7 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 790807,
+    "bytes": 799896,
     "status": "ADAPTIVE_AUDIO_SCORE_001_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
@@ -515,7 +515,7 @@
     "multiplayer": "OUT_OF_SCOPE",
     "multiplayer_target": "NONE",
     "hosting": "offline_static_preview_with_loopback_launcher",
-    "browser_matrix": "Chromium automation only; Firefox/WebKit/physical devices NOT_TESTED",
+    "browser_matrix": "Chromium/Firefox/WebKit desktop + mobile smoke automation added; CI pending; physical devices NOT_TESTED",
     "status": "SINGLE_PLAYER_BROWSER_BUILD",
     "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_AND_DAMAGE_PIPELINE_INTEGRATED; OTHER CORE MODULES STILL INCREMENTAL",
     "core_modules": [
@@ -528,7 +528,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contracts; clock/damage integration; roster/map/ability; desktop/mobile selection; objective; save export/import; audio; normal-play; enemy balance with post-armor damage budget; survival-upgrade offer regression; four-wizard natural-run exploratory regression.",
+    "core_tests": "22 Node contracts; clock/damage integration; gameplay regressions; audio mixer/SFX/ambience regression; Chromium/Firefox/WebKit desktop/mobile smoke pending CI",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -561,7 +561,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "Latest four-wizard natural run on commit 5d6aedb passed Briar/Mul and Nyx/Krog, but Aster/Sol and Ember/Sol died to repeated untelegraphed boss-body contact (32 raw damage every 0.9s; Krog 41). New candidate reduces body contact to 10 (12 Krog), adds 1.1s independent contact cooldown and 34–52 unit knockback; telegraphed boss abilities retain their distinct damage. CI and natural-run rerun pending.",
+    "natural_run_matrix": "REQUIRED GATE: baseline commit 4940a2eb passed natural solo boss victories for all four selectable wizards (Aster/Sol 20:00; Ember/Sol 20:15; Briar/Mul 21:23; Nyx/Krog 20:28). Promoted from continue-on-error exploratory job to required CI gate.",
     "launcher": {
       "windows": "PLAY.bat",
       "unix": "PLAY.sh",
@@ -569,6 +569,33 @@
       "default_host": "127.0.0.1",
       "default_port": 8000,
       "public_network_exposure": false
+    },
+    "audio": {
+      "status": "PROCEDURAL_ADAPTIVE_SCORE_AND_AMBIENCE_WITH_NAMED_SFX_BANK",
+      "channels": [
+        "music",
+        "sfx",
+        "ambience",
+        "ui"
+      ],
+      "persistent_mixer": true,
+      "master_mute": true,
+      "wizard_specific_casts": true,
+      "combat_events": [
+        "spell_cast",
+        "element_impact",
+        "player_hurt",
+        "objective_complete",
+        "boss_arrival",
+        "boss_stagger",
+        "ghost_phase",
+        "pickup",
+        "chest",
+        "victory",
+        "defeat"
+      ],
+      "external_audio_assets": 0,
+      "remaining": "Owner listening review and final loudness/balance pass"
     }
   },
   "last_single_player_ci": {
@@ -580,5 +607,12 @@
     "required_jobs_total": 20,
     "exploratory_wizard_natural_runs": "1/4 boss wins",
     "scope": "One-map offline browser single-player; not release acceptance."
-  }
+  },
+  "candidate_work": [
+    "Added persistent independent music, combat SFX, ambience and UI volume controls with master mute and audio preview.",
+    "Added throttled named SFX for wizard-specific casting/abilities, elemental impacts, pickups, objectives, boss arrival/stagger, ghost phase and run results.",
+    "Added low-level looping forest ambience that is separately controlled from adaptive music.",
+    "Added Chromium/Firefox/WebKit desktop and mobile-flow regression matrix.",
+    "Promoted four-wizard natural boss-win simulation from exploratory continue-on-error to a required CI gate."
+  ]
 }

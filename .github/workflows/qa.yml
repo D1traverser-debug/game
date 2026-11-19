@@ -82,6 +82,28 @@ jobs:
       - name: Verify production damage functions use DamagePipeline
         run: python web/tests/runtime_damage_integration.py
 
+  browser-compatibility:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright browser
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright
+          python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Verify desktop and mobile single-player flow
+        env:
+          AETHER_BROWSER: ${{ matrix.browser }}
+        run: python tests/browser_compatibility_regression.py
+
   browser-component:
     strategy:
       fail-fast: false
@@ -126,12 +148,10 @@ jobs:
 # online co-op, commercial-quality assets, physical-device performance or player acceptance.
 
   
-  # Exploratory until every wizard has a repeatable natural win on the same build.
-  # Keep it visible in CI while tuning; promote to a required gate after all four pass.
+  # Required gate: every selectable wizard must finish a natural solo expedition on the same build.
   wizard-natural-run:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

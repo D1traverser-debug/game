@@ -264,3 +264,14 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - A cached deterministic noise buffer feeds filtered snare/hat/impact layers. Character motifs differ for Aster, Ember, Briar and Nyx.
 - Extended the browser audio regression to verify the percussion buffer, character motif and boss/low-health adaptive layers.
 - This is an original procedural score candidate, not professionally recorded music. CI and listening review are pending.
+
+
+## Audio mixer, SFX and cross-browser release gate — 2026-11-19
+
+- Added a dedicated audio settings screen with independent persistent music, combat SFX, forest ambience and UI volumes (0–100%) plus master mute and preview.
+- Existing adaptive character-motif score follows the music channel. A subtle looped forest ambience follows the ambience channel.
+- Added named/throttled one-shot cues for character-specific casts and abilities, elemental impacts, damage, pickups, objective completion, boss arrival/stagger, ghost phase, chests and run results.
+- The audio engine remains fully procedural and offline; no external audio files or CDN runtime were introduced.
+- Added a CI matrix for Chromium, Firefox and WebKit covering desktop and mobile single-player flows.
+- The baseline natural run completed 4/4 wizard boss victories. Its job is now a required gate rather than continue-on-error.
+- Product status remains NOT_READY pending new CI, owner listening/visual acceptance and physical-device performance testing.

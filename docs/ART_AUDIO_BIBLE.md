@@ -15,7 +15,7 @@ Each needs distinct selection portrait, gameplay tint/silhouette treatment, cast
 One bounded map with named districts, seven landmarks, river, bridges, weathered roads, central rift, foliage, ruins and map boundary. The minimap and world navigation must agree with the actual playable coordinates.
 
 ## Audio
-Original adaptive music, ambience, enemy cues, wizard-specific ability sounds, spell casts/impacts, damage, objectives, boss phases, UI and results. Add separate music/SFX/ambience/UI volume and mute controls.
+Original adaptive procedural music with character motifs, looped forest ambience, wizard-specific cast/ability signatures, elemental impacts, player damage, pickups, objectives, boss arrival/stagger, ghost phase, chest and result cues. Independent persistent music/SFX/ambience/UI levels (0–100%) and master mute are exposed in the audio settings screen. The sound engine is fully synthesized in Web Audio and has no external runtime assets. Owner listening review and loudness balance remain release gates.
 
 ## Provenance and budgets
 No copied commercial character/creature designs, extracted assets or proprietary recordings. Every external asset needs documented commercial-use rights. Bundle assets or serve from controlled origin; no CDN runtime. Current atlas/procedural art and synthesized audio are prototypes until visually and aurally reviewed by the owner.
