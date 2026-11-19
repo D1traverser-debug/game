@@ -245,3 +245,13 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - Moved the boss-contact implementation into `src/game/boss_encounters.js` and regenerated `index.html` using the exact `scripts/build_game.py` fragment and homing-projectile replacement rules.
 - The deterministic build test now checks that the exact canonical boss module is embedded in the shipped HTML.
 - Candidate CI and four-wizard natural-run validation are pending.
+
+
+## Wizard action feedback animation — 2026-11-19
+
+- Added fixed-step-decayed `castPulse`, `abilityPulse` and `hurtPulse` state to the player.
+- Spell casts animate the wizard's focus/staff and emit character-color casting sparks.
+- Active abilities produce a wider animated sigil ring; hit reactions add a brief red rim flash.
+- The four characters retain distinct mantle, focus and regalia shapes; action feedback is layered over each character's existing identity.
+- Extended browser visual regression to compare idle/cast/ability frames for all four wizards. CI pending.
+- This is readable procedural animation polish, not a claim that bespoke skeletal rigs or authored animation clips are complete.

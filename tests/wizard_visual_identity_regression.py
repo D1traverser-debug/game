@@ -9,6 +9,13 @@ assert SOURCE.count(MARKER)==1
 PROBE=r"""
 window.__wizardArtProbe={
  ready:()=>V2_ATLAS.complete&&V2_ATLAS.naturalWidth===1024&&typeof v2heroMantle==='function'&&typeof v2heroFocus==='function',
+ renderStates:()=>{
+  const old=ctx,oldAge=V2.age,off=document.createElement('canvas');off.width=220;off.height=220;ctx=off.getContext('2d');V2.age=3.7;
+  const hash=()=>{const d=ctx.getImageData(0,0,off.width,off.height).data;let h=2166136261;for(let i=0;i<d.length;i+=5)h=Math.imul(h^d[i],16777619);return(h>>>0).toString(16)};
+  const out={};
+  for(const ch of CHARACTERS){out[ch.id]={};for(const [state,castPulse,abilityPulse] of [['idle',0,0],['cast',.24,0],['ability',0,.65]]){ctx.clearRect(0,0,220,220);v2hero({characterId:ch.id,x:110,y:116,lastMove:1,facing:0,invuln:0,ghost:false,castPulse,abilityPulse,hurtPulse:0});out[ch.id][state]=hash()}}
+  ctx=old;V2.age=oldAge;return out;
+ },
  render:(kind)=>{
   const old=ctx,oldAge=V2.age,off=document.createElement('canvas');off.width=220;off.height=220;ctx=off.getContext('2d');V2.age=3.7;
   const hash=()=>{const d=ctx.getImageData(0,0,off.width,off.height).data;let h=2166136261;for(let i=0;i<d.length;i+=5)h=Math.imul(h^d[i],16777619);return(h>>>0).toString(16)};
@@ -34,8 +41,14 @@ async def main():
   landmarks=await page.evaluate("window.__wizardArtProbe.render('landmarks')")
   report["hero_hashes"]=heroes;report["landmark_hashes"]=landmarks
   report["checks"]["four_distinct_in_world_wizard_renders"]=len(set(heroes.values()))==4
+  states=await page.evaluate("window.__wizardArtProbe.renderStates()")
+  report["wizard_action_states"]=states
+  report["checks"]["each_wizard_has_visible_cast_feedback"]=all(x["idle"]!=x["cast"] for x in states.values())
+  report["checks"]["each_wizard_has_visible_ability_feedback"]=all(x["idle"]!=x["ability"] for x in states.values())
+  report["checks"]["action_feedback_is_distinct_from_cast"]=all(x["cast"]!=x["ability"] for x in states.values())
   report["checks"]["seven_distinct_landmark_renders"]=len(set(landmarks.values()))==7
   report["checks"]["all_wizard_visual_layers_exist"]="v2heroMantle" in SOURCE and "v2heroFocus" in SOURCE
+  report["checks"]["simulation_drives_visual_action_pulses"]="p.castPulse=Math.max" in SOURCE and "p.abilityPulse=.65" in SOURCE and "p.hurtPulse=.2" in SOURCE
   report["checks"]["all_landmarks_use_style_specific_geometry"]=all(x in SOURCE for x in ["'sunspire'","'oathgate'","'moonfen_temple'","'mossfall_altar'","'starwell'","'eastwatch'","'westshrine'"])
   report["checks"]["no_runtime_errors"]=not report["page_errors"] and not report["console_errors"]
   report["checks"]["offline_no_external_requests"]=not report["external_requests"]

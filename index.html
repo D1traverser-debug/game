@@ -647,7 +647,7 @@ function makePlayer(){
  armor:ch.armor+(e.armor||0)*4,regen:ch.regen+(e.regen||0)*3,luck:2+(e.luck||0)*1.0,manaGain:ch.manaGain,
  rerolls:e.reroll||0,banishes:e.banish||0,locks:e.lock||0,dodge:ch.dodge+(e.dodge||0)*.04,
  manaPull:100*ch.pickup*(1+(e.manaPull||0)*.2),spells:[{...starter,cd:starter.cd*.88,level:1,cdNow:0,infusions:[],augments:[]}],
- scrolls:[],kills:0,damageDone:0,casts:0,critHits:0,objectives:0,scrollCount:0,stand:0,invuln:0,stagger:0,
+ scrolls:[],kills:0,damageDone:0,casts:0,critHits:0,objectives:0,scrollCount:0,stand:0,invuln:0,stagger:0,castPulse:0,abilityPulse:0,hurtPulse:0,
  lowSpeed:false,hardLessons:false,attune:false,growth:false,manaSiphon:false,vital:false,thick:false,fight:false,
  elixir:false,healBonus:0,overload:false,damageTaken:0,heal:0,rerollUsed:0,banished:[],lastMove:0,combo:0,
  ghost:false,ghostUsed:false,ghostTimer:0,abilityCd:0,abilityMaxCd:ch.abilityCooldown,regenBoost:0,regenBoostT:0,facing:-Math.PI/2};
@@ -829,7 +829,7 @@ function spellInfusion(sp){return sp.infusions.length>1?{a:sp.infusions[0],b:sp.
   if(healer)t=healer;
  }
  const ang=t?Math.atan2(t.y-p.y,t.x-p.x):rand(0,TAU);let base=sp.dmg*(1+sp.level*.13);if(sp.id==='solar'&&sp.augments.includes('solarZenith'))base*=1+Math.min(1.2,p.stand*.08)*sp.augments.filter(a=>a==='solarZenith').length;const size=p.spellSize*(1+sp.level*.012),range=sp.range*size;
- sp.cdNow=sp.cd/p.cast*(1-(p.attune&&p.stand>.5?.2:0));p.casts++;save.stats.casts=(save.stats.casts||0)+1;
+ sp.cdNow=sp.cd/p.cast*(1-(p.attune&&p.stand>.5?.2:0));p.castPulse=Math.max(p.castPulse||0,.24);p.casts++;save.stats.casts=(save.stats.casts||0)+1;
 if(p.characterId==='aster'&&p.casts%6===0){const star=nearest(p.x,p.y,560);if(star){damageEnemy(star,72+p.level*6,'starEcho',null,false);game.fx.push({x:star.x,y:star.y,r:42,life:.38,max:.38,color:'#a8e9f3',type:'burst'})}}
 
 let hit=(e,m=1)=>damageEnemy(e,base*m,sp.id,el);if(game.objective?.type==='sacrifice'&&game.objective.variant==='death'&&Math.hypot(p.x-game.objective.x,p.y-game.objective.y)<125){let shrine=game.objective;shrine.shrineHp-=base*.28;if(shrine.shrineHp<=0&&!shrine.done){shrine.shrineHp=0;completeObjective();toast('死亡神龛被摧毁！')}}
@@ -1020,12 +1020,12 @@ function useCharacterAbility(){
   p.x=ex;p.y=ey;p.invuln=Math.max(p.invuln,.58);
   game.fx.push({x:ox,y:oy,r:22,life:.35,max:.35,color:ch.color,type:'ring'},{x:ex,y:ey,r:76,life:.45,max:.45,color:ch.color,type:'burst'});sound(250,.18,'sawtooth');
  }
- p.abilityCd=p.abilityMaxCd||ch.abilityCooldown;toast(ch.abilityName+' · 已释放');return true;
+ p.abilityCd=p.abilityMaxCd||ch.abilityCooldown;p.abilityPulse=.65;toast(ch.abilityName+' · 已释放');return true;
 }
 
-function damagePlayer(n,source='enemy'){let p=game.player;if(p.ghost||p.invuln>0||!Number.isFinite(n)||n<=0)return;if(Math.random()<p.dodge){if(p.evasion)p.hp=Math.min(p.maxHp,p.hp+n*.2);if(p.characterId==='nyx'){for(const e of game.enemies)if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<128)damageEnemy(e,38+p.level*3,'shadowStep',null,false);game.fx.push({x:p.x,y:p.y,r:128,life:.3,max:.3,color:'#b9a2ec',type:'ring'})}toast('闪避！');return}let armor=p.armor+(p.thick?(1-p.hp/p.maxHp)*90:0);let dmg=Math.max(1,n*(100/(100+armor)));if(coreDamageApi)applyCoreDamage(game.damageSource,p,2,1,dmg);else p.hp-=dmg;p.damageTaken+=dmg;p.invuln=.65;if(p.fight)p.fightT=2;if(p.spells.some(s=>s.id==='talon'&&s.augments.includes('counterTalon')))p.nextTalonCount=2;game.shake=7;game.fx.push({x:p.x,y:p.y,r:30,life:.25,max:.25,color:'#f48d80',type:'ring'});sound(110,.1,'sawtooth',.02);if(source==='explosiveSprout')grantSpellQuest('sprout');if(p.hp<=0){if(!p.ghost&&p.spells.some(s=>s.id==='imp')&&!p.ghostUsed)beginGhostPhase();else if(!p.ghost)finish(false)}}
+function damagePlayer(n,source='enemy'){let p=game.player;if(p.ghost||p.invuln>0||!Number.isFinite(n)||n<=0)return;if(Math.random()<p.dodge){if(p.evasion)p.hp=Math.min(p.maxHp,p.hp+n*.2);if(p.characterId==='nyx'){for(const e of game.enemies)if(!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<128)damageEnemy(e,38+p.level*3,'shadowStep',null,false);game.fx.push({x:p.x,y:p.y,r:128,life:.3,max:.3,color:'#b9a2ec',type:'ring'})}toast('闪避！');return}let armor=p.armor+(p.thick?(1-p.hp/p.maxHp)*90:0);let dmg=Math.max(1,n*(100/(100+armor)));if(coreDamageApi)applyCoreDamage(game.damageSource,p,2,1,dmg);else p.hp-=dmg;p.damageTaken+=dmg;p.invuln=.65;p.hurtPulse=.2;if(p.fight)p.fightT=2;if(p.spells.some(s=>s.id==='talon'&&s.augments.includes('counterTalon')))p.nextTalonCount=2;game.shake=7;game.fx.push({x:p.x,y:p.y,r:30,life:.25,max:.25,color:'#f48d80',type:'ring'});sound(110,.1,'sawtooth',.02);if(source==='explosiveSprout')grantSpellQuest('sprout');if(p.hp<=0){if(!p.ghost&&p.spells.some(s=>s.id==='imp')&&!p.ghostUsed)beginGhostPhase();else if(!p.ghost)finish(false)}}
 function beginGhostPhase(){let p=game.player;if(p.ghostUsed)return;p.ghostUsed=true;p.ghost=true;p.hp=0;p.ghostTimer=12;game.ghostTimer=12;game.ghostDamage=0;game.ghostImps=Array.from({length:8},(_,i)=>({id:i,angle:i*Math.PI/4,attack:.1+i*.035,damage:92,range:520}));toast('巫师倒下，但小恶魔进入幽灵狂潮！');sound(170,.55,'sawtooth',.04)}
-function update(dt){if(!game||screen!=='playing')return;let g=game,p=g.player;g.time+=dt;if(p.invuln>0)p.invuln-=dt;if(p.fightT>0)p.fightT-=dt;if(p.abilityCd>0)p.abilityCd=Math.max(0,p.abilityCd-dt);if(p.regenBoostT>0){p.regenBoostT=Math.max(0,p.regenBoostT-dt);if(p.regenBoostT===0)p.regenBoost=0}if(!p.ghost&&(p.regen+(p.regenBoost||0))>0)p.hp=Math.min(p.maxHp,p.hp+(p.regen+(p.regenBoost||0))*dt);if(p.hp<=0&&!p.ghost){finish(false);return}if(p.ghost){p.ghostTimer-=dt;game.ghostTimer=p.ghostTimer;if(p.ghostTimer<=0){finish(false);return}}
+function update(dt){if(!game||screen!=='playing')return;let g=game,p=g.player;g.time+=dt;if(p.invuln>0)p.invuln-=dt;if(p.castPulse>0)p.castPulse=Math.max(0,p.castPulse-dt);if(p.abilityPulse>0)p.abilityPulse=Math.max(0,p.abilityPulse-dt);if(p.hurtPulse>0)p.hurtPulse=Math.max(0,p.hurtPulse-dt);if(p.fightT>0)p.fightT-=dt;if(p.abilityCd>0)p.abilityCd=Math.max(0,p.abilityCd-dt);if(p.regenBoostT>0){p.regenBoostT=Math.max(0,p.regenBoostT-dt);if(p.regenBoostT===0)p.regenBoost=0}if(!p.ghost&&(p.regen+(p.regenBoost||0))>0)p.hp=Math.min(p.maxHp,p.hp+(p.regen+(p.regenBoost||0))*dt);if(p.hp<=0&&!p.ghost){finish(false);return}if(p.ghost){p.ghostTimer-=dt;game.ghostTimer=p.ghostTimer;if(p.ghostTimer<=0){finish(false);return}}
 let mx=p.ghost?0:(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+joy.x,my=p.ghost?0:(keys.KeyS||keys.ArrowDown?1:0)-(keys.KeyW||keys.ArrowUp?1:0)+joy.y;let mag=Math.hypot(mx,my);if(mag>1){mx/=mag;my/=mag}if(mag<.05){p.stand+=dt;p.lastMove=0}else{p.stand=0;p.lastMove=mag;p.facing=Math.atan2(my,mx)}const terrain=worldTerrainAt(p.x,p.y,p.r);let speed=p.move*(game.carriedCore?.alive?.58:1)*(p.lowSpeed?1+(1-p.hp/p.maxHp)*.21:1)*(p.fightT>0?1.3:1)*terrain.speed;if(terrain.id==='stream'&&mag>.1){p.waterStep=(p.waterStep||0)-dt;if(p.waterStep<=0){g.fx.push({x:p.x,y:p.y+8,r:12,life:.32,max:.32,color:'#9edfe4',type:'ring'});p.waterStep=.34}}worldMoveEntity(p,mx*speed*dt,my*speed*dt,p.r);
 // Mission schedule and pressure curve
 if(g.time>=120&&g.nextObj===0){g.nextObj=1;startObjective()}if(g.time>=360&&g.nextObj===1){g.nextObj=2;startObjective()}if(g.time>=660&&g.nextObj===2){g.nextObj=3;startObjective()}if(g.time>=840&&g.nextObj===3){g.nextObj=4;startObjective()}if(g.time>=120&&g.nextChest===120){spawnChest();g.nextChest=660}if(g.time>=660&&g.nextChest===660){spawnChest();g.nextChest=1140}if(g.time>=1140&&g.nextChest===1140){spawnChest();g.nextChest=99999}
@@ -1482,7 +1482,8 @@ function v2heroMantle(ch,t){
  }
  ctx.restore();
 }
-function v2heroFocus(ch,t){
+function v2heroFocus(ch,t,cast=0,ability=0){
+ ctx.translate(27,4);ctx.rotate(-cast*.11+ability*.045);ctx.translate(-27,-4);
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowColor=ch.color;ctx.shadowBlur=12;
  if(ch.id==='aster'){
   ctx.strokeStyle='#9bdce8';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(29,12);ctx.lineTo(47,-47);ctx.stroke();ctx.strokeStyle='#e9d59b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(29,12);ctx.lineTo(47,-47);ctx.stroke();
@@ -1523,12 +1524,16 @@ function v2heroRegalia(ch,t){
 }
 function v2hero(p){
  const a=V2.age,walk=p.lastMove>0?.9:0,bob=Math.sin(a*10)*walk*2,ch=CHARACTER_BY_ID[p.characterId]||CHARACTERS[0];
+ const cast=clamp((p.castPulse||0)/.24,0,1),ability=clamp((p.abilityPulse||0)/.65,0,1),hurt=clamp((p.hurtPulse||0)/.2,0,1);
  ctx.save();ctx.translate(p.x,p.y+bob);if(p.facing&&Math.cos(p.facing)<-.1)ctx.scale(-1,1);
  let shadow=ctx.createRadialGradient(0,12,2,0,12,34);shadow.addColorStop(0,'#091d20bb');shadow.addColorStop(1,'#091b1800');ctx.fillStyle=shadow;ctx.beginPath();ctx.ellipse(0,12,31,17,0,0,TAU);ctx.fill();
  if(p.invuln>0&&Math.floor(a*15)%2===0)ctx.globalAlpha=.58;
  v2heroMantle(ch,a);
  ctx.filter=ch.spriteFilter||'none';ctx.shadowColor=ch.color;ctx.shadowBlur=p.ghost?22:8+Math.sin(a*4)*3;v2sprite(V2_SPRITE.hero,0,-12,92,100,p.ghost?.58:1);
- ctx.filter='none';ctx.shadowBlur=0;ctx.globalAlpha=p.ghost?.7:1;v2heroRegalia(ch,a);v2heroFocus(ch,a);
+ ctx.filter='none';ctx.shadowBlur=0;ctx.globalAlpha=p.ghost?.7:1;v2heroRegalia(ch,a);v2heroFocus(ch,a,cast,ability);
+ if(ability>0){ctx.save();ctx.globalAlpha*=ability*.72;ctx.shadowColor=ch.color;ctx.shadowBlur=16;ctx.strokeStyle=ch.color;ctx.lineWidth=2.2;ctx.setLineDash([4,6]);ctx.beginPath();ctx.ellipse(0,7,42+ability*13,20+ability*6,-.2,0,TAU);ctx.stroke();ctx.setLineDash([]);ctx.restore()}
+ if(cast>0){ctx.save();ctx.globalAlpha*=cast;ctx.shadowColor=ch.accent;ctx.shadowBlur=14;ctx.fillStyle=ch.accent;ctx.beginPath();ctx.arc(40,-47,3.5+cast*3,0,TAU);ctx.fill();for(let i=0;i<3;i++){const q=a*8+i*TAU/3,x=40+Math.cos(q)*10,y=-47+Math.sin(q)*10;ctx.beginPath();ctx.arc(x,y,1.4,0,TAU);ctx.fill()}ctx.restore()}
+ if(hurt>0){ctx.save();ctx.globalAlpha*=hurt*.8;ctx.strokeStyle='#ff9a86';ctx.lineWidth=3;ctx.shadowColor='#ff6e67';ctx.shadowBlur=13;v2arc(0,-12,48,0,TAU,'#ff9a86',3);ctx.restore()}
  ctx.strokeStyle=ch.color;ctx.lineWidth=2.4;ctx.shadowColor=ch.color;ctx.shadowBlur=10;v2arc(0,-12,34,Math.sin(a*1.5),Math.PI+Math.cos(a*1.5),ch.color,2);ctx.shadowBlur=0;
  ctx.fillStyle=ch.accent;ctx.font='bold 13px Georgia';ctx.textAlign='center';ctx.fillText(ch.glyph,0,-58);ctx.fillStyle=ch.color;ctx.shadowColor=ch.color;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(23,-27,4.5+Math.sin(a*5)*1.2,0,TAU);ctx.fill();ctx.restore();
 }

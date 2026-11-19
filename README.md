@@ -49,3 +49,7 @@ Boss body contact is deliberately weaker than a telegraphed boss ability and app
 
 ### Source build rule
 Boss encounter logic lives in `src/game/boss_encounters.js`. After editing it, regenerate the offline browser entry with `python scripts/build_game.py`; `python scripts/build_game.py --check` and the build reproducibility tests verify that the shipped HTML contains the exact source fragment.
+
+
+### Wizard action readability
+The four wizards now show simulation-timed spell-cast sparks, an active-ability sigil pulse and a brief hit reaction. These are layered over their distinct mantle, focus and regalia designs. Full bespoke skeletal rigs and recorded animation clips remain outside this procedural polish pass.

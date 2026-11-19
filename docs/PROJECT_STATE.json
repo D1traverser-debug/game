@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "BOSS_CONTACT_COUNTERPLAY_002",
+  "checkpoint": "WIZARD_ACTION_FEEDBACK_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -310,7 +310,10 @@
     "Added deterministic browser regression for boss contact damage caps, pushback, independent cooldown and source classification; candidate CI pending.",
     "Corrected the source-of-truth layer: boss contact changes now live in src/game/boss_encounters.js, and index.html is regenerated with scripts/build_game.py semantics.",
     "Root HTML now embeds the exact canonical boss source fragment; build reproducibility regression is expected to verify source/artifact parity.",
-    "Boss contact candidate uses 10 raw damage for Sol/Mul, 12 for Krog, 34–52 unit pushback and a 1.1-second cooldown; browser contact regression remains attached."
+    "Boss contact candidate uses 10 raw damage for Sol/Mul, 12 for Krog, 34–52 unit pushback and a 1.1-second cooldown; browser contact regression remains attached.",
+    "Added simulation-timed spell-cast, active-ability and hit-reaction pulses to the four wizard render paths; the animation state decays on fixed simulation ticks and does not consume gameplay RNG.",
+    "Wizard staff/focus props now lean into cast and ability actions; unique color-coded casting sparks, ability sigil rings and red hit-reactive outlines make combat actions readable in-world.",
+    "Extended the four-wizard visual regression to render and compare idle, spell-cast and active-ability frames for each wizard; CI pending."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -321,7 +324,6 @@
     "Current character portraits and in-world identities are palette/sigil adaptations of the existing atlas hero, not four separately authored production rigs. Owner visual review remains required.",
     "Map regions and landmarks are authored and navigable, but collision/occlusion, environmental interaction and real player exploration review remain incomplete.",
     "Natural full-run balance and boss victory have not yet been demonstrated for all four selectable wizards on this exact build.",
-    "Original music/SFX, bespoke character animation, hit reactions, spell VFX and production-quality visual/audio review remain incomplete.",
     "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
     "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
     "Save import/export is implemented and under CI verification; cross-browser file chooser/download behavior still requires Firefox/WebKit and physical-device acceptance.",
@@ -332,9 +334,10 @@
     "Four-wizard natural-run acceptance remains incomplete: latest balance candidate achieved 2/4 wins; Aster/Sol and Briar/Mul'gath need a new natural-run result after healer auto-target and telegraph-aware pilot changes.",
     "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted.",
     "One-click launch package awaits CI verification; local Windows/macOS/Linux execution and browser storage acceptance remain untested on owner hardware.",
-    "The new boss body-contact counterplay patch has not yet passed CI or been evaluated by a fresh four-wizard natural run. Human playtest, visual/audio review, bespoke animation and cross-browser/device performance remain open."
+    "The new boss body-contact counterplay patch has not yet passed CI or been evaluated by a fresh four-wizard natural run. Human playtest, visual/audio review, bespoke animation and cross-browser/device performance remain open.",
+    "Spell-cast/ability/hit feedback animation candidate is awaiting browser visual regression; full bespoke skeletal rigs, authored animation clips, original recorded music/SFX and human art review remain open."
   ],
-  "next_action": "Run checkpoint, build reproducibility, all browser component/content tests and the four-wizard natural-run matrix against the canonical source-module build. Inspect failures before tuning further.",
+  "next_action": "Verify action-feedback visual regression and latest boss-contact four-wizard natural run; then deepen audio composition and continue single-player content/presentation acceptance.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -363,7 +366,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "BOSS_CONTACT_COUNTERPLAY_002_CI_PENDING",
+  "latest_candidate_ci_status": "WIZARD_ACTION_FEEDBACK_001_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -480,8 +483,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 787117,
-    "status": "BOSS_CONTACT_COUNTERPLAY_002_CI_PENDING",
+    "bytes": 788426,
+    "status": "WIZARD_ACTION_FEEDBACK_001_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",

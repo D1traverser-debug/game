@@ -55,3 +55,8 @@ Boss body collision is a low-damage bump, distinct from committed telegraphed at
 ## Canonical source/build boundary
 
 Boss encounter logic is authored in `src/game/boss_encounters.js`. The root `index.html` is a generated, offline browser artifact and must be refreshed with `python scripts/build_game.py`; direct edits to the embedded fragment are rejected by `tests/test_build_reproducible.py`. This keeps the boss implementation and shipped HTML byte-aligned.
+
+
+## Wizard action feedback
+
+The 2.5D character renderer reads three short-lived player presentation pulses: spell cast, active ability and hit reaction. Their timers decay in the fixed simulation update; the renderer consumes them without mutating simulation or gameplay RNG. Staff/focus lean, character-colored sparks, ability sigil rings and a brief hit rim are layered over the four existing mantle/regalia silhouettes. This is procedural feedback, not a replacement for bespoke skeletal rigs.
