@@ -601,7 +601,7 @@ function drawCharacterPortrait(canvas,ch){
  if(V2_WIZARD_ATLAS_READY){
   const row=V2_WIZARD_ROWS[ch.id]??0,size=Math.min(w*.86,h*.78),x=(w-size)/2,y=(h-size)/2+7;
   c.save();c.globalAlpha=.98;c.shadowColor=ch.color;c.shadowBlur=18;
-  c.drawImage(V2_WIZARD_PACK,0,row*V2_WIZARD_FRAME,size===0?96:96,96,x,y,size,size);
+  c.drawImage(V2_WIZARD_PACK,0,row*V2_WIZARD_FRAME,V2_WIZARD_FRAME,V2_WIZARD_FRAME,x,y,size,size);
   c.restore();
   c.strokeStyle=ch.accent+'88';c.lineWidth=1.4;c.beginPath();c.arc(w/2,h*.49,Math.min(w,h)*.43,0,Math.PI*2);c.stroke();
   c.fillStyle=ch.accent;c.globalAlpha=.8;c.font='bold 15px Georgia';c.textAlign='center';c.fillText(ch.glyph,w/2,h*.94);c.globalAlpha=1;
