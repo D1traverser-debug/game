@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "CI_RECONCILIATION_SOURCE_AND_HARNESS_001",
+  "checkpoint": "SCOPE_AND_SOLO_CATALOGUE_GOVERNANCE_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -77,7 +77,7 @@
     "2026-11-17 exact 717368-byte art-forward 2.5D single-file candidate committed to development/index.html and fetched back with exact content equality; SHA-256 21fbfcdf3149c5d2eee188a213bf66c3fba5a6b777e7c868a5ddb823a79c0239",
     "Removed a later duplicate legacy v2enemy declaration that shadowed the atlas-backed renderer; runtime now calls atlas-backed enemy drawing and uses the embedded 1024x1024 atlas",
     "Pre-baked the 480 static meadow props and seven ruin landmarks into 24 512x512 visible tiles; dynamic actors remain depth-sorted",
-    "Reginald spell catalogue is now explicitly scoped to 18 spells: Astral Orbs, three official 1.2 starters, and the 14 general spell-quest unlocks; seven other-wizard/unsupported entries are excluded from unlocks, trial UI, and level-up pool",
+    "Current Aetherwilds solo spell pool contains 18 shared eligible IDs: four wizard starters plus fourteen general quest unlocks; seven legacy source-game definitions remain outside this provisional pool pending source-version disposition.",
     "Save normalization filters legacy non-Reginald unlocks, quest flags, and trial selections; in-memory migration regression passed",
     "Atlas renderer regression passed 9/9, including actual atlas draw calls, 24 static cache tiles, no runtime errors and no external requests",
     "Reginald spell-scope regression passed 13/13, including exact pool, research UI, legacy save filtering, valid quest grant and rejection of other-wizard quest",
@@ -317,32 +317,23 @@
     "Four-wizard natural solo boss matrix passed 4/4 on gameplay candidate 75aa4979: Aster/Sol, Ember/Sol, Briar/Mul'gath and Nyx/Krog'wa all selected through production UI and defeated their bosses; no runtime or external network errors.",
     "All 21 CI jobs passed on boss-contact candidate 75aa4979, including 31 boss encounter checks, build reproducibility, save, progression, objectives, controller, audio, map/roster and browser integration.",
     "Wizard action-feedback visual regression passed for all four characters: idle, spell-cast and active-ability renders are distinct per character.",
-    "Reworked the procedural soundtrack into a denser adaptive score with deterministic synthesized percussion, character-specific melodic motifs, boss-phase tension and low-health tension layers; expanded audio regression to verify these layers."
+    "Reworked the procedural soundtrack into a denser adaptive score with deterministic synthesized percussion, character-specific melodic motifs, boss-phase tension and low-health tension layers; expanded audio regression to verify these layers.",
+    "GitHub Actions run 44484418951 passed all 24 jobs on commit 63fd96aeeaacabffd2fc0f211b3d973cd2e9e83a; Chromium/Firefox/WebKit desktop-mobile smoke passed and four natural wizard runs won their bosses."
   ],
   "failed_or_open": [
-    "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
-    "Production-quality original character, enemy, realm, animation, spell VFX, UI, music and SFX assets are not complete.",
-    "Full wizard/spell/element/infusion/augmentation/enemy/objective/boss/quest/trial/meta inventories need source-version reconciliation.",
-    "Firefox, WebKit, mobile Safari, Android Chrome, physical GPU performance and 15-minute stability are NOT_TESTED.",
-    "Fixed-step clock and central damage pipeline are integrated; seeded RNG, projectile, spell and network modules remain independent contracts awaiting incremental integration.",
-    "Current character portraits and in-world identities are palette/sigil adaptations of the existing atlas hero, not four separately authored production rigs. Owner visual review remains required.",
-    "Map regions and landmarks are authored and navigable, but collision/occlusion, environmental interaction and real player exploration review remain incomplete.",
-    "Natural full-run balance and boss victory have not yet been demonstrated for all four selectable wizards on this exact build.",
-    "The four wizard bodies still share a base atlas body beneath distinct capes, headpieces and weapons; fully bespoke skeletal rigs and authored animation sets remain a later art-production task.",
-    "Save import/export is implemented and under CI verification; cross-browser file chooser/download behavior still requires Firefox/WebKit and physical-device acceptance.",
-    "Save export/import is implemented; current Playwright download/import regression and cross-browser file chooser behavior are pending CI and Firefox/WebKit acceptance.",
-    "Controller input mapping is implemented and under Chromium automation; physical Xbox/PlayStation controller pairing and browser-specific Gamepad API behavior remain untested.",
-    "The four-wizard natural full-run matrix must be rerun on this balance candidate; automated and human full-run wins remain unverified until then.",
-    "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted.",
-    "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted.",
-    "One-click launch package awaits CI verification; local Windows/macOS/Linux execution and browser storage acceptance remain untested on owner hardware.",
-    "Spell-cast/ability/hit feedback animation candidate is awaiting browser visual regression; full bespoke skeletal rigs, authored animation clips, original recorded music/SFX and human art review remain open.",
-    "Adaptive procedural score candidate awaits CI and listening review; it is not a substitute for professionally recorded/original audio assets. Bespoke skeletal rigs, authored animation clips, VFX polish, cross-browser/physical-device performance and owner playtest remain open.",
-    "Audio system is synthesized and now has independent persistent channel controls plus named event cues; owner still needs to listen on target speakers/headphones and approve mix/loudness.",
-    "Chromium, Firefox and WebKit desktop/mobile automated smoke matrix added; current candidate CI pending.",
-    "Physical iOS/Android devices, real controllers, low-end GPU frame-time and long-session thermal/performance acceptance still require target-device testing."
+    "The four wizards still share a base atlas body beneath distinct mantles, headpieces, weapons and palettes; bespoke production rigs and authored animation remain incomplete.",
+    "Production-quality original environment, enemy, spell VFX, UI, animation, music and SFX assets are incomplete; current art/audio includes procedural placeholders.",
+    "The full source-version content manifest remains unresolved across spells, augments, elements/infusions, enemies, objectives, bosses, quests and meta progression.",
+    "Physical iOS Safari/Android Chrome, real hardware controllers, representative GPU performance, memory and 15-minute stability are NOT_TESTED; current Chromium/Firefox/WebKit automation passed.",
+    "The modular simulation core is partial: fixed-step clock and damage pipeline are integrated; seeded RNG, event buffer, input validator, projectile and spell modules remain independent contracts.",
+    "Map collision and navigation code has automated coverage, but real-player exploration and landmark/river/bridge readability review remain incomplete.",
+    "Save import/export file chooser/download behavior on physical and cross-browser targets remains unverified despite Chromium automation passing.",
+    "The procedural adaptive soundtrack and SFX have not received owner listening/loudness acceptance or been replaced by authored/recorded production assets.",
+    "The four-wizard natural-run matrix achieved 4/4 automated wins on commit 63fd96a; repeated seeds, all threat levels and human difficulty acceptance remain open.",
+    "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
+    "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines."
   ],
-  "next_action": "Rerun the complete required CI matrix after regenerating index.html from src/game/boss_encounters.js and correcting the audio/browser test harness; inspect every job and retain NOT_READY until all automated gates and owner acceptance are complete.",
+  "next_action": "Run the full CI matrix on the scope/catalogue governance candidate. Then audit all 25 spell definitions and 18 eligible IDs with evidence-backed disposition, followed by a controlled deterministic-RNG integration experiment. Keep physical-device, production art/audio and owner acceptance gates open.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -371,20 +362,20 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "SOURCE_BUILD_AND_BROWSER_HARNESS_RECONCILIATION_PENDING",
+  "latest_candidate_ci_status": "SCOPE_AND_CATALOGUE_RECONCILIATION_CANDIDATE_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
-    "run_id": 44131377996,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44131377996",
-    "commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
+    "run_id": 44484418951,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44484418951",
+    "commit": "63fd96aeeaacabffd2fc0f211b3d973cd2e9e83a",
     "conclusion": "success",
-    "checkpoint": "PASS",
-    "browser_jobs_passed": 10,
-    "browser_jobs_total": 10,
-    "boss_regression": "26/26 PASS",
-    "artifact_sha256": "7a98c8989cbfb85f53063f69507c023f3bd899ed1b1eba97271fb44c45955bd9",
-    "artifact_bytes": 734011,
-    "scope": "legacy single-player browser prototype only; not full-game acceptance"
+    "checkpoint": "PASS_MECHANICAL_ONLY",
+    "jobs_passed": 24,
+    "jobs_total": 24,
+    "natural_run_matrix": "4/4 automated natural boss wins",
+    "artifact_sha256": "8bc83ce3ee62a8c65b583376b2d6b9d488953ef54d7d680dc3ddb2ae1d4ff5d3",
+    "artifact_bytes": 799918,
+    "scope": "Current single-player browser product baseline; human/device acceptance remains open."
   },
   "active_production_branch": "full-game",
   "legacy_prototype_branch": "development",
@@ -461,15 +452,15 @@
     "Windows native build, controller hardware, real save/load, performance, network reliability and independent human acceptance are NOT_TESTED."
   ],
   "last_full_game_scope_ci": {
-    "run_id": 44141825172,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44141825172",
-    "commit": "daead42f4790e5afb8b2343f8271894fac0895b3",
+    "run_id": 44484418951,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44484418951",
+    "commit": "63fd96aeeaacabffd2fc0f211b3d973cd2e9e83a",
     "conclusion": "success",
-    "jobs_passed": 10,
-    "jobs_total": 10,
+    "jobs_passed": 24,
+    "jobs_total": 24,
     "checkpoint": "PASS_MECHANICAL_ONLY",
-    "legacy_browser_regressions": "9/9 PASS",
-    "meaning": "Full-game scope metadata and legacy prototype integrity were checked; legacy browser regression jobs passed. No Unity project/build, multiplayer, art/audio or full-game acceptance is implied."
+    "natural_run_matrix": "4/4 automated natural boss wins",
+    "meaning": "Current full-game single-player browser branch automation passed; no human, physical-device or production-art acceptance is implied."
   },
   "last_full_game_ci": {
     "status": "HISTORICAL_SUPERSEDED_BY_BROWSER_TARGET",
@@ -488,8 +479,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 799918,
-    "status": "SOURCE_BUILD_AND_CROSS_BROWSER_RECONCILIATION_PENDING",
+    "bytes": 799965,
+    "status": "SCOPE_AND_CATALOGUE_RECONCILIATION_CANDIDATE_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -500,7 +491,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "8bc83ce3ee62a8c65b583376b2d6b9d488953ef54d7d680dc3ddb2ae1d4ff5d3"
+    "sha256": "8faf86ac248a15f89d12a74dd052458bf3ea5dfcb680417a880f1fca828d0f85"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
@@ -515,7 +506,7 @@
     "multiplayer": "OUT_OF_SCOPE",
     "multiplayer_target": "NONE",
     "hosting": "offline_static_preview_with_loopback_launcher",
-    "browser_matrix": "Chromium/Firefox/WebKit desktop + mobile smoke automation added; CI pending; physical devices NOT_TESTED",
+    "browser_matrix": "PASS: GitHub Actions run 44484418951; Chromium/Firefox/WebKit desktop and mobile smoke all passed. Physical iOS Safari/Android Chrome and real-device performance remain NOT_TESTED.",
     "status": "SINGLE_PLAYER_BROWSER_BUILD",
     "simulation_core": "PARTIAL: FIXED_STEP_CLOCK_AND_DAMAGE_PIPELINE_INTEGRATED; OTHER CORE MODULES STILL INCREMENTAL",
     "core_modules": [
@@ -528,7 +519,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contracts; clock/damage integration; gameplay regressions; audio mixer/SFX/ambience regression; Chromium/Firefox/WebKit desktop/mobile smoke pending CI",
+    "core_tests": "22 Node contracts and clock/damage integration pass; current 24-job CI baseline passed all jobs, including progression, map, collision, save, audio, controller, visual and browser regressions.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -561,7 +552,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "REQUIRED GATE: baseline commit 4940a2eb passed natural solo boss victories for all four selectable wizards (Aster/Sol 20:00; Ember/Sol 20:15; Briar/Mul 21:23; Nyx/Krog 20:28). Promoted from continue-on-error exploratory job to required CI gate.",
+    "natural_run_matrix": "PASS on commit 63fd96a / CI 44484418951: Aster defeated Sol'phish, Ember defeated Sol'phish, Briar defeated Mul'gath, Nyx defeated Krog'wa (4/4). Automated agent evidence only; human acceptance remains open.",
     "launcher": {
       "windows": "PLAY.bat",
       "unix": "PLAY.sh",
@@ -599,14 +590,16 @@
     }
   },
   "last_single_player_ci": {
-    "run_id": 44447174307,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44447174307",
-    "commit": "1b7c578f39056314597531434ee60f57a9a03776",
+    "run_id": 44484418951,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44484418951",
+    "commit": "63fd96aeeaacabffd2fc0f211b3d973cd2e9e83a",
     "conclusion": "success",
-    "required_jobs_passed": 20,
-    "required_jobs_total": 20,
-    "exploratory_wizard_natural_runs": "1/4 boss wins",
-    "scope": "One-map offline browser single-player; not release acceptance."
+    "required_jobs_passed": 24,
+    "required_jobs_total": 24,
+    "natural_run_matrix": "4/4 automated natural boss wins: Aster/Sol'phish, Ember/Sol'phish, Briar/Mul'gath, Nyx/Krog'wa",
+    "artifact_sha256": "8bc83ce3ee62a8c65b583376b2d6b9d488953ef54d7d680dc3ddb2ae1d4ff5d3",
+    "artifact_bytes": 799918,
+    "scope": "One-realm offline browser single-player; automation only, not owner acceptance."
   },
   "candidate_work": [
     "Added persistent independent music, combat SFX, ambience and UI volume controls with master mute and audio preview.",
@@ -616,6 +609,10 @@
     "Promoted four-wizard natural boss-win simulation from exploratory continue-on-error to a required CI gate.",
     "Regenerated the offline root HTML from the canonical Boss encounter source fragment using scripts/build_game.py rules; no combat tuning.",
     "Corrected audio regression to dispatch lexical IIFE functions through a test-only closure probe rather than assuming they are window globals.",
-    "Changed browser compatibility smoke to wait for the visible simulation timer to advance with a bounded timeout instead of fixed sub-second sleeps."
+    "Changed browser compatibility smoke to wait for the visible simulation timer to advance with a bounded timeout instead of fixed sub-second sleeps.",
+    "CI run 44484418951 passed 24/24 jobs on commit 63fd96a; Chromium/Firefox/WebKit desktop/mobile smoke passed and all four natural wizard runs defeated their selected bosses.",
+    "Reconciled product requirements and issue register with the owner-approved one-realm four-wizard offline solo scope; multiplayer, WSS, extra realms, native builds and mandatory production WebGL2 are explicitly OUT_OF_SCOPE.",
+    "Renamed the implemented 18-ID shared solo spell allowlist from the stale Reginald-only identifier and aligned its regression test and research notes with the four-wizard product.",
+    "This scope/catalogue governance candidate has not yet been CI-verified; retain NOT_READY until its own CI and human acceptance."
   ]
 }

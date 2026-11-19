@@ -1,44 +1,28 @@
-# Research Backlog
+# Research Backlog — Aetherwilds Single-Player
 
-Research must produce observable mechanics and testable rules, not just descriptive notes.
+This backlog is limited to the owner-approved product: one Verdant Wilds realm, four wizards, seven enemy archetypes, three bosses, nine objective families and an offline-capable solo expedition. Source-game research is reference evidence only; it does not authorize implementing the source game's full roster, multiple realms or co-op.
+
+## Current product research
 
 | Topic | Required evidence | Current state |
 |---|---|---|
-| Reginald base stats and Astral Orbs | Current-version official or in-game observation; targeting, orbit, hit cadence, damage, cooldown, size | PARTIAL |
-| Spell list and unlock rules | Current patch notes + quest conditions + gameplay observation | OPEN |
-| Five element base effects | Per-element trigger, duration, tick, scaling, visuals, audio | OPEN |
-| Ten pairwise infusions | Pair matrix; interaction order, damage, status, stacking, crit, target caps | OPEN |
-| Augmentations | Every included spell's augmentation choices and effect stacking | OPEN |
-| Scrolls and chest behavior | Drop pools, rarity, stack limits, bans/rerolls, effects | OPEN |
-| XP and level-up | XP values, magnet range, thresholds, multi-level queue, grace window | OPEN |
-| Verdant Meadow enemies | Spawn schedule, HP, speed, contact/attack damage, AI state machines, drops | OPEN |
-| Gnasher | Roar, burrow, underground invulnerability, approach, leap, landing AoE | PARTIAL |
-| Objectives | All included objective types, success/fail conditions, timers, bounds, rewards | OPEN |
-| Sol'phish | Intro, attack tells, burst, projectile patterns, stagger, vulnerability, outro | PARTIAL |
-| Threat levels | Exact enemy/player scaling and spawn curve | OPEN |
-| Meta progression | Camp enchantment tiers, costs, unlocks, persistent stats | OPEN |
-| UI/audio | Original feedback hierarchy, sound event matrix, settings | OPEN |
-| Version drift | Current official update date and affected mechanics | OPEN |
+| Four wizard identities | Stats, starter spell, passive, active ability, movement/role and visual readability | Implemented; human balance/visual review OPEN |
+| Shared solo spell pool | Stable IDs, starter eligibility, quest unlocks, targeting, cooldown, damage, level/augment behavior | 18 IDs currently eligible; full source/version reconciliation OPEN |
+| Spell definitions | Runtime contains 25 definitions; only the 18-ID solo pool is eligible for research/unlock/level-up | Seven non-pool definitions need explicit disposition; do not silently expose them |
+| 1.2 starter augmentations | Four choices for each of Loaded Dice, Tiny Tremors and Wicked Buzzsaw; distinguish official behavior from original adaptations | Prototype options exist; individual behavior and source evidence need review |
+| Elements and infusions | Five primary-element candidates, advanced effects, pair matrix, order, stacking, duration, damage, status, crit and visuals | Inventory discrepancy unresolved |
+| Seven enemy archetypes | Spawn curve, HP, speed, contact/projectile damage, AI state machine, telegraphs, drops and navigation | Implemented; balance and human readability review OPEN |
+| Three boss archetypes | Attack definitions, telegraph geometry, active/recovery windows, phase transitions, healing counterplay and death | Implemented; repeated natural runs and human review OPEN |
+| Nine objective families | Spawn bounds, collection, navigation, completion, timeout, rewards and softlock handling | Implemented; real-player exploration review OPEN |
+| Progression and persistence | XP thresholds, level-up queue, spell slots, scrolls, chests, trials, camp costs, migration and recovery | Automated regressions pass; full content reconciliation OPEN |
+| Realm navigation | Six districts, seven landmarks, river/bridges, props, collision, boundaries and minimap | Automated map/collision checks pass; human exploration OPEN |
+| Audio and presentation | Character-specific feedback, VFX readability, music/SFX mix, volume persistence and provenance | Procedural candidate exists; owner listening/visual review OPEN |
+| Performance | Peak combat load, frame-time distribution, memory and 15-minute stability on representative hardware | Synthetic sample only; physical profiling NOT_TESTED |
 
-## Newly qualified high-priority work
-- Determine second spell slot milestone from current 1.1/1.2 source.
-- Build the 25-spell catalogue and identify Reginald-eligible spell pool; include 1.2 new spells and four augmentations each.
-- Implement the 14 spell-specific unlock quests and 4 element unlock quests; keep title/outfit-only quests distinct.
-- Research and implement Krog'wa and Mul'gath; confirm boss randomization and Verdant Meadows eligibility.
-- Model the red summoning circle and Sol'phish runestone/stagger mechanics; use current source version.
-- Implement all Verdant Meadows objective variants introduced by 1.1, with per-solo target counts.
-- Trace common enemy roster and XP drop tables: Buffer, Shield Crab, Crabladon, Teethy Worm, Bloat Crab, Gnasher and remaining common types.
-- Implement solo-only content filters; exclude Healing Slam and other co-op-only content.
-- Add Reginald outfit quests, Wizard Rank, Enchantments, Masteries, Scroll unlocks, Ascension/Covenant subset that remains meaningful in solo play.
+## Source-reference protocol
 
-
-## Full-game production research — 2026-11-18
-
-- Pin the latest source version before each content freeze; check for the announced post-1.2 major update.
-- Reconcile the full wizard roster (community guide reports 15) and every wizard's passive, stats, signature spell, unlock quest and co-op-specific interactions.
-- Reconcile all four realms and their layout variants, hazards, destructible props, enemy rosters, objectives and boss eligibility.
-- Build complete spell/augmentation catalogues; include the three 1.2 spells and distinguish official effects from undocumented adaptations.
-- Resolve the element/infusion inventory discrepancy (five primary plus fifteen advanced candidates vs seven identities plus ten combinations); confirm every effect, stacking, status, crit, friendly-fire and co-op rule.
-- Map co-op rules: friendly fire, revive, team objectives, individual/shared level-up timing, disconnect/reconnect and player death/return.
-- Research current scroll, trial, covenant, mastery, enchantment, rank, quest, outfit and achievement progression.
-- Record gameplay timing and damage only when supported by current-version observation; do not inherit provisional prototype numbers.
+1. Pin the reference game version/date before treating a mechanic as current.
+2. Record whether evidence is official, in-game observation, community secondary source or an original Aetherwilds adaptation.
+3. Separate source-game facts from product requirements. Mechanics requiring source-game co-op, extra realms or non-roster characters are reference-only and OUT_OF_SCOPE here.
+4. Never infer an undocumented mechanic from a name, icon or wiki summary.
+5. Record uncertainty and rejected hypotheses in the Mechanic Reference Matrix; do not silently promote them into code.

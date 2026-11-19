@@ -491,16 +491,16 @@ const scrolls=[
 const enchants=[['damage','伤害','所有法术伤害提高',100,[7,12,15,20,25]],['manaPull','魔力牵引','经验球拾取范围提高',100,[20,40,60,80,100]],['maxHp','最大生命','最大生命值提高',100,[150,300,450,600,750]],['critDmg','暴击伤害','暴击伤害提高',150,[7,12,18,25,32]],['manaGain','魔力获取','经验获取提高',150,[3,6,9,12,15]],['armor','护甲','受到伤害降低',150,[20,40,60,80,100]],['cast','施法速度','法术冷却缩短',200,[3,6,9,12,15]],['bounty','悬赏','任务金币奖励提高',200,[5,10,15,20,25]],['regen','生命再生','每秒恢复生命',200,[3,6,9,12,15]],['size','法术尺寸','范围与命中面积提高',250,[4,8,12,16,20]],['reroll','重掷','升级、卷轴选项重掷次数',250,[1,2,3,4,5]],['luck','幸运','提高高稀有度改善出现率',250,[4,6,8,10,12]],['speed','移动速度','移动速度提高',250,[5,10,16,22,28]],['crit','暴击率','暴击概率提高',300,[4,6,8,12,16]],['banish','放逐','本局可放逐改善次数',300,[1,2,3,4,5]],['lock','锁定','保留升级候选的次数',300,[1,2,3,4,5]],['dodge','闪避','概率完全规避伤害',300,[4,8,12,16,20]]];
 // Source-verifiable 1.2 starter unlocks; NEVER overwrite persisted unlocks with the catalogue.
 const INITIAL_SPELL_IDS=['astral','loadedDice','tinyTremors','wickedBuzzsaw'];
-// Reginald's actual solo-eligible catalogue: his signature, 3.1.2 starters,
-// and the 14 general spell-quest unlocks. Other wizards' Ascension signature
-// spells are deliberately excluded from this one-hero product.
-const REGINALD_SPELL_IDS=new Set([
+// Current Aetherwilds solo catalogue: four wizard starters plus fourteen
+// shared quest unlocks. This allowlist defines this product's playable pool;
+// it does not claim to reproduce the source game's complete spell inventory.
+const SOLO_SPELL_CATALOG_IDS=new Set([
  'astral','loadedDice','tinyTremors','wickedBuzzsaw',
  'missile','solar','moon','sword','beam','stars','blades','runes',
  'rocky','wings','bell','sprout','talon','imp'
 ]);
 function normalizeSave(){
- const registered=REGINALD_SPELL_IDS,oldVersion=Number(save.schemaVersion||0);
+ const registered=SOLO_SPELL_CATALOG_IDS,oldVersion=Number(save.schemaVersion||0);
  // Legacy v1 auto-unlocked the entire catalogue on every load. Those flags are untrustworthy.
  // Keep currency/enchantments/statistics; rebuild only the invalid unlock set from known quest flags.
  const questGranted=Array.isArray(save.questFlags)?save.questFlags.filter(x=>registered.has(x)):[];
@@ -509,8 +509,8 @@ function normalizeSave(){
  save.enchant=save.enchant&&typeof save.enchant==='object'&&!Array.isArray(save.enchant)?save.enchant:{};
  save.stats=save.stats&&typeof save.stats==='object'&&!Array.isArray(save.stats)?save.stats:{};
  for(const k of ['kills','casts','damage','fire','lightning','acid','ice','dark','lightningHits','iceHits','objectives','scrolls','infusions'])if(!Number.isFinite(save.stats[k]))save.stats[k]=0;
- save.questFlags=Array.isArray(save.questFlags)?[...new Set(save.questFlags.filter(x=>REGINALD_SPELL_IDS.has(x)&&!INITIAL_SPELL_IDS.includes(x)))]:[];
- save.trialSpellId=REGINALD_SPELL_IDS.has(save.trialSpellId)&&!INITIAL_SPELL_IDS.includes(save.trialSpellId)?save.trialSpellId:null;
+ save.questFlags=Array.isArray(save.questFlags)?[...new Set(save.questFlags.filter(x=>SOLO_SPELL_CATALOG_IDS.has(x)&&!INITIAL_SPELL_IDS.includes(x)))]:[];
+ save.trialSpellId=SOLO_SPELL_CATALOG_IDS.has(save.trialSpellId)&&!INITIAL_SPELL_IDS.includes(save.trialSpellId)?save.trialSpellId:null;
  save.questCounters=save.questCounters&&typeof save.questCounters==='object'?save.questCounters:{};
  save.elementUnlocks=Array.isArray(save.elementUnlocks)?[...new Set(save.elementUnlocks.filter(x=>['lightning','acid','ice','dark'].includes(x)))]:[];
  save.doubleInfusionUnlocked=!!save.doubleInfusionUnlocked||(save.stats?.infusions||0)>=5;
@@ -660,14 +660,14 @@ function openCamp(){renderCamp();show('campScreen')}
 function renderCamp(){$('campGold').textContent=save.gold;$('runs').textContent=save.runs;$('wins').textContent=save.wins;$('best').textContent=fmt(save.best||0);$('campGrid').innerHTML='';enchants.forEach(e=>{let lv=save.enchant[e[0]]||0,cost=Math.round(e[3]*(1+lv*.55));let d=document.createElement('div');d.className='upgradeitem';d.innerHTML=`<div><b>${e[1]}　${lv}/5</b><small>${e[2]} · ${lv?e[4][lv-1]+'%':'未强化'}</small></div><button ${lv>=5||save.gold<cost?'disabled':''}>${lv>=5?'已满级':'升级 '+cost+' ✧'}</button>`;d.querySelector('button').onclick=()=>{if(lv<5&&save.gold>=cost){save.gold-=cost;save.enchant[e[0]]=lv+1;persist();renderCamp();sound(660,.13,'triangle')}};$('campGrid').appendChild(d)});renderResearch()}
 const spellQuestDescriptions={missile:'单枚 Magic Missile 命中四次暴击',solar:'Solar Pulse 单次命中十名敌人，累计九十九次',moon:'单枚 Moonerang 命中十二名敌人',sword:'单次 Arcane Broadsword 击杀九名敌人',beam:'同时释放三道 Aether Beam（本作以三联光束增幅实现）',rocky:'Rocky Road 生成八百五十块暴击岩石',wings:'单只 Aurora Wings 灵鸟命中五名敌人',runes:'同一目标受到同一次 Rune Burst 的三次连续命中',talon:'装备 Talon Slash 后从卷轴宝箱窃取生命',stars:'同时释放四颗 Falling Stars',sprout:'受到自己 Explosive Sprout 的爆炸伤害',blades:'Phantom Blades 命中黄金蟹',imp:'单人适配：倒下后进入幽灵阶段，小恶魔累计造成 12,840 伤害',bell:'单次 Bell March 爆炸命中十八名敌人'};
 function grantSpellQuest(id){
- if(!REGINALD_SPELL_IDS.has(id)||INITIAL_SPELL_IDS.includes(id))return false;
+ if(!SOLO_SPELL_CATALOG_IDS.has(id)||INITIAL_SPELL_IDS.includes(id))return false;
  save.questFlags=save.questFlags||[];if(save.questFlags.includes(id))return false;
  save.questFlags.push(id);save.questCounters=save.questCounters||{};
  checkSpellUnlocks();persist();toast('专属法术试炼完成：'+spells.find(x=>x.id===id).name);return true;
 }
 function renderResearch(){let box=$('questGrid');if(!box)return;
  box.innerHTML='<div class="questline"><b>远征法术档案</b> · 四位巫师共享法术研究进度。<p style="color:#a4b7a3;font-size:10px">单人远征：选择一项尚未解锁的法术作为本局试炼法术；完成对应挑战后永久解锁。</p></div>';
- for(const s of spells){if(!REGINALD_SPELL_IDS.has(s.id)||s.id==='astral')continue;let ok=save.unlocks.includes(s.id);
+ for(const s of spells){if(!SOLO_SPELL_CATALOG_IDS.has(s.id)||s.id==='astral')continue;let ok=save.unlocks.includes(s.id);
   let rule=INITIAL_SPELL_IDS.includes(s.id)?'初始解锁':(spellQuestDescriptions[s.id]||'专属挑战：规则尚待核实，不自动发放');
   let canTrial=!ok&&!INITIAL_SPELL_IDS.includes(s.id);
   let trial=canTrial?` <button class="smallbtn" data-trial="${s.id}" style="float:right;padding:3px 7px">${save.trialSpellId===s.id?'★ 已选':'下局试炼'}</button>`:'';
@@ -693,7 +693,7 @@ function makePlayer(){
  lowSpeed:false,hardLessons:false,attune:false,growth:false,manaSiphon:false,vital:false,thick:false,fight:false,
  elixir:false,healBonus:0,overload:false,damageTaken:0,heal:0,rerollUsed:0,banished:[],lastMove:0,combo:0,
  ghost:false,ghostUsed:false,ghostTimer:0,abilityCd:0,abilityMaxCd:ch.abilityCooldown,regenBoost:0,regenBoostT:0,facing:-Math.PI/2};
- if(save.trialSpellId){const trial=spells.find(x=>x.id===save.trialSpellId);if(trial&&REGINALD_SPELL_IDS.has(trial.id)&&!INITIAL_SPELL_IDS.includes(trial.id)&&trial.id!==starter.id){p.spells.push({...trial,cd:trial.cd*.88,level:1,cdNow:0,infusions:[],augments:[]});save.trialSpellId=null;persist()}}
+ if(save.trialSpellId){const trial=spells.find(x=>x.id===save.trialSpellId);if(trial&&SOLO_SPELL_CATALOG_IDS.has(trial.id)&&!INITIAL_SPELL_IDS.includes(trial.id)&&trial.id!==starter.id){p.spells.push({...trial,cd:trial.cd*.88,level:1,cdNow:0,infusions:[],augments:[]});save.trialSpellId=null;persist()}}
  return p;
 }
 function startRun(){ensureAudioContext();if(coreClock)coreClock.reset();simulationDebt=0;game={time:0,mapId:WORLD_MAP.id,world:WORLD_MAP.bounds.width,damageStates:new WeakMap(),nextCombatantId:1,damageSource:{},player:makePlayer(),enemies:[],orbs:[],shots:[],plants:[],ghostImps:[],castSequence:0,ghostDamage:0,ghostTimer:0,fx:[],damageNumbers:[],decor:[],chests:[],hazards:[],boss:null,spawn:0,objective:null,nextObj:0,doneObj:0,nextChest:120,paused:false,ended:false,shake:0,killStreak:0,score:0,randomSeed:1,lockedOption:null,hudTick:0,pendingLevels:0,stats:{}};generateDecor();buildDecorCache(game.decor);for(let i=0;i<12;i++)spawnEnemy(true);document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));$('hud').classList.add('active');screen='playing';last=performance.now();sound(440,.15,'triangle');toast('远征开始：保护自己，收集奥术经验');renderHud()}
@@ -745,7 +745,7 @@ function dropOrb(x,y,v){if(game.orbs.length>1500)game.orbs.splice(0,100);game.or
 function checkSpellUnlocks(){
  // Source-specific achievements must be emitted by a verified event tracker.
  // General kill count does not authorize any particular spell unlock.
- let additions=(save.questFlags||[]).filter(id=>REGINALD_SPELL_IDS.has(id)&&!save.unlocks.includes(id));
+ let additions=(save.questFlags||[]).filter(id=>SOLO_SPELL_CATALOG_IDS.has(id)&&!save.unlocks.includes(id));
  for(const id of additions){save.unlocks.push(id);toast('法术专属挑战完成：'+spells.find(s=>s.id===id).name)}
  if(additions.length)persist();
 }
@@ -758,8 +758,8 @@ function spellElementOptions(sp){let avail=chooseElementOptions(),options=[];if(
 // temporary design assumption, not an assertion about the original game.
 const SLOT_TWO_RESEARCH_ASSUMPTION=2;
 function allowedSpellSlots(level){return level>=20?4:level>=13?3:level>=SLOT_TWO_RESEARCH_ASSUMPTION?2:1}
-function spellOfferAvailable(p){return p.spells.length<allowedSpellSlots(p.level)&&spells.some(s=>REGINALD_SPELL_IDS.has(s.id)&&save.unlocks.includes(s.id)&&!p.spells.some(x=>x.id===s.id))}
-function offerUpgrade(reason){if(screen!=='playing')return;let p=game.player,opts=[];let pool=spells.filter(s=>REGINALD_SPELL_IDS.has(s.id)&&(save.unlocks.includes(s.id)||s.id==='astral'||s.id===save.trialSpellId));
+function spellOfferAvailable(p){return p.spells.length<allowedSpellSlots(p.level)&&spells.some(s=>SOLO_SPELL_CATALOG_IDS.has(s.id)&&save.unlocks.includes(s.id)&&!p.spells.some(x=>x.id===s.id))}
+function offerUpgrade(reason){if(screen!=='playing')return;let p=game.player,opts=[];let pool=spells.filter(s=>SOLO_SPELL_CATALOG_IDS.has(s.id)&&(save.unlocks.includes(s.id)||s.id==='astral'||s.id===save.trialSpellId));
  if(reason==='newSpellBonus'&&game.pendingSpellBonus){
   let sp=game.pendingSpellBonus;
   opts=[
@@ -991,7 +991,7 @@ const SOURCE_AUGMENTS={
   {code:'seeking',title:'索敌灵球 · Seeking',desc:'优先攻击生命值最高的敌人，增强伤害。',icon:'◎'}],
  missile:[{code:'massiveMissile',title:'巨型飞弹 · Massive Missile',desc:'飞弹大幅增大、伤害提高，但减慢施放与飞行速度。',icon:'➶'}],
  beam:[{code:'auraBeam',title:'光束光环 · Aura Beam',desc:'光束命中区域产生增长的能量场，对附近敌人造成伤害。',icon:'◉'},{code:'triuneBeam',title:'三相光束 · Solo Bridge',desc:'单人适配增幅：一次施法同时发射三道 Aether Beam，用于完成原作三束齐发挑战。',icon:'✧'}],
- sprout:[{code:'healingSprout',title:'疗愈萌芽 · Healing Sprout',desc:'植物会周期性为附近的 Reginald 恢复生命（单人适配）。',icon:'♡'},{code:'stalkingSprout',title:'追猎萌芽 · Stalking Sprout',desc:'植物会缓慢向附近目标移动。',icon:'♣'},{code:'explosiveSprout',title:'爆裂萌芽 · Explosive Sprout',desc:'植物寿命结束时爆炸；站在爆炸范围内会受到伤害。',icon:'✹'},{code:'growingSprout',title:'成长萌芽 · Growing Sprout',desc:'植物每次攻击后伤害和尺寸提高 8%。',icon:'✦'},{code:'babySprout',title:'幼小萌芽 · Baby Sprout',desc:'植物击败敌人时，有机会在死亡地点长出次级植物。',icon:'♣'}],
+ sprout:[{code:'healingSprout',title:'疗愈萌芽 · Healing Sprout',desc:'植物会周期性为附近的巫师恢复生命（单人适配）。',icon:'♡'},{code:'stalkingSprout',title:'追猎萌芽 · Stalking Sprout',desc:'植物会缓慢向附近目标移动。',icon:'♣'},{code:'explosiveSprout',title:'爆裂萌芽 · Explosive Sprout',desc:'植物寿命结束时爆炸；站在爆炸范围内会受到伤害。',icon:'✹'},{code:'growingSprout',title:'成长萌芽 · Growing Sprout',desc:'植物每次攻击后伤害和尺寸提高 8%。',icon:'✦'},{code:'babySprout',title:'幼小萌芽 · Baby Sprout',desc:'植物击败敌人时，有机会在死亡地点长出次级植物。',icon:'♣'}],
  talon:[{code:'counterTalon',title:'反击鹰爪 · Counter Talon',desc:'受到伤害后，下次施法额外挥出两爪。',icon:'⌁'}],
  blades:[{code:'piercingBlades',title:'穿刺之刃 · Piercing Blades',desc:'每柄刀刃额外穿透一名敌人（可叠加）。',icon:'⚔',stack:3}],
  necro:[{code:'pullingWhirl',title:'牵引旋刃 · Pulling Whirl',desc:'旋刃把附近敌人向中心吸引。',icon:'☠'}],

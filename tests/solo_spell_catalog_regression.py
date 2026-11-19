@@ -1,4 +1,4 @@
-"""Reginald-only spell eligibility, save migration and quest regression.
+"""Shared solo spell catalogue, save migration and quest regression.
 
 Diagnostics are injected into an in-memory document only; no test hooks ship.
 """
@@ -10,7 +10,7 @@ from playwright.async_api import async_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = (ROOT / "index.html").read_text(encoding="utf-8")
-EXCLUDED = {"hex", "necro", "spear", "sickle", "orbital", "seismic", "mesh"}
+UNSUPPORTED_LEGACY_SIGNATURES = {"hex", "necro", "spear", "sickle", "orbital", "seismic", "mesh"}
 
 
 def instrument(source: str) -> str:
@@ -18,9 +18,9 @@ def instrument(source: str) -> str:
     assert source.count(marker) == 1
     assert len(re.findall(r"function\s+v2enemy\s*\(", source)) == 1
     probe = r"""
-window.__scopeProbe={
- snapshot:()=>({ids:[...REGINALD_SPELL_IDS],unlocks:[...save.unlocks],trial:save.trialSpellId,questFlags:[...save.questFlags],atlas:{loaded:V2_ATLAS.complete,w:V2_ATLAS.naturalWidth,h:V2_ATLAS.naturalHeight},screen}),
- migrate:()=>{save.schemaVersion=3;save.unlocks=['astral','loadedDice','tinyTremors','wickedBuzzsaw','hex','necro','spear','sickle','orbital','seismic','mesh','solar'];save.questFlags=['solar','seismic','beam'];save.trialSpellId='hex';normalizeSave();return window.__scopeProbe.snapshot()},
+window.__catalogProbe={
+ snapshot:()=>({ids:[...SOLO_SPELL_CATALOG_IDS],unlocks:[...save.unlocks],trial:save.trialSpellId,questFlags:[...save.questFlags],atlas:{loaded:V2_ATLAS.complete,w:V2_ATLAS.naturalWidth,h:V2_ATLAS.naturalHeight},screen}),
+ migrate:()=>{save.schemaVersion=3;save.unlocks=['astral','loadedDice','tinyTremors','wickedBuzzsaw','hex','necro','spear','sickle','orbital','seismic','mesh','solar'];save.questFlags=['solar','seismic','beam'];save.trialSpellId='hex';normalizeSave();return window.__catalogProbe.snapshot()},
  grant:(id)=>({result:grantSpellQuest(id),unlocks:[...save.unlocks],flags:[...save.questFlags]})
 };
 """
@@ -40,24 +40,24 @@ async def main():
         page.on("request", lambda r: out["external_requests"].append(r.url) if r.url.startswith(("http://", "https://")) else None)
         await page.set_content(instrument(SOURCE), wait_until="load")
         await page.wait_for_timeout(1000)
-        initial = await page.evaluate("__scopeProbe.snapshot()")
+        initial = await page.evaluate("__catalogProbe.snapshot()")
         out["initial"] = initial
-        out["checks"]["exactly_18_reginald_spells"] = len(initial["ids"]) == 18
-        out["checks"]["no_other_wizard_signature_spells"] = not (EXCLUDED & set(initial["ids"]))
-        out["checks"]["four_source_starters_only"] = set(initial["unlocks"]) == {"astral", "loadedDice", "tinyTremors", "wickedBuzzsaw"}
+        out["checks"]["exactly_18_shared_solo_spells"] = len(initial["ids"]) == 18
+        out["checks"]["no_other_wizard_signature_spells"] = not (UNSUPPORTED_LEGACY_SIGNATURES & set(initial["ids"]))
+        out["checks"]["four_wizard_starters_only"] = set(initial["unlocks"]) == {"astral", "loadedDice", "tinyTremors", "wickedBuzzsaw"}
         await page.locator("#camp").click()
         text = await page.locator("#questGrid").inner_text()
-        out["checks"]["research_ui_hides_other_hero_spells"] = not any(x in text for x in ["Hex Bomb", "Necro Whirl", "Spear Barrage", "Swirl Sickle", "Scepter Mesh", "Seismic Slam", "六角诅咒弹", "亡灵旋刃", "长矛齐射", "旋风镰刀", "权杖网阵", "地脉震击"])
-        out["checks"]["research_ui_has_all_reginald_entries"] = all(x in text for x in ["魔法飞弹", "太阳脉冲", "月牙回旋", "奥术巨剑", "以太光束", "坠星", "命运骰子", "微型地震", "邪刃锯轮"])
-        migrated = await page.evaluate("__scopeProbe.migrate()")
+        out["checks"]["research_ui_hides_unsupported_legacy_signatures"] = not any(x in text for x in ["Hex Bomb", "Necro Whirl", "Spear Barrage", "Swirl Sickle", "Scepter Mesh", "Seismic Slam", "六角诅咒弹", "亡灵旋刃", "长矛齐射", "旋风镰刀", "权杖网阵", "地脉震击"])
+        out["checks"]["research_ui_has_all_shared_catalogue_entries"] = all(x in text for x in ["魔法飞弹", "太阳脉冲", "月牙回旋", "奥术巨剑", "以太光束", "坠星", "命运骰子", "微型地震", "邪刃锯轮"])
+        migrated = await page.evaluate("__catalogProbe.migrate()")
         out["migrated"] = migrated
-        out["checks"]["legacy_unlocks_filtered"] = not (EXCLUDED & set(migrated["unlocks"]))
+        out["checks"]["legacy_unlocks_filtered"] = not (UNSUPPORTED_LEGACY_SIGNATURES & set(migrated["unlocks"]))
         out["checks"]["legacy_trial_filtered"] = migrated["trial"] is None
         out["checks"]["valid_quest_flags_retained"] = set(migrated["questFlags"]) == {"solar", "beam"}
-        rejected = await page.evaluate('__scopeProbe.grant("seismic")')
-        accepted = await page.evaluate('__scopeProbe.grant("missile")')
-        out["checks"]["other_hero_quest_rejected"] = rejected["result"] is False and "seismic" not in rejected["unlocks"]
-        out["checks"]["reginald_quest_granted"] = accepted["result"] is True and "missile" in accepted["unlocks"]
+        rejected = await page.evaluate('__catalogProbe.grant("seismic")')
+        accepted = await page.evaluate('__catalogProbe.grant("missile")')
+        out["checks"]["unsupported_legacy_quest_rejected"] = rejected["result"] is False and "seismic" not in rejected["unlocks"]
+        out["checks"]["valid_shared_spell_quest_granted"] = accepted["result"] is True and "missile" in accepted["unlocks"]
         out["checks"]["atlas_loaded"] = initial["atlas"]["loaded"] and initial["atlas"]["w"] == 1024 and initial["atlas"]["h"] == 1024
         out["checks"]["no_runtime_errors"] = not out["errors"] and not out["console_errors"]
         out["checks"]["no_external_requests"] = not out["external_requests"]
