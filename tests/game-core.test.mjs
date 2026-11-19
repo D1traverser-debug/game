@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import { writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const match = html.match(/<script>([\s\S]*?)<\/script>/);
@@ -144,7 +146,16 @@ function boot(seed) {
     console
   };
   const context = vm.createContext(sandbox);
-  const compiled = new vm.Script(instrumentedScript, {filename:'game-inline.js'});
+  let compiled;
+  try {
+    compiled = new vm.Script(instrumentedScript, {filename:'game-inline.js'});
+  } catch (error) {
+    const path = '/tmp/game-inline-debug.js';
+    await writeFile(path, instrumentedScript);
+    const check = spawnSync(process.execPath, ['--check', path], {encoding:'utf8'});
+    console.error(check.stderr || error.stack);
+    throw error;
+  }
   compiled.runInContext(context, {timeout:2000});
   return {api: window.__TEST_API, store};
 }
