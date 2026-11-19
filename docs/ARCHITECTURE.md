@@ -35,3 +35,8 @@ The shared world collision resolver now combines seven authored landmark footpri
 ## Solo enemy pressure and telegraph rules
 
 Enemy damage now scales with `1 + elapsedSeconds / 1800`. Gnasher leap damage, contact damage and burrow speed are isolated behind named functions so their balance can be regression-tested. The Gnasher leap snapshots its landing position and creates a zero-damage warning hazard at that exact point before resolving the leap. Enemy density grows more slowly in long runs; health and magnet drops provide additional recovery opportunities. These changes require full-run balance validation and do not imply human acceptance.
+
+
+## Solo survival balance and level-up offer policy
+
+A Gnasher leap is a telegraphed heavy hit, not a near-full-health one-shot. Standard enemy contact must remain sustainable when several enemies overlap the player. The current balance coefficients are 0.32× scaled Gnasher base damage and 0.045× scaled enemy contact damage; ranged enemy projectiles use 0.36×. Level-up offers guarantee one defensive stat choice when the character remains below the survival targets and no defensive stat was naturally rolled. This is an offer, not an automatic player-stat mutation. Validate through post-armor damage budgets and four-wizard natural-run telemetry.

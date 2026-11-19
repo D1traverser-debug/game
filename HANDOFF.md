@@ -192,3 +192,13 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 ## Natural-run harness synchronization — 2026-11-19
 
 The balance patch extracted enemy damage into named helpers. The long-run Playwright instrumentation still expected the previous inline formulas and aborted before simulating any wizard. Updated the test-only instrumentation to wrap `gnasherLeapDamage`, `enemyContactDamage` and the new ranged damage coefficient. This is a harness fix, not a gameplay result; the four-wizard natural run must be rerun.
+
+
+## Single-player survival balance follow-up — 2026-11-19
+
+- Reviewed the exact four-wizard natural-run telemetry from CI #44447174307. All four character-selection paths worked and the browser had no runtime, console or external-network errors, but only Briar defeated a boss (1/4).
+- Aster died at 384.7s after three Gnasher leap hits of roughly 93 raw damage each. Ember died at 278s after accumulated contact/friendly-fire hits. Nyx died at 812.3s from repeated Crabladon contact.
+- Reduced Gnasher leap damage from 0.90× to 0.32× its scaled base damage and general enemy contact damage from 0.09× to 0.045×. Reduced ranged projectile damage from 0.52× to 0.36×.
+- Added a defensive level-up fallback: when a character remains below the minimum survival targets and the three naturally rolled cards contain no defensive stat, replace the third card with a valid max-HP, armor, regeneration or dodge option. The player still chooses; this does not auto-apply stats.
+- Strengthened the enemy-balance regression to measure actual post-armor damage for a late Gnasher leap and late Crabladon contact. Strengthened character-upgrade regression to require a defensive option for an underbuilt character.
+- CI for this candidate is pending. Do not claim all four wizard runs pass until the natural-run matrix is rerun.

@@ -23,3 +23,7 @@ The static preview is emitted to dist/ with the HTML and eight runtime modules, 
 
 ### Current single-player balance checkpoint
 The latest candidate includes a slower late-run enemy damage curve, a readable Gnasher landing warning, reduced Gnasher/Crabladon pressure, and more frequent recovery pickups. The four-wizard natural-run matrix is pending revalidation; this is not a release-ready build.
+
+
+### Current solo survival balance candidate
+The latest patch reduces Gnasher leap, enemy contact and ranged projectile damage and ensures an under-defended build can be offered a defensive level-up card. Required browser CI and the four-wizard natural-run matrix are pending; prior natural-run acceptance was 1/4 boss wins, so the product remains NOT READY.

@@ -24,7 +24,8 @@ window.__characterUpgradeRegression = () => {
     three_cards:offers.length===3,
     new_spell_slot:offers.some(x=>x.kind==='newSpell'),
     spell_upgrade:offers.some(x=>x.kind==='spellLevel'||x.kind==='infuse'),
-    character_upgrade:offers.some(x=>x.kind==='stat'&&Number.isFinite(x.amount)&&x.amount>0)
+    character_upgrade:offers.some(x=>x.kind==='stat'&&Number.isFinite(x.amount)&&x.amount>0),
+    survival_option_when_underbuilt:offers.some(x=>x.kind==='stat'&&['maxHp','regen','armor','dodge'].includes(x.k))
   };
   const cases=[
     ['maxHp',100,200],['regen',1,1],['armor',16,16],['dodge',.04,.07],

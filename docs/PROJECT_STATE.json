@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "SOLO_ENEMY_BALANCE_TELEGRAPH_002",
+  "checkpoint": "SOLO_DAMAGE_AND_UPGRADE_BALANCE_003",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -289,7 +289,13 @@
     "Reduced late-run Crabladon contact damage and increased health/magnet pickup drop rates to support sustained solo play.",
     "Reduced the late-run living-enemy target growth from one additional enemy every 34 seconds to every 40 seconds.",
     "Added a browser regression that exercises the actual Gnasher burrow-to-leap transition, verifies its warning geometry, and bounds the damage formulas.",
-    "Updated natural-run instrumentation to observe the new named Gnasher leap, contact and ranged damage helpers rather than stale pre-balance inline formulas."
+    "Updated natural-run instrumentation to observe the new named Gnasher leap, contact and ranged damage helpers rather than stale pre-balance inline formulas.",
+    "Latest required CI run 44447174307 passed all 20 required jobs; exploratory four-wizard natural-run job selected all four characters but only Briar won 1/4.",
+    "Root-cause evidence: Aster took three Gnasher leap hits of about 93 raw damage each; Ember died after accumulated low-value contact/friendly-fire hits; Nyx died from repeated Crabladon contact hits.",
+    "Reduced Gnasher leap coefficient from 0.90 to 0.32 of its scaled base damage and enemy contact coefficient from 0.09 to 0.045; reduced ranged projectile coefficient from 0.52 to 0.36.",
+    "Level-up offers now guarantee at least one defensive stat choice while the player's base defenses remain below survivability targets and no defensive card was rolled naturally.",
+    "Enemy-balance regression now measures actual post-armor player damage for a late Gnasher leap and late Crabladon contact, not only raw coefficients.",
+    "Character-upgrade regression now asserts that an under-defended character receives a defensive level-up option."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -307,9 +313,10 @@
     "Save export/import is implemented; current Playwright download/import regression and cross-browser file chooser behavior are pending CI and Firefox/WebKit acceptance.",
     "Controller input mapping is implemented and under Chromium automation; physical Xbox/PlayStation controller pairing and browser-specific Gamepad API behavior remain untested.",
     "The four-wizard natural full-run matrix must be rerun on this balance candidate; automated and human full-run wins remain unverified until then.",
-    "Natural-run pilot has not yet been rerun after synchronizing its instrumentation with the new Gnasher/contact/ranged damage helpers; four-wizard victory remains unverified."
+    "Four-wizard natural-run acceptance remains incomplete: previous exact-build result was 1/4 natural boss wins; this balance/upgrade candidate must rerun before any all-character completion claim.",
+    "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted."
   ],
-  "next_action": "Rerun the natural-run pilot with current damage instrumentation; use its traces to address any remaining survival, objective-routing or boss-fight failures.",
+  "next_action": "Run required browser regressions and the four-wizard natural solo expedition. Use the new post-armor damage budgets and survival-offer coverage to validate the balance change; do not claim release readiness until all four runs and human/device acceptance are complete.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -338,7 +345,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "NATURAL_RUN_INSTRUMENTATION_SYNCED_CI_PENDING",
+  "latest_candidate_ci_status": "SOLO_DAMAGE_AND_UPGRADE_BALANCE_003_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -455,8 +462,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 785678,
-    "status": "NATURAL_RUN_INSTRUMENTATION_SYNCED_CI_PENDING",
+    "bytes": 786274,
+    "status": "SOLO_DAMAGE_AND_UPGRADE_BALANCE_003_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -495,7 +502,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contract tests; clock/damage browser integration; roster/map/ability; desktop/mobile character-selection layout; objective; save export/import; audio; normal-play; and natural-run exploratory regressions. Current save export/import CI pending. Enemy balance and Gnasher telegraph regression added.",
+    "core_tests": "22 Node contracts; clock/damage integration; roster/map/ability; desktop/mobile selection; objective; save export/import; audio; normal-play; enemy balance with post-armor damage budget; survival-upgrade offer regression; four-wizard natural-run exploratory regression.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -528,7 +535,16 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "The first balance run reached the new browser regressions but the natural-run harness failed before simulation because its source instrumentation still expected the old Gnasher/contact/ranged formulas. Harness anchors now follow the production helpers; full four-wizard run pending."
+    "natural_run_matrix": "CI #44447174307: all four characters selected; Briar won 1/4. Aster died at 384.7s after repeated Gnasher leaps (~93 raw each); Ember died at 278s after accumulated contact/friendly-fire; Nyx died at 812.3s from Crabladon contact. This candidate lowers Gnasher leap/contact and ranged damage, and guarantees a defensive level-up choice when the build remains under-defended. Rerun pending."
   },
-  "last_single_player_ci": null
+  "last_single_player_ci": {
+    "run_id": 44447174307,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44447174307",
+    "commit": "1b7c578f39056314597531434ee60f57a9a03776",
+    "conclusion": "success",
+    "required_jobs_passed": 20,
+    "required_jobs_total": 20,
+    "exploratory_wizard_natural_runs": "1/4 boss wins",
+    "scope": "One-map offline browser single-player; not release acceptance."
+  }
 }
