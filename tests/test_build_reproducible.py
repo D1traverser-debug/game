@@ -14,7 +14,7 @@ class BuildReproducibilityTests(unittest.TestCase):
   html=INDEX.read_text(encoding="utf-8")
   fragment=RNG_MODULE.read_text(encoding="utf-8").replace("export class SeededRng","class SeededRng",1).rstrip("\n")
   self.assertIn(RNG_START,html)
-  self.assertIn(RNG_START+"\\nconst MASK_64",html)
+  self.assertIn(RNG_START+chr(10)+"const MASK_64",html)
   self.assertIn(fragment,html)
   self.assertNotIn("export class SeededRng",html)
 if __name__=="__main__":unittest.main()
