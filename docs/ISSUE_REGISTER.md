@@ -22,8 +22,3 @@ CI 44491163465 on 266928c passed 24/24 jobs, including the exact 17-check solo s
 
 
 The objective RNG integration is intentionally partial: it does not make enemy/combat/loot/spell/chest/boss outcomes fully replayable. Product status remains NOT_READY until all release gates and owner acceptance pass.
-
-
-## Latest automated evidence — 2026-11-19 (objective RNG candidate)
-
-Run `44507473452` on candidate commit `b99802cb1bc300a22dce1780d969cd42541db02c` passed 25/25 jobs, including objective RNG isolation/replay checks, Chromium/Firefox/WebKit compatibility and all four natural wizard boss wins. The objective RNG integration slice is closed for automated CI. Full-run RNG coverage is still incomplete: enemy director, combat, loot, level-up, spell, chest and boss randomness remain on legacy call sites. Product status remains NOT_READY; owner and physical-device acceptance remain open.

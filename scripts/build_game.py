@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]
 INDEX=ROOT/"index.html"
 BOSS_MODULE=ROOT/"src"/"game"/"boss_encounters.js"
 RNG_MODULE=ROOT/"web"/"src"/"core"/"seeded-rng.mjs"
-RNG_START="/* Shared deterministic gameplay RNG. */"
+RNG_START="/* Shared deterministic gameplay RNG."
 RNG_END="\nlet coreClock=null;"
 START="/* Shared, data-driven boss attack lifecycle."
 END="\nfunction pause("

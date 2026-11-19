@@ -89,15 +89,3 @@ The first bounded slice is implemented on `work/objective-rng-integration-001`:
 - Added `tests/objective_rng_regression.py` for same-seed trace, different-seed divergence, world-layout independence, render/audio/pause isolation, fresh-run seeds, result-screen seed visibility and offline/no-error checks. Added it to the required browser-component CI matrix.
 
 CI is pending. This does not claim full-run deterministic replay: enemy director, combat, loot, level-up, spell, chest and boss randomness remain to be migrated. No gameplay balance, map bounds, enemy values or objective targets were changed. CAOS remains read-only.
-
-
-## CI evidence update — 2026-11-19
-
-The first candidate run `44505974849` passed the offline package integrity check and the new objective RNG browser regression. The project-state checkpoint initially failed because the recorded HTML byte count was stale (803533 vs actual 803536); the metadata has been corrected to the package's measured byte count and SHA-256. Full required CI rerun remains pending.
-
-
-## Objective RNG slice closed — CI PASS — 2026-11-19
-
-The bounded objective RNG slice is now automated-CI green. Run `44507473452` passed 25/25 jobs on `b99802cb1bc300a22dce1780d969cd42541db02c`. The objective-specific regression passed 32/32 unique traces across nine objective families and verified world-layout independence, render/audio/pause isolation, fresh run seeds, result diagnostics and offline/no-error behavior. Four natural wizard runs all defeated a boss and reached the result screen. See `docs/experiments/OBJECTIVE_RNG_INTEGRATION_001.md` for the exact seeds, outcomes and artifact hashes.
-
-Next audit boundary: enemy director spawn decisions and entity identity allocation. Inspect every relevant random call and ID generation site, distinguish spawn scheduling/selection/position from combat, loot and presentation, and define a minimal replay trace before implementation. No global random replacement.
