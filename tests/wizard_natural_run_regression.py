@@ -38,8 +38,10 @@ async def main():
    page.on("request",lambda r:requests.append(r.url) if r.url.startswith(("http://","https://")) else None)
    page.set_default_timeout(180000)
    await page.set_content(DOCUMENT,wait_until="load")
+   await page.wait_for_timeout(450)
    # Select each wizard through the actual production character-selection UI.
    await page.locator("#selectCharacter").click()
+   await page.locator(".character-card").first.wait_for(state="visible",timeout=10000)
    await page.locator(f'[data-character="{character}"]').click()
    selected=await page.evaluate("JSON.parse(localStorage.getItem('spellbrigade_solo_v1')).selectedCharacterId")
    await page.evaluate("(seed)=>window.__setRunSeed(seed)",seed)
