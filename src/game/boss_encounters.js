@@ -169,7 +169,7 @@ function updateBossEncounter(dt){
  if(b.burn>0){b.burnTick=(b.burnTick||0)-dt;if(b.burnTick<=0){b.burnTick=.5;damageEnemy(b,b.burnDmg||4,'burn',null,false)}}
  if(b.dead)return;
  bossSyncPhase(b);
- if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;bossCancelAttack(b);b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');sound(460,.34,'square',.035)}
+ if(b.stagger>=100&&b.vulnerable<=0){b.stagger=0;b.vulnerable=2.6;bossCancelAttack(b);b.attackCooldown=1.2;toast(spec.name+' 失衡！伤害提高 200%');playSfx('stagger')}
  b.phaseTransitionTimer=Math.max(0,(b.phaseTransitionTimer||0)-dt);
  const dx=p.x-b.x,dy=p.y-b.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx);
  const committedAttack=!!b.attackInstance&&(b.attackInstance.stage==='telegraph'||b.attackInstance.stage==='active');if(b.vulnerable<=0&&b.freeze<=0&&!committedAttack&&b.phaseTransitionTimer<=0){const speed=(spec.speed+Math.min(b.bossId==='sol'?150:60,b.age*(b.bossId==='sol'?1.7:.45)))*(1+(b.phaseIndex||0)*.12);worldMoveEntity(b,Math.cos(a)*speed*(1-b.slow)*dt,Math.sin(a)*speed*(1-b.slow)*dt,Math.min(38,b.r*.45))}
