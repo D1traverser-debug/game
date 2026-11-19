@@ -335,3 +335,16 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 - This closes the objective RNG integration's automated CI gate, not the product release gate. The PR remains draft/unmerged; owner playtest, physical device/controller checks, performance and final art/audio acceptance remain open. Product remains `NOT_READY`.
 - Next bounded engineering task: audit enemy-director spawn randomness and entity ID allocation; write a testable migration plan before touching runtime behavior. Do not bulk-replace `Math.random` and do not claim full-run replay.
 - CAOS remains read-only and unchanged.
+
+
+## Production art and audio identity pass — 2026-11-19
+
+- Candidate branch: `work/production-art-vfx-audio-002`; based on the objective-RNG integration branch. Latest candidate commit at handoff: `12aaef008a703cfaaec21566dae429f363223d81`.
+- Added `assets/wizard_4x4_pack.avif.b64`: original project-generated 4×4 wizard atlas, 384×384, alpha channel, 96×96 cells. Rows: Aster / Ember / Briar / Nyx. Columns: idle / walk / cast / ability.
+- Embedded the atlas in the single-file offline HTML through `scripts/build_game.py`. Runtime does not fetch an external asset or CDN. If AVIF fails to decode, the existing procedural fallback remains available.
+- Character selection portraits and live player rendering use the same character-specific source art. Pose selection follows movement, cast and ability pulses; separate deterministic orbit VFX identify the four elements.
+- Adaptive score now uses four character-specific interval motifs and adds sparse forest bird calls on the ambience channel. Existing boss tension, percussion, independent volume controls and mute behavior remain.
+- Added/expanded `wizard_visual_identity_regression.py`, `art_renderer_regression.py` and `audio_engine_regression.py` for atlas decode, four unique heroes/portraits, four action poses, moving VFX, live sprite draw, unique music motifs and offline/no-error checks.
+- Exact embedded `index.html`: 842422 UTF-8 bytes; SHA-256 `f25f45870d83db5a40bbafded5068d5ddca1e544c67cf051d983ac401b021fc9`. Project state metadata synchronized.
+- CI has not yet run on this candidate. Product status remains `NOT_READY`; owner review, physical device checks, full environment/enemy/spell/UI art coverage, authored-audio decision and final acceptance remain open. This is a presentation slice, not a claim that the full game is complete.
+- CAOS remains read-only and unchanged.
