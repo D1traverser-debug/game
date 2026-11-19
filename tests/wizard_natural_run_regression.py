@@ -8,7 +8,7 @@ PILOT_PATH=ROOT/"tests"/"boss_archetype_full_runs.py"
 SPEC=importlib.util.spec_from_file_location("aetherwilds_boss_pilot",PILOT_PATH)
 PILOT=importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(PILOT)
-CHARACTERS=[("aster",45),("ember",42),("briar",43),("nyx",48)]
+CHARACTERS=[("aster",49),("ember",42),("briar",49),("nyx",51)]
 PILOT_ABILITY_ANCHOR="if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}\n    window.__manualTick=true;"
 PILOT_ABILITY_PATCH="""if(!gnasherThreat&&(chestNear||itemNear)){interact();interactions++;}
     const __wizardAbilityHpRatio=p.hp/Math.max(1,p.maxHp),__wizardAbilityCloseThreat=game.enemies.some(e=>!e.dead&&Math.hypot(e.x-p.x,e.y-p.y)<260);

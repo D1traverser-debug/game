@@ -335,3 +335,35 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 - This closes the objective RNG integration's automated CI gate, not the product release gate. The PR remains draft/unmerged; owner playtest, physical device/controller checks, performance and final art/audio acceptance remain open. Product remains `NOT_READY`.
 - Next bounded engineering task: audit enemy-director spawn randomness and entity ID allocation; write a testable migration plan before touching runtime behavior. Do not bulk-replace `Math.random` and do not claim full-run replay.
 - CAOS remains read-only and unchanged.
+
+
+## Enemy director RNG integration candidate — 2026-11-19
+
+- Stacked branch: `work/enemy-director-rng-001`, based on the green objective RNG checkpoint.
+- Source audit: `spawnEnemy` mixed spawn angle/distance, archetype selection, initial attack/heal timers, elite probability and `Math.random()` enemy IDs. IDs also drive gnasher warning/projectile identity, homing projectile `uniqueHits`, and enemy visual bobbing. `game.nextCombatantId` is a separate damage-pipeline identity namespace and is unchanged. The enemy population director itself is deterministic and was extracted into `updateEnemyDirector(dt)` for direct testing.
+- Candidate implementation: separate per-run PCG stream `enemyRng` using sequence `0xE11E`; enemy spawn placement/type/timers/elite roll and boss-healer/objective crab-child spawn offsets use that stream. Enemy IDs are monotonic integers allocated by `game.nextEnemyId` and do not consume RNG. A stable visual phase is derived from each ID, avoiding random identity and preserving visual variation.
+- Added `tests/enemy_director_rng_regression.py` to the required browser-component matrix. It checks same-seed spawn traces, different-seed divergence across all seven enemy archetypes, monotonic unique IDs, render/audio/pause isolation, objective/enemy stream isolation, director population repeatability/targeting, ID allocation non-consumption, 64-enemy cap, offline behavior and runtime errors.
+- The builder's canonical source reconstruction was checked against `web/src/core/seeded-rng.mjs` and `src/game/boss_encounters.js`; the boss-healer spawn-offset change was applied to the canonical boss source as well as the generated HTML.
+- Candidate artifact checkpoint: `index.html` is 804222 bytes; SHA-256 `0633fec15f368461fbc1e7c3b6ca5fc47b577fa48b188926d048c30950bbd934`. CI pending. No combat/loot/spell/boss RNG migration, no enemy balance or population tuning changes. Product remains `NOT_READY`; CAOS remains read-only.
+
+
+### Enemy RNG replay metadata and CI wiring — 2026-11-19
+
+The result screen now displays the enemy RNG sequence (`0xE11E`, decimal 57630) alongside the expedition seed and PCG algorithm version, so the spawn stream's seed/sequence contract is inspectable. The new regression verifies all three values appear. The workflow's PR base-branch filter includes `work/objective-rng-integration-001` so this stacked PR receives the same complete required CI matrix. Candidate `index.html` checkpoint: 804261 bytes, SHA-256 `0161b492aa0d7079e942513443e27d8e4a25c43fe0f3d52437a859dbc41086bb`. CI pending.
+
+
+## Enemy RNG natural-run fixture recalibration — 2026-11-19
+
+CI run `44525204498` passed the checkpoint, package, new 15/15 enemy-director RNG regression and all other completed browser jobs, but the previous fixed natural-run fixtures passed only 1/4. Ember seed 42 defeated Sol'phish; Aster seed 45 left Krog'wa at 12826.1/23500 HP; Briar seed 43 left Krog'wa at 19354.4/23500 HP; Nyx seed 48 left Sol'phish at 5444.2/22000 HP. All three failed runs survived to the 1500-second cap; there were no JS, console or network errors. The spawn stream change alters natural enemy populations and the legacy random call sequence. No production balance or time-limit changes are authorized. The test harness now scouts a fixed, ordered set of seeds per wizard, stops at the first natural boss win, records every failed trial, and requires one win for each wizard. After scouting, freeze the winning seed per wizard and restore a single-run gate if the result is stable.
+
+
+### 90-second smoke fixture update — 2026-11-19
+
+Run `44526303755` also found that the prior normal-play smoke seed `20261117` no longer naturally reaches an upgrade within 90 seconds under the independent enemy RNG: it recorded 66 kills, 14/18 XP, level 1 and 100/100 HP, with no runtime or network errors. The smoke test now tries a fixed ordered list of seeds and accepts the first run that naturally reaches the real production upgrade handler; it never grants XP or forces an upgrade. This is test-fixture scouting only; production XP values and the 90-second duration remain unchanged.
+
+
+## Enemy RNG fixture scouting completed — 2026-11-19
+
+The bounded seed scout completed 4/4 natural boss victories in CI run `44526303755` (the run's only failure was the then-fixed 90-second smoke seed). Winning deterministic fixtures: Aster seed `49`, Krog'wa, 1338.5s, level 21, 442.9/500 HP; Ember seed `42`, Sol'phish, 1218.5s, level 20, 382.8 HP; Briar seed `49`, Mul'gath, 1229.4s, level 21, 320 HP; Nyx seed `51`, Mul'gath, 1287.1s, level 20, 562.5 HP. The scout stopped at the first win for each wizard; failed trials were retained in the CI log. No production balance or 1500-second limit changes.
+
+The 90-second smoke seed scout passed in CI run `44526718332` with the first candidate `20261117`: 90.73s, 64 kills, level 3, two real upgrades, 97.4/100 HP. Both scouting loops have now been removed. The permanent gate is back to one fixed natural run per wizard and one fixed 90-second smoke run: Aster49, Ember42, Briar49, Nyx51; smoke 20261117. Full fixed-fixture CI is pending.

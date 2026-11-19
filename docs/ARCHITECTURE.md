@@ -74,3 +74,10 @@ The procedural score runs only while the browser AudioContext is active and the 
 Objective type selection, variant chance/choice, objective origin and object placement, and the brazier sequence use only the per-run stream. Collision-bearing static meadow decoration uses `WORLD_LAYOUT_SEED` and `WORLD_LAYOUT_VERSION` through a separate world-layout stream, so objective open-point resolution sees the same world layout across runs. Camera shake continues to use the legacy presentation helper; procedural audio noise keeps its private LCG. These streams cannot advance `runRng`.
 
 This is deliberately not a full deterministic-replay claim. Enemy spawning, combat rolls, loot, level-up offers, spell execution, chests and boss selection still contain legacy random call sites and must be migrated in separate bounded slices with behavior-parity tests.
+
+
+## Enemy director RNG ownership
+
+Enemy spawning owns an independent PCG stream (`enemyRng`) initialized from the expedition seed with sequence `0xE11E`. This stream is separate from objective generation (`runRng`) and static collision-bearing world layout (`worldRng`). Spawn angle/distance, archetype roll, initial attack/heal timers, elite probability, and spawned minion placement consume only `enemyRng`. Enemy identity is a monotonic per-run integer allocated by `nextEnemyId`; ID allocation does not consume entropy. Enemy visual bobbing phase is derived deterministically from the ID. The population director's deterministic target/cap logic is isolated in `updateEnemyDirector(dt)` for direct regression.
+
+This does not migrate combat rolls, critical hits, dodge, elemental procs, loot/drop probabilities, upgrade offers, spell randomness, chest behavior or boss selection/attacks. Those remain separate migration boundaries.

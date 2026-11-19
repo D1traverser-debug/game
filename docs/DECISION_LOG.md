@@ -18,3 +18,7 @@ The 2.5D atlas renderer with Canvas 2D simulation is the default production path
 
 ## D-038 — Explicit entropy ownership for browser simulation (2026-11-19) — ACTIVE
 The browser runtime will migrate random decisions one subsystem at a time to the canonical PCG-XSH-RR stream. Each expedition owns a recorded run seed; collision-bearing static world layout owns a separate fixed/versioned seed; presentation and audio must never consume the per-run stream. The first integrated subsystem is objective selection/generation. No global `Math.random` replacement and no full-run replay claim are permitted until all gameplay call sites have been migrated and validated.
+
+
+## D-039 — Enemy spawn entropy and identity ownership (2026-11-19) — ACTIVE
+Enemy spawning uses a dedicated PCG stream keyed to the expedition seed but separated from objective RNG by sequence `0xE11E`. Enemy entity IDs are deterministic monotonic integers and are not RNG draws. The population director remains behavior-equivalent and is extracted for direct tests. Combat, loot, spell, chest and boss random call sites remain untouched until individually audited and parity-tested.
