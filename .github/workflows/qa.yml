@@ -3,7 +3,7 @@ on:
   push:
     branches: [development, main, full-game]
   pull_request:
-    branches: [main, full-game]
+    branches: [main, full-game, work/objective-rng-integration-001, work/enemy-director-rng-001]
   workflow_dispatch:
 
 jobs:
@@ -14,6 +14,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Verify deterministic offline HTML assembly
+        run: python scripts/build_game.py --check
       - name: Validate browser source
         run: python scripts/package_web.py --check
       - name: Verify browser scope and artifact checkpoint
