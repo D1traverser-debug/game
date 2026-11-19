@@ -272,7 +272,9 @@
     "Local Chromium verification at 1280x800 confirms four visible character cards, portrait canvas contained by its card, map preview contained by modal, and primary start action fully inside the modal.",
     "Local Chromium verification at 390x844 confirms responsive character selection, scrollable modal, and successful transition into gameplay after selecting the primary start action; zero JS/console errors.",
     "Added desktop layout and mobile start-flow assertions to the roster/map browser regression; updated the natural-run harness to wait for the actual active character screen and dynamic card population, with diagnostic errors.",
-    "Latest CI exposed a Python syntax error in the newly extended roster regression and a duplicate const identifier in the test-only natural-run Q-ability patch. Both test-harness defects were corrected; no production game logic change was needed."
+    "Latest CI exposed a Python syntax error in the newly extended roster regression and a duplicate const identifier in the test-only natural-run Q-ability patch. Both test-harness defects were corrected; no production game logic change was needed.",
+    "Roster regression now isolates the global decor-collider fixture before testing Nyx's dash, so unrelated generated map props cannot block the test's synthetic dash lane.",
+    "Mobile start-flow regression now reads the game state through its injected test-only closure probe rather than attempting to access IIFE-local variables from the page global scope."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -291,7 +293,7 @@
     "Natural-run boss victories for all four wizards must be verified on the latest collision-aware build; monster navigation and balance remain subject to natural-run evidence.",
     "Save export/import UI and multi-device synchronization are not implemented; browser-origin persistence, backup recovery and corruption fallback now have automated regression coverage."
   ],
-  "next_action": "Rerun CI with the corrected Python/browser test harness and exact artifact byte count; inspect natural-run telemetry only after the test enters the actual game.",
+  "next_action": "Run the full single-player CI suite; analyze actual natural-run telemetry by wizard if any expedition or boss victory fails.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -320,7 +322,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "CHARACTER_SELECT_AND_NATURAL_RUN_HARNESS_FIX_CI_PENDING",
+  "latest_candidate_ci_status": "CHARACTER_SELECT_AND_NATURAL_RUN_REGRESSION_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -510,7 +512,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "EXPLORATORY: last run revealed a test-only duplicate lexical declaration in the wizard ability pilot, not a production gameplay defect. Pilot identifiers were isolated; rerun pending."
+    "natural_run_matrix": "EXPLORATORY: browser document now parses after unique ability-policy identifiers; the next CI run will determine whether each wizard can naturally clear the full expedition and boss."
   },
   "last_single_player_ci": null
 }

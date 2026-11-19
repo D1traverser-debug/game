@@ -46,8 +46,8 @@ window.__soloProbe={
   const ch=CHARACTER_BY_ID[id],p=makePlayer();p.characterId=id;p.x=0;p.y=0;p.hp=Math.max(30,p.maxHp*.35);p.facing=0;p.abilityCd=0;
   const e={id:'test-'+id,type:'crawler',x:155,y:0,r:18,hp:20000,max:20000,dead:false,state:'chase',slow:0,burn:0,acid:0,corrupt:0,freeze:0,hitFlash:0};
   game={player:p,enemies:[e],fx:[],damageNumbers:[],shots:[],hazards:[],plants:[],chests:[],orbs:[],decor:[],ghostImps:[],boss:null,objective:null,damageStates:new WeakMap(),nextCombatantId:1,damageSource:{}};
-  const old=coreDamageApi;coreDamageApi=null;screen='playing';const before={hp:e.hp,playerHp:p.hp,x:p.x};
-  const used=useCharacterAbility();const after={hp:e.hp,playerHp:p.hp,x:p.x,cd:p.abilityCd,burn:e.burn||0,slow:e.slow||0};coreDamageApi=old;
+  const old=coreDamageApi,oldDecor=WORLD_DECOR_COLLIDERS;coreDamageApi=null;WORLD_DECOR_COLLIDERS=[];screen='playing';const before={hp:e.hp,playerHp:p.hp,x:p.x};
+  const used=useCharacterAbility();const after={hp:e.hp,playerHp:p.hp,x:p.x,cd:p.abilityCd,burn:e.burn||0,slow:e.slow||0};coreDamageApi=old;WORLD_DECOR_COLLIDERS=oldDecor;
   return {used,before,after,ability:ch.abilityName};
  }
 };
@@ -119,7 +119,7 @@ async def main():
   report["checks"]["mobile_portraits_and_map_are_in_flow"]=mobile_layout["portraitPosition"]=="static" and mobile_layout["mapPosition"]=="static" and mobile_layout["portraitInsideCard"] and mobile_layout["mapInsideModal"]
   await mobile.locator("#characterStart").scroll_into_view_if_needed()
   await mobile.locator("#characterStart").click()
-  report["checks"]["mobile_character_start_reaches_gameplay"]=await mobile.evaluate("screen==='playing'&&!!game?.player")
+  report["checks"]["mobile_character_start_reaches_gameplay"]=await mobile.evaluate("window.__soloProbe.runSnapshot().screen==='playing'")
   report["checks"]["mobile_character_select_no_runtime_errors"]=not mobile_errors and not mobile_console
   await mobile.close()
   report["checks"]["no_runtime_errors"]=not report["page_errors"] and not report["console_errors"]

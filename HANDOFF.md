@@ -126,3 +126,10 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - The natural-run browser document failed to parse because the test-only Q-ability pilot redeclared `hpRatio` in an existing function scope. Renamed all injected ability-policy locals to unique `__wizardAbility*` identifiers.
 - The checkpoint guard reported the exact candidate HTML size as 781674 bytes; synchronized PROJECT_STATE to the CI-measured size.
 - These are test/handoff metadata corrections. No production combat values were changed. Rerun CI before recording any natural-run gameplay result.
+
+
+## Regression fixture isolation — 2026-11-19
+
+- The roster regression's Nyx dash check reused the 90 generated map-prop colliders from an earlier collision test. It now clears and restores only that test fixture so the dash ability is exercised on a known clear lane; production collision behavior is unchanged.
+- The mobile start assertion now reads the IIFE-local game state through the test-only probe, instead of trying to access lexical variables from the browser global scope.
+- The natural-run test's source assertion now matches the unique renamed ability-policy identifier. CI rerun pending.

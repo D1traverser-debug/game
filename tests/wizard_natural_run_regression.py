@@ -23,7 +23,7 @@ PILOT_ABILITY_PATCH="""if(!gnasherThreat&&(chestNear||itemNear)){interact();inte
     window.__manualTick=true;"""
 DOCUMENT=PILOT.DOCUMENT.replace(PILOT_ABILITY_ANCHOR,PILOT_ABILITY_PATCH)
 assert DOCUMENT!=PILOT.DOCUMENT
-assert DOCUMENT.count("if(shouldUseAbility)useCharacterAbility();")==1
+assert DOCUMENT.count("if(__wizardShouldUseAbility)useCharacterAbility();")==1
 
 async def main():
  report={"runs":[],"checks":{}}
