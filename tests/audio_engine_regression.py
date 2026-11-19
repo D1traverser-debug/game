@@ -9,7 +9,7 @@ MARKER = "// Production build: internal debug mutations are test-only and not sh
 assert SOURCE.count(MARKER) == 1
 
 PROBE = r"""
-window.__audioOscillators=0;
+window.__audioOscillators=0;window.__audioNoiseHits=0;
 const __AudioContext=window.AudioContext||window.webkitAudioContext;
 if(__AudioContext){
   const __createOscillator=__AudioContext.prototype.createOscillator;
@@ -18,14 +18,27 @@ if(__AudioContext){
     return __createOscillator.call(this);
   };
 }
+const __baseNoiseHit=studioNoiseHit;
+studioNoiseHit=function(...args){window.__audioNoiseHits++;return __baseNoiseHit(...args)};
 window.__audioProbe={
   resume:()=>audio?.resume(),
   snapshot:()=>({
     state:audio?.state||'uninitialized',
     oscillators:window.__audioOscillators||0,
     muted:muted,
-    musicStep:STUDIO_AUDIO.step
-  })
+    musicStep:STUDIO_AUDIO.step,
+    noiseBufferReady:!!STUDIO_AUDIO.noiseBuffer,
+    layers:STUDIO_AUDIO.lastLayers,
+    motif:STUDIO_AUDIO.motif
+  }),
+  bossMix:()=>{
+    const oldBoss=game.boss,oldHp=game.player.hp;
+    game.boss={dead:false,phaseIndex:2};game.player.hp=game.player.maxHp*.2;
+    STUDIO_AUDIO.next=0;STUDIO_AUDIO.step=2;
+    const before=window.__audioNoiseHits;studioMusicTick();
+    const result={layers:STUDIO_AUDIO.lastLayers,noiseHits:window.__audioNoiseHits-before,motif:STUDIO_AUDIO.motif};
+    game.boss=oldBoss;game.player.hp=oldHp;return result;
+  }
 };
 """
 DOCUMENT = SOURCE.replace(MARKER, PROBE + "\n" + MARKER)
@@ -56,6 +69,14 @@ async def main():
         report["checks"]["audio_context_started"] = state["state"] == "running"
         report["checks"]["procedural_music_advances"] = state["musicStep"] >= 2
         report["checks"]["layered_voices_created"] = state["oscillators"] >= 10
+        report["checks"]["deterministic_noise_percussion_created"] = state["noiseBufferReady"] is True
+        report["checks"]["character_motif_selected"] = state["motif"] in ("aster", "ember", "briar", "nyx")
+        mix = await page.evaluate("window.__audioProbe.bossMix()")
+        report["boss_mix"] = mix
+        report["checks"]["boss_adaptive_layer_activates"] = mix["layers"]["boss"] is True
+        report["checks"]["low_health_tension_layer_activates"] = mix["layers"]["tension"] is True
+        report["checks"]["boss_mix_uses_character_motif"] = mix["motif"] == "aster"
+        report["checks"]["percussion_and_boss_noise_are_scheduled"] = mix["noiseHits"] >= 1 and mix["layers"]["percussion"] is True
         report["checks"]["no_runtime_errors"] = not report["page_errors"] and not report["console_errors"]
         report["checks"]["offline_no_external_requests"] = not report["external_requests"]
         report["pass"] = all(report["checks"].values())

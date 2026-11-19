@@ -1644,43 +1644,78 @@ function drawWorld(){
 }
 
 /* No audio files: compact procedural soundtrack and controller input. */
-const STUDIO_AUDIO={next:0,step:0};
+const STUDIO_AUDIO={next:0,step:0,noiseBuffer:null,lastLayers:{},motif:null};
 function studioTone(freq,duration,volume=.008,wave='triangle',pan=0,cutoff=1800){
  if(muted||!audio||audio.state!=='running')return;
  try{
   const now=audio.currentTime,os=audio.createOscillator(),overtone=audio.createOscillator(),mix=audio.createGain(),gain=audio.createGain(),filter=audio.createBiquadFilter(),panner=audio.createStereoPanner?.();
-  os.type=wave;os.frequency.setValueAtTime(freq,now);os.detune.setValueAtTime(wave==='triangle'?-3:0,now);
-  overtone.type='sine';overtone.frequency.setValueAtTime(freq*2.002,now);mix.gain.setValueAtTime(.13,now);
+  os.type=wave;os.frequency.setValueAtTime(Math.max(28,freq),now);os.detune.setValueAtTime(wave==='triangle'?-3:0,now);
+  overtone.type='sine';overtone.frequency.setValueAtTime(Math.max(28,freq)*2.002,now);mix.gain.setValueAtTime(.13,now);
   filter.type='lowpass';filter.frequency.setValueAtTime(cutoff,now);filter.Q.value=.45;
-  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(volume,now+.11);gain.gain.setValueAtTime(volume*.68,now+Math.min(duration*.62,.9));gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(volume,now+.035);gain.gain.setValueAtTime(volume*.68,now+Math.min(duration*.62,.9));gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
   os.connect(filter);overtone.connect(mix);mix.connect(filter);filter.connect(gain);
   if(panner){panner.pan.setValueAtTime(Math.max(-1,Math.min(1,pan)),now);gain.connect(panner);panner.connect(audio.destination)}else gain.connect(audio.destination);
   os.start(now);overtone.start(now);os.stop(now+duration+.015);overtone.stop(now+duration+.015);
  }catch(e){}
 }
+function studioNoiseHit(duration=.07,volume=.001,cutoff=3200,pan=0){
+ if(muted||!audio||audio.state!=='running')return;
+ try{
+  if(!STUDIO_AUDIO.noiseBuffer){
+   const length=Math.floor(audio.sampleRate*.42),buffer=audio.createBuffer(1,length,audio.sampleRate),data=buffer.getChannelData(0);
+   let seed=0x6d2b79f5;
+   for(let i=0;i<length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;data[i]=(seed/2147483648-1)*(1-i/length*.34)}
+   STUDIO_AUDIO.noiseBuffer=buffer;
+  }
+  const now=audio.currentTime,source=audio.createBufferSource(),filter=audio.createBiquadFilter(),gain=audio.createGain(),panner=audio.createStereoPanner?.();
+  source.buffer=STUDIO_AUDIO.noiseBuffer;filter.type='highpass';filter.frequency.setValueAtTime(cutoff,now);filter.Q.value=.55;
+  gain.gain.setValueAtTime(Math.max(.0001,volume),now);gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+  source.connect(filter);filter.connect(gain);
+  if(panner){panner.pan.setValueAtTime(Math.max(-1,Math.min(1,pan)),now);gain.connect(panner);panner.connect(audio.destination)}else gain.connect(audio.destination);
+  source.start(now);source.stop(now+duration+.01);
+ }catch(e){}
+}
 function studioMusicTick(){
  if(!audio||muted||screen!=='playing'||audio.state!=='running')return;
  const now=audio.currentTime;if(now<STUDIO_AUDIO.next)return;
- STUDIO_AUDIO.next=now+.48;
+ STUDIO_AUDIO.next=now+.24;
  const chords=[
   {root:146.83,notes:[220,261.63,329.63],melody:[440,392,329.63,261.63]},
   {root:130.81,notes:[196,233.08,293.66],melody:[392,349.23,293.66,233.08]},
   {root:116.54,notes:[174.61,220,261.63],melody:[349.23,329.63,261.63,220]},
   {root:130.81,notes:[196,246.94,293.66],melody:[392,349.23,293.66,246.94]}
  ];
- const step=STUDIO_AUDIO.step++%32,chord=chords[Math.floor(step/8)%4],beat=Math.floor(step/2)%4;
- if(step%8===0){
-  studioTone(chord.root/2,3.8,.010,'sine',0,420);
-  chord.notes.forEach((n,i)=>studioTone(n,3.3,.0028,'sine',(i-1)*.34,1450));
-  studioTone(chord.root,1.05,.0048,'triangle',-.18,900);
+ const boss=!!(game?.boss&&!game.boss.dead),hpRatio=game?.player?game.player.hp/Math.max(1,game.player.maxHp):1;
+ const character=game?.player?.characterId||'aster';
+ const motifs={
+  aster:[0,2,1,3,2,3,1,0],ember:[0,1,2,3,2,1,3,2],
+  briar:[0,2,1,2,3,2,1,0],nyx:[0,1,3,2,1,3,2,0]
+ };
+ const step=STUDIO_AUDIO.step++%64,chord=chords[Math.floor(step/16)%4],beat=Math.floor((step%8)/2);
+ const tension=hpRatio<.28,melodyIndex=(motifs[character]||motifs.aster)[Math.floor(step/2)%8];
+ STUDIO_AUDIO.motif=character;
+ STUDIO_AUDIO.lastLayers={pad:step%16===0,bass:step%8===0,melody:step%2===0,percussion:step%8===2||step%8===6||step%2===1,boss,tension,character};
+ if(step%16===0){
+  studioTone(chord.root/2,3.6,.009,'sine',0,390);
+  chord.notes.forEach((n,i)=>studioTone(n,3.1,.0025,'sine',(i-1)*.36,1500));
+  studioTone(chord.root,1.1,.0042,'triangle',-.16,920);
  }
- if(step%2===0)studioTone(chord.melody[beat],.54,.0032,'triangle',beat%2?.24:-.24,2300);
- if(step%4===2)studioTone(chord.notes[(step/4)%3]*2,.68,.0016,'sine',.38,3200);
- if(game.time>300&&step%4===0)studioTone(chord.root*.5,.24,.0035,'sine',-.3,650);
- if(game?.boss&&!game.boss.dead){
-  if(step%4===0)studioTone(73.42,.72,.011,'sawtooth',0,280);
-  if(step%8===4)studioTone(chord.notes[1]*.5,.55,.0045,'triangle',.2,720);
+ if(step%8===0)studioTone(chord.root*.5,1.65,.0065,'sine',-.28,520);
+ if(step%8===4)studioTone(chord.root*.5*1.5,.38,.0026,'triangle',.28,980);
+ if(step%2===0)studioTone(chord.melody[melodyIndex],.34,.0028,'triangle',beat%2?.28:-.28,2450);
+ if(step%4===2)studioTone(chord.notes[(step/4)%3]*2,.22,.0013,'sine',.42,3400);
+ if(step%8===0)studioTone(58,.18,.006,'sine',0,180);
+ if(step%8===4)studioTone(66,.13,.0038,'sine',0,220);
+ if(step%8===2||step%8===6)studioNoiseHit(.105,.00145,1550,step%8===2?-.32:.32);
+ if(step%2===1)studioNoiseHit(.032,.00048,5200,step%4===1?-.42:.42);
+ if(game.time>300&&step%8===0)studioTone(chord.root*.5,.42,.003,'sine',-.3,620);
+ if(boss){
+  if(step%8===0)studioTone(73.42,.68,.0095,'sawtooth',0,260);
+  if(step%8===4)studioTone(chord.notes[1]*.5,.42,.0038,'triangle',.2,760);
+  if(step%8===6)studioNoiseHit(.14,.0026,760,0);
+  if((game.boss.phaseIndex||0)>0&&step%4===2)studioTone(48.99,.26,.0027,'sawtooth',-.12,220);
  }
+ if(tension&&step%8===4)studioTone(55,.3,.0032,'sine',-.2,280);
 }
 const STUDIO_PAD={lastInteract:false,lastAbility:false,lastPause:false};
 function studioController(){

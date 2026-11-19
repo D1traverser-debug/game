@@ -60,3 +60,8 @@ Boss encounter logic is authored in `src/game/boss_encounters.js`. The root `ind
 ## Wizard action feedback
 
 The 2.5D character renderer reads three short-lived player presentation pulses: spell cast, active ability and hit reaction. Their timers decay in the fixed simulation update; the renderer consumes them without mutating simulation or gameplay RNG. Staff/focus lean, character-colored sparks, ability sigil rings and a brief hit rim are layered over the four existing mantle/regalia silhouettes. This is procedural feedback, not a replacement for bespoke skeletal rigs.
+
+
+## Adaptive audio architecture
+
+The procedural score runs only while the browser AudioContext is active and the run is playing. It uses a fixed 0.24-second sequencer, four-chord progression, per-wizard melodic motifs, bass/pad/pluck layers and a cached deterministic noise buffer for percussion. Boss presence/phase and critical health add tension layers. The noise generator uses a private deterministic LCG, never gameplay `Math.random`. This is a procedural score, not a replacement for recorded music or owner listening acceptance.

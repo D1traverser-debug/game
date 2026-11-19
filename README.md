@@ -53,3 +53,7 @@ Boss encounter logic lives in `src/game/boss_encounters.js`. After editing it, r
 
 ### Wizard action readability
 The four wizards now show simulation-timed spell-cast sparks, an active-ability sigil pulse and a brief hit reaction. These are layered over their distinct mantle, focus and regalia designs. Full bespoke skeletal rigs and recorded animation clips remain outside this procedural polish pass.
+
+
+### Adaptive procedural soundtrack
+The offline score layers sustained harmony, bass, per-character melodies, plucked harmonics and deterministic percussion. Boss phases and critical health add tension layers. It uses the Web Audio API without external audio files or CDN requests. Listening review and professionally recorded asset production remain separate acceptance items.

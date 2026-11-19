@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "WIZARD_ACTION_FEEDBACK_001",
+  "checkpoint": "ADAPTIVE_AUDIO_SCORE_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -313,7 +313,11 @@
     "Boss contact candidate uses 10 raw damage for Sol/Mul, 12 for Krog, 34–52 unit pushback and a 1.1-second cooldown; browser contact regression remains attached.",
     "Added simulation-timed spell-cast, active-ability and hit-reaction pulses to the four wizard render paths; the animation state decays on fixed simulation ticks and does not consume gameplay RNG.",
     "Wizard staff/focus props now lean into cast and ability actions; unique color-coded casting sparks, ability sigil rings and red hit-reactive outlines make combat actions readable in-world.",
-    "Extended the four-wizard visual regression to render and compare idle, spell-cast and active-ability frames for each wizard; CI pending."
+    "Extended the four-wizard visual regression to render and compare idle, spell-cast and active-ability frames for each wizard; CI pending.",
+    "Four-wizard natural solo boss matrix passed 4/4 on gameplay candidate 75aa4979: Aster/Sol, Ember/Sol, Briar/Mul'gath and Nyx/Krog'wa all selected through production UI and defeated their bosses; no runtime or external network errors.",
+    "All 21 CI jobs passed on boss-contact candidate 75aa4979, including 31 boss encounter checks, build reproducibility, save, progression, objectives, controller, audio, map/roster and browser integration.",
+    "Wizard action-feedback visual regression passed for all four characters: idle, spell-cast and active-ability renders are distinct per character.",
+    "Reworked the procedural soundtrack into a denser adaptive score with deterministic synthesized percussion, character-specific melodic motifs, boss-phase tension and low-health tension layers; expanded audio regression to verify these layers."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -335,9 +339,10 @@
     "Visual/audio quality, bespoke rigs and animations, cross-browser/physical-device performance, and human owner playtest remain unaccepted.",
     "One-click launch package awaits CI verification; local Windows/macOS/Linux execution and browser storage acceptance remain untested on owner hardware.",
     "The new boss body-contact counterplay patch has not yet passed CI or been evaluated by a fresh four-wizard natural run. Human playtest, visual/audio review, bespoke animation and cross-browser/device performance remain open.",
-    "Spell-cast/ability/hit feedback animation candidate is awaiting browser visual regression; full bespoke skeletal rigs, authored animation clips, original recorded music/SFX and human art review remain open."
+    "Spell-cast/ability/hit feedback animation candidate is awaiting browser visual regression; full bespoke skeletal rigs, authored animation clips, original recorded music/SFX and human art review remain open.",
+    "Adaptive procedural score candidate awaits CI and listening review; it is not a substitute for professionally recorded/original audio assets. Bespoke skeletal rigs, authored animation clips, VFX polish, cross-browser/physical-device performance and owner playtest remain open."
   ],
-  "next_action": "Verify action-feedback visual regression and latest boss-contact four-wizard natural run; then deepen audio composition and continue single-player content/presentation acceptance.",
+  "next_action": "Verify adaptive soundtrack regression and the latest four-wizard natural-run on the exact current build; then continue single-player visual, VFX, accessibility and owner acceptance.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -366,7 +371,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "WIZARD_ACTION_FEEDBACK_001_CI_PENDING",
+  "latest_candidate_ci_status": "ADAPTIVE_AUDIO_SCORE_001_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -483,8 +488,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 788426,
-    "status": "WIZARD_ACTION_FEEDBACK_001_CI_PENDING",
+    "bytes": 790807,
+    "status": "ADAPTIVE_AUDIO_SCORE_001_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",

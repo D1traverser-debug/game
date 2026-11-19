@@ -255,3 +255,12 @@ The balance patch extracted enemy damage into named helpers. The long-run Playwr
 - The four characters retain distinct mantle, focus and regalia shapes; action feedback is layered over each character's existing identity.
 - Extended browser visual regression to compare idle/cast/ability frames for all four wizards. CI pending.
 - This is readable procedural animation polish, not a claim that bespoke skeletal rigs or authored animation clips are complete.
+
+
+## Adaptive procedural soundtrack — 2026-11-19
+
+- Rebuilt the music sequencer as a denser 8th-note arrangement with sustained pads, bass, character-specific melodic motifs, plucked upper harmonics and deterministic synthesized percussion.
+- The score adapts to boss presence/phase and critical player health; no global gameplay RNG is used to generate noise.
+- A cached deterministic noise buffer feeds filtered snare/hat/impact layers. Character motifs differ for Aster, Ember, Briar and Nyx.
+- Extended the browser audio regression to verify the percussion buffer, character motif and boss/low-health adaptive layers.
+- This is an original procedural score candidate, not professionally recorded music. CI and listening review are pending.
