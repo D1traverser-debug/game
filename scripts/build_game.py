@@ -7,6 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]
 INDEX=ROOT/"index.html"
 BOSS_MODULE=ROOT/"src"/"game"/"boss_encounters.js"
 RNG_MODULE=ROOT/"web"/"src"/"core"/"seeded-rng.mjs"
+WIZARD_ATLAS_B64=ROOT/"assets"/"wizard_4x4_pack.avif.b64"
 RNG_START="/* Shared deterministic gameplay RNG. */"
 RNG_END="\nlet coreClock=null;"
 START="/* Shared, data-driven boss attack lifecycle."
@@ -39,6 +40,14 @@ def build_html():
  text=replace_idempotent(text,SHOT_OLD,SHOT_NEW,"HOMING_UPDATE")
  text=replace_idempotent(text,SHOT_2D_OLD,SHOT_2D_NEW,"HOMING_2D_STYLE")
  text=replace_idempotent(text,SHOT_3D_OLD,SHOT_3D_NEW,"HOMING_3D_STYLE")
+ encoded=WIZARD_ATLAS_B64.read_text(encoding="ascii").strip()
+ alphabet=set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
+ if not encoded or any(char not in alphabet for char in encoded):raise ValueError("WIZARD_ATLAS_BASE64_INVALID")
+ marker=f"V2_WIZARD_PACK.src='data:image/avif;base64,{encoded}';"
+ if marker in text:
+  if text.count(marker)!=1:raise ValueError("DUPLICATE_WIZARD_ATLAS_EMBED")
+ else:
+  text=replace_once(text,"V2_WIZARD_PACK.src='__WIZARD_ATLAS_DATA_URI__';",marker)
  return text
 def main():
  parser=argparse.ArgumentParser(description=__doc__);parser.add_argument("--check",action="store_true");args=parser.parse_args()
@@ -48,6 +57,6 @@ def main():
   status="PASS_REPRODUCIBLE"
  else:INDEX.write_text(generated,encoding="utf-8",newline="");current=generated;status="BUILT"
  raw=current.encode("utf-8")
- print(json.dumps({"status":status,"artifact":"index.html","bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest(),"source_fragments":["web/src/core/seeded-rng.mjs","src/game/boss_encounters.js"],"offline_single_file":True},ensure_ascii=False,indent=2))
+ print(json.dumps({"status":status,"artifact":"index.html","bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest(),"source_fragments":["web/src/core/seeded-rng.mjs","src/game/boss_encounters.js","assets/wizard_4x4_pack.avif.b64"],"offline_single_file":True},ensure_ascii=False,indent=2))
  return 0
 if __name__=="__main__":sys.exit(main())

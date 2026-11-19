@@ -27,7 +27,10 @@ def instrument(source: str) -> str:
 window.__atlasSpriteDraws=0;
 const __originalV2Sprite=v2sprite;
 v2sprite=function(...args){window.__atlasSpriteDraws++;return __originalV2Sprite(...args)};
-window.__artProbe={snapshot:()=>({screen,atlasComplete:V2_ATLAS.complete,atlasWidth:V2_ATLAS.naturalWidth,atlasHeight:V2_ATLAS.naturalHeight,mode:save.renderMode,enemies:game?.enemies.filter(e=>!e.dead).length||0,enemySpriteRenders:window.__enemySpriteRenders||0,atlasSpriteDraws:window.__atlasSpriteDraws||0,cacheTiles:V2.decorTiles?.length||0})};
+window.__wizardSpriteDraws=0;
+const __originalWizardSprite=v2wizardSprite;
+v2wizardSprite=function(...args){window.__wizardSpriteDraws++;return __originalWizardSprite(...args)};
+window.__artProbe={snapshot:()=>({screen,atlasComplete:V2_ATLAS.complete,atlasWidth:V2_ATLAS.naturalWidth,atlasHeight:V2_ATLAS.naturalHeight,wizardAtlasReady:V2_WIZARD_ATLAS_READY,wizardAtlasWidth:V2_WIZARD_PACK.naturalWidth,wizardAtlasHeight:V2_WIZARD_PACK.naturalHeight,mode:save.renderMode,enemies:game?.enemies.filter(e=>!e.dead).length||0,enemySpriteRenders:window.__enemySpriteRenders||0,atlasSpriteDraws:window.__atlasSpriteDraws||0,wizardSpriteDraws:window.__wizardSpriteDraws||0,cacheTiles:V2.decorTiles?.length||0})};
 """
     return source.replace(marker, probe + "\n" + marker)
 
@@ -55,6 +58,8 @@ async def main():
         report["checks"]["enemies_spawned"] = state["enemies"] >= 8
         report["checks"]["atlas_enemy_renderer_called"] = state["enemySpriteRenders"] > 0
         report["checks"]["atlas_sprite_draws_occurred"] = state["atlasSpriteDraws"] > 0
+        report["checks"]["original_wizard_atlas_loaded"] = state["wizardAtlasReady"] and state["wizardAtlasWidth"] == 384 and state["wizardAtlasHeight"] == 384
+        report["checks"]["original_wizard_sprites_rendered"] = state["wizardSpriteDraws"] > 0
         report["checks"]["static_meadow_cache_baked"] = state["cacheTiles"] == 24
         report["checks"]["no_runtime_errors"] = not report["page_errors"] and not report["console_errors"]
         report["checks"]["no_external_requests"] = not report["external_requests"]

@@ -16,7 +16,16 @@ const __basePlayUiSfx=playUiSfx;playUiSfx=function(...args){window.__uiEvents.pu
 window.__audioProbe={
  snapshot:()=>({state:audio?.state||'uninitialized',time:audio?.currentTime||0,oscillators:window.__audioOscillators||0,muted,musicStep:STUDIO_AUDIO.step,noiseBufferReady:!!STUDIO_AUDIO.noiseBuffer,ambientNext:STUDIO_AUDIO.ambientNext,layers:STUDIO_AUDIO.lastLayers,motif:STUDIO_AUDIO.motif,volumes:{music:musicVolume,sfx:sfxVolume,ambience:ambienceVolume,ui:uiVolume},sfxEvents:window.__sfxEvents.slice(),uiEvents:window.__uiEvents.slice()}),
  bossMix:()=>{const oldBoss=game.boss,oldHp=game.player.hp;game.boss={dead:false,phaseIndex:2};game.player.hp=game.player.maxHp*.2;STUDIO_AUDIO.next=0;STUDIO_AUDIO.step=2;const before=window.__audioNoiseHits;studioMusicTick();const result={layers:STUDIO_AUDIO.lastLayers,noiseHits:window.__audioNoiseHits-before,motif:STUDIO_AUDIO.motif};game.boss=oldBoss;game.player.hp=oldHp;return result},
-dispatch:()=>{playSfx('cast','aster');playSfx('impact','fire');playUiSfx('click')}
+dispatch:()=>{playSfx('cast','aster');playSfx('impact','fire');playUiSfx('click')},
+motifNotes:()=>{
+ const oldCharacter=game.player.characterId,oldStep=STUDIO_AUDIO.step,oldNext=STUDIO_AUDIO.next,out={};
+ for(const character of ['aster','ember','briar','nyx']){
+  game.player.characterId=character;STUDIO_AUDIO.step=2;STUDIO_AUDIO.next=0;studioMusicTick();
+  out[character]=STUDIO_AUDIO.lastLayers.leadHz;
+ }
+ game.player.characterId=oldCharacter;STUDIO_AUDIO.step=oldStep;STUDIO_AUDIO.next=oldNext;
+ return out;
+}
 };
 """
 DOCUMENT = SOURCE.replace(MARKER, PROBE + "\n" + MARKER)
@@ -57,6 +66,9 @@ async def main():
   events=await page.evaluate("window.__audioProbe.snapshot()")
   report["checks"]["named_combat_sfx_dispatched"]=any(x[0]=="cast" for x in events["sfxEvents"]) and any(x[0]=="impact" for x in events["sfxEvents"])
   report["checks"]["ui_sfx_dispatched"]=any(x[0]=="click" for x in events["uiEvents"])
+  motifs=await page.evaluate("window.__audioProbe.motifNotes()")
+  report["character_motif_hz"]=motifs
+  report["checks"]["four_wizards_have_distinct_musical_motifs"]=len(set(motifs.values()))==4
   boss=await page.evaluate("window.__audioProbe.bossMix()")
   report["boss_mix"]=boss
   report["checks"]["boss_adaptive_layer_activates"]=boss["layers"]["boss"] is True
