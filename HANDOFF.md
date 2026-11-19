@@ -175,3 +175,15 @@ CAOS is read-only. Do not touch CAOS repositories or configuration.
 - Added controller instructions to the field manual.
 - Added a Chromium browser regression for analog movement, deadzone, edge-triggered interaction/ability and pause/resume.
 - Physical controller pairing and browser/device-specific Gamepad API behavior remain untested.
+
+
+## Solo enemy-balance and Gnasher telegraph checkpoint — 2026-11-19
+
+- Reduced enemy damage scaling to `1 + gameTime / 1800`.
+- Gnasher base damage is lower; leap damage is now 0.9× its scaled base damage rather than 1.7×.
+- Gnasher contact damage is 9% of its scaled base damage; its burrow pursuit is 2.4× movement speed and its attack recovery is longer.
+- Every Gnasher leap now commits a visible, zero-damage purple landing warning at the exact landing point for the 0.55-second leap window.
+- Crabladon base contact damage and ranged projectile damage were reduced; health and magnet pickup drops are more frequent.
+- Enemy population target grows more slowly late in a run.
+- Added `tests/enemy_balance_regression.py` to verify actual runtime damage formulas and the real burrow-to-leap warning transition.
+- The four-wizard natural-run matrix must be rerun. This change is not yet proof of a complete run or player acceptance.

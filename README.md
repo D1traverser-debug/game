@@ -19,3 +19,7 @@ Online co-op, lobbies, room servers, Unity/native builds and additional realms o
 - Browser regressions: Playwright scripts under tests/, including single_player_roster_map_regression.py.
 
 The static preview is emitted to dist/ with the HTML and eight runtime modules, byte lengths and SHA-256 hashes. A green CI run proves only the listed automated checks, not visual quality or owner acceptance.
+
+
+### Current single-player balance checkpoint
+The latest candidate includes a slower late-run enemy damage curve, a readable Gnasher landing warning, reduced Gnasher/Crabladon pressure, and more frequent recovery pickups. The four-wizard natural-run matrix is pending revalidation; this is not a release-ready build.

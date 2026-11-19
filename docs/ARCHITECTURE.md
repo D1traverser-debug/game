@@ -30,3 +30,8 @@ The 2.5D renderer now uses seven distinct landmark structures and nearby namepla
 ## One-realm natural-prop collision and navigation
 
 The shared world collision resolver now combines seven authored landmark footprints with generated tree, stone and bush footprints. Decorative solid props are rejected from landmark buffers, the central start/rift safe zone, river/bridge corridors and overlapping prop clusters. Player movement, enemy locomotion, boss locomotion, boss minions and moving objective actors use the same axis-separated slide resolver. Grass and flowers remain passable.
+
+
+## Solo enemy pressure and telegraph rules
+
+Enemy damage now scales with `1 + elapsedSeconds / 1800`. Gnasher leap damage, contact damage and burrow speed are isolated behind named functions so their balance can be regression-tested. The Gnasher leap snapshots its landing position and creates a zero-damage warning hazard at that exact point before resolving the leap. Enemy density grows more slowly in long runs; health and magnet drops provide additional recovery opportunities. These changes require full-run balance validation and do not imply human acceptance.

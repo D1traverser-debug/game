@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "GAMEPAD_CONTROL_COMPLETION_001",
+  "checkpoint": "SOLO_ENEMY_BALANCE_TELEGRAPH_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -283,7 +283,12 @@
     "Corrected a duplicated 'THE' in the main menu's world-title artwork.",
     "Completed standard Gamepad API mapping: left stick movement, button 0 (A/Cross) interaction, button 1 (B/Circle) wizard ability, button 9 (Start) pause/resume.",
     "All controller actions are edge-triggered; holding an input no longer repeats interaction, ability activation or pause toggles.",
-    "Updated the in-game manual with the standard controller mapping and added Playwright coverage for analog movement, deadzone, action edges and pause/resume."
+    "Updated the in-game manual with the standard controller mapping and added Playwright coverage for analog movement, deadzone, action edges and pause/resume.",
+    "Rebalanced the enemy damage curve from linear +1 per 20 minutes to +1 per 30 minutes; Gnasher leap, contact, and ranged projectile damage now use explicit bounded coefficients.",
+    "Reduced Gnasher base damage and spawn frequency, slowed its burrow pursuit, lengthened its recovery, and added a committed purple landing-zone warning before its leap.",
+    "Reduced late-run Crabladon contact damage and increased health/magnet pickup drop rates to support sustained solo play.",
+    "Reduced the late-run living-enemy target growth from one additional enemy every 34 seconds to every 40 seconds.",
+    "Added a browser regression that exercises the actual Gnasher burrow-to-leap transition, verifies its warning geometry, and bounds the damage formulas."
   ],
   "failed_or_open": [
     "2.5D atlas rendering is default; raw WebGL2 3D remains experimental. Renderer and real-device visual/performance acceptance are NOT_TESTED.",
@@ -300,9 +305,10 @@
     "Save import/export is implemented and under CI verification; cross-browser file chooser/download behavior still requires Firefox/WebKit and physical-device acceptance.",
     "Automated natural-run pilot currently fails to win with all four wizards: Aster, Ember and Nyx die before the boss schedule; Briar reaches the Mul'gath boss but dies during the encounter. Diagnose player-build choices, objective routing and combat pressure before claiming balance acceptance.",
     "Save export/import is implemented; current Playwright download/import regression and cross-browser file chooser behavior are pending CI and Firefox/WebKit acceptance.",
-    "Controller input mapping is implemented and under Chromium automation; physical Xbox/PlayStation controller pairing and browser-specific Gamepad API behavior remain untested."
+    "Controller input mapping is implemented and under Chromium automation; physical Xbox/PlayStation controller pairing and browser-specific Gamepad API behavior remain untested.",
+    "The four-wizard natural full-run matrix must be rerun on this balance candidate; automated and human full-run wins remain unverified until then."
   ],
-  "next_action": "Verify gamepad regression and package integrity; then use natural-run combat telemetry to fix objective routing and solo difficulty, followed by art/audio and cross-browser acceptance.",
+  "next_action": "Run enemy-balance, normal-play, objective, boss and four-wizard natural-run regressions; then address any remaining objective/boss failures before final art/audio and cross-browser acceptance.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -331,7 +337,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "GAMEPAD_CONTROL_CI_PENDING",
+  "latest_candidate_ci_status": "SOLO_ENEMY_BALANCE_CI_PENDING",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44131377996,
@@ -448,8 +454,8 @@
   "web_game_artifact": {
     "branch": "full-game",
     "path": "index.html",
-    "bytes": 0,
-    "status": "GAMEPAD_CONTROL_CI_PENDING",
+    "bytes": 785678,
+    "status": "SOLO_ENEMY_BALANCE_CI_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "self-contained prototype; no external runtime CDN",
@@ -488,7 +494,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contract tests; clock/damage browser integration; roster/map/ability; desktop/mobile character-selection layout; objective; save export/import; audio; normal-play; and natural-run exploratory regressions. Current save export/import CI pending.",
+    "core_tests": "22 Node contract tests; clock/damage browser integration; roster/map/ability; desktop/mobile character-selection layout; objective; save export/import; audio; normal-play; and natural-run exploratory regressions. Current save export/import CI pending. Enemy balance and Gnasher telegraph regression added.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -521,7 +527,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "Automated pilot confirms selection and browser stability but currently fails full boss victory. Added per-wizard damage-source, Gnasher, boss-health, upgrade and objective timeline telemetry to identify actual failure causes."
+    "natural_run_matrix": "Pending rerun after reducing late-run enemy damage scaling, Gnasher leap damage and contact pressure; no full-run win is claimed until the four-wizard matrix passes."
   },
   "last_single_player_ci": null
 }

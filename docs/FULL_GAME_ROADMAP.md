@@ -10,7 +10,7 @@
 - Audit all seven enemy archetypes and three bosses for telegraphs, hitboxes, damage, recovery and death.
 - Audit nine objective families for spawn bounds, navigation, collection, completion, timeout and softlock handling.
 - Audit spell catalogue, levels, augments, elements and scrolls; remove dead or misleading choices.
-- Balance all four wizards through repeatable natural runs on standard/severe/hardcore threat.
+- Balance all four wizards through repeatable natural runs on standard/severe/hardcore threat; validate telegraph readability, enemy damage curves, healing cadence and boss survival.
 
 ## Phase 3 — Presentation and UX
 - Distinct hero silhouettes/palettes and readable attack/ability feedback.
