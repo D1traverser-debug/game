@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "OBJECTIVE_RNG_INTEGRATION_001_CI_GREEN",
+  "checkpoint": "ENEMY_DIRECTOR_RNG_INTEGRATION_CANDIDATE_001",
   "status": "NOT_READY",
   "updated_at": "2026-11-19",
   "scope": {
@@ -328,7 +328,8 @@
     "GitHub Actions run 44507473452 on objective RNG candidate commit b99802cb1bc300a22dce1780d969cd42541db02c completed SUCCESS: all 25/25 required jobs passed, including Chromium/Firefox/WebKit, offline package, objective RNG regression, and four-wizard natural boss run.",
     "Objective RNG regression passed: 32/32 distinct objective traces across all nine objective families; fixed world-layout signature independent of run seed; render/audio/pause isolation; 8/8 unique ordinary run seeds; seed and algorithm version visible on result; no runtime errors or external requests.",
     "Four-wizard natural-run regression passed 4/4 after test-only seed recalibration for the new fixed world-layout stream: Aster seed 45 defeated Mul'gath at 1322.9s; Ember seed 42 defeated Sol'phish at 1242.5s; Briar seed 43 defeated Sol'phish at 1190.8s; Nyx seed 48 defeated Mul'gath at 1226.4s. All reached result screen with one recorded win.",
-    "Offline package uploaded as artifact 14519897430 (516232-byte ZIP; ZIP SHA-256 bb95c95e44437837782173cfa1da6b59b72546045785dcdf7ab16f13ca45dff1); embedded index.html is 803536 bytes with SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667."
+    "Offline package uploaded as artifact 14519897430 (516232-byte ZIP; ZIP SHA-256 bb95c95e44437837782173cfa1da6b59b72546045785dcdf7ab16f13ca45dff1); embedded index.html is 803536 bytes with SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667.",
+    "Enemy-director RNG candidate added on stacked branch work/enemy-director-rng-001: isolated per-run enemyRng PCG stream (sequence 0xE11E), deterministic monotonic enemy IDs, stable visual phase derived from ID, and extracted updateEnemyDirector for direct regression. Full CI pending."
   ],
   "failed_or_open": [
     "The four wizards still share a base atlas body beneath distinct mantles, headpieces, weapons and palettes; bespoke production rigs and authored animation remain incomplete.",
@@ -343,7 +344,7 @@
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
     "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines."
   ],
-  "next_action": "Record the green objective RNG checkpoint and proceed with a source audit of enemy-director randomness and entity identity allocation. Design the next bounded migration with same-seed spawn traces and behavior-parity tests; do not bulk-replace Math.random, do not claim full-run deterministic replay, and keep product status NOT_READY until owner/independent acceptance.",
+  "next_action": "Run full CI for enemy-director RNG candidate. If green, audit combat RNG separately (critical hits, dodge, elemental proc, drops, loot and spell procs) and define a bounded migration with natural-run behavior-parity checks. Do not bulk-replace Math.random or claim full-run deterministic replay.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -372,7 +373,7 @@
     "branch": "development",
     "status": "LEGACY_BROWSER_PROTOTYPE_ONLY"
   },
-  "latest_candidate_ci_status": "PASS_25_OF_25_OBJECTIVE_RNG_AND_FOUR_WIZARD_NATURAL_RUNS",
+  "latest_candidate_ci_status": "PENDING_ENEMY_DIRECTOR_RNG_CI",
   "last_verified_development_commit": "f40e2b41a8e8e725a5b72f90cfc0ee0aa04f9709",
   "last_verified_ci_run": {
     "run_id": 44491163465,
@@ -500,10 +501,10 @@
     "note": "Historical Unity skeleton only; not production target or active CI."
   },
   "web_game_artifact": {
-    "branch": "full-game",
+    "branch": "work/enemy-director-rng-001",
     "path": "index.html",
-    "bytes": 803536,
-    "status": "AUTOMATED_CI_PASS_OWNER_ACCEPTANCE_PENDING",
+    "bytes": 804222,
+    "status": "AUTOMATED_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
     "renderer_default": "2.5D atlas renderer",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "offline-capable static browser package with local ES modules; no external runtime CDN",
@@ -514,7 +515,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667"
+    "sha256": "0633fec15f368461fbc1e7c3b6ca5fc47b577fa48b188926d048c30950bbd934"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
@@ -531,7 +532,7 @@
     "hosting": "offline_static_preview_with_loopback_launcher",
     "browser_matrix": "PASS: GitHub Actions run 44507473452; Chromium, Firefox and WebKit desktop/mobile smoke passed. Physical iOS Safari/Android Chrome and real-device performance remain NOT_TESTED.",
     "status": "SINGLE_PLAYER_BROWSER_BUILD",
-    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK, DAMAGE_PIPELINE AND OBJECTIVE_RNG INTEGRATED; ENEMY_DIRECTOR/COMBAT/LOOT/SPELL/CHEST/BOSS RNG MIGRATION REMAINING",
+    "simulation_core": "PARTIAL: FIXED_STEP_CLOCK, DAMAGE_PIPELINE, OBJECTIVE_RNG AND ENEMY_DIRECTOR_RNG CANDIDATES INTEGRATED; COMBAT/LOOT/LEVEL_UP/SPELL/CHEST/BOSS RNG MIGRATION REMAINING",
     "core_modules": [
       "fixed-step-clock",
       "seeded-rng",
@@ -542,7 +543,7 @@
       "projectile-system",
       "spell-system"
     ],
-    "core_tests": "22 Node contracts plus fixed-step clock and damage-pipeline integration; objective_rng_regression passed in full CI run 44507473452.",
+    "core_tests": "22 Node contracts plus fixed-step clock and damage-pipeline integration; objective_rng_regression passed in CI 44507473452; enemy_director_rng_regression candidate added and awaiting full CI.",
     "runtime_modules_packaged": true,
     "package_includes": [
       "index.html",
@@ -651,6 +652,7 @@
     "Documented RNG stream ownership and bounded first integration slice: per-run SeededRng for objective generation, separate fixed world-layout/presentation/audio streams, and reproducibility/isolation acceptance tests.",
     "Implemented bounded PCG objective RNG candidate: per-run seed/stream for objective selection, variants, spawn offsets and brazier Fisher–Yates order; fixed/versioned world-layout stream for collision-bearing decoration; result-screen seed/version; browser regression added to CI. Full-run RNG migration remains incomplete.",
     "First CI run 44505974849: package integrity check passed with index.html 803536 bytes and SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667; objective_rng_regression passed. The checkpoint guard failed only because PROJECT_STATE still recorded 803533 bytes; metadata corrected, full CI rerun pending.",
-    "Objective RNG candidate full CI is green: run 44507473452, 25/25 jobs. All four natural wizard runs win after test-only seed fixture recalibration (Aster 45, Ember 42, Briar 43, Nyx 48). No production combat/balance changes were made for the recalibration."
+    "Objective RNG candidate full CI is green: run 44507473452, 25/25 jobs. All four natural wizard runs win after test-only seed fixture recalibration (Aster 45, Ember 42, Briar 43, Nyx 48). No production combat/balance changes were made for the recalibration.",
+    "Enemy-director RNG integration candidate: enemy spawns now use an independent PCG stream for spawn angle/distance, type selection, initial attack/heal timers and elite chance; boss-healer and objective crab-child spawn offsets use the same enemy stream. Enemy IDs are sequential per run and do not consume RNG. Added browser regression for same-seed traces, seven archetypes, stream isolation, director population pacing, ID uniqueness/cap and offline/no-error checks."
   ]
 }

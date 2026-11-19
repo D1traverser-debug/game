@@ -335,3 +335,13 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 - This closes the objective RNG integration's automated CI gate, not the product release gate. The PR remains draft/unmerged; owner playtest, physical device/controller checks, performance and final art/audio acceptance remain open. Product remains `NOT_READY`.
 - Next bounded engineering task: audit enemy-director spawn randomness and entity ID allocation; write a testable migration plan before touching runtime behavior. Do not bulk-replace `Math.random` and do not claim full-run replay.
 - CAOS remains read-only and unchanged.
+
+
+## Enemy director RNG integration candidate — 2026-11-19
+
+- Stacked branch: `work/enemy-director-rng-001`, based on the green objective RNG checkpoint.
+- Source audit: `spawnEnemy` mixed spawn angle/distance, archetype selection, initial attack/heal timers, elite probability and `Math.random()` enemy IDs. IDs also drive gnasher warning/projectile identity, homing projectile `uniqueHits`, and enemy visual bobbing. `game.nextCombatantId` is a separate damage-pipeline identity namespace and is unchanged. The enemy population director itself is deterministic and was extracted into `updateEnemyDirector(dt)` for direct testing.
+- Candidate implementation: separate per-run PCG stream `enemyRng` using sequence `0xE11E`; enemy spawn placement/type/timers/elite roll and boss-healer/objective crab-child spawn offsets use that stream. Enemy IDs are monotonic integers allocated by `game.nextEnemyId` and do not consume RNG. A stable visual phase is derived from each ID, avoiding random identity and preserving visual variation.
+- Added `tests/enemy_director_rng_regression.py` to the required browser-component matrix. It checks same-seed spawn traces, different-seed divergence across all seven enemy archetypes, monotonic unique IDs, render/audio/pause isolation, objective/enemy stream isolation, director population repeatability/targeting, ID allocation non-consumption, 64-enemy cap, offline behavior and runtime errors.
+- The builder's canonical source reconstruction was checked against `web/src/core/seeded-rng.mjs` and `src/game/boss_encounters.js`; the boss-healer spawn-offset change was applied to the canonical boss source as well as the generated HTML.
+- Candidate artifact checkpoint: `index.html` is 804222 bytes; SHA-256 `0633fec15f368461fbc1e7c3b6ca5fc47b577fa48b188926d048c30950bbd934`. CI pending. No combat/loot/spell/boss RNG migration, no enemy balance or population tuning changes. Product remains `NOT_READY`; CAOS remains read-only.

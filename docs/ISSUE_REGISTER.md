@@ -27,3 +27,8 @@ The objective RNG integration is intentionally partial: it does not make enemy/c
 ## Latest automated evidence — 2026-11-19 (objective RNG candidate)
 
 Run `44507473452` on candidate commit `b99802cb1bc300a22dce1780d969cd42541db02c` passed 25/25 jobs, including objective RNG isolation/replay checks, Chromium/Firefox/WebKit compatibility and all four natural wizard boss wins. The objective RNG integration slice is closed for automated CI. Full-run RNG coverage is still incomplete: enemy director, combat, loot, level-up, spell, chest and boss randomness remain on legacy call sites. Product status remains NOT_READY; owner and physical-device acceptance remain open.
+
+
+## Enemy director RNG candidate — 2026-11-19
+
+The next candidate isolates enemy spawn randomness and enemy entity identity. It does not claim combat determinism. `WEB-006` remains IN_PROGRESS until all gameplay entropy boundaries are migrated and release acceptance passes.
