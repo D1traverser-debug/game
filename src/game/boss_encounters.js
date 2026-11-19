@@ -130,7 +130,7 @@ function bossApplyMagneticField(b,dt){
 function spawnBoss(){
  const p=game.player,archetype=pick(BOSS_ARCHETYPES),rawLoc=game.bossPending||{x:p.x+rand(-400,400),y:p.y-520},loc=worldFindOpenPoint(rawLoc.x,rawLoc.y,Math.min(38,archetype.r*.45),360),mult=selectedThreat==='hardcore'?2.1:selectedThreat==='severe'?1.45:1;
  const b={id:'boss',type:'boss',bossId:archetype.id,name:archetype.name,x:loc.x,y:loc.y,r:archetype.r,hp:archetype.hp*mult,max:archetype.hp*mult,speed:archetype.speed,attack:2.5,rune:4,stagger:0,vulnerable:0,dead:false,hitFlash:0,elite:true,burn:0,burnDmg:0,acid:0,slow:0,freeze:0,weakness:0,corrupt:0,corruptT:0,age:0,phase:'hunt',phaseT:0,healTimer:8,phaseIndex:0,phaseCount:archetype.phaseCount,headCount:1,phaseTransitionTimer:0,attackCooldown:1.65,attackSequence:0,attackInstance:null,fieldActive:false,fieldCenter:null,fieldRadius:0,fieldHazard:null};
- save.stats.bossesEncountered=(save.stats.bossesEncountered||0)+1;persist();game.boss=b;game.bossPending=null;game.enemies.push(b);toast(archetype.name+' 正在穿越裂隙！');sound(75,.7,'sawtooth',.04);
+ save.stats.bossesEncountered=(save.stats.bossesEncountered||0)+1;persist();game.boss=b;game.bossPending=null;game.enemies.push(b);toast(archetype.name+' 正在穿越裂隙！');playSfx('boss');
 }
 function spawnBossHealer(b){
  if(game.enemies.filter(e=>!e.dead&&e.bossHealer).length>=5)return;
