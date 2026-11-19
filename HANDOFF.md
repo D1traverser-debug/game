@@ -348,3 +348,5 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 - Exact embedded `index.html`: 842422 UTF-8 bytes; SHA-256 `f25f45870d83db5a40bbafded5068d5ddca1e544c67cf051d983ac401b021fc9`. Project state metadata synchronized.
 - CI has not yet run on this candidate. Product status remains `NOT_READY`; owner review, physical device checks, full environment/enemy/spell/UI art coverage, authored-audio decision and final acceptance remain open. This is a presentation slice, not a claim that the full game is complete.
 - CAOS remains read-only and unchanged.
+
+- CI plumbing: the objective-RNG base branch now triggers the full PR matrix for objective/enemy feature branches and runs `python scripts/build_game.py --check` before packaging, so the embedded wizard atlas must be reproducible from its versioned source asset.
