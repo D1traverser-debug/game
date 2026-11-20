@@ -16,7 +16,11 @@ MARKER = "// Production build: internal debug mutations are test-only and not sh
 assert SOURCE.count(MARKER) == 1
 
 PROBE = r"""
+let __pendingNormalRunSeed=null;
+const __normalOriginalStartRun=startRun;
+startRun=(seed=null)=>{const effectiveSeed=seed===null?__pendingNormalRunSeed:seed;__pendingNormalRunSeed=null;return __normalOriginalStartRun(effectiveSeed)};
 window.__setRunSeed=(seed)=>{
+  __pendingNormalRunSeed=seed>>>0;
   let state=seed>>>0;
   Math.random=()=>{
     state=(Math.imul(1664525,state)+1013904223)>>>0;

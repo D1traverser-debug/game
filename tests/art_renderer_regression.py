@@ -1,4 +1,4 @@
-"""Regression for the canonical atlas-backed 2.5D enemy renderer.
+"""Regression for the canonical bespoke cached 2.5D creature renderer.
 
 The test injects diagnostics into an in-memory copy only. No debug API ships.
 """
@@ -20,14 +20,20 @@ def instrument(source: str) -> str:
     assert "const V2_SPRITES" not in source
     assert source.count("function buildDecorCache(decor)") == 1
     assert "buildDecorCache(game.decor)" in source
-    old = "function v2enemy(e){let t=V2.age"
+    old = "function v2enemy(e){"
     assert source.count(old) == 1
-    source = source.replace(old, "function v2enemy(e){window.__enemySpriteRenders=(window.__enemySpriteRenders||0)+1;let t=V2.age")
+    source = source.replace(old, "function v2enemy(e){window.__enemySpriteRenders=(window.__enemySpriteRenders||0)+1;", 1)
+    draw = "ctx.drawImage(sprite,-size/2,-size/2,size,size);"
+    assert source.count(draw) == 1
+    source = source.replace(draw, "window.__creatureSpriteDraws=(window.__creatureSpriteDraws||0)+1;" + draw, 1)
     probe = r"""
 window.__atlasSpriteDraws=0;
 const __originalV2Sprite=v2sprite;
 v2sprite=function(...args){window.__atlasSpriteDraws++;return __originalV2Sprite(...args)};
-window.__artProbe={snapshot:()=>({screen,atlasComplete:V2_ATLAS.complete,atlasWidth:V2_ATLAS.naturalWidth,atlasHeight:V2_ATLAS.naturalHeight,mode:save.renderMode,enemies:game?.enemies.filter(e=>!e.dead).length||0,enemySpriteRenders:window.__enemySpriteRenders||0,atlasSpriteDraws:window.__atlasSpriteDraws||0,cacheTiles:V2.decorTiles?.length||0})};
+window.__wizardSpriteDraws=0;
+const __originalWizardSprite=v2wizardSprite;
+v2wizardSprite=function(...args){window.__wizardSpriteDraws++;return __originalWizardSprite(...args)};
+window.__artProbe={snapshot:()=>({screen,atlasComplete:V2_ATLAS.complete,atlasWidth:V2_ATLAS.naturalWidth,atlasHeight:V2_ATLAS.naturalHeight,wizardAtlasReady:V2_WIZARD_ATLAS_READY,wizardAtlasWidth:V2_WIZARD_PACK.naturalWidth,wizardAtlasHeight:V2_WIZARD_PACK.naturalHeight,mode:save.renderMode,enemies:game?.enemies.filter(e=>!e.dead).length||0,enemySpriteRenders:window.__enemySpriteRenders||0,atlasSpriteDraws:window.__atlasSpriteDraws||0,wizardSpriteDraws:window.__wizardSpriteDraws||0,cacheTiles:V2.decorTiles?.length||0,creatureCacheTypes:V2_CREATURE_CACHE?Object.keys(V2_CREATURE_CACHE).length:0,creatureSpriteDraws:window.__creatureSpriteDraws||0})};
 """
     return source.replace(marker, probe + "\n" + marker)
 
@@ -53,8 +59,11 @@ async def main():
         report["checks"]["entered_play"] = state["screen"] == "playing"
         report["checks"]["atlas_loaded"] = state["atlasComplete"] and state["atlasWidth"] == 1024 and state["atlasHeight"] == 1024
         report["checks"]["enemies_spawned"] = state["enemies"] >= 8
-        report["checks"]["atlas_enemy_renderer_called"] = state["enemySpriteRenders"] > 0
-        report["checks"]["atlas_sprite_draws_occurred"] = state["atlasSpriteDraws"] > 0
+        report["checks"]["creature_renderer_called"] = state["enemySpriteRenders"] > 0
+        report["checks"]["seven_archetype_creature_cache_ready"] = state["creatureCacheTypes"] == 7
+        report["checks"]["creature_sprite_draws_occurred"] = state["creatureSpriteDraws"] > 0
+        report["checks"]["original_wizard_atlas_loaded"] = state["wizardAtlasReady"] and state["wizardAtlasWidth"] == 384 and state["wizardAtlasHeight"] == 384
+        report["checks"]["original_wizard_sprites_rendered"] = state["wizardSpriteDraws"] > 0
         report["checks"]["static_meadow_cache_baked"] = state["cacheTiles"] == 24
         report["checks"]["no_runtime_errors"] = not report["page_errors"] and not report["console_errors"]
         report["checks"]["no_external_requests"] = not report["external_requests"]
