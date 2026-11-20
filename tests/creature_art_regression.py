@@ -12,7 +12,7 @@ window.__creatureProbe={
  hash:(c)=>{const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let h=2166136261,n=0;for(let i=0;i<d.length;i+=4){h=Math.imul(h^d[i],16777619);h=Math.imul(h^d[i+1],16777619);h=Math.imul(h^d[i+2],16777619);if(d[i+3]>8)n++}return{hash:(h>>>0).toString(16),pixels:n}},
  enemy:(type,time,pose='walk')=>{const old=ctx,age=V2.age,c=document.createElement('canvas');c.width=180;c.height=160;ctx=c.getContext('2d');V2.age=time;const e={type,x:90,y:92,r:({crawler:18,sprout:16,ranged:16,buffer:17,shield:22,gnasher:24,crabladon:33})[type],hp:70,max:100,state:pose==='burrow'?'burrow':pose==='leap'?'leap':pose==='idle'?'idle':'chase',stateT:.27,attack:pose==='attack'?.08:1.2,hitFlash:pose==='hurt'?.15:0,freeze:0,burn:0,corruptT:0,elite:false};v2enemy(e);const out=window.__creatureProbe.hash(c);ctx=old;V2.age=age;return out},
  boss:(id,time,phase=0,heads=1,attackId='')=>{const old=ctx,age=V2.age,c=document.createElement('canvas');c.width=260;c.height=240;ctx=c.getContext('2d');V2.age=time;v2boss({bossId:id,x:130,y:128,r:id==='krog'?60:id==='sol'?52:56,hp:100,max:100,vulnerable:0,hitFlash:0,phaseIndex:phase,headCount:heads,attackInstance:attackId?{id:attackId,stage:'telegraph'}:null});const out=window.__creatureProbe.hash(c);ctx=old;V2.age=age;return out},
- cache:()=>({types:V2_CREATURE_CACHE?Object.keys(V2_CREATURE_CACHE).length:0,poses:V2_CREATURE_CACHE?Object.values(V2_CREATURE_CACHE).map(x=>Object.keys(x).length):[]}),
+ cache:()=>{v2buildCreatureCache();return{types:V2_CREATURE_CACHE?Object.keys(V2_CREATURE_CACHE).length:0,poses:V2_CREATURE_CACHE?Object.values(V2_CREATURE_CACHE).map(x=>Object.keys(x).length):[]}},
  sourceChecks:()=>({seven_types:V2_CREATURE_TYPES.length===7,five_poses:V2_CREATURE_POSES.length===5,three_boss_drawers:typeof v2bossSol==='function'&&typeof v2bossKrog==='function'&&typeof v2bossMul==='function',no_random:[String(v2drawCreature),String(v2drawBoss),String(v2buildCreatureCache)].every(x=>!x.includes('Math.random')&&!x.includes('worldRandom'))})
 };
 """
@@ -27,7 +27,7 @@ async def main():
   page.on("request",lambda r:report["external_requests"].append(r.url) if r.url.startswith(("http://","https://")) else None)
   await page.set_content(DOCUMENT,wait_until="load")
   await page.wait_for_function("window.__creatureProbe.ready()",timeout=10000)
-  cache=await page.evaluate("()=>{v2buildCreatureCache();return window.__creatureProbe.cache()}")
+  cache=await page.evaluate("window.__creatureProbe.cache()")
   report["checks"]["seven_archetypes_cached"]=cache["types"]==7
   report["checks"]["five_poses_each"]=cache["poses"]==[5]*7
   types=["crawler","sprout","ranged","buffer","shield","gnasher","crabladon"];hashes={};poses={}

@@ -1,4 +1,4 @@
-"""Regression for the canonical atlas-backed 2.5D enemy renderer.
+"""Regression for the canonical bespoke cached 2.5D creature renderer.
 
 The test injects diagnostics into an in-memory copy only. No debug API ships.
 """
@@ -22,7 +22,10 @@ def instrument(source: str) -> str:
     assert "buildDecorCache(game.decor)" in source
     old = "function v2enemy(e){"
     assert source.count(old) == 1
-    source = source.replace(old, "function v2enemy(e){window.__enemySpriteRenders=(window.__enemySpriteRenders||0)+1;window.__creatureSpriteDraws=(window.__creatureSpriteDraws||0)+1;", 1)
+    source = source.replace(old, "function v2enemy(e){window.__enemySpriteRenders=(window.__enemySpriteRenders||0)+1;", 1)
+    draw = "ctx.drawImage(sprite,-size/2,-size/2,size,size);"
+    assert source.count(draw) == 1
+    source = source.replace(draw, "window.__creatureSpriteDraws=(window.__creatureSpriteDraws||0)+1;" + draw, 1)
     probe = r"""
 window.__atlasSpriteDraws=0;
 const __originalV2Sprite=v2sprite;
@@ -57,7 +60,6 @@ async def main():
         report["checks"]["atlas_loaded"] = state["atlasComplete"] and state["atlasWidth"] == 1024 and state["atlasHeight"] == 1024
         report["checks"]["enemies_spawned"] = state["enemies"] >= 8
         report["checks"]["creature_renderer_called"] = state["enemySpriteRenders"] > 0
-        report["checks"]["atlas_sprite_draws_occurred"] = state["atlasSpriteDraws"] > 0
         report["checks"]["seven_archetype_creature_cache_ready"] = state["creatureCacheTypes"] == 7
         report["checks"]["creature_sprite_draws_occurred"] = state["creatureSpriteDraws"] > 0
         report["checks"]["original_wizard_atlas_loaded"] = state["wizardAtlasReady"] and state["wizardAtlasWidth"] == 384 and state["wizardAtlasHeight"] == 384
