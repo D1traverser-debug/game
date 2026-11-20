@@ -368,3 +368,16 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 - Added a dedicated browser visual regression and promoted it to the required content/visual CI matrix.
 - Product status remains NOT_READY. The custom 2D art is an original substitute, not source-game 3D asset parity. Human review, spell-specific VFX, UI art, audio listening, physical-device performance and source-version fidelity remain open.
 - CAOS remains read-only and untouched.
+
+
+## Creature art regression repair and full CI pass — 2026-11-20
+
+- Candidate branch: `work/production-creature-art-001`; commit `df507720bfb678993a9f54f7e0cb1697a8f81e0f`.
+- The first CI run (`44652465370`) exposed two test-harness mismatches, not a confirmed production renderer failure: `v2buildCreatureCache` is module-scoped and must be called through the injected probe closure; the art-renderer test still required legacy generic-atlas draws after enemies had moved to bespoke cached canvases.
+- Corrected the probe to build the cache inside `window.__creatureProbe.cache()`. Changed the live-renderer probe to count the actual cached-creature `ctx.drawImage(sprite, ...)` call and removed the obsolete generic-atlas draw requirement. No production simulation, balance, RNG or rendering code changed in this repair.
+- CI run `44653857044` completed **27/27 jobs PASS**. Deterministic build: `index.html` 857515 UTF-8 bytes, SHA-256 `ee959e218fc95cdeb65274c3ac953ddcae7b10a8f10bbb5f6fc734ca0ad33e23`; checkpoint `PASS_MECHANICAL_ONLY`.
+- Visual regression: all seven enemy silhouettes distinct; five cached poses per archetype; four visible action poses; three distinct bosses; Mul'gath phase/head growth and Krog'wa tongue-smash presentation pass. Live renderer produced 143 cached-creature draw calls in the smoke sample, with seven cache types, 24 static meadow tiles and no runtime errors/external requests.
+- Browser matrix: Chromium, Firefox and WebKit desktop/mobile smoke passed. Natural-run gate: Aster seed 45 defeated Mul'gath; Ember seed 42 defeated Sol'phish; Briar seed 43 defeated Sol'phish; Nyx seed 48 defeated Mul'gath (4/4).
+- Offline artifact: [aetherwilds-browser-preview](https://github.com/D1traverser-debug/game/actions/runs/44653857044/artifacts/14592656128), ID `14592656128`, ZIP 550823 bytes, SHA-256 `8e32cabd2207d18d174030cf492f7475a92546326e87279cf5ac34b7ef9d0a49`.
+- This closes the creature-art candidate's automated gate, not product acceptance. Source-game 3D parity, normal-scale owner visual review, full spell-specific VFX, UI art, owner listening review, physical devices, representative hardware performance and full source-version fidelity remain open. Product remains `NOT_READY`; CAOS remains read-only.
+- Next bounded engineering slice: spell-specific VFX across all 25 runtime spell definitions, with deterministic/offline visual regression; then UI art hierarchy. Do not alter combat numbers or gameplay RNG as part of the presentation slice.

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "PRODUCTION_CREATURE_ART_CANDIDATE_001_PENDING",
+  "checkpoint": "PRODUCTION_CREATURE_ART_CANDIDATE_001_CI_PASS",
   "status": "NOT_READY",
   "updated_at": "2026-11-20",
   "scope": {
@@ -328,11 +328,17 @@
     "GitHub Actions run 44507473452 on objective RNG candidate commit b99802cb1bc300a22dce1780d969cd42541db02c completed SUCCESS: all 25/25 required jobs passed, including Chromium/Firefox/WebKit, offline package, objective RNG regression, and four-wizard natural boss run.",
     "Objective RNG regression passed: 32/32 distinct objective traces across all nine objective families; fixed world-layout signature independent of run seed; render/audio/pause isolation; 8/8 unique ordinary run seeds; seed and algorithm version visible on result; no runtime errors or external requests.",
     "Four-wizard natural-run regression passed 4/4 after test-only seed recalibration for the new fixed world-layout stream: Aster seed 45 defeated Mul'gath at 1322.9s; Ember seed 42 defeated Sol'phish at 1242.5s; Briar seed 43 defeated Sol'phish at 1190.8s; Nyx seed 48 defeated Mul'gath at 1226.4s. All reached result screen with one recorded win.",
-    "Offline package uploaded as artifact 14519897430 (516232-byte ZIP; ZIP SHA-256 bb95c95e44437837782173cfa1da6b59b72546045785dcdf7ab16f13ca45dff1); embedded index.html is 803536 bytes with SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667."
+    "Offline package uploaded as artifact 14519897430 (516232-byte ZIP; ZIP SHA-256 bb95c95e44437837782173cfa1da6b59b72546045785dcdf7ab16f13ca45dff1); embedded index.html is 803536 bytes with SHA-256 ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667.",
+    "Fixed two visual-regression harness mismatches on the creature-art candidate: the module-scoped creature cache is now built through the injected closure, and the live renderer regression counts actual cached-creature drawImage calls instead of requiring obsolete generic-atlas draws. No production gameplay behavior changed.",
+    "GitHub Actions run 44653857044 on commit df507720bfb678993a9f54f7e0cb1697a8f81e0f passed all 27/27 jobs, including checkpoint, deterministic build, Chromium/Firefox/WebKit, all browser component/visual regressions, offline package and four-wizard natural boss gate.",
+    "Creature-art regression passed: seven distinct enemy silhouettes, five cached poses per archetype, four visible poses, three distinct boss silhouettes, Mul'gath phase/head growth, Krog'wa tongue-smash presentation, no runtime errors and no external requests.",
+    "Live renderer regression passed: seven creature caches ready, actual cached sprite draws, original wizard atlas and player sprites rendered, 24 static meadow cache tiles, no runtime errors and no external requests.",
+    "Four natural expeditions won on the exact candidate: Aster seed 45 / Mul'gath; Ember seed 42 / Sol'phish; Briar seed 43 / Sol'phish; Nyx seed 48 / Mul'gath. All reached the result screen.",
+    "Offline package uploaded as artifact 14592656128 (550823-byte ZIP; SHA-256 8e32cabd2207d18d174030cf492f7475a92546326e87279cf5ac34b7ef9d0a49); embedded index.html is 857515 bytes with SHA-256 ee959e218fc95cdeb65274c3ac953ddcae7b10a8f10bbb5f6fc734ca0ad33e23."
   ],
   "failed_or_open": [
     "Four unique original wizard sprite rows and idle/walk/cast/ability poses now render from a bespoke 4x4 atlas; final silhouette readability, pose timing, hit feedback and owner acceptance remain open.",
-    "Original wizard identity art is integrated; deterministic environment atmosphere and layered spell-impact presentation now have a CI-pending candidate, while bespoke enemy animation, spell-specific VFX, UI and full animation coverage remain incomplete.",
+    "Original wizard art, deterministic environment atmosphere/film grain/layered impact VFX, seven bespoke enemy archetypes and three distinct boss silhouettes are integrated and pass automated CI; full spell-specific VFX, UI art, owner review and production animation parity remain incomplete.",
     "The full source-version content manifest remains unresolved across spells, augments, elements/infusions, enemies, objectives, bosses, quests and meta progression.",
     "Physical iOS Safari/Android Chrome, real hardware controllers, representative GPU performance, memory and 15-minute stability are NOT_TESTED; current Chromium/Firefox/WebKit automation passed.",
     "Deterministic RNG integration is partial: per-run PCG covers objective generation and a fixed world-layout stream covers collision-bearing decoration; enemy director, combat, loot, level-up, spell, chest and boss random call sites remain on legacy randomness.",
@@ -342,10 +348,10 @@
     "The four-wizard natural-run matrix achieved 4/4 automated wins on commit 63fd96a; repeated seeds, all threat levels and human difficulty acceptance remain open.",
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
     "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines.",
-    "Seven original enemy archetype silhouettes and three distinct boss renderers are integrated in a 2D Canvas substitute; normal-scale readability, attack-pose timing, physical-device performance and owner visual acceptance remain NOT_TESTED.",
+    "Seven original enemy archetype silhouettes and three distinct boss renderers are integrated in a 2D Canvas substitute and pass CI; normal-scale readability, attack-pose timing, physical-device performance and owner visual acceptance remain NOT_TESTED.",
     "Spell-specific VFX for the full spell catalogue, UI art hierarchy, authored audio decision and full source-version fidelity remain incomplete."
   ],
-  "next_action": "Run the full required CI matrix on work/production-environment-vfx-001. Inspect the environment visual regression and packaged browser artifact; then continue enemy/creature animation, spell-specific VFX and UI art. Product remains NOT_READY.",
+  "next_action": "Continue on an isolated branch from the passing creature-art candidate. Next bounded slice: replace generic spell/projectile/hazard presentation with distinct spell-specific VFX across the 25 runtime spell definitions, add a visual regression for every supported effect family, and preserve simulation values/RNG/offline invariants. Then address UI art hierarchy. Keep product NOT_READY until owner playtest, visual/audio review, physical-device/performance and source-version acceptance.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
   "branch": "full-game",
   "last_main_baseline_commit": "eace4cb66f282d35c663f3a13d6e39ff8a15e0b8",
@@ -505,7 +511,7 @@
     "branch": "work/production-creature-art-001",
     "path": "index.html",
     "bytes": 857515,
-    "status": "CREATURE_ART_CANDIDATE_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
+    "status": "AUTOMATED_CI_PASS_OWNER_ACCEPTANCE_PENDING",
     "renderer_default": "2.5D atlas renderer with original four-wizard action atlas, seven bespoke cached creature archetypes, three distinct boss silhouettes, deterministic world atmosphere and layered spell-impact VFX",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "offline-capable static browser package with local ES modules; no external runtime CDN",
@@ -516,7 +522,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "PENDING_CI_BUILD_HASH"
+    "sha256": "ee959e218fc95cdeb65274c3ac953ddcae7b10a8f10bbb5f6fc734ca0ad33e23"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
@@ -531,7 +537,7 @@
     "multiplayer": "OUT_OF_SCOPE",
     "multiplayer_target": "NONE",
     "hosting": "offline_static_preview_with_loopback_launcher",
-    "browser_matrix": "PASS: GitHub Actions run 44507473452; Chromium, Firefox and WebKit desktop/mobile smoke passed. Physical iOS Safari/Android Chrome and real-device performance remain NOT_TESTED.",
+    "browser_matrix": "PASS: GitHub Actions run 44653857044; Chromium, Firefox and WebKit desktop/mobile smoke passed. Physical iOS Safari/Android Chrome and real-device performance remain NOT_TESTED.",
     "status": "SINGLE_PLAYER_BROWSER_BUILD",
     "simulation_core": "PARTIAL: FIXED_STEP_CLOCK, DAMAGE_PIPELINE AND OBJECTIVE_RNG INTEGRATED; ENEMY_DIRECTOR/COMBAT/LOOT/SPELL/CHEST/BOSS RNG MIGRATION REMAINING",
     "core_modules": [
@@ -577,7 +583,7 @@
       "decor_collision": "TREES_STONES_BUSHES_SOLID_WITH_CLEAR_START_RIFT_RIVER_BRIDGES_AND_LANDMARKS",
       "ai_navigation": "PLAYER_ENEMIES_GNASHER_LEAPS_BOSS_BOSS_MINIONS_AND_MOVING_OBJECTIVES_USE_SHARED_COLLISION_RESOLVER"
     },
-    "natural_run_matrix": "PASS on candidate commit b99802cb1bc300a22dce1780d969cd42541db02c / CI 44507473452: Aster defeated Mul'gath, Ember defeated Sol'phish, Briar defeated Sol'phish, Nyx defeated Mul'gath (4/4). Automated test-only pilot; human playtest and owner acceptance remain open.",
+    "natural_run_matrix": "PASS on candidate commit df507720bfb678993a9f54f7e0cb1697a8f81e0f / CI 44653857044: Aster seed 45 defeated Mul'gath; Ember seed 42 defeated Sol'phish; Briar seed 43 defeated Sol'phish; Nyx seed 48 defeated Mul'gath. Automated test-only pilots; human playtest and owner acceptance remain open.",
     "launcher": {
       "windows": "PLAY.bat",
       "unix": "PLAY.sh",
@@ -615,25 +621,26 @@
     }
   },
   "last_single_player_ci": {
-    "run_id": 44507473452,
-    "url": "https://github.com/D1traverser-debug/game/actions/runs/44507473452",
-    "commit": "b99802cb1bc300a22dce1780d969cd42541db02c",
+    "run_id": 44653857044,
+    "url": "https://github.com/D1traverser-debug/game/actions/runs/44653857044",
+    "commit": "df507720bfb678993a9f54f7e0cb1697a8f81e0f",
     "conclusion": "success",
-    "jobs_passed": 25,
-    "jobs_total": 25,
+    "jobs_passed": 27,
+    "jobs_total": 27,
     "checkpoint": "PASS_MECHANICAL_ONLY",
-    "objective_rng_regression": "PASS: 32/32 unique objective traces across all nine objective families; fixed world layout independent of run seed; render/audio/pause isolation; eight unique fresh run seeds; result seed/version visible; zero runtime errors and external requests.",
+    "build_reproducibility": "PASS: index.html 857515 UTF-8 bytes; SHA-256 ee959e218fc95cdeb65274c3ac953ddcae7b10a8f10bbb5f6fc734ca0ad33e23.",
+    "creature_art_regression": "PASS: seven distinct enemy silhouettes, five cached poses per archetype, four visible action poses, three distinct bosses, Mul'gath phase/head growth, Krog'wa tongue-smash pose, no runtime errors or external requests.",
     "browser_matrix": "Chromium, Firefox and WebKit desktop/mobile smoke passed.",
     "natural_run_matrix": "4/4 automated natural boss wins: Aster/Mul'gath (seed 45), Ember/Sol'phish (seed 42), Briar/Sol'phish (seed 43), Nyx/Mul'gath (seed 48).",
-    "artifact_id": 14519897430,
-    "artifact_url": "https://github.com/D1traverser-debug/game/actions/runs/44507473452/artifacts/14519897430",
-    "artifact_zip_bytes": 516232,
-    "artifact_sha256": "bb95c95e44437837782173cfa1da6b59b72546045785dcdf7ab16f13ca45dff1",
-    "artifact_bytes": 803536,
-    "artifact_html_sha256": "ce35b6d2402a004f467e7d579283f3ae4f5bfdb44cb6e0e46fd886a644f0f667",
+    "artifact_id": 14592656128,
+    "artifact_url": "https://github.com/D1traverser-debug/game/actions/runs/44653857044/artifacts/14592656128",
+    "artifact_zip_bytes": 550823,
+    "artifact_sha256": "8e32cabd2207d18d174030cf492f7475a92546326e87279cf5ac34b7ef9d0a49",
+    "artifact_bytes": 857515,
+    "artifact_html_sha256": "ee959e218fc95cdeb65274c3ac953ddcae7b10a8f10bbb5f6fc734ca0ad33e23",
     "scope": "One-realm offline browser single-player; automated CI evidence only, not owner acceptance.",
-    "required_jobs_passed": 25,
-    "required_jobs_total": 25
+    "required_jobs_passed": 27,
+    "required_jobs_total": 27
   },
   "candidate_work": [
     "Added persistent independent music, combat SFX, ambience and UI volume controls with master mute and audio preview.",
@@ -657,6 +664,7 @@
     "Production art/audio candidate on work/production-art-vfx-audio-002: generated and integrated an original 4x4 AVIF atlas (Aster/Ember/Briar/Nyx × idle/walk/cast/ability), selection portraits, action-driven in-world poses, deterministic character-specific orbit VFX, four adaptive music motifs and forest bird ambience. Added visual/art/audio regressions and build-time offline atlas embedding. CI pending; no owner acceptance claimed.",
     "Environment/VFX presentation candidate on work/production-environment-vfx-001: added deterministic animated river shimmer, world-anchored pollen/fireflies, three-frame film grain and layered spell beam/slash/burst/ring impacts. Added environment_visual_regression.py to required CI. No gameplay RNG changes; CI pending.",
     "The environment/VFX candidate CI matrix now includes a canonical scripts/build_game.py --check gate before packaging, in addition to the new environment visual regression.",
-    "Creature-art candidate on work/production-creature-art-001: replaced shared enemy atlas-body presentation with seven original cached archetypes and five action poses each; added distinct Sol'phish, Krog'wa and phase-aware Mul'gath silhouettes; no gameplay tuning or RNG changes; dedicated visual regression promoted to required CI."
+    "Creature-art candidate on work/production-creature-art-001: replaced shared enemy atlas-body presentation with seven original cached archetypes and five action poses each; added distinct Sol'phish, Krog'wa and phase-aware Mul'gath silhouettes; no gameplay tuning or RNG changes; dedicated visual regression promoted to required CI.",
+    "Creature-art CI repair and full pass — 2026-11-20: corrected module-closure probe invocation and obsolete atlas-render assertion; 27/27 jobs passed, including seven enemy archetypes, three bosses, browser matrix, four natural boss wins and reproducible offline package."
   ]
 }
