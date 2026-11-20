@@ -130,7 +130,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [game3d_integration, trial_unlock_regression, art_renderer_regression, solo_spell_catalog_regression, boss_encounter_regression, wizard_visual_identity_regression, environment_visual_regression]
+        test: [game3d_integration, trial_unlock_regression, art_renderer_regression, creature_art_regression, solo_spell_catalog_regression, boss_encounter_regression, wizard_visual_identity_regression, environment_visual_regression]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

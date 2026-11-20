@@ -37,3 +37,8 @@ A first original-IP wizard identity pass is integrated: four unique sprite rows,
 ## Environment/VFX presentation candidate — 2026-11-20
 
 A bounded renderer pass adds animated water caustics, deterministic world-space ambience, a subtle moving grain layer and richer spell-impact geometry. The automated visual gate verifies these effects are wired into the 2.5D play path and remain independent of gameplay randomness. Next priorities remain authored enemy/creature animation, spell-specific VFX, UI hierarchy, source-version content reconciliation and human playtest.
+
+
+## Creature identity and combat readability pass — 2026-11-20 candidate
+
+Seven original enemy archetype renderers and three distinct boss silhouettes now replace the shared atlas-body presentation. Each standard creature has idle, alternating walk, attack and hurt poses, with deterministic cached rendering and state overlays. Next: compare silhouettes and attack tells at real camera distance, expand per-spell impact/VFX identities, complete UI art hierarchy, and verify performance on representative hardware before owner acceptance.

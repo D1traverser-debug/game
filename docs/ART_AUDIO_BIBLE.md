@@ -39,3 +39,12 @@ No copied commercial character/creature designs, extracted assets or proprietary
 ## Environment atmosphere and spell-impact presentation — 2026-11-20 candidate
 
 The 2.5D renderer adds deterministic moving river highlights, world-anchored pollen/fireflies, a three-frame film-grain overlay and layered beam/slash/burst/ring impacts. These effects use render time and coordinate hashes only; they do not consume gameplay RNG or add runtime network assets. The environment visual regression checks visible output, temporal variation, render-path wiring, offline behavior and runtime errors. This is an original atmospheric treatment, not source-game asset parity or owner acceptance.
+
+
+## Original creature and boss identity pass — 2026-11-20 candidate
+
+- Replaced the shared enemy-atlas body presentation with seven original, cached 2D creature silhouettes: Crawler, Sprout, Ranged Wisp, Buffer, Shield Crab, Gnasher and Crabladon.
+- Each archetype has five pre-rendered action poses (idle, two alternating locomotion frames, attack and hurt). State-driven rendering selects the pose; status overlays preserve readable freeze, burn, corruption and elite feedback.
+- Rebuilt the three boss silhouettes as distinct original forms: Sol'phish (abyssal leviathan), Krog'wa (armoured amphibian) and Mul'gath (multi-headed void hydra). Mul'gath's visible head count follows the actual boss phase state; Krog'wa's tongue-smash telegraph changes the boss pose.
+- Creature shapes are generated locally with Canvas paths and gradients, cached once, and remain offline. Presentation animation is deterministic and does not consume gameplay RNG.
+- This is an original 2D art substitute, not a claim of source-game 3D asset or rig parity. Gameplay-scale readability, frame pacing, colour-blind/status contrast, physical-device performance and owner visual acceptance remain open.

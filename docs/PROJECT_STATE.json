@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project": "Aetherwilds Single-Player Browser Roguelite",
   "repository": "D1traverser-debug/game",
-  "checkpoint": "PRODUCTION_ENVIRONMENT_VFX_CANDIDATE_001_PENDING",
+  "checkpoint": "PRODUCTION_CREATURE_ART_CANDIDATE_001_PENDING",
   "status": "NOT_READY",
   "updated_at": "2026-11-20",
   "scope": {
@@ -341,7 +341,9 @@
     "Character-specific procedural music motifs and sparse forest ambience calls are integrated; SFX and the overall mix remain procedural and still require owner listening/loudness acceptance.",
     "The four-wizard natural-run matrix achieved 4/4 automated wins on commit 63fd96a; repeated seeds, all threat levels and human difficulty acceptance remain open.",
     "The owner has not completed unassisted playtesting or final visual/audio review of the exact build; independent product acceptance remains NOT_TESTED.",
-    "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines."
+    "Windows/macOS/Linux one-click launcher and persistent storage still require verification on the owner's actual machines.",
+    "Seven original enemy archetype silhouettes and three distinct boss renderers are integrated in a 2D Canvas substitute; normal-scale readability, attack-pose timing, physical-device performance and owner visual acceptance remain NOT_TESTED.",
+    "Spell-specific VFX for the full spell catalogue, UI art hierarchy, authored audio decision and full source-version fidelity remain incomplete."
   ],
   "next_action": "Run the full required CI matrix on work/production-environment-vfx-001. Inspect the environment visual regression and packaged browser artifact; then continue enemy/creature animation, spell-specific VFX and UI art. Product remains NOT_READY.",
   "caos_boundary": "CAOS remains read-only. Do not modify CAOS repositories, branches, files, PRs, plugins, Skills, docs, configuration or data.",
@@ -500,11 +502,11 @@
     "note": "Historical Unity skeleton only; not production target or active CI."
   },
   "web_game_artifact": {
-    "branch": "work/production-environment-vfx-001",
+    "branch": "work/production-creature-art-001",
     "path": "index.html",
-    "bytes": 847131,
-    "status": "ENVIRONMENT_VFX_CANDIDATE_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
-    "renderer_default": "2.5D atlas renderer with original four-wizard action atlas, deterministic world atmosphere and layered spell-impact VFX",
+    "bytes": 857515,
+    "status": "CREATURE_ART_CANDIDATE_CI_PENDING_OWNER_ACCEPTANCE_PENDING",
+    "renderer_default": "2.5D atlas renderer with original four-wizard action atlas, seven bespoke cached creature archetypes, three distinct boss silhouettes, deterministic world atmosphere and layered spell-impact VFX",
     "renderer_experimental": "raw WebGL2 3D",
     "runtime_dependencies": "offline-capable static browser package with local ES modules; no external runtime CDN",
     "map": "verdant_wilds · 2400x1800 · six districts · seven landmarks",
@@ -514,7 +516,7 @@
       "briar",
       "nyx"
     ],
-    "sha256": "f25f45870d83db5a40bbafded5068d5ddca1e544c67cf051d983ac401b021fc9"
+    "sha256": "PENDING_CI_BUILD_HASH"
   },
   "web_runtime": {
     "delivery": "downloadable_static_web_package_with_one_click_local_launch",
@@ -654,6 +656,7 @@
     "Objective RNG candidate full CI is green: run 44507473452, 25/25 jobs. All four natural wizard runs win after test-only seed fixture recalibration (Aster 45, Ember 42, Briar 43, Nyx 48). No production combat/balance changes were made for the recalibration.",
     "Production art/audio candidate on work/production-art-vfx-audio-002: generated and integrated an original 4x4 AVIF atlas (Aster/Ember/Briar/Nyx × idle/walk/cast/ability), selection portraits, action-driven in-world poses, deterministic character-specific orbit VFX, four adaptive music motifs and forest bird ambience. Added visual/art/audio regressions and build-time offline atlas embedding. CI pending; no owner acceptance claimed.",
     "Environment/VFX presentation candidate on work/production-environment-vfx-001: added deterministic animated river shimmer, world-anchored pollen/fireflies, three-frame film grain and layered spell beam/slash/burst/ring impacts. Added environment_visual_regression.py to required CI. No gameplay RNG changes; CI pending.",
-    "The environment/VFX candidate CI matrix now includes a canonical scripts/build_game.py --check gate before packaging, in addition to the new environment visual regression."
+    "The environment/VFX candidate CI matrix now includes a canonical scripts/build_game.py --check gate before packaging, in addition to the new environment visual regression.",
+    "Creature-art candidate on work/production-creature-art-001: replaced shared enemy atlas-body presentation with seven original cached archetypes and five action poses each; added distinct Sol'phish, Krog'wa and phase-aware Mul'gath silhouettes; no gameplay tuning or RNG changes; dedicated visual regression promoted to required CI."
   ]
 }
