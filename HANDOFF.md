@@ -359,3 +359,12 @@ Run `44505974849` verified the offline package (`803536` bytes; SHA-256 `ce35b6d
 - Presentation code uses `V2.age` and stable coordinate hashes only; no `Math.random`, world-layout RNG or per-run RNG calls were added.
 - Added `tests/environment_visual_regression.py` and wired it into the required browser-content-visual matrix. CI pending.
 - This does not close bespoke enemy animation, full spell-specific VFX, UI art, source-game fidelity, owner visual acceptance or physical-device/performance gates. Product remains `NOT_READY`; CAOS remains read-only.
+
+
+## Creature art candidate — 2026-11-20
+
+- Continued from the latest passing environment/VFX candidate (4ac13f24a116f6fa64e389c8da3309e4a838fa3a) on isolated branch work/production-creature-art-001; the stale work/production-art-vfx-audio-001 branch was not used.
+- Added seven original enemy silhouettes with five cached poses each and three distinct boss renderers. Mul'gath's head growth and Krog'wa's tongue-smash pose follow existing encounter state; no combat numbers, spawn rates or gameplay outcomes were changed.
+- Added a dedicated browser visual regression and promoted it to the required content/visual CI matrix.
+- Product status remains NOT_READY. The custom 2D art is an original substitute, not source-game 3D asset parity. Human review, spell-specific VFX, UI art, audio listening, physical-device performance and source-version fidelity remain open.
+- CAOS remains read-only and untouched.
